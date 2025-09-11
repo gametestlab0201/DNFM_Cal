@@ -1,0 +1,54 @@
+[
+  {
+    "id": "do_001",
+    "slot": "weapon",
+    "name": "청룡도",
+    "img": "./portraits/버서커.png",
+    "job_groups": ["slayer"],
+    "type": "도",
+    "rarity": "epic",
+    "stats": {
+      "phys_atk": 1200, "mag_atk": 0, "str": 50, "int": 0,
+      "phys_crit": 0, "mag_crit": 0, "acc": 0,
+      "phys_crit_rate": 0, "mag_crit_rate": 0,
+      "add_damage": 0.08, "counter_add_damage": 0,
+      "str_pct": 0, "int_pct": 0, "damage_inc": 0.1, "counter_damage_inc": 0,
+      "crit_damage_inc": 0, "phys_atk_pct": 0.12, "mag_atk_pct": 0, "skill_atk_inc": 0,
+      "elem": { "fire": 0, "water": 0, "light": 0, "dark": 0, "all": 0 },
+      "elem_add_damage": { "fire": 0, "water": 0, "light": 0, "dark": 0 },
+      "def_reduction": 0,
+      "speed": { "attack": 0, "move": 0, "cast": 0 },
+      "dot_add": { "poison": 0, "bleed": 0, "burn": 0, "shock": 0 },
+      "dot_inc":  { "poison": 0, "bleed": 0, "burn": 0, "shock": 0 },
+      "skill_levels": []
+    },
+    "effects": [],
+    "notes": []
+  },
+  {
+    "id": "staff_001",
+    "slot": "weapon",
+    "name": "별의 스태프",
+    "img": "./portraits/로터스.png",
+    "job_groups": ["mage"],
+    "type": "스태프",
+    "rarity": "epic",
+    "stats": {
+      "phys_atk": 0, "mag_atk": 1300, "str": 0, "int": 60,
+      "phys_crit": 0, "mag_crit": 0, "acc": 0,
+      "phys_crit_rate": 0, "mag_crit_rate": 0.1,
+      "add_damage": 0.06, "counter_add_damage": 0,
+      "str_pct": 0, "int_pct": 0.12, "damage_inc": 0.08, "counter_damage_inc": 0,
+      "crit_damage_inc": 0.2, "phys_atk_pct": 0, "mag_atk_pct": 0.15, "skill_atk_inc": 0.1,
+      "elem": { "fire": 15, "water": 0, "light": 0, "dark": 0, "all": 0 },
+      "elem_add_damage": { "fire": 0.07, "water": 0, "light": 0, "dark": 0 },
+      "def_reduction": 0,
+      "speed": { "attack": 0, "move": 0.03, "cast": 0.08 },
+      "dot_add": { "poison": 0, "bleed": 0, "burn": 0, "shock": 0 },
+      "dot_inc":  { "poison": 0, "bleed": 0, "burn": 0, "shock": 0 },
+      "skill_levels": []
+    },
+    "effects": [],
+    "notes": []
+  }
+]

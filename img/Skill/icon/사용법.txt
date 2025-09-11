@@ -1,0 +1,16 @@
+1. AssetStudio 열기
+2. 던파m 폴더 - 던파m데이터폴더 - 스트리밍아셋 - 번들 폴더
+3. skillicon 검색하면 남자캐릭스킬, atskillicon 검색하면 여자캐릭스킬 나옴
+equipment_01_weapon 검색하면 무기나옴
+equipment_02_cloth 검색하면 방어구나옴
+equipment_07 반지
+equipment_08 목걸이
+equipment_09 팔찌
+4. AssetStudio 에 드래그해도 되고, File - Load file 해서 열기
+5. Asset List 에 뜨면 우클릭 하여 export 실행
+6. 아이콘모음사진을 input 으로 이름변경
+7. 그림판 3d 를 열어 투명배경바꾸지말고 검은색배경 입히고 저장
+8. cmd 열기
+9. cd C:\Users\SSW\Desktop\Texture2D위치입력
+10. convert input.png -crop 130x130 output.png 입력
+11. 동일폴더에 저장 완료!
