@@ -1825,6 +1825,8 @@
     // ===== SP/TP 상태 및 렌더 =====
     state.sp = state.sp || { total: 0, left: 0 };
     state.tp = state.tp || { total: 0, left: 0 };
+    state.skillTpLv = state.skillTpLv || {};   // TP 레벨 저장(사용 중이 아니어도 무해)
+state.skillDmg  = state.skillDmg  || {};   // ★ 스킬 현재 데미지 캐시 {id: { per, flat, lv }}
 
     
 
@@ -2130,7 +2132,7 @@ document.addEventListener('click', (e)=>{
     function refundTp(cost) { state.tp.left = Math.min((state.tp.total ?? 0), (state.tp.left ?? 0) + (Number(cost) || 0)); renderSpTp(); }
     function noSpFeedback() { alert('SP가 부족합니다.'); }
     function noTpFeedback() { alert('TP가 부족합니다.'); }
-    async function loadCharTotalsAndApply(charName) {
+    async function loadCharTotalsAndApply(charName) {     // 선택된 캐릭터의 총 sp/tp 한도를 시트에서 읽어와 상태(state)에 반영하는 초기화 루틴
       try {
         const url = (typeof CHAR_SHEET_SAFE !== 'undefined' && CHAR_SHEET_SAFE) ?
           CHAR_SHEET_SAFE : (typeof CHAR_SHEET !== 'undefined' ? CHAR_SHEET : null);
@@ -2214,34 +2216,50 @@ document.addEventListener('click', (e)=>{
     };
     /** 시트 → 표준 스킬 객체 매핑 */
     // 교체할 함수
-    function mapRowToSkill2(r) {
-      // 1) 캐릭터 키(시트 '캐릭터명'과 정확히 일치, 공백 제거)
-      const who = String(r['캐릭터명'] || '').replace(/\s+/g, '');
-      // 2) 노출/정렬/좌표
-      const show = Number(String(r['노출여부'] || '').trim()) === 1;
-      const level = Number(String(r['스킬렙제'] || '').trim()) || 0;
-      const x = Math.min(6, Math.max(1, Number(String(r['가로위치'] || '').trim()) || 1));
-      const y = Math.max(1, Number(String(r['세로위치'] || '').trim()) || 1);
-      // 3) 핵심 필드(스펙: 스킬명/이미지 사용)
-      const name = String(r['스킬명'] || '').trim();
-      const img = cleanUrl(r['이미지'] || '') || PLACEHOLDER_IMG;
-      // 4) 최소/최대 스킬 레벨
-      const minLv = Math.max(0, Number(String(r['최소스킬레벨'] || '').trim()) || 0);
-      const maxLv = Math.max(minLv, Number(String(r['최대스킬레벨'] || '').trim()) || minLv); // 최소보다 작지 않게
+function mapRowToSkill2(r) {        // 시트 컬럼들을 읽습니다. who = 캐릭터명, show = 노출여부, ...
+  // 1) 캐릭터 키(시트 '캐릭터명'과 정확히 일치, 공백 제거)
+  const who = String(r['캐릭터명'] || '').replace(/\s+/g, '');
+  // 2) 노출/정렬/좌표
+  const show  = Number(String(r['노출여부'] || '').trim()) === 1;
+  const level = Number(String(r['스킬렙제']  || '').trim()) || 0;
+  const x     = Math.min(6, Math.max(1, Number(String(r['가로위치'] || '').trim()) || 1));
+  const y     = Math.max(1, Number(String(r['세로위치'] || '').trim()) || 1);
+  // 3) 핵심 필드(스펙: 스킬명/이미지 사용)
+  const name = String(r['스킬명'] || '').trim();
+  const img  = cleanUrl(r['이미지'] || '') || PLACEHOLDER_IMG;
+  // 4) 최소/최대 스킬 레벨
+  const minLv = Math.max(0, Number(String(r['최소스킬레벨'] || '').trim()) || 0);
+  const maxLv = Math.max(minLv, Number(String(r['최대스킬레벨'] || '').trim()) || minLv); // 최소보다 작지 않게
 
-      // 5) ID(없으면 스킬명 기반 대체)
-      const idSrc = String(r['ID'] ?? r['id'] ?? name).trim();
-      const id = idSrc || ('SK_' + Math.random().toString(36).slice(2));
-      // SP cost per level
-      const sp = toInt(r['소모 SP'] ?? r['소모SP'] ?? r['SP'] ?? r['sp'] ?? 0, 0);
-      const tpCost = toInt(r['tp설정'] ?? r['TP설정'] ?? r['tp 설정'] ?? r['TP 설정'] ?? r['tp'] ?? r['TP'] ?? 0, 0);
-      return { id, name, img, who, show, level, x, y, minLv, maxLv, sp, tpCost };
-    }
+  // 5) ID(없으면 스킬명 기반 대체)
+  const idSrc = String(r['ID'] ?? r['id'] ?? name).trim();
+  const id    = idSrc || ('SK_' + Math.random().toString(36).slice(2));
+
+  // 6) SP/TP 코스트
+  const sp     = toInt(r['소모 SP'] ?? r['소모SP'] ?? r['SP'] ?? r['sp'] ?? 0, 0);
+  const tpCost = toInt(r['tp설정'] ?? r['TP설정'] ?? r['tp 설정'] ?? r['TP 설정'] ?? r['tp'] ?? r['TP'] ?? 0, 0);
+
+  // 7) ★ 퍼뎀/고뎀 선형 모델(시트 컬럼 그대로)
+  //    - '1렙데미지'   : minLv 기준 퍼뎀
+  //    - '1렙고정뎀'   : minLv 기준 고뎀
+  //    - '1렙당 데미지': 레벨 +1당 퍼뎀 증가치
+  //    - '1렙당 고정뎀': 레벨 +1당 고뎀 증가치
+  const dmg1Base  = toNum(r['1렙데미지'],    NaN);
+  const fix1Base  = toNum(r['1렙고정뎀'],    NaN);
+  const dmg1PerLv = toNum(r['1렙당 데미지'],  NaN);
+  const fix1PerLv = toNum(r['1렙당 고정뎀'],  NaN);
+
+  return {
+    id, name, img, who, show, level, x, y, minLv, maxLv, sp, tpCost,
+    // ★ 추가된 4개 필드
+    dmg1Base, fix1Base, dmg1PerLv, fix1PerLv
+  };
+}
 
 
 
-    /** 시트 로드(1회) */
-    async function ensureSkillLoaded2() {
+    /** 시트 로드(1회) */ 
+    async function ensureSkillLoaded2() {     // SKILL_SHEET 를 Papa.parse로 읽고 각 행을 mapRowToSkill2로 표준 스킬 객체로 변환한 뒤 ST2.rows 에 캐시해둡니다
       if (ST2.loaded) return;
       const text = await fetch(SKILL_SHEET, { cache: 'no-store' }).then(r => r.text());
       const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
@@ -2257,9 +2275,70 @@ document.addEventListener('click', (e)=>{
     }
 
     /* ===== TP 범위 & 상태 ===== */
-    const TP_MIN = 0, TP_MAX = 7;
+    const TP_MIN = 0, TP_MAX = 5;
     state.skillTpLv = state.skillTpLv || {}; // { skillId: tpLevel }
 
+/* ===== 스킬 데미지 유틸(선형 + TP 배율) ===== */
+// 0) (없으면 추가) 현재 데미지 캐시
+state.skillDmg = state.skillDmg || {};   // { skillId: {per, flat, lv, tpLv, tpIncPercent} }
+
+// 1) (없으면 추가) 선형 퍼뎀/고뎀 계산
+function calcSkillDamageLinear(skill, lv) {
+  // 0과 null/undefined 를 구분: 0은 유효 레벨
+  const maxLv = Number(skill.maxLv ?? 0);
+  const rawLv = Number(lv ?? 0);
+
+  // 1) 레벨 하한은 0으로 클램프 (0레벨 허용)
+  const curLv = Math.max(0, Math.min(maxLv, rawLv));
+
+  // 2) 0레벨이면 데미지 0 확정
+  if (curLv === 0) return { per: 0, flat: 0, lv: 0 };
+
+  // 3) '1렙데미지'를 기준으로 선형 증가
+  //    step은 항상 (현재레벨 - 1)
+  const dmg1Base  = Number.isFinite(skill.dmg1Base)  ? skill.dmg1Base  : 0;
+  const fix1Base  = Number.isFinite(skill.fix1Base)  ? skill.fix1Base  : 0;
+  const dmg1PerLv = Number.isFinite(skill.dmg1PerLv) ? skill.dmg1PerLv : 0;
+  const fix1PerLv = Number.isFinite(skill.fix1PerLv) ? skill.fix1PerLv : 0;
+
+  const step = curLv - 1; // ★ 1렙 기준
+  const per  = dmg1Base + dmg1PerLv * step;  // 퍼뎀
+  const flat = fix1Base + fix1PerLv * step;  // 고뎀
+
+  return { per, flat, lv: curLv };
+}
+
+// 2) 외부(아이템/룬 등) TP 보너스 합산 – 초기는 0으로 두고 나중에 구현
+function getTpBonusFromSources(skillId) {
+  return 0; // TODO: 아이템/룬/옵션에서 해당 스킬 TP +n을 합산해 반환
+}
+
+// 3) tp설정(1/2)에 따른 TP 증가율(%) 계산 (최대 7레벨)
+function tpIncreasePercent(tpSetting, tpLevel) {
+  const lv = Math.max(0, Math.min(7, Number(tpLevel) || 0));
+  if (lv === 0 || !Number.isFinite(tpSetting) || tpSetting <= 0) return 0;
+
+  if (tpSetting === 1) return 5 + (lv - 1) * 2; // 1레벨 5%, 이후 +2%
+  if (tpSetting === 2) return 8 + (lv - 1) * 3; // 1레벨 8%, 이후 +3%
+  return 0;
+}
+
+// 4) 선형 데미지에 TP 비율을 곱해 최종치 산출
+function calcSkillDamageWithTp(skill, skillLv, baseTpLv) {
+  const base = calcSkillDamageLinear(skill, skillLv);
+  const bonus = getTpBonusFromSources(skill.id); // 외부 +TP
+  const effTpLv = Math.min(7, Math.max(0, Number(baseTpLv || 0) + Number(bonus || 0)));
+  const incPct = tpIncreasePercent(Number(skill.tpCost || 0), effTpLv);
+  const mul = 1 + (incPct / 100);
+
+  return {
+    per:  Math.max(0, base.per  * mul),
+    flat: Math.max(0, base.flat * mul),
+    lv:   base.lv,
+    tpLv: effTpLv,
+    tpIncPercent: incPct
+  };
+}
     /* ===== 길게누르기(민감 완화): pointer 이벤트 기반 ===== */
     function attachPressRepeat(btn, stepFn) {
       let timer = null, active = false, interval = 180;
@@ -2288,7 +2367,7 @@ document.addEventListener('click', (e)=>{
     }
 
     /* ===== 렌더러 교체 ===== */
-    async function renderSkillTreeBands() {
+    async function renderSkillTreeBands() {   //스킬을 밴드형으로 배치
       await ensureSkillLoaded2();
 
       // 현재 캐릭터 키
@@ -2324,41 +2403,52 @@ document.addEventListener('click', (e)=>{
         return clampSkill(s, state.skillLv[s.id]);
       };
       const setSkill = (s, v) => {
-        const target = clampSkill(s, v);
-        const cur = getSkill(s);
-        const delta = target - cur;
-        const per = Number(s.sp || 0);
-        if (delta > 0) {
-          const cost = per * delta;
-          if (!canSpendSp(cost)) { noSpFeedback(); return; }
-          state.skillLv[s.id] = target;
-          spendSp(cost);
-        } else if (delta < 0) {
-          state.skillLv[s.id] = target;
-          refundSp(per * (-delta));
-        } else {
-          state.skillLv[s.id] = target;
-        }
-      };
+  const target = clampSkill(s, v);
+  const cur = getSkill(s);
+  const delta = target - cur;
+  const per = Number(s.sp || 0);
+
+  if (delta > 0) {
+    const cost = per * delta;
+    if (!canSpendSp(cost)) { noSpFeedback(); return; }
+    state.skillLv[s.id] = target;
+    spendSp(cost);
+  } else if (delta < 0) {
+    state.skillLv[s.id] = target;
+    refundSp(per * (-delta));
+  } else {
+    state.skillLv[s.id] = target;
+  }
+
+  // ★ 여기부터 교체: 확정 레벨(target)과 TP(없으면 0)를 사용, ??로 안전 처리
+  const curTpLv = state.skillTpLv?.[s.id] ?? 0;              // ← 0 그대로 인정
+  state.skillDmg[s.id] = calcSkillDamageWithTp(s, target, curTpLv);
+};
       const getTp = (s) => {
         if (state.skillTpLv[s.id] === undefined) state.skillTpLv[s.id] = TP_MIN;
         return clampTp(state.skillTpLv[s.id]);
       };
       const setTp = (s, v) => {
-        const unit = Number(s.tpCost || 0);
-        if (!Number.isFinite(unit) || unit <= 0) return; // TP 강화 미지원
-        const target = clampTp(v);
-        const cur = getTp(s);
-        if (target > cur) {
-          const need = (target - cur) * unit;
-          if (!canSpendTp(need)) { noTpFeedback(); return; }
-          spendTp(need);
-        } else if (target < cur) {
-          const back = (cur - target) * unit;
-          refundTp(back);
-        }
-        state.skillTpLv[s.id] = target;
-      };
+  const unit = Number(s.tpCost || 0);
+  if (!Number.isFinite(unit) || unit <= 0) return; // TP 강화 미지원
+
+  const target = clampTp(v);
+  const cur = getTp(s);
+
+  if (target > cur) {
+    const need = (target - cur) * unit;
+    if (!canSpendTp(need)) { noTpFeedback(); return; }
+    spendTp(need);
+  } else if (target < cur) {
+    const back = (cur - target) * unit;
+    refundTp(back);
+  }
+  state.skillTpLv[s.id] = target;
+
+  // ★ 여기! TP 확정 후 재계산. minLv=0을 깨지 않도록 ?? 사용
+  const curLv = state.skillLv?.[s.id] ?? (s.minLv ?? 1);     // ← 0 그대로 인정
+  state.skillDmg[s.id] = calcSkillDamageWithTp(s, curLv, target);
+};
 
       // 레벨 밴드 단위로 DOM 생성
       levels.forEach(lvl => {
@@ -2540,14 +2630,6 @@ document.addEventListener('click', (e)=>{
 
     /** 버튼 연결 (기존 old 렌더러 바인딩이 있다면 교체) */
     const stModal = document.getElementById('skillTreeModal');
-    const btnST = document.getElementById('btnSkillTree');
-    if (btnST) {
-      btnST.onclick = async () => {
-        await renderSkillTreeBands();
-        stModal?.classList.add('show');
-        stModal?.setAttribute('aria-hidden', 'false');
-      };
-    }
 
     /* ESC로 닫기(선택 사항) */
     document.addEventListener('keydown', (e) => {
@@ -2591,6 +2673,54 @@ document.addEventListener('click', (e)=>{
         });
       });
     }
+/* ===== 스킬룬 코어 ===== */
+// 카테고리 키: RUNE_CATS에서 쓰는 키 그대로 사용(각성/마력/허상/숙련/기교)
+const RUNE_KEYS = {
+  awakening: '각성룬',   // 데미지 ×1.04^n
+  magic:     '마력룬',   // 데미지 ×1.03^n
+  illusion:  '허상룬',   // 쿨타임 ×0.96^n
+  training:  '숙련룬',   // 스킬레벨 +n
+  technique: '기교룬',   // 스킬강화레벨 +n
+};
+
+// 선택 개수 가져오기: state.runes[catKey][tier] (없으면 0)
+function getRuneCountByKey(catKey, tier) {
+  const row = (state.runes?.[catKey]) || {};
+  return Number(row[tier] || 0);
+}
+
+// 스킬의 렙제(밴드) 알아내기: mapRowToSkill에서 band 필드를 채움
+// (스킬 객체에 band가 없으면 0/기본 취급)
+function skillTierOf(skill) {
+  const b = Number(skill?.band || 0);
+  return b > 0 ? b : null;
+}
+
+// 1) 최종 공격력 배수: 각성(1.04^n) × 마력(1.03^n)
+function runeDamageMultiplier(skill) {
+  const tier = skillTierOf(skill);
+  if (!tier) return 1;
+  const nA = getRuneCountByKey('awakening', tier);
+  const nM = getRuneCountByKey('magic', tier);
+  return Math.pow(1.04, nA) * Math.pow(1.03, nM);
+}
+
+// 2) 쿨타임 보정: 허상룬 → baseCd × (0.96^n)
+function runeCooldown(skill, baseCd) {
+  const tier = skillTierOf(skill);
+  if (!tier) return baseCd;
+  const nH = getRuneCountByKey('illusion', tier);
+  return baseCd * Math.pow(0.96, nH);
+}
+
+// 3) 레벨 보정: 숙련(+n), 기교(+n)
+function runeLevelAdds(skill) {
+  const tier = skillTierOf(skill);
+  if (!tier) return { skillLvAdd: 0, enhLvAdd: 0 };
+  const nS = getRuneCountByKey('training', tier);
+  const nT = getRuneCountByKey('technique', tier);
+  return { skillLvAdd: nS, enhLvAdd: nT };
+}
 
     function countSelectedRunes() {
       let sum = 0;
@@ -3037,7 +3167,7 @@ async function ensureMonsterLoaded() {
       charModal.classList.remove('show');   // show 제거 - 숨김
       charModal.setAttribute('aria-hidden', 'true');    // 접근성 : 숨김 상태 알림
     }
-    function applyCharacter({ src, jobGroup, jobGroupLabel, name, power }) {    //카드 클릭 시 이 함수가 호출됨, ui 이미지 교체 - 상태 업데이트 - 파생 ui업데이트까지 한번에 처리
+    async function applyCharacter({ src, jobGroup, jobGroupLabel, name, power }) {    //카드 클릭 시 이 함수가 호출됨, ui 이미지 교체 - 상태 업데이트 - 파생 ui업데이트까지 한번에 처리
       characterImg.src = src;   // 메인 캐릭터 이미지 교체
       characterImg.style.display = 'block';   // 실제 이미지 보이기
       characterGhost.style.display = 'none';    // 플레이스홀더(유령 이미지) 숨김
@@ -3048,8 +3178,11 @@ async function ensureMonsterLoaded() {
         imgSrc: src,
         power: power || null
       };
+      state.skillLv = {}; state.skillTpLv = {}; // 현재 사용한 SP/TP 초기화
+      state.skillDmg = {};
+      state.stUsedSP = 0; state.stUsedTP = 0;
+      await loadCharTotalsAndApply(name);   // 캐릭터 이름 기준으로 누적값/상세값 불러와 적용
       recalcAndRenderPanel();   // 장비/스탯/버프 등 계산 후 표시를 갱신하는 내부 함수
-      loadCharTotalsAndApply(name);   // 캐릭터 이름 기준으로 누적값/상세값 불러와 적용
     }
 
     characterCard.addEventListener('click', openCharacterPicker);
