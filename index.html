@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>게임실험연구소 계산기 (시즌5)</title>
   <style>
-/*기본 변수 색상*/
+    /*기본 변수 색상*/
     :root {
       --bg: #0f1115;
       --panel: #151922;
@@ -18,11 +18,13 @@
       --gold-2: #8f6b2b;
       --card-bg: #17120f;
     }
+
     /*모든 박스*/
     * {
       box-sizing: border-box;
     }
-/*html과 body에 대해 */
+
+    /*html과 body에 대해 */
     html,
     body {
       height: 100%;
@@ -35,7 +37,8 @@
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial;
       overflow: auto;
     }
-/*클래스선택자(색상세트)*/
+
+    /*클래스선택자(색상세트)*/
     .shell {
       height: 100dvh;
       display: grid;
@@ -43,7 +46,7 @@
     }
 
     /*맨 위 제목임*/
-/*header는 제목, head는 메타정보*/
+    /*header는 제목, head는 메타정보*/
     header {
       display: flex;
       align-items: center;
@@ -55,35 +58,87 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
       backdrop-filter: blur(4px);
     }
-/*header : 태그선택자, title : 클래스, h1 : 태그선택자, header안 -> title안 -> h1만 선택*/
+
+    /*header : 태그선택자, title : 클래스, h1 : 태그선택자, header안 -> title안 -> h1만 선택*/
     header .title h1 {
       margin: 0;
       font-size: 16px;
       font-weight: 600;
     }
-/*앞쪽에 태그선택자가 없으므로, 전역에 actions 클래스 사용가능*/
+
+    /*앞쪽에 태그선택자가 없으므로, 전역에 actions 클래스 사용가능*/
     .actions {
       font-size: 12px;
       color: var(--muted);
     }
 
     /* 레이아웃: 오른쪽에 합산 패널 열 추가 (고정폭) */
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(220px, 1fr) minmax(320px, 36vw) minmax(220px, 1fr) minmax(220px, 260px) 300px;
-      gap: clamp(8px, 2vw, 24px);
-      height: calc(100dvh - 54px);
-      padding: clamp(8px, 1.6vw, 18px);
-      align-items: center;
-      justify-items: center;
-    }
-/* justify-content 는 가로방향정렬, align-items 은 세로방향정렬
+.layout {
+  display: grid;
+  grid-template-columns: 
+  minmax(220px, 1fr)       /* 1번째 열 (왼쪽) */
+    minmax(320px, 36vw)      /* 2번째 열 (캐릭터) */
+    minmax(220px, 1fr)       /* 3번째 열 (오른쪽) */
+    300px                    /* 4번째 열 (옵션) */
+    300px;                   /* 5번째 열 (합산스탯) */
+  grid-template-rows: auto auto;
+  gap: clamp(8px, 2vw, 24px);
+
+  grid-template-areas:
+    "left char right options stats"
+    "save save right options stats";
+}
+
+.left-col    { grid-area: left; }
+.char-col    { grid-area: char; }
+.right-col   { grid-area: right; grid-row: 1 / span 2; }
+.options-col { grid-area: options; grid-row: 1 / span 2; }
+.stats-col   { grid-area: stats; grid-row: 1 / span 2; }
+.save-box    { grid-area: save; }
+
+.save-box {
+  grid-area: save;
+  background: rgba(110, 168, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: flex-start;  /* ← 왼쪽 정렬 */
+  gap: 10px;
+  position: relative;
+  transform: translateY(-100px);  /* -6 ~ -20px 등으로 조절 */
+  z-index: 2;                    /* 겹칠 때 위에 보이게 */
+}
+
+.save-box button {
+  width: 48px;           /* 정사각형 */
+  height: 48px;          /* 정사각형 */
+  border-radius: 12px;   /* 둥근 모서리 */
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 24px;       /* + 기호 크게 */
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.save-box button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+
+    /* justify-content 는 가로방향정렬, align-items 은 세로방향정렬
  flex-start는 아이템들을 시작지점에 붙여서정렬 가로면 왼쪽정렬, 세로면 위쪽정렬
  flex-end는 아이템들을 끝지점에 붙여서 정렬, 가로면 오른쪽정렬, 세로면 아래쪽정렬*/
     .column {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-self: start !important;   /* 세로축 위쪽 정렬 */
+  height: max-content !important; /* 내용만큼만 높이 */
       gap: 12px;
       padding: 10px 6px;
       border-radius: 18px;
@@ -96,7 +151,8 @@
       align-items: center;
       gap: 10px;
     }
-/*slot-row 와 left 두가지 클래스 모두를 가지고 있는것, slot-row와 left 중 하나만 있으면 적용되지 않는다)
+
+    /*slot-row 와 left 두가지 클래스 모두를 가지고 있는것, slot-row와 left 중 하나만 있으면 적용되지 않는다)
 //slot-row left 점이 아닌 띄어쓰기를 하면, left가 앞 요소 안의 요소가 되는데, 이때 left는 태그이다. .left로 쓰게되면 클래스가 된다.
 //html(클래스)에 넣어서 쓸때는 띄어쓰기로 쓴다. class = "slot-row left" */
     .slot-row.left {
@@ -121,7 +177,8 @@
       transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) inset, 0 1px 0 rgba(255, 255, 255, 0.04);
     }
-/* :는 의사클래스, hover는 마우스를 위에 올린 상태를 뜻함. 따라서 slot 클래스에 마우스를 올리면 이라는 뜻
+
+    /* :는 의사클래스, hover는 마우스를 위에 올린 상태를 뜻함. 따라서 slot 클래스에 마우스를 올리면 이라는 뜻
 // 그외에도 active : 클릭한 순간(마우스 버튼 누르고 있을때), focus : 입력창 클릭했을때, visited : 방문한 링크, link : 방문하지 않은 링크
 // first-child : 부모 안에서 첫번째 자식, last-child : 부모 안에서 마지막 자식, ntn-child(n) : 부모 안에서 n번째 자식
 //checked : 체크박스나 라디오버튼에 체크된상태, valid, invalid : 입력값이 유효성 검사에 맞거나 아닐때
@@ -131,7 +188,8 @@
       border-color: rgba(110, 168, 255, 0.5);
       box-shadow: 0 0 0 4px var(--ring), 0 10px 24px rgba(0, 0, 0, 0.35) inset;
     }
-/* slot-label 클래스는 slot의 자손선택자이다. 따라서 slot 클래스를 선언하고 그 안에 또 slot-label 클래스를 선언해야한다. */
+
+    /* slot-label 클래스는 slot의 자손선택자이다. 따라서 slot 클래스를 선언하고 그 안에 또 slot-label 클래스를 선언해야한다. */
     .slot .slot-label {
       position: absolute;
       top: 50%;
@@ -184,8 +242,10 @@
       height: 100%;
     }
 
-    .character-card {
-      width: clamp(240px, 34vw, 520px);
+    .character-card {   /*메인 캐릭터 박스*/
+      /*margin-top: 0px;  /* 원하는 값(px, %, rem 등) */
+      align-self: start;   /* ← 세로축 위쪽에 붙음 */
+      width: clamp(20px, 25vw, 520px);
       aspect-ratio: 3/4;
       border-radius: 22px;
       background: radial-gradient(60% 40% at 50% 10%, rgba(110, 168, 255, 0.08), transparent 60%),
@@ -222,7 +282,9 @@
 
     /* ▼ 하단 4개 슬롯 */
     .mini-bar {
-      margin-top: 10px;
+      align-self: start;   /* 그리드 칸에서 위쪽에 붙임 */
+      /*margin-top: 10px;*/
+      margin-bottom: 70px;
       display: flex;
       gap: 8px;
       align-items: center;
@@ -242,7 +304,8 @@
       border-radius: 12px;
       flex: 0 0 auto;
     }
-/*slot클래스와 mini클래스 동시에 적용하며 그 두 클래스의 자손클래스가 slot-label이 된다.*/
+
+    /*slot클래스와 mini클래스 동시에 적용하며 그 두 클래스의 자손클래스가 slot-label이 된다.*/
     .slot.mini .slot-label {
       position: absolute;
       top: 50%;
@@ -286,7 +349,8 @@
       grid-template-rows: auto 1fr;
       gap: 10px;
     }
-/*header와 h2는 dialog의 자손태그들이다. 태그는 쓰려면 <header> </header>을 써야한다.
+
+    /*header와 h2는 dialog의 자손태그들이다. 태그는 쓰려면 <header> </header>을 써야한다.
 //이 코드만 보고는 종속관계를 알수는 없다. header가 더 높은지, h2가 높은지 알수없다. */
     .dialog header {
       display: grid;
@@ -336,32 +400,45 @@
       border: 2px solid #6e5124;
     }
 
-    .cards {    /* 카드의 스타일 */
-      display: grid;    /* 그리드 레이아웃 배치*/
-      grid-template-columns: repeat(5, minmax(160px, 1fr));   /* 가로칸(columns) 4개, 각칸은 최소 160px, 최대 1fr(=남는 공간 균등 분배) 크기 */
-      gap: 12px;    /*카드들 사이 가로/세로 간격 */
+    .cards {
+      /* 카드의 스타일 */
+      display: grid;
+      /* 그리드 레이아웃 배치*/
+      grid-template-columns: repeat(5, minmax(160px, 1fr));
+      /* 가로칸(columns) 4개, 각칸은 최소 160px, 최대 1fr(=남는 공간 균등 분배) 크기 */
+      gap: 12px;
+      /*카드들 사이 가로/세로 간격 */
     }
 
     .char-card {
       position: relative;
       display: grid;
-      grid-template-rows: auto auto;    /*세로로 2줄 그리드 (첫줄 이미지, 두번째줄 이름*/
-      gap: 6px;   /* 줄 사이 6px 간격 */
-      padding: 8px;   /* 안쪽 여백 */
-      border-radius: 12px; 
+      grid-template-rows: auto auto;
+      /*세로로 2줄 그리드 (첫줄 이미지, 두번째줄 이름*/
+      gap: 6px;
+      /* 줄 사이 6px 간격 */
+      padding: 8px;
+      /* 안쪽 여백 */
+      border-radius: 12px;
       background: var(--card-bg);
-      cursor: pointer;    /*마우스 올리면 손가락 모양*/
-      border: 1px solid var(--gold-2);    /* 카드 테두리 (금색 계열 변수) */
+      cursor: pointer;
+      /*마우스 올리면 손가락 모양*/
+      border: 1px solid var(--gold-2);
+      /* 카드 테두리 (금색 계열 변수) */
     }
 
-    .char-card:hover {    /*마우스 올렸을때 효과 */
+    .char-card:hover {
+      /*마우스 올렸을때 효과 */
       box-shadow: inset 0 0 0 2px rgba(207, 162, 79, 0.22), 0 8px 22px rgba(0, 0, 0, 0.55);
     }
 
     .char-img {
-      width: 100%;    /* 부모 카드의 가로폭을 전부 차지 */
-      aspect-ratio: 16/7;   /* 가로:세로 비율 16:7 유지 */
-      object-fit: cover;    /* 이미지 잘리더라도 영역 꽉 채움 */
+      width: 100%;
+      /* 부모 카드의 가로폭을 전부 차지 */
+      aspect-ratio: 16/7;
+      /* 가로:세로 비율 16:7 유지 */
+      object-fit: cover;
+      /* 이미지 잘리더라도 영역 꽉 채움 */
       border-radius: 8px;
       border: 1px solid rgba(207, 162, 79, 0.35);
       background: #0c0a08;
@@ -397,7 +474,8 @@
       color: #f0e6d2;
       box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset
     }
-/*overflow는 요소크기보다 내용이 넘치면 어떻게 처리할지를 나타냄
+
+    /*overflow는 요소크기보다 내용이 넘치면 어떻게 처리할지를 나타냄
 //auto는 자동 스크롤바 생김, visible은 그냥 밖으로 삐져나옴, hidden은 넘치는 부분 잘라냄, scroll은 항상 스크롤바 표시 */
     /* 리스트형 카드 */
     .items {
@@ -543,7 +621,8 @@
       border-color: #cfa24f;
       box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
     }
-/*@는 모바일 전환시 사용하는 부호. 정확히는 폭이 좁아지면.
+
+    /*@는 모바일 전환시 사용하는 부호. 정확히는 폭이 좁아지면.
     /* 모바일 1열 전환 시 자연스럽게 흐르도록(기존 규칙 유지) */
     @media (max-width: 900px) {
       .column.options {
@@ -636,7 +715,7 @@
       text-align: right;
     }
 
-/* #은 고유 id를 뜻한다. 클래스와 다른점은 고유하기때문에 단한번만 사용한다는 차이가 있음
+    /* #은 고유 id를 뜻한다. 클래스와 다른점은 고유하기때문에 단한번만 사용한다는 차이가 있음
     /* 강화 선택 모달(텍스트 리스트) */
     #enhanceModal .dialog {
       width: min(520px, 95vw);
@@ -697,50 +776,53 @@
         position: static;
       }
     }
-/* autoEnchantModal 전용 2-컬럼 레이아웃 */
-#autoEnchantModal .dialog { /* 강화설정 모달과 같은 폭/패딩을 공유한다면 생략 가능 */
-  max-width: 700px; /*모달너비*/
-}
 
-#autoEnchantModal .body.two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
+    /* autoEnchantModal 전용 2-컬럼 레이아웃 */
+    #autoEnchantModal .dialog {
+      /* 강화설정 모달과 같은 폭/패딩을 공유한다면 생략 가능 */
+      max-width: 700px;
+      /*모달너비*/
+    }
 
-/* 각 컬럼 내부 버튼 리스트 레이아웃 */
-#autoEnchantModal .col .list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
+    #autoEnchantModal .body.two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
 
-/* 타이틀 여백/스타일도 강화설정 모달과 톤을 맞춤 */
-#autoEnchantModal .col .title {
-  font-weight: 600;
-  margin-bottom: 8px;
-}
+    /* 각 컬럼 내부 버튼 리스트 레이아웃 */
+    #autoEnchantModal .col .list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
 
-/* 추천 마법부여 모달: 선택 강조 */
-#autoEnchantModal .opt-btn.active {
-  border-color: var(--brand, #2563eb);
-  box-shadow: 0 0 0 2px rgba(37,99,235,0.25);
-  /* 필요시 배경도 살짝 */
-  background: rgba(37,99,235,0.06);
-}
+    /* 타이틀 여백/스타일도 강화설정 모달과 톤을 맞춤 */
+    #autoEnchantModal .col .title {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
 
-/* 키보드 포커스 접근성도 보정(선택과 구분되게) */
-#autoEnchantModal .opt-btn:focus-visible {
-  outline: 2px solid var(--brand, #2563eb);
-  outline-offset: 2px;
-}
+    /* 추천 마법부여 모달: 선택 강조 */
+    #autoEnchantModal .opt-btn.active {
+      border-color: var(--brand, #2563eb);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+      /* 필요시 배경도 살짝 */
+      background: rgba(37, 99, 235, 0.06);
+    }
 
-/* 모바일 좁은 화면에선 1열로 떨어지도록 */
-@media (max-width: 520px) {
-  #autoEnchantModal .body.two-col {
-    grid-template-columns: 1fr;
-  }
-}
+    /* 키보드 포커스 접근성도 보정(선택과 구분되게) */
+    #autoEnchantModal .opt-btn:focus-visible {
+      outline: 2px solid var(--brand, #2563eb);
+      outline-offset: 2px;
+    }
+
+    /* 모바일 좁은 화면에선 1열로 떨어지도록 */
+    @media (max-width: 520px) {
+      #autoEnchantModal .body.two-col {
+        grid-template-columns: 1fr;
+      }
+    }
 
     /* 고정 높이 아이템 모달 */
     #itemModal .dialog {
@@ -1482,8 +1564,6 @@
       border-color: #6ea8ff;
       box-shadow: 0 0 0 2px rgba(110, 168, 255, .25) inset;
     }
-
-
   </style>
 </head>
 
@@ -1494,7 +1574,7 @@
         <div class="dot" aria-hidden="true"></div>
         <h1>게임실험연구소 계산기 (시즌5)</h1>
       </div>
- <!--span 은 한줄에서 특별히 강조 할때 쓴다. div는 한줄이 강제로 나뉘기때문에 쓴다.-->
+      <!--span 은 한줄에서 특별히 강조 할때 쓴다. div는 한줄이 강제로 나뉘기때문에 쓴다.-->
       <div class="actions">
         <div class="sp-tp" id="spTpTop">
           <span class="counter-pill sp"><span class="lab">SP</span><span id="spLeftTop"
@@ -1595,6 +1675,13 @@
               class="rect">선택</button><button class="rect">선택</button></div>
         </div>
       </div>
+     <div class="save-box">
+  <button>+</button>
+  <button>+</button>
+  <button>+</button>
+  <button>+</button>
+  <button>+</button>
+</div>
       <div class="column options">
         <div class="opt-box">
           <h4 class="opt-title">아바타 세부 선택</h4>
@@ -1632,7 +1719,7 @@
               <option value="10m">10분딜</option>
             </select>
           </label>
-<!--document.getElementById("selMonster").value 라고 쓰면 설정된 몬스터값 불러올 수 있음-->
+          <!--document.getElementById("selMonster").value 라고 쓰면 설정된 몬스터값 불러올 수 있음-->
           <label class="field">
             <span class="label">몬스터 설정</span>
             <select id="selMonster" class="select" aria-label="몬스터 설정">
@@ -1695,23 +1782,28 @@
             </div>
           </div>
         </div>
-
+<div class="final-damage">
+            <span class="label">최종데미지</span>
+            <strong class="value" id="finalDamageValue2">&nbsp;</strong>
+            <button id="btn-sum-all-final2" type="button">계산하기</button>
+          </div>
 
       </div>
-
+      
       <aside class="stats">
         <div class="stats-panel">
           <h3>합산 스탯</h3>
           <div id="statList" class="stat-list"></div>
           <div class="final-damage">
             <span class="label">최종데미지</span>
-            <strong class="value" id="finalDamageValue">47,978,023,776</strong>
+            <strong class="value" id="finalDamageValue">&nbsp;</strong>
+            <button id="btn-sum-all-final" type="button">계산하기</button>
           </div>
         </div>
       </aside>
-    </section>
-  </div>
-<!--ㅇ-->
+      </section>
+      </div>
+  <!--ㅇ-->
   <div id="charModal" class="modal" aria-hidden="true">
     <div class="backdrop" data-close></div><!--모달 뒤 배경 검정, data-close 속성 붙은 요소 클릭하면 모달 닫힘-->
     <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
@@ -1826,107 +1918,109 @@
     state.sp = state.sp || { total: 0, left: 0 };
     state.tp = state.tp || { total: 0, left: 0 };
     state.skillTpLv = state.skillTpLv || {};   // TP 레벨 저장(사용 중이 아니어도 무해)
-state.skillDmg  = state.skillDmg  || {};   // ★ 스킬 현재 데미지 캐시 {id: { per, flat, lv }}
-
-    
-
-// === [ENCHANT] 전역 캐시 & 프리로드 ===
-const ENCHANT_CACHE = {
-  ready: false,            // 프리로드 완료 여부
-  byType: new Map(),       // '무기마부' -> [{name, typeKey}, ...]
-  version: 'v1',           // 캐시 버전(시트가 바뀌면 여기 문자열만 바꿔 새로 받도록)
-};
-
-async function preloadEnchantSheet(){
-  const urlBase = (typeof ENHANCE_SHEET_SAFE!=='undefined' && ENHANCE_SHEET_SAFE)
-    ? ENHANCE_SHEET_SAFE
-    : (typeof ENHANCE_SHEET!=='undefined' ? ENHANCE_SHEET : null);
-
-  if(!urlBase){ ENCHANT_CACHE.ready = true; return; }
-
-  // 캐시 허용. (필요 시 버전 쿼리로 강제 갱신)
-  const url = urlBase + (urlBase.includes('?') ? '&' : '?') + ENCHANT_CACHE.version;
-
-  const text = await fetch(url, { cache: 'default' }).then(r=>r.text());
-  const parsed = Papa.parse(text, { header:true, skipEmptyLines:true });
-  const rows = parsed.data || [];
-
-  const byType = new Map();
-// (수정) 프리로드 루프
-for (const r of rows) {
-  const typeKey = String(r['종류'] || '').trim();
-  if (!typeKey) continue;
-
-  // 1) 기존 변환기가 있으면 재사용(권장)
-  const obj = (typeof mapRowToEnhance === 'function') ? mapRowToEnhance(r) : null;
-
-  // 2) 이름/스탯/직업군 안전 추출
-  const name  = String(obj?.name ?? r['이름'] ?? r['name'] ?? '').trim();
-  if (!name) continue;
-
-  const stats = obj?.stats ?? null;                  // ← undefined 방지
-  const jobGroup = String(r['직업군'] ?? obj?.jobGroup ?? '').trim();
-
-  // 3) 종류별 바구니 확보
-  if (!byType.has(typeKey)) byType.set(typeKey, []);
-
-  // 4) 캐시에 푸시(원본도 보존)
-  byType.get(typeKey).push({
-    name,
-    typeKey,
-    stats,            // ← 반드시 정의된 값만(없으면 null)
-    jobGroup,         // ← 추천 키 검색용
-    raw: r
-  });
-}
+    // ===== 레벨링(장비/스탯 합산) =====
+    state.leveling = state.leveling || {}; // { 15: n, 20: n, 25: n, ... }
+    state.skillDmg = state.skillDmg || {};   // ★ 스킬 현재 데미지 캐시 {id: { per, flat, lv }}
 
 
 
-  ENCHANT_CACHE.byType = byType;
-  ENCHANT_CACHE.ready = true;
-}
+    // === [ENCHANT] 전역 캐시 & 프리로드 ===
+    const ENCHANT_CACHE = {
+      ready: false,            // 프리로드 완료 여부
+      byType: new Map(),       // '무기마부' -> [{name, typeKey}, ...]
+      version: 'v1',           // 캐시 버전(시트가 바뀌면 여기 문자열만 바꿔 새로 받도록)
+    };
 
-async function ensureEnchantCache(){
-  if(!ENCHANT_CACHE.ready){
-    try { await preloadEnchantSheet(); }
-    catch(e){ console.warn('[ENCHANT] preload failed:', e); ENCHANT_CACHE.ready = true; }
-  }
-}
+    async function preloadEnchantSheet() {
+      const urlBase = (typeof ENHANCE_SHEET_SAFE !== 'undefined' && ENHANCE_SHEET_SAFE)
+        ? ENHANCE_SHEET_SAFE
+        : (typeof ENHANCE_SHEET !== 'undefined' ? ENHANCE_SHEET : null);
+
+      if (!urlBase) { ENCHANT_CACHE.ready = true; return; }
+
+      // 캐시 허용. (필요 시 버전 쿼리로 강제 갱신)
+      const url = urlBase + (urlBase.includes('?') ? '&' : '?') + ENCHANT_CACHE.version;
+
+      const text = await fetch(url, { cache: 'default' }).then(r => r.text());
+      const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+      const rows = parsed.data || [];
+
+      const byType = new Map();
+      // (수정) 프리로드 루프
+      for (const r of rows) {
+        const typeKey = String(r['종류'] || '').trim();
+        if (!typeKey) continue;
+
+        // 1) 기존 변환기가 있으면 재사용(권장)
+        const obj = (typeof mapRowToEnhance === 'function') ? mapRowToEnhance(r) : null;
+
+        // 2) 이름/스탯/직업군 안전 추출
+        const name = String(obj?.name ?? r['이름'] ?? r['name'] ?? '').trim();
+        if (!name) continue;
+
+        const stats = obj?.stats ?? null;                  // ← undefined 방지
+        const jobGroup = String(r['직업군'] ?? obj?.jobGroup ?? '').trim();
+
+        // 3) 종류별 바구니 확보
+        if (!byType.has(typeKey)) byType.set(typeKey, []);
+
+        // 4) 캐시에 푸시(원본도 보존)
+        byType.get(typeKey).push({
+          name,
+          typeKey,
+          stats,            // ← 반드시 정의된 값만(없으면 null)
+          jobGroup,         // ← 추천 키 검색용
+          raw: r
+        });
+      }
+
+
+
+      ENCHANT_CACHE.byType = byType;
+      ENCHANT_CACHE.ready = true;
+    }
+
+    async function ensureEnchantCache() {
+      if (!ENCHANT_CACHE.ready) {
+        try { await preloadEnchantSheet(); }
+        catch (e) { console.warn('[ENCHANT] preload failed:', e); ENCHANT_CACHE.ready = true; }
+      }
+    }
 
 
 
     // === [ENCHANT] 0) 세부상자(3번째) 기본 라벨 "마법 부여"로 세팅 ===
     // === [ENCHANT] 0) 세부상자 기본 라벨/역할 세팅 ===
-function setDefaultEnchantLabels() {
-  // ① 장비 슬롯 행: 세 번째 세부상자 → "마법 부여"
-  document.querySelectorAll('.slot-row').forEach(row => {
-    const third = row.querySelector('.outer-rects .rect:nth-child(3)');
-    if (third) {
-      third.textContent = '마법 부여';
-      third.dataset.role = 'enchant';
-      third.removeAttribute('data-unused');
-      third.removeAttribute('aria-disabled');
-      third.disabled = false;
-      third.classList.remove('disabled','is-disabled');
-      third.style.pointerEvents = ''; // 혹시 막혀 있으면 해제
-    }
-  });
+    function setDefaultEnchantLabels() {
+      // ① 장비 슬롯 행: 세 번째 세부상자 → "마법 부여"
+      document.querySelectorAll('.slot-row').forEach(row => {
+        const third = row.querySelector('.outer-rects .rect:nth-child(3)');
+        if (third) {
+          third.textContent = '마법 부여';
+          third.dataset.role = 'enchant';
+          third.removeAttribute('data-unused');
+          third.removeAttribute('aria-disabled');
+          third.disabled = false;
+          third.classList.remove('disabled', 'is-disabled');
+          third.style.pointerEvents = ''; // 혹시 막혀 있으면 해제
+        }
+      });
 
-  // ② C2(칭호) mini-cell: 첫 번째 세부버튼 활성화 → "마법 부여"
-  const c2cell = document.querySelector('.slot.mini[data-slot="C2"]')?.closest('.mini-cell');
-  if (c2cell) {
-    const firstBtn = c2cell.querySelector('.outer-rects .rect:nth-child(1)');
-    if (firstBtn) {
-      firstBtn.textContent = '마법 부여';
-      firstBtn.dataset.role = 'enchant';
-      firstBtn.removeAttribute('data-unused');
-      firstBtn.removeAttribute('aria-disabled');
-      firstBtn.disabled = false;
-      firstBtn.classList.remove('disabled','is-disabled');
-      firstBtn.style.pointerEvents = '';
+      // ② C2(칭호) mini-cell: 첫 번째 세부버튼 활성화 → "마법 부여"
+      const c2cell = document.querySelector('.slot.mini[data-slot="C2"]')?.closest('.mini-cell');
+      if (c2cell) {
+        const firstBtn = c2cell.querySelector('.outer-rects .rect:nth-child(1)');
+        if (firstBtn) {
+          firstBtn.textContent = '마법 부여';
+          firstBtn.dataset.role = 'enchant';
+          firstBtn.removeAttribute('data-unused');
+          firstBtn.removeAttribute('aria-disabled');
+          firstBtn.disabled = false;
+          firstBtn.classList.remove('disabled', 'is-disabled');
+          firstBtn.style.pointerEvents = '';
+        }
+      }
     }
-  }
-}
 
     document.addEventListener('DOMContentLoaded', () => {
       setDefaultEnchantLabels();
@@ -1954,140 +2048,140 @@ function setDefaultEnchantLabels() {
     }
 
     // === [ENCHANT] 2) ENHANCE_SHEET 로딩 & 옵션 추출 ===
-// === [ENCHANT] 캐시 우선 옵션 로더 ===
-async function loadEnchantOptions(typeKey){
-  await ensureEnchantCache();
-  const list = ENCHANT_CACHE.byType.get(String(typeKey).trim());
-  return Array.isArray(list) ? list : [];
-}
+    // === [ENCHANT] 캐시 우선 옵션 로더 ===
+    async function loadEnchantOptions(typeKey) {
+      await ensureEnchantCache();
+      const list = ENCHANT_CACHE.byType.get(String(typeKey).trim());
+      return Array.isArray(list) ? list : [];
+    }
 
 
 
     // === [ENCHANT] 3) 모달 핸들러 ===
-const $enchantModal  = document.getElementById('enchantModal');
-const $enchantList   = document.getElementById('enchantList');
+    const $enchantModal = document.getElementById('enchantModal');
+    const $enchantList = document.getElementById('enchantList');
 
-function openEnchantModalFor(slotKey){
-  state.currentSlotKey = slotKey;
-  const typeKey = enchantTypeForSlot(slotKey);
-  if(!typeKey){ alert('해당 슬롯의 마법부여 종류를 찾을 수 없습니다.'); return; }
-  renderEnchantList(typeKey);
-  showModal($enchantModal, true);
-}
-
-async function renderEnchantList(typeKey){
-  const list = await loadEnchantOptions(typeKey);
-  if(!list.length){
-    $enchantList.innerHTML = '<div style="color:#c7b589;">해당 부위의 마법부여가 없습니다.</div>';
-    return;
-  }
-  // 캡션 사용하지 않음(요구 5). 이름만 버튼으로.
-  $enchantList.innerHTML = '';
-  list.forEach(opt=>{
-    const btn = document.createElement('button');
-    btn.className = 'enh-option';
-    btn.type = 'button';
-    btn.textContent = opt.name;
-    btn.addEventListener('click', ()=>applyEnchantSelection(opt));
-    $enchantList.appendChild(btn);
-  });
-}
-// === [ENCHANT][AUTO] 속성+티어/티어만 규칙대로 전체 자동 적용
-async function applyAutoEnchant(attr, tier){
-  await ensureEnchantCache(); // 캐시 보장
-
-  const combo = `${attr}${tier}`;
-
-  // 규칙: 무기/팔/목/반지는 "속성+티어"로 찾는다
-  const USE_COMBO = new Set(['무기마부','팔찌마부','목걸이마부','반지마부']);
-  // 규칙: 머어/상의/하의/허리/신발/보장/칭호는 "티어"만으로 찾는다
-  const USE_TIER  = new Set(['머리어깨마부','상의마부','하의마부','허리마부','신발마부','보장마부','칭호마부']);
-
-  // 적용 대상 슬롯 코드(좌/우/보조/칭호 포함)
-  const targetSlots = ['R1','R2','R3','R4','R5','L1','L2','L3','L4','L5','C2'];
-
-  const applied = [];
-  // 한 슬롯씩 찾아서 state.enchants에 넣고 버튼 라벨도 갱신
-  for (const slotCode of targetSlots){
-    const typeKey = enchantTypeForSlot(slotCode); // 예: R1 -> '무기마부' :contentReference[oaicite:2]{index=2}
-    if (!typeKey) continue;
-
-    const keyToUse = USE_COMBO.has(typeKey) ? combo
-                   : USE_TIER.has(typeKey)  ? tier
-                   : null;
-    if (!keyToUse) continue;
-
-    const opt = findEnchantByJobGroup(typeKey, keyToUse);
-    if (!opt) continue;
-
-    // 기존 단일 적용 로직을 재사용해서 라벨/합산까지 동일 동작
-    const prev = state.currentSlotKey;
-    state.currentSlotKey = slotCode;
-    applyEnchantSelection(opt); // 이 함수 안에서 버튼명 갱신 + 재계산 + 모달닫기까지 처리됨 :contentReference[oaicite:3]{index=3}
-    state.currentSlotKey = prev;
-
-    applied.push({ slot: slotCode, name: opt.name });
-  }
-
-  if (!applied.length){
-    // 찾을 수 없는 케이스를 안내(선택한 조합이 시트에 없는 경우)
-    if (typeof toast === 'function') toast('조건에 맞는 추천 마법부여를 찾지 못했습니다.');
-    else alert('조건에 맞는 추천 마법부여를 찾지 못했습니다.');
-  }
-}
-
-function applyEnchantSelection(opt){
-  const slotKey = state.currentSlotKey;
-  if(!slotKey) return;
-   state.enchants[slotKey] = {
-    name: opt.name,
-    typeKey: opt.typeKey,
-    stats: opt.stats || null,
-    raw: opt.raw || null
-  };
-
-  // 1) 장비 슬롯 행(.slot-row)에 있으면: 마법부여 버튼(data-role) 또는 3번째 버튼 갱신
-  const row = document.querySelector(`.slot-row .slot[data-slot="${slotKey}"]`)?.closest('.slot-row');
-  if (row) {
-    const target = row.querySelector('.outer-rects .rect[data-role="enchant"]')
-               || row.querySelector('.outer-rects .rect:nth-child(3)');
-    if (target) target.textContent = opt.name;
-  } else {
-    // 2) 미니 셀(C1~C4)에 있으면: 마법부여 버튼(data-role) 또는 1번째 버튼 갱신
-    const cell = document.querySelector(`.mini-cell .slot.mini[data-slot="${slotKey}"]`)?.closest('.mini-cell');
-    if (cell) {
-      const target = cell.querySelector('.outer-rects .rect[data-role="enchant"]')
-                   || cell.querySelector('.outer-rects .rect:nth-child(1)');
-      if (target) target.textContent = opt.name;
+    function openEnchantModalFor(slotKey) {
+      state.currentSlotKey = slotKey;
+      const typeKey = enchantTypeForSlot(slotKey);
+      if (!typeKey) { alert('해당 슬롯의 마법부여 종류를 찾을 수 없습니다.'); return; }
+      renderEnchantList(typeKey);
+      showModal($enchantModal, true);
     }
-  }
 
-  showModal($enchantModal, false);
-  recalcAndRenderPanel();
-}
+    async function renderEnchantList(typeKey) {
+      const list = await loadEnchantOptions(typeKey);
+      if (!list.length) {
+        $enchantList.innerHTML = '<div style="color:#c7b589;">해당 부위의 마법부여가 없습니다.</div>';
+        return;
+      }
+      // 캡션 사용하지 않음(요구 5). 이름만 버튼으로.
+      $enchantList.innerHTML = '';
+      list.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'enh-option';
+        btn.type = 'button';
+        btn.textContent = opt.name;
+        btn.addEventListener('click', () => applyEnchantSelection(opt));
+        $enchantList.appendChild(btn);
+      });
+    }
+    // === [ENCHANT][AUTO] 속성+티어/티어만 규칙대로 전체 자동 적용
+    async function applyAutoEnchant(attr, tier) {
+      await ensureEnchantCache(); // 캐시 보장
 
-// 공용 모달 show/hide 유틸(파일 내 다른 모달과 동일 방식 사용)
-function showModal(modal, on){
-  if(!modal) return;
-  if(on){ modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); }
-  else { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
-}
-$enchantModal?.querySelector('.backdrop[data-close]')?.addEventListener('click', ()=>showModal($enchantModal,false));
+      const combo = `${attr}${tier}`;
 
-// === [ENCHANT] 4) 세 번째 세부상자 클릭 시 모달 ===
-document.addEventListener('click', (e)=>{
-  const btn = e.target.closest('.rect');
-  if(!btn) return;
+      // 규칙: 무기/팔/목/반지는 "속성+티어"로 찾는다
+      const USE_COMBO = new Set(['무기마부', '팔찌마부', '목걸이마부', '반지마부']);
+      // 규칙: 머어/상의/하의/허리/신발/보장/칭호는 "티어"만으로 찾는다
+      const USE_TIER = new Set(['머리어깨마부', '상의마부', '하의마부', '허리마부', '신발마부', '보장마부', '칭호마부']);
 
-  // 3번째 버튼만 처리 (dataset.role='enchant'는 A단계에서 부여)
-  if(btn.dataset.role === 'enchant'){
-    // ★ slot-row 또는 mini-cell(하단 C1~C4 영역) 모두 지원
-    const container = btn.closest('.slot-row, .mini-cell, .mini-bar');
-    const slotKey = container?.querySelector('.slot')?.getAttribute('data-slot');
-    if(!slotKey) return;
-    openEnchantModalFor(slotKey);
-  }
-});
+      // 적용 대상 슬롯 코드(좌/우/보조/칭호 포함)
+      const targetSlots = ['R1', 'R2', 'R3', 'R4', 'R5', 'L1', 'L2', 'L3', 'L4', 'L5', 'C2'];
+
+      const applied = [];
+      // 한 슬롯씩 찾아서 state.enchants에 넣고 버튼 라벨도 갱신
+      for (const slotCode of targetSlots) {
+        const typeKey = enchantTypeForSlot(slotCode); // 예: R1 -> '무기마부' :contentReference[oaicite:2]{index=2}
+        if (!typeKey) continue;
+
+        const keyToUse = USE_COMBO.has(typeKey) ? combo
+          : USE_TIER.has(typeKey) ? tier
+            : null;
+        if (!keyToUse) continue;
+
+        const opt = findEnchantByJobGroup(typeKey, keyToUse);
+        if (!opt) continue;
+
+        // 기존 단일 적용 로직을 재사용해서 라벨/합산까지 동일 동작
+        const prev = state.currentSlotKey;
+        state.currentSlotKey = slotCode;
+        applyEnchantSelection(opt); // 이 함수 안에서 버튼명 갱신 + 재계산 + 모달닫기까지 처리됨 :contentReference[oaicite:3]{index=3}
+        state.currentSlotKey = prev;
+
+        applied.push({ slot: slotCode, name: opt.name });
+      }
+
+      if (!applied.length) {
+        // 찾을 수 없는 케이스를 안내(선택한 조합이 시트에 없는 경우)
+        if (typeof toast === 'function') toast('조건에 맞는 추천 마법부여를 찾지 못했습니다.');
+        else alert('조건에 맞는 추천 마법부여를 찾지 못했습니다.');
+      }
+    }
+
+    function applyEnchantSelection(opt) {
+      const slotKey = state.currentSlotKey;
+      if (!slotKey) return;
+      state.enchants[slotKey] = {
+        name: opt.name,
+        typeKey: opt.typeKey,
+        stats: opt.stats || null,
+        raw: opt.raw || null
+      };
+
+      // 1) 장비 슬롯 행(.slot-row)에 있으면: 마법부여 버튼(data-role) 또는 3번째 버튼 갱신
+      const row = document.querySelector(`.slot-row .slot[data-slot="${slotKey}"]`)?.closest('.slot-row');
+      if (row) {
+        const target = row.querySelector('.outer-rects .rect[data-role="enchant"]')
+          || row.querySelector('.outer-rects .rect:nth-child(3)');
+        if (target) target.textContent = opt.name;
+      } else {
+        // 2) 미니 셀(C1~C4)에 있으면: 마법부여 버튼(data-role) 또는 1번째 버튼 갱신
+        const cell = document.querySelector(`.mini-cell .slot.mini[data-slot="${slotKey}"]`)?.closest('.mini-cell');
+        if (cell) {
+          const target = cell.querySelector('.outer-rects .rect[data-role="enchant"]')
+            || cell.querySelector('.outer-rects .rect:nth-child(1)');
+          if (target) target.textContent = opt.name;
+        }
+      }
+
+      showModal($enchantModal, false);
+      recalcAndRenderPanel();
+    }
+
+    // 공용 모달 show/hide 유틸(파일 내 다른 모달과 동일 방식 사용)
+    function showModal(modal, on) {
+      if (!modal) return;
+      if (on) { modal.classList.add('show'); modal.setAttribute('aria-hidden', 'false'); }
+      else { modal.classList.remove('show'); modal.setAttribute('aria-hidden', 'true'); }
+    }
+    $enchantModal?.querySelector('.backdrop[data-close]')?.addEventListener('click', () => showModal($enchantModal, false));
+
+    // === [ENCHANT] 4) 세 번째 세부상자 클릭 시 모달 ===
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.rect');
+      if (!btn) return;
+
+      // 3번째 버튼만 처리 (dataset.role='enchant'는 A단계에서 부여)
+      if (btn.dataset.role === 'enchant') {
+        // ★ slot-row 또는 mini-cell(하단 C1~C4 영역) 모두 지원
+        const container = btn.closest('.slot-row, .mini-cell, .mini-bar');
+        const slotKey = container?.querySelector('.slot')?.getAttribute('data-slot');
+        if (!slotKey) return;
+        openEnchantModalFor(slotKey);
+      }
+    });
 
 
 
@@ -2150,7 +2244,16 @@ document.addEventListener('click', (e)=>{
 
 
     /* ===== 스킬 시트 로더 & 게임형(가로 칼럼) 렌더러 ===== */
-
+    // (스킬트리 렌더러 상단 어딘가, 중복 정의 없이 1회 선언)
+    const onSkillTreeChanged = (() => {
+      let t = null;
+      return () => {
+        clearTimeout(t);
+        t = setTimeout(() => {
+          if (typeof recalcAndRenderPanel === 'function') recalcAndRenderPanel();
+        }, 60); // 너무 자주 돌지 않게 살짝 디바운스
+      };
+    })();
     const ST_BANDS = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 65, 70, 75, 80];
     const DBSkills = { loaded: false, rows: [] };
 
@@ -2216,49 +2319,58 @@ document.addEventListener('click', (e)=>{
     };
     /** 시트 → 표준 스킬 객체 매핑 */
     // 교체할 함수
-function mapRowToSkill2(r) {        // 시트 컬럼들을 읽습니다. who = 캐릭터명, show = 노출여부, ...
-  // 1) 캐릭터 키(시트 '캐릭터명'과 정확히 일치, 공백 제거)
-  const who = String(r['캐릭터명'] || '').replace(/\s+/g, '');
-  // 2) 노출/정렬/좌표
-  const show  = Number(String(r['노출여부'] || '').trim()) === 1;
-  const level = Number(String(r['스킬렙제']  || '').trim()) || 0;
-  const x     = Math.min(6, Math.max(1, Number(String(r['가로위치'] || '').trim()) || 1));
-  const y     = Math.max(1, Number(String(r['세로위치'] || '').trim()) || 1);
-  // 3) 핵심 필드(스펙: 스킬명/이미지 사용)
-  const name = String(r['스킬명'] || '').trim();
-  const img  = cleanUrl(r['이미지'] || '') || PLACEHOLDER_IMG;
-  // 4) 최소/최대 스킬 레벨
-  const minLv = Math.max(0, Number(String(r['최소스킬레벨'] || '').trim()) || 0);
-  const maxLv = Math.max(minLv, Number(String(r['최대스킬레벨'] || '').trim()) || minLv); // 최소보다 작지 않게
+    function mapRowToSkill2(r) {        // 시트 컬럼들을 읽습니다. who = 캐릭터명, show = 노출여부, ...
+      // 1) 캐릭터 키(시트 '캐릭터명'과 정확히 일치, 공백 제거)
+      const who = String(r['캐릭터명'] || '').replace(/\s+/g, '');
+      // 2) 노출/정렬/좌표
+      const show = Number(String(r['노출여부'] || '').trim()) === 1;
+      const level = Number(String(r['스킬렙제'] || '').trim()) || 0;
+      const x = Math.min(6, Math.max(1, Number(String(r['가로위치'] || '').trim()) || 1));
+      const y = Math.max(1, Number(String(r['세로위치'] || '').trim()) || 1);
+      const cd = toNum(r['쿨타임']);
+      const castFrames = toNum(r['시전프레임']);
+      // ★ 추가: 구분(평타/연결평타/스킬/각성기)
+      const rawKind = String(r['구분'] || '').trim();
+      // 기본값은 '스킬' (시트에서 비워두면 스킬로 취급)
+      const kind = rawKind || '스킬';
+      // 3) 핵심 필드(스펙: 스킬명/이미지 사용)
+      const name = String(r['스킬명'] || '').trim();
+      const img = cleanUrl(r['이미지'] || '') || PLACEHOLDER_IMG;
+      // 4) 최소/최대 스킬 레벨
+      const minLv = Math.max(0, Number(String(r['최소스킬레벨'] || '').trim()) || 0);
+      const maxLv = Math.max(minLv, Number(String(r['최대스킬레벨'] || '').trim()) || minLv); // 최소보다 작지 않게
 
-  // 5) ID(없으면 스킬명 기반 대체)
-  const idSrc = String(r['ID'] ?? r['id'] ?? name).trim();
-  const id    = idSrc || ('SK_' + Math.random().toString(36).slice(2));
+      // 5) ID(없으면 스킬명 기반 대체)
+      const idSrc = String(r['ID'] ?? r['id'] ?? name).trim();
+      const id = idSrc || ('SK_' + Math.random().toString(36).slice(2));
 
-  // 6) SP/TP 코스트
-  const sp     = toInt(r['소모 SP'] ?? r['소모SP'] ?? r['SP'] ?? r['sp'] ?? 0, 0);
-  const tpCost = toInt(r['tp설정'] ?? r['TP설정'] ?? r['tp 설정'] ?? r['TP 설정'] ?? r['tp'] ?? r['TP'] ?? 0, 0);
+      // 6) SP/TP 코스트
+      const sp = toInt(r['소모 SP'] ?? r['소모SP'] ?? r['SP'] ?? r['sp'] ?? 0, 0);
+      const tpCost = toInt(r['tp설정'] ?? r['TP설정'] ?? r['tp 설정'] ?? r['TP 설정'] ?? r['tp'] ?? r['TP'] ?? 0, 0);
 
-  // 7) ★ 퍼뎀/고뎀 선형 모델(시트 컬럼 그대로)
-  //    - '1렙데미지'   : minLv 기준 퍼뎀
-  //    - '1렙고정뎀'   : minLv 기준 고뎀
-  //    - '1렙당 데미지': 레벨 +1당 퍼뎀 증가치
-  //    - '1렙당 고정뎀': 레벨 +1당 고뎀 증가치
-  const dmg1Base  = toNum(r['1렙데미지'],    NaN);
-  const fix1Base  = toNum(r['1렙고정뎀'],    NaN);
-  const dmg1PerLv = toNum(r['1렙당 데미지'],  NaN);
-  const fix1PerLv = toNum(r['1렙당 고정뎀'],  NaN);
+      // 7) ★ 퍼뎀/고뎀 선형 모델(시트 컬럼 그대로)
+      //    - '1렙데미지'   : minLv 기준 퍼뎀
+      //    - '1렙고정뎀'   : minLv 기준 고뎀
+      //    - '1렙당 데미지': 레벨 +1당 퍼뎀 증가치
+      //    - '1렙당 고정뎀': 레벨 +1당 고뎀 증가치
+      const dmg1Base = toNum(r['1렙데미지'], NaN);
+      const fix1Base = toNum(r['1렙고정뎀'], NaN);
+      const dmg1PerLv = toNum(r['1렙당 데미지'], NaN);
+      const fix1PerLv = toNum(r['1렙당 고정뎀'], NaN);
 
-  return {
-    id, name, img, who, show, level, x, y, minLv, maxLv, sp, tpCost,
-    // ★ 추가된 4개 필드
-    dmg1Base, fix1Base, dmg1PerLv, fix1PerLv
-  };
-}
+      return {
+        id, name, img, who, show, level, x, y, minLv, maxLv, sp, tpCost,
+        // ★ 추가된 4개 필드
+        dmg1Base, fix1Base, dmg1PerLv, fix1PerLv, band: level, levelGate: level, cd,             // ★ 추가: 계산에서 바로 쓰도록
+        cooldown: cd,
+        castFrames,    // ★ 호환용 키
+        kind
+      };
+    }
 
 
 
-    /** 시트 로드(1회) */ 
+    /** 시트 로드(1회) */
     async function ensureSkillLoaded2() {     // SKILL_SHEET 를 Papa.parse로 읽고 각 행을 mapRowToSkill2로 표준 스킬 객체로 변환한 뒤 ST2.rows 에 캐시해둡니다
       if (ST2.loaded) return;
       const text = await fetch(SKILL_SHEET, { cache: 'no-store' }).then(r => r.text());
@@ -2278,67 +2390,63 @@ function mapRowToSkill2(r) {        // 시트 컬럼들을 읽습니다. who = �
     const TP_MIN = 0, TP_MAX = 5;
     state.skillTpLv = state.skillTpLv || {}; // { skillId: tpLevel }
 
-/* ===== 스킬 데미지 유틸(선형 + TP 배율) ===== */
-// 0) (없으면 추가) 현재 데미지 캐시
-state.skillDmg = state.skillDmg || {};   // { skillId: {per, flat, lv, tpLv, tpIncPercent} }
+    /* ===== 스킬 데미지 유틸(선형 + TP 배율) ===== */
+    // 0) (없으면 추가) 현재 데미지 캐시
+    state.skillDmg = state.skillDmg || {};   // { skillId: {per, flat, lv, tpLv, tpIncPercent} }
 
-// 1) (없으면 추가) 선형 퍼뎀/고뎀 계산
-function calcSkillDamageLinear(skill, lv) {
-  // 0과 null/undefined 를 구분: 0은 유효 레벨
-  const maxLv = Number(skill.maxLv ?? 0);
-  const rawLv = Number(lv ?? 0);
+    // 1) (없으면 추가) 선형 퍼뎀/고뎀 계산
+    function calcSkillDamageLinear(skill, lv) {
+      // 0과 null/undefined 를 구분: 0은 유효 레벨
+      const maxLv = Number(skill.maxLv ?? 0);
+      const rawLv = Number(lv ?? 0);
 
-  // 1) 레벨 하한은 0으로 클램프 (0레벨 허용)
-  const curLv = Math.max(0, Math.min(maxLv, rawLv));
+      // 1) 레벨 하한은 0으로 클램프 (0레벨 허용)
+      // ✅ 계산상 상한 제거
+      const curLv = Math.max(0, rawLv);
 
-  // 2) 0레벨이면 데미지 0 확정
-  if (curLv === 0) return { per: 0, flat: 0, lv: 0 };
+      // 2) 0레벨이면 데미지 0 확정
+      if (curLv === 0) return { per: 0, flat: 0, lv: 0 };
 
-  // 3) '1렙데미지'를 기준으로 선형 증가
-  //    step은 항상 (현재레벨 - 1)
-  const dmg1Base  = Number.isFinite(skill.dmg1Base)  ? skill.dmg1Base  : 0;
-  const fix1Base  = Number.isFinite(skill.fix1Base)  ? skill.fix1Base  : 0;
-  const dmg1PerLv = Number.isFinite(skill.dmg1PerLv) ? skill.dmg1PerLv : 0;
-  const fix1PerLv = Number.isFinite(skill.fix1PerLv) ? skill.fix1PerLv : 0;
+      // 3) '1렙데미지'를 기준으로 선형 증가
+      //    step은 항상 (현재레벨 - 1)
+      const dmg1Base = Number.isFinite(skill.dmg1Base) ? skill.dmg1Base : 0;
+      const fix1Base = Number.isFinite(skill.fix1Base) ? skill.fix1Base : 0;
+      const dmg1PerLv = Number.isFinite(skill.dmg1PerLv) ? skill.dmg1PerLv : 0;
+      const fix1PerLv = Number.isFinite(skill.fix1PerLv) ? skill.fix1PerLv : 0;
 
-  const step = curLv - 1; // ★ 1렙 기준
-  const per  = dmg1Base + dmg1PerLv * step;  // 퍼뎀
-  const flat = fix1Base + fix1PerLv * step;  // 고뎀
+      const step = curLv - 1; // ★ 1렙 기준
+      const per = dmg1Base + dmg1PerLv * step;  // 퍼뎀
+      const flat = fix1Base + fix1PerLv * step;  // 고뎀
 
-  return { per, flat, lv: curLv };
-}
+      return { per, flat, lv: curLv };
+    }
 
-// 2) 외부(아이템/룬 등) TP 보너스 합산 – 초기는 0으로 두고 나중에 구현
-function getTpBonusFromSources(skillId) {
-  return 0; // TODO: 아이템/룬/옵션에서 해당 스킬 TP +n을 합산해 반환
-}
+    // 2) 외부(아이템/룬 등) TP 보너스 합산 – 초기는 0으로 두고 나중에 구현
+    // TP 추가 보정치(기교룬 등)
+    function getTpBonusFromSources(skillId) {
+      // ① 사용자가 찍은 '기본 TP'가 0이면 → 기교룬 보너스 차단
+      const baseUiTp = Number(state.skillTpLv?.[skillId] ?? 0);
+      if (!(baseUiTp > 0)) return 0;
 
-// 3) tp설정(1/2)에 따른 TP 증가율(%) 계산 (최대 7레벨)
-function tpIncreasePercent(tpSetting, tpLevel) {
-  const lv = Math.max(0, Math.min(7, Number(tpLevel) || 0));
-  if (lv === 0 || !Number.isFinite(tpSetting) || tpSetting <= 0) return 0;
+      // ② 기교룬(+TP) 합산
+      const s = (ST2?.rows || []).find(r => r.id === skillId);
+      if (!s) return 0;
+      const { enhLvAdd } = runeLevelAdds(s); // 기교룬 수량
+      return Number(enhLvAdd || 0);
+    }
 
-  if (tpSetting === 1) return 5 + (lv - 1) * 2; // 1레벨 5%, 이후 +2%
-  if (tpSetting === 2) return 8 + (lv - 1) * 3; // 1레벨 8%, 이후 +3%
-  return 0;
-}
+    // 3) tp설정(1/2)에 따른 TP 증가율(%) 계산 (최대 7레벨)
+    function tpIncreasePercent(tpSetting, tpLevel) {
+      const lv = Math.max(0, Math.min(7, Number(tpLevel) || 0));
+      if (lv === 0 || !Number.isFinite(tpSetting) || tpSetting <= 0) return 0;
 
-// 4) 선형 데미지에 TP 비율을 곱해 최종치 산출
-function calcSkillDamageWithTp(skill, skillLv, baseTpLv) {
-  const base = calcSkillDamageLinear(skill, skillLv);
-  const bonus = getTpBonusFromSources(skill.id); // 외부 +TP
-  const effTpLv = Math.min(7, Math.max(0, Number(baseTpLv || 0) + Number(bonus || 0)));
-  const incPct = tpIncreasePercent(Number(skill.tpCost || 0), effTpLv);
-  const mul = 1 + (incPct / 100);
+      if (tpSetting === 1) return 5 + (lv - 1) * 2; // 1레벨 5%, 이후 +2%
+      if (tpSetting === 2) return 8 + (lv - 1) * 3; // 1레벨 8%, 이후 +3%
+      return 0;
+    }
 
-  return {
-    per:  Math.max(0, base.per  * mul),
-    flat: Math.max(0, base.flat * mul),
-    lv:   base.lv,
-    tpLv: effTpLv,
-    tpIncPercent: incPct
-  };
-}
+    // 4) 선형 데미지에 TP 비율을 곱해 최종치 산출
+
     /* ===== 길게누르기(민감 완화): pointer 이벤트 기반 ===== */
     function attachPressRepeat(btn, stepFn) {
       let timer = null, active = false, interval = 180;
@@ -2403,52 +2511,54 @@ function calcSkillDamageWithTp(skill, skillLv, baseTpLv) {
         return clampSkill(s, state.skillLv[s.id]);
       };
       const setSkill = (s, v) => {
-  const target = clampSkill(s, v);
-  const cur = getSkill(s);
-  const delta = target - cur;
-  const per = Number(s.sp || 0);
+        const target = clampSkill(s, v);
+        const cur = getSkill(s);
+        const delta = target - cur;
+        const per = Number(s.sp || 0);
 
-  if (delta > 0) {
-    const cost = per * delta;
-    if (!canSpendSp(cost)) { noSpFeedback(); return; }
-    state.skillLv[s.id] = target;
-    spendSp(cost);
-  } else if (delta < 0) {
-    state.skillLv[s.id] = target;
-    refundSp(per * (-delta));
-  } else {
-    state.skillLv[s.id] = target;
-  }
+        if (delta > 0) {
+          const cost = per * delta;
+          if (!canSpendSp(cost)) { noSpFeedback(); return; }
+          state.skillLv[s.id] = target;
+          spendSp(cost);
+        } else if (delta < 0) {
+          state.skillLv[s.id] = target;
+          refundSp(per * (-delta));
+        } else {
+          state.skillLv[s.id] = target;
+        }
 
-  // ★ 여기부터 교체: 확정 레벨(target)과 TP(없으면 0)를 사용, ??로 안전 처리
-  const curTpLv = state.skillTpLv?.[s.id] ?? 0;              // ← 0 그대로 인정
-  state.skillDmg[s.id] = calcSkillDamageWithTp(s, target, curTpLv);
-};
+        // ★ 여기부터 교체: 확정 레벨(target)과 TP(없으면 0)를 사용, ??로 안전 처리
+        const curTpLv = state.skillTpLv?.[s.id] ?? 0;              // ← 0 그대로 인정
+        state.skillDmg[s.id] = calcSkillDamageWithTp(s, curTpLv);
+        onSkillTreeChanged();
+      };
       const getTp = (s) => {
         if (state.skillTpLv[s.id] === undefined) state.skillTpLv[s.id] = TP_MIN;
         return clampTp(state.skillTpLv[s.id]);
       };
       const setTp = (s, v) => {
-  const unit = Number(s.tpCost || 0);
-  if (!Number.isFinite(unit) || unit <= 0) return; // TP 강화 미지원
+        const unit = Number(s.tpCost || 0);
+        if (!Number.isFinite(unit) || unit <= 0) return; // TP 강화 미지원
 
-  const target = clampTp(v);
-  const cur = getTp(s);
+        const target = clampTp(v);
+        const cur = getTp(s);
 
-  if (target > cur) {
-    const need = (target - cur) * unit;
-    if (!canSpendTp(need)) { noTpFeedback(); return; }
-    spendTp(need);
-  } else if (target < cur) {
-    const back = (cur - target) * unit;
-    refundTp(back);
-  }
-  state.skillTpLv[s.id] = target;
+        if (target > cur) {
+          const need = (target - cur) * unit;
+          if (!canSpendTp(need)) { noTpFeedback(); return; }
+          spendTp(need);
+        } else if (target < cur) {
+          const back = (cur - target) * unit;
+          refundTp(back);
+        }
+        state.skillTpLv[s.id] = target;
 
-  // ★ 여기! TP 확정 후 재계산. minLv=0을 깨지 않도록 ?? 사용
-  const curLv = state.skillLv?.[s.id] ?? (s.minLv ?? 1);     // ← 0 그대로 인정
-  state.skillDmg[s.id] = calcSkillDamageWithTp(s, curLv, target);
-};
+        // ★ 여기! TP 확정 후 재계산. minLv=0을 깨지 않도록 ?? 사용
+        const curLv = state.skillLv?.[s.id] ?? (s.minLv ?? 1);     // ← 0 그대로 인정
+        state.skillDmg[s.id] = calcSkillDamageWithTp(s, target);
+        onSkillTreeChanged();
+      };
 
       // 레벨 밴드 단위로 DOM 생성
       levels.forEach(lvl => {
@@ -2655,7 +2765,7 @@ function calcSkillDamageWithTp(skill, skillLv, baseTpLv) {
     });
     // 룬 각인 선택 결과(한 개만 유지)
     state.runeEngrave = state.runeEngrave || null; // {name, tag, stats, ...}
-//일반스킬룬
+    //일반스킬룬
     const RUNE_LEVELS = [15, 20, 25, 30, 35, 40, 45, 65];
     const RUNE_CATS = [
       { key: 'awakening', label: '각성' },
@@ -2673,54 +2783,65 @@ function calcSkillDamageWithTp(skill, skillLv, baseTpLv) {
         });
       });
     }
-/* ===== 스킬룬 코어 ===== */
-// 카테고리 키: RUNE_CATS에서 쓰는 키 그대로 사용(각성/마력/허상/숙련/기교)
-const RUNE_KEYS = {
-  awakening: '각성룬',   // 데미지 ×1.04^n
-  magic:     '마력룬',   // 데미지 ×1.03^n
-  illusion:  '허상룬',   // 쿨타임 ×0.96^n
-  training:  '숙련룬',   // 스킬레벨 +n
-  technique: '기교룬',   // 스킬강화레벨 +n
-};
+    /* ===== 스킬룬 코어 ===== */
+    // 카테고리 키: RUNE_CATS에서 쓰는 키 그대로 사용(각성/마력/허상/숙련/기교)
+    const RUNE_KEYS = {
+      awakening: '각성룬',   // 데미지 ×1.04^n
+      magic: '마력룬',   // 데미지 ×1.03^n
+      illusion: '허상룬',   // 쿨타임 ×0.96^n
+      training: '숙련룬',   // 스킬레벨 +n
+      technique: '기교룬',   // 스킬강화레벨 +n
+    };
 
-// 선택 개수 가져오기: state.runes[catKey][tier] (없으면 0)
-function getRuneCountByKey(catKey, tier) {
-  const row = (state.runes?.[catKey]) || {};
-  return Number(row[tier] || 0);
-}
+    // 선택 개수 가져오기: state.runes[catKey][tier] (없으면 0)
+    function getRuneCountByKey(catKey, tier) {
+      const row = (state.runes?.[catKey]) || {};
+      return Number(row[tier] || 0);
+    }
 
-// 스킬의 렙제(밴드) 알아내기: mapRowToSkill에서 band 필드를 채움
-// (스킬 객체에 band가 없으면 0/기본 취급)
-function skillTierOf(skill) {
-  const b = Number(skill?.band || 0);
-  return b > 0 ? b : null;
-}
+    // 스킬의 렙제(밴드) 알아내기: mapRowToSkill에서 band 필드를 채움
+    // (스킬 객체에 band가 없으면 0/기본 취급)
+    function skillTierOf(skill) {
+      const b = Number(skill?.band || 0);
+      return b > 0 ? b : null;
+    }
 
-// 1) 최종 공격력 배수: 각성(1.04^n) × 마력(1.03^n)
-function runeDamageMultiplier(skill) {
-  const tier = skillTierOf(skill);
-  if (!tier) return 1;
-  const nA = getRuneCountByKey('awakening', tier);
-  const nM = getRuneCountByKey('magic', tier);
-  return Math.pow(1.04, nA) * Math.pow(1.03, nM);
-}
+    // (skillTierOf 바로 아래에)
+    function getLevelingCountByTier(tier) {
+      return Number(state.leveling?.[tier] || 0);
+    }
 
-// 2) 쿨타임 보정: 허상룬 → baseCd × (0.96^n)
-function runeCooldown(skill, baseCd) {
-  const tier = skillTierOf(skill);
-  if (!tier) return baseCd;
-  const nH = getRuneCountByKey('illusion', tier);
-  return baseCd * Math.pow(0.96, nH);
-}
+    // cd 값을 '초' 숫자로만 얻기 (문자 섞여 있어도 숫자만 추출)
+    function toSec(v) {
+      const n = Number(String(v ?? '').replace(/[^\d.]/g, ''));
+      return Number.isFinite(n) ? n : 0;
+    }
 
-// 3) 레벨 보정: 숙련(+n), 기교(+n)
-function runeLevelAdds(skill) {
-  const tier = skillTierOf(skill);
-  if (!tier) return { skillLvAdd: 0, enhLvAdd: 0 };
-  const nS = getRuneCountByKey('training', tier);
-  const nT = getRuneCountByKey('technique', tier);
-  return { skillLvAdd: nS, enhLvAdd: nT };
-}
+    // 1) 최종 공격력 배수: 각성(1.04^n) × 마력(1.03^n)
+    function runeDamageMultiplier(skill) {
+      const tier = skillTierOf(skill);
+      if (!tier) return 1;
+      const nA = getRuneCountByKey('awakening', tier);
+      const nM = getRuneCountByKey('magic', tier);
+      return Math.pow(1.04, nA) * Math.pow(1.03, nM);
+    }
+
+    // 2) 쿨타임 보정: 허상룬 → baseCd × (0.96^n)
+    function runeCooldown(skill, baseCd) {
+      const tier = skillTierOf(skill);
+      if (!tier) return baseCd;
+      const nH = getRuneCountByKey('illusion', tier);
+      return baseCd * Math.pow(0.96, nH);
+    }
+
+    // 3) 레벨 보정: 숙련(+n), 기교(+n)
+    function runeLevelAdds(skill) {
+      const tier = skillTierOf(skill);
+      if (!tier) return { skillLvAdd: 0, enhLvAdd: 0 };
+      const nS = getRuneCountByKey('training', tier);
+      const nT = getRuneCountByKey('technique', tier);
+      return { skillLvAdd: nS, enhLvAdd: nT };
+    }
 
     function countSelectedRunes() {
       let sum = 0;
@@ -2734,6 +2855,19 @@ function runeLevelAdds(skill) {
       const a = document.getElementById('runeCount'); if (a) a.textContent = n;
       const b = document.getElementById('runeCountLabel'); if (b) b.textContent = n;
     }
+    // 룬 변경 시 살짝 디바운스해서 전체 재계산
+    const onRunesChanged = (() => {
+      let t = null;
+      return () => {
+        clearTimeout(t);
+        t = setTimeout(() => {
+          // 전체 합산/스킬 캐시/표시까지 한 번에 처리
+          if (typeof recalcAndRenderPanel === 'function') {
+            recalcAndRenderPanel();
+          }
+        }, 60);
+      };
+    })();
 
     state.options = state.options || {
       avatar: null,        // 'rare' | 'advanced'
@@ -2755,36 +2889,357 @@ function runeLevelAdds(skill) {
       quest: '퀘스트 무기압'
     };
     /* ▼ 드롭다운 value → 시트 '몬스터명' 매핑 */
-const MONSTER_NAME = {
-  nugol: '거대누골',
-  blackdragon: '흑룡',
-  anton: '안톤',
-  asmar_calix: '아스마르/칼릭스'
-};
-
-// 드롭다운 변경 시 호출
-async function onMonsterChange(selectedName) {
-  await ensureMonsterLoaded();
-  const row = DBMonster.rows.find(r => String(r['몬스터명']).trim() === selectedName);
-
-  state.options = state.options || {};
-  state.options.monster = selectedName;
-
-  if (row) {
-    state.monster = {
-      level:   Number(row['몬스터레벨']) || 0,
-      defRate: Number(row['방어율']) || 0,
-      fire:    Number(row['화속성저항']) || 0,
-      water:   Number(row['수속성저항']) || 0,
-      light:   Number(row['명속성저항']) || 0,
-      dark:    Number(row['암속성저항']) || 0,
+    const MONSTER_NAME = {
+      nugol: '거대누골',
+      blackdragon: '흑룡',
+      anton: '안톤',
+      asmar_calix: '아스마르/칼릭스'
     };
-  } else {
-    state.monster = { level:0, defRate:0, fire:0, water:0, light:0, dark:0 };
+
+    // ★ C) 효과적 스킬 레벨(레벨링 + 숙련룬 적용, 0레벨은 활성화 안 함)
+function effectiveSkillLevelForDamage(skill) {
+  // 1) 기본 스킬 레벨
+  let baseLv = Number(state.skillLv?.[skill.id] ?? 0);
+  const kind = String(skill?.kind || '').trim();
+
+  // 평타/연결평타는 기본 레벨이 없으면 1로 보정
+  const isNormal = (kind === '평타' || kind === '연결평타' || kind.startsWith('평타'));
+  if ((!Number.isFinite(baseLv) || baseLv <= 0) && isNormal) {
+    baseLv = 1;
   }
+  // 평타가 아니고, 유효 베이스레벨이 없으면 0 (기존 규칙 유지)
+  if (!Number.isFinite(baseLv) || baseLv <= 0) {
+    return 0;
+  }
+
+  // 2) 스킬렙제(레벨링 게이트) 결정: levelGate → band → 기존 helper 순
+  const gate =
+    Number(skill?.levelGate ?? 0) ||
+    Number(skill?.band ?? 0) ||
+    (skillTierOf ? (Number(skillTierOf(skill)) || 0) : 0);
+
+  const lvlAddByLeveling = gate ? getLevelingCountByTier(gate) : 0;
+
+  // 3) 숙련룬(+n)
+  const { skillLvAdd } = runeLevelAdds ? runeLevelAdds(skill) : { skillLvAdd: 0 };
+
+  // 4) 최종 유효 레벨(상한 없음, 1 이상으로 보정)
+  const eff = baseLv + (lvlAddByLeveling || 0) + (skillLvAdd || 0);
+  return Math.max(1, eff);
 }
 
-document.getElementById('selMonster').value
+
+    // ★ D) 최종 데미지: (선형 데미지 at 효과적 레벨) × (TP 배율) × (룬 배율)
+    function calcSkillDamageWithTp(skill, baseTpLv) {
+      // 1) 초 단위 쿨 계산
+      const cdBase = (typeof toSec === 'function') ? toSec(skill.cd) : Number(skill.cd || 0);
+      const cdFinal = cdBase > 0 ? runeCooldown(skill, cdBase) : 0; // 허상룬
+      const cdMul = (cdBase > 0) ? (cdFinal / cdBase) : 1;
+
+      // 2) 시전 프레임
+      const castFrames = Number(skill.castFrames || 0);
+
+        // 3) 유효 스킬 레벨
+  let effLv = effectiveSkillLevelForDamage(skill);     // ← (A) let 으로 변경 (보정 위해)
+  const kindNorm = String(skill?.kind || '스킬').trim();
+
+  // ★ 옵션 B: 평타(또는 연결평타)는 레벨 미지정이어도 1레벨로 보정
+  if (effLv === 0 && (kindNorm === '평타' || kindNorm === '연결평타' || kindNorm.startsWith('평타'))) {
+    effLv = 1;
+  }
+       if (effLv === 0) {
+        return {
+          per: 0,
+          flat: 0,
+          lv: 0,
+          tpLv: 0,
+          tpIncPercent: 0,
+          runeMul: 1,
+          cdBase,
+          cdFinal,
+          cdMul,
+          castFrames,
+          dps: 0,            // ★ 조기 리턴에도 dps 명시
+          uses: 0,           // ★ 시뮬 후 덮어씀
+           kind: kindNorm,
+        };
+      }
+
+      // 4) 선형 데미지 기반
+      const base = calcSkillDamageLinear(skill, effLv); // {per, flat, lv}
+
+      // 5) TP (TP 0이면 기교룬 무효 규칙 유지)
+      const tpBase = Math.max(0, Math.min(5, Number(state.skillTpLv?.[skill.id] ?? 0)));
+      const tpBonus = (tpBase > 0) ? getTpBonusFromSources(skill.id) : 0;
+      const tpLv = Math.max(0, Math.min(7, tpBase + tpBonus));
+      const tpPct = tpIncreasePercent(Number(skill.tpCost || 0), tpLv);
+      const tpMul = 1 + (tpPct / 100);
+
+      // 6) 룬 배수
+      const rMul = runeDamageMultiplier(skill);
+
+      // 7) 최종 per/flat 먼저 산출
+      const per = (base.per || 0) * tpMul * rMul;
+      const flat = (base.flat || 0) * tpMul * rMul;
+
+      // 8) 이제 dps 계산 (고뎀 제외, per만)
+      const dps = cdFinal > 0 ? (per / cdFinal) : 0;
+
+      // 9) 반환
+      return {
+        per,
+        flat,
+        lv: base.lv,
+        tpLv,
+        tpIncPercent: tpPct,
+        runeMul: rMul,
+        cdBase,
+        cdFinal,
+        cdMul,
+        castFrames,
+        dps,            // ★ 여기서 정의된 dps 사용
+        uses: 0,        // ★ 시뮬 후 덮어씀
+         kind: kindNorm,
+      };
+    }
+
+
+    /* ===== Uses 시뮬레이터(프레임 단위) ===== */
+    (function () {
+      const FPS = 60;
+
+      function currentCharKey() {
+        const k =
+          (typeof currentSkillOwnerKey === 'function' ? currentSkillOwnerKey() : null) ??
+          [state.currentCharacter?.jobGroupLabel, state.currentCharacter?.name].filter(Boolean).join('');
+        return String(k || '').replace(/\s+/g, '');
+      }
+
+      // 내부: 대상 스킬 목록 구성(요구사항 8 반영)
+      function collectSimCandidates() {
+        const key = currentCharKey();
+        if (!key || !(ST2?.rows?.length)) return { skills: [], awks: [], normals: [], link: null };
+
+        const rowsAll = ST2.rows.filter(s => s.who === key);
+
+        // 현재 사용 레벨(>=1)인 스킬/각성기
+        const isOn = (id) => Number(state.skillLv?.[id] ?? 0) >= 1;
+
+        const skills = rowsAll.filter(s => (s.kind === '스킬') && isOn(s.id));
+        const awks = rowsAll.filter(s => (s.kind === '각성기') && isOn(s.id));
+
+        // 평타/연결평타(show와 무관)
+        const normals = rowsAll.filter(s => s.kind === '평타');
+        const link = rowsAll.find(s => s.kind === '연결평타') || null;
+
+        return { skills, awks, normals, link };
+      }
+
+      // 내부: 스킬 엔트리로 변환(데미지 캐시 보강 + cd/캐스트 프레임 산출)
+      function toEntry(skill) {
+        const tp = Math.max(0, Math.min(5, Number(state.skillTpLv?.[skill.id] ?? 0)));
+        const d = calcSkillDamageWithTp(skill, tp); // per, flat, cdFinal(초), castFrames 등
+        // state.skillDmg에 병합(uses 초기화/유지)
+        const prev = state.skillDmg?.[skill.id] || {};
+        state.skillDmg[skill.id] = { ...prev, ...d, uses: Number(prev.uses || 0) };
+
+        const cdF = Math.max(0, Math.round(Number(d.cdFinal || 0) * FPS)); // 쿨(프레임)
+        const castF = Math.max(0, Math.round(Number(skill.castFrames || 0))); // 시전(프레임)
+
+        return {
+          id: skill.id,
+          name: skill.name,
+          kind: skill.kind || '스킬',
+          per: Number(d.per || 0),
+          cdF,
+          castF,
+          nextReady: 0
+        };
+      }
+
+      // 내부: DPS 계산(per / cd[초]) — 평타/연결평타에는 사용 안함
+      const dps = (e) => {
+        const cdSec = e.cdF / FPS;
+        return (cdSec > 0) ? (e.per / cdSec) : 0;
+      };
+
+      // 메인: 60초(=3600프레임) 시뮬
+      function simulateSkillUsage(totalSec = 60) {
+        const totalF = Math.max(1, Math.floor(totalSec * FPS));
+
+        const { skills, awks, normals, link } = collectSimCandidates();
+        let S = skills.map(toEntry);
+        let A = awks.map(toEntry);
+        let N = normals.map(toEntry);
+        let L = link ? toEntry(link) : null;
+
+        // uses 초기화
+        for (const e of [...S, ...A, ...N, ...(L ? [L] : [])]) {
+          state.skillDmg[e.id].uses = 0;
+        }
+
+        const log = [];
+        let now = 0;              // 현재 프레임
+        let lastKind = null;      // 직전 액션 kind (평타 연속 금지 체크용)
+
+        // nextReady를 tStart + cdF 로 설정하기 위해 start 프레임 별도 변수 사용
+        const use = (entry) => {
+          const t0 = now; // 시작 프레임
+          const t1 = t0 + entry.castF;
+          if (t1 > totalF) return false; // 남은 시간 부족 → 시전 불가
+
+          // 로그 축적(자동출력 금지 — 배열에만 저장)
+          log.push({
+            fStart: t0, fEnd: t1, kind: entry.kind, id: entry.id, name: entry.name
+          });
+
+          // uses 증가
+          state.skillDmg[entry.id].uses = (state.skillDmg[entry.id].uses || 0) + 1;
+
+          // 쿨다운: “사용 즉시 시작, 캐스팅 중에도 흐름” → nextReady = t0 + cdF
+          entry.nextReady = Math.max(entry.nextReady, t0 + entry.cdF);
+
+          // 시간 진행
+          now = t1;
+          lastKind = entry.kind;
+          return true;
+        };
+
+        // 다음 ‘비-평타(스킬/각성기)’ 준비까지 남은 프레임 R
+        const nextReadyNonNormals = () => {
+          const arr = [...S, ...A].map(e => e.nextReady).filter(v => Number.isFinite(v));
+          if (!arr.length) return Number.POSITIVE_INFINITY;
+          return Math.max(0, Math.min(...arr) - now);
+        };
+
+        while (now < totalF) {
+          // 1) 스킬(준비됨) 중 DPS 최고
+          const readyS = S.filter(e => now >= e.nextReady);
+          if (readyS.length) {
+            // DPS 최대 선택
+            let pick = readyS.reduce((a, b) => (dps(a) >= dps(b) ? a : b));
+            if (!use(pick)) break;
+            continue;
+          }
+
+          // 2) 각성기(준비됨) 중 DPS 최고
+          const readyA = A.filter(e => now >= e.nextReady);
+          if (readyA.length) {
+            let pick = readyA.reduce((a, b) => (dps(a) >= dps(b) ? a : b));
+            if (!use(pick)) break;
+            continue;
+          }
+
+          // 3) 둘 다 쿨이면 평타/연결평타
+          let R = nextReadyNonNormals(); // 다음 비-평타까지 남은 프레임
+          if (R <= 0) {
+            // 이론상 0이하가 나올 수 있으니 한 프레임 진행(혹은 준비 재평가)
+            now += 1;
+            continue;
+          }
+
+          // 평타 연속 금지
+          // 3) 둘 다 쿨이면 평타/연결평타
+
+
+          // ⛔ 규칙 보강: 직전이 '평타'였다면, 평타/연결평타는 전부 금지.
+          //    오로지 스킬/각성기가 준비될 때까지 '대기(프레임 점프)'만 허용.
+          const canUseAnyNormal = (lastKind !== '평타');
+          if (!canUseAnyNormal) {
+            if (Number.isFinite(R) && R > 0) {
+              now = Math.min(totalF, now + R);
+            } else {
+              now = Math.min(totalF, now + 1);
+            }
+            continue;
+          }
+
+          // (여기부터는 직전이 평타가 아닐 때만 실행됨)
+          // 평타 후보: castF ≤ R, R에 더 근접(|R - castF| 최소), 동률이면 per 큰 것
+          let pickN = null;
+          if (N.length) {
+            const candidates = N
+              .filter(e => e.castF > 0 && e.castF <= R)
+              .sort((a, b) => {
+                const da = Math.abs(R - a.castF);
+                const db = Math.abs(R - b.castF);
+                if (da !== db) return da - db;           // R 근접 우선
+                if (a.per !== b.per) return b.per - a.per; // 동률이면 per 큰 것
+                return 0;
+              });
+            pickN = candidates[0] || null;
+          }
+
+          if (pickN) {                 // 평타 1회만 허용 (uses 증가 및 lastKind='평타'로 설정됨)
+            if (!use(pickN)) break;
+            continue;
+          }
+
+          // 평타가 안 맞으면 '연결평타' 고려 (연속 허용)
+          //  ⚠️ 주의: 위에서 canUseAnyNormal=false(=직전 평타)였으면 이 블록까지 오지 않음
+          if (L && L.castF > 0) {
+            if (!use(L)) break;
+            continue;
+          }
+
+          // 평타/연결평타 둘 다 못 쓰면, 다음 스킬/각성기 준비 시점까지 점프
+          if (Number.isFinite(R) && R > 0) {
+            now = Math.min(totalF, now + R);
+          } else {
+            now = Math.min(totalF, now + 1);
+          }
+
+        }
+
+        // 로그 저장(자동 출력 X)
+        state.skillSimLog = log;
+        return log;
+      }
+
+      // 외부 노출: 수동 출력용
+      window.printSkillSimLog = function () {
+        const L = state?.skillSimLog || [];
+        if (!L.length) { console.log('[SIM] 로그 없음'); return; }
+        for (const row of L) {
+          console.log(`[f=${row.fStart}~${row.fEnd}] 사용: [${row.kind}] ${row.name} (${row.id})`);
+        }
+        // 마지막에 uses 요약
+        const summary = {};
+        for (const [id, v] of Object.entries(state.skillDmg || {})) {
+          if (v?.uses) summary[id] = v.uses;
+        }
+        console.log('[SIM] uses:', summary);
+      };
+
+      // 외부 노출: 실행 함수
+      window.simulateSkillUsage = simulateSkillUsage;
+    })();
+
+
+
+    // 드롭다운 변경 시 호출
+    async function onMonsterChange(selectedName) {
+      await ensureMonsterLoaded();
+      const row = DBMonster.rows.find(r => String(r['몬스터명']).trim() === selectedName);
+
+      state.options = state.options || {};
+      state.options.monster = selectedName;
+
+      if (row) {
+        state.monster = {
+          level: Number(row['몬스터레벨']) || 0,
+          defRate: Number(row['방어율']) || 0,
+          fire: Number(row['화속성저항']) || 0,
+          water: Number(row['수속성저항']) || 0,
+          light: Number(row['명속성저항']) || 0,
+          dark: Number(row['암속성저항']) || 0,
+        };
+      } else {
+        state.monster = { level: 0, defRate: 0, fire: 0, water: 0, light: 0, dark: 0 };
+      }
+    }
+
+    document.getElementById('selMonster').value
 
     /* 선택된 시트 아이템(스탯 묶음) 보관 슬롯 */
     state.options.avatarEnh = state.options.avatarEnh || null; // {name,type,img,stats...}
@@ -2822,7 +3277,7 @@ document.getElementById('selMonster').value
     const SKILL_SHEET = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=1356906568&single=true&output=csv';
     const Monster_SHEET = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=1366990880&single=true&output=csv';
     window.BUFF_SHEET = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=113170614&single=true&output=csv';
-    
+
     const ALLOWED_WEAPON_TYPES = {
       slayer: ['소검', '도', '둔기', '대검', '광검'],
       gunner: ['리볼버', '자동권총', '머스켓', '핸드캐넌', '보우건'],
@@ -2983,25 +3438,25 @@ document.getElementById('selMonster').value
       console.log('[Enhance] loaded:', rows.length);
     }
 
-//몬스터 시트 로더
-let DBMonster = { loaded: false, rows: [] };
+    //몬스터 시트 로더
+    let DBMonster = { loaded: false, rows: [] };
 
-async function ensureMonsterLoaded() {
-  if (DBMonster.loaded) return;
-  try {
-    const res = await fetch(Monster_SHEET);
-    const text = await res.text();
+    async function ensureMonsterLoaded() {
+      if (DBMonster.loaded) return;
+      try {
+        const res = await fetch(Monster_SHEET);
+        const text = await res.text();
 
-    // Papa.parse 사용
-    const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
-    DBMonster.rows = parsed.data;
+        // Papa.parse 사용
+        const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+        DBMonster.rows = parsed.data;
 
-    DBMonster.loaded = true;
-    console.log('[Monster] 로드 성공:', DBMonster.rows.length, '행');
-  } catch (e) {
-    console.error('[Monster] 시트 로딩 실패', e);
-  }
-}
+        DBMonster.loaded = true;
+        console.log('[Monster] 로드 성공:', DBMonster.rows.length, '행');
+      } catch (e) {
+        console.error('[Monster] 시트 로딩 실패', e);
+      }
+    }
 
 
     /* ===== 룬 각인 드롭다운(시트 연동) ===== */
@@ -3114,8 +3569,8 @@ async function ensureMonsterLoaded() {
       }
     }
     async function ensureCharactersLoaded() {   //필요 할때만 loadCharactersheet() 호출
-       if (!DBChars.loaded) await loadCharacterSheet(); 
-      }
+      if (!DBChars.loaded) await loadCharacterSheet();
+    }
 
     /*실제 캐릭터 선택창 내용을 채우는 로직*/
     function renderCatalog() {
@@ -3126,7 +3581,7 @@ async function ensureMonsterLoaded() {
         msg.style.color = '#c7b589';    /*글자색 베이지색*/
         msg.textContent = '시트에서 캐릭터 목록을 불러올 수 없습니다.';   /*텍스트 출력*/
         catalogEl.appendChild(msg); /*만든 메시지를 catalog 영역에 추가, appendChild는 자식 요소로 맨 뒤에 붙인다 는 메서드, 즉, catalogEl(부모)에 msg(자식)을 넣는것*/
-        return; 
+        return;
       }
       groups.forEach(group => {   /*groups 배열을 돌면서 각 그룹(남귀검사, 여마법사 등)에 대해 <div clas="row" 하나 만든다*/
         const row = document.createElement('div'); row.className = 'row';
@@ -3158,11 +3613,11 @@ async function ensureMonsterLoaded() {
       });
     }
     async function openCharacterPicker() {    // 모달 열때 씀
-       await ensureCharactersLoaded();    // 시트 데이터를 아직 안받았다면 받아올때까지 기다림
-       renderCatalog();   // 로드된 데이터로 카탈로그 그리기
-       charModal.classList.add('show');   //모달에 show 클래스 추가 - 화면에 보이게, 보통 .modal.show {display:block;} 같이 제어
-       charModal.setAttribute('aria-hidden', 'false');    // 스크린리더에 '보이는 상태' 알림, 모달열릴때 false, 모달 닫힐때 true.
-      }
+      await ensureCharactersLoaded();    // 시트 데이터를 아직 안받았다면 받아올때까지 기다림
+      renderCatalog();   // 로드된 데이터로 카탈로그 그리기
+      charModal.classList.add('show');   //모달에 show 클래스 추가 - 화면에 보이게, 보통 .modal.show {display:block;} 같이 제어
+      charModal.setAttribute('aria-hidden', 'false');    // 스크린리더에 '보이는 상태' 알림, 모달열릴때 false, 모달 닫힐때 true.
+    }
     function closeCharacterPicker() {   // 모달 닫을 때 씀
       charModal.classList.remove('show');   // show 제거 - 숨김
       charModal.setAttribute('aria-hidden', 'true');    // 접근성 : 숨김 상태 알림
@@ -3323,46 +3778,60 @@ async function ensureMonsterLoaded() {
     const statListEl = document.getElementById('statList');
     function sumSelections() {
       const S = {     //모든 항목 0으로 시작
-        phys_atk: 0, mag_atk: 0, str: 0, int: 0, phys_crit: 0, mag_crit: 0, phys_crit_rate: 0, mag_crit_rate: 0, add_damage: 0, elem_add_sum: 0,
+        phys_atk: 0, mag_atk: 0, str: 0, int: 0, phys_crit: 0, mag_crit: 0, phys_crit_rate: 0, mag_crit_rate: 0, add_damage: 0, counter_damage_inc: 0, elem_add_sum: 0,
         str_pct: 0, int_pct: 0, damage_inc: 0, crit_damage_inc: 0, phys_atk_pct: 0, mag_atk_pct: 0, skill_atk_inc: 0,
-        elem: { fire: 0, water: 0, light: 0, dark: 0 }, cdr: 0, speed: { attack: 0, move: 0, cast: 0 }, def_break_inc: 0
+        elem: { fire: 0, water: 0, light: 0, dark: 0 }, cdr: 0, speed: { attack: 0, move: 0, cast: 0 }, def_break_inc: 0,
+        counter_add_damage: 0,                        // 카운터추뎀(%)
+        elem_add: { fire: 0, water: 0, light: 0, dark: 0 },     // 속성별 ‘기본’ 속추(%) 합
+        elem_add_eff_sum: 0,           // 식 적용 후 유효 속추(%) 합
+        fin_add_damage: 0,    //최종추뎀(%)
+        final_phys_crit_pct: 0,   // 최종 물리크리율(0~1)
+        final_mag_crit_pct: 0,    // 최종 마법크리율(0~1)
+        factor_phys: 1,           // 물공 기준 확률계수
+        factor_mag: 1,             // 마공 기준 확률계수
       };
-        // ★ 스증 전용 임시 누적기(베이스부터 누적 시작)
-  S.__skillMul = 1;        // 곱연산 대상(아이템/강화/엠블렘/옵션/룬/마봉/마부 등)
-  S.__skillAddBuff = 0;    // 합연산 대상(버프 시트에서 온 스증)
+      // ★ 스증 전용 임시 누적기(베이스부터 누적 시작)
+      S.__skillMul = 1;        // 곱연산 대상(아이템/강화/엠블렘/옵션/룬/마봉/마부 등)
+      S.__skillAddBuff = 0;    // 합연산 대상(버프 시트에서 온 스증)
       const addStats = (s) => {   // 아이템 하나의 stats를 받아 S에 누적
-    if (!s) return;
-    S.phys_atk += s.phys_atk || 0; S.mag_atk += s.mag_atk || 0;
-    S.str += s.str || 0; S.int += s.int || 0;
-    S.phys_crit += s.phys_crit || 0; S.mag_crit += s.mag_crit || 0;
-    S.phys_crit_rate += s.phys_crit_rate || 0; S.mag_crit_rate += s.mag_crit_rate || 0;
-    S.add_damage += s.add_damage || 0;
+        if (!s) return;
+        S.phys_atk += s.phys_atk || 0; S.mag_atk += s.mag_atk || 0;
+        S.str += s.str || 0; S.int += s.int || 0;
+        S.phys_crit += s.phys_crit || 0; S.mag_crit += s.mag_crit || 0;
+        S.phys_crit_rate += s.phys_crit_rate || 0; S.mag_crit_rate += s.mag_crit_rate || 0;
+        S.add_damage += s.add_damage || 0;
+        S.counter_add_damage += s.counter_add_damage || 0;
+        S.counter_damage_inc += s.counter_damage_inc || 0;
 
-    if (s.elem_add_damage) {
-      S.elem_add_sum += (s.elem_add_damage.fire || 0) + (s.elem_add_damage.water || 0)
-                      + (s.elem_add_damage.light || 0) + (s.elem_add_damage.dark || 0);
-    }
+        if (s.elem_add_damage) {
+          S.elem_add.fire += s.elem_add_damage.fire || 0;
+          S.elem_add.water += s.elem_add_damage.water || 0;
+          S.elem_add.light += s.elem_add_damage.light || 0;
+          S.elem_add.dark += s.elem_add_damage.dark || 0;
+        }
 
-    S.str_pct += s.str_pct || 0; S.int_pct += s.int_pct || 0;
-    S.damage_inc += s.damage_inc || 0; S.crit_damage_inc += s.crit_damage_inc || 0;
-    S.phys_atk_pct += s.phys_atk_pct || 0; S.mag_atk_pct += s.mag_atk_pct || 0;
+        S.str_pct += s.str_pct || 0; S.int_pct += s.int_pct || 0;
+        S.damage_inc += s.damage_inc || 0; S.crit_damage_inc += s.crit_damage_inc || 0;
+        S.phys_atk_pct += s.phys_atk_pct || 0; S.mag_atk_pct += s.mag_atk_pct || 0;
 
-    // ★ 스증은 더하지 말고 곱 누적(버프는 아직 안 들어옴)
-    if (s.skill_atk_inc) {
-      S.__skillMul *= (1 + (s.skill_atk_inc || 0));
-    }
+        // ★ 스증은 더하지 말고 곱 누적(버프는 아직 안 들어옴)
+        if (s.skill_atk_inc) {
+          S.__skillMul *= (1 + (s.skill_atk_inc || 0));
+        }
 
-    if (s.elem) { S.elem.fire += s.elem.fire || 0; S.elem.water += s.elem.water || 0; S.elem.light += s.elem.light || 0; S.elem.dark += s.elem.dark || 0; }
-    S.cdr += s.cdr || 0;
-    if (s.speed) { S.speed.attack += s.speed.attack || 0; S.speed.move += s.speed.move || 0; S.speed.cast += s.speed.cast || 0; }
-    if (s.other) { S.def_break_inc += s.other.def_break_inc || 0; }
-  };
+        if (s.elem) { S.elem.fire += s.elem.fire || 0; S.elem.water += s.elem.water || 0; S.elem.light += s.elem.light || 0; S.elem.dark += s.elem.dark || 0; }
+        S.cdr += s.cdr || 0;
+        if (s.speed) { S.speed.attack += s.speed.attack || 0; S.speed.move += s.speed.move || 0; S.speed.cast += s.speed.cast || 0; }
+        if (s.other) { S.def_break_inc += s.other.def_break_inc || 0; }
+      };
       Object.values(state.selections).forEach(it => addStats(it?.stats));   //선택 장비들 모두 누적해서 최종 s반환
       // 장비 합
       Object.values(state.upgrades).forEach(up => addStats(up?.stats));   // 선택 강화들 모두 누적해서 최종 s반환
       // 강화 합(요청: 합연산)
       //Object.values(state.enchants || {}).forEach(en => addStats(en?.stats));
       // 마법부여 합산
+      // 기본(원시) 총합도 유지
+
       return S;
     }
 
@@ -3387,7 +3856,10 @@ async function ensureMonsterLoaded() {
       const mainStatVal = p === 'phys' ? S.str : p === 'mag' ? S.int : null;
       const critVal = p === 'phys' ? S.phys_crit : p === 'mag' ? S.mag_crit : null;
       const critRateVal = p === 'phys' ? S.phys_crit_rate : p === 'mag' ? S.mag_crit_rate : null;
-      const finalCritPct = (critVal == null || critRateVal == null) ? null : (((critVal || 0) / ((3.8665*(100/97.25)**80/*몬스터레벨*/)*100)) * 100 + (critRateVal || 0) * 100) + 3;   //최종크리티컬 계산식
+      const finalCritPct =
+        p === 'phys' ? (S.final_phys_crit_pct ?? 0)
+          : p === 'mag' ? (S.final_mag_crit_pct ?? 0)
+            : Math.max(S.final_phys_crit_pct ?? 0, S.final_mag_crit_pct ?? 0); // 미정이면 큰 쪽
       const mainPctVal = p === 'phys' ? S.str_pct : p === 'mag' ? S.int_pct : null;
       const atkPctVal = p === 'phys' ? S.phys_atk_pct : p === 'mag' ? S.mag_atk_pct : null;
       const elems = S.elem; const maxVal = Math.max(elems.fire, elems.water, elems.light, elems.dark);
@@ -3398,8 +3870,8 @@ async function ensureMonsterLoaded() {
       statListEl.appendChild(show(atkLabel, fmtInt(atkVal)));   // 실제 화면 UI에 행추가
       statListEl.appendChild(show(mainStatLabel, fmtInt(mainStatVal)));
       statListEl.appendChild(show(critLabel, fmtInt(critVal)));
-      statListEl.appendChild(show('최종 크리티컬(%)', finalCritPct == null ? '—' : (Math.round(finalCritPct * 10) / 10).toFixed(1) + '%'));
-      statListEl.appendChild(show('최종 추가데미지(%)', fmtPct((S.add_damage || 0) + (S.elem_add_sum || 0))));
+      statListEl.appendChild(show('최종 크리티컬(%)', (finalCritPct * 100).toFixed(1) + '%'));
+      statListEl.appendChild(show('최종 추가데미지(%)', fmtPct(S.fin_add_damage)));
       statListEl.appendChild(show(mainPctLabel, fmtPct(mainPctVal)));
       statListEl.appendChild(show('데미지증가(%)', fmtPct(S.damage_inc)));
       statListEl.appendChild(show('크리티컬데미지증가(%)', fmtPct(S.crit_damage_inc)));
@@ -3411,22 +3883,76 @@ async function ensureMonsterLoaded() {
       statListEl.appendChild(show('공격속도(%)', fmtPct(S.speed.attack)));
       statListEl.appendChild(show('이동속도(%)', fmtPct(S.speed.move)));
       statListEl.appendChild(show('캐스팅속도(%)', fmtPct(S.speed.cast)));
+
+        const row = document.createElement('div');  // 네 UI 구조에 맞게 li/tr 등으로 바꿔도 됨
+  
     }
 
-async function recalcAndRenderPanel() {
-  // 1) 버프 먼저 계산
-  state.__buffStats = await BuffLeveling.computeBuffStats();
-  console.log("[BUFF-DEBUG] state.__buffStats 저장됨:", state.__buffStats); //로그값
+    async function recalcAndRenderPanel() {
+      // 1) 버프 먼저 계산
+      state.__buffStats = await BuffLeveling.computeBuffStats();
+      console.log("[BUFF-DEBUG] state.__buffStats 저장됨:", state.__buffStats); //로그값
 
-  // 2) 합산
-  const S = sumSelections();
-  console.log("[BUFF-DEBUG] sumSelections 최종 합산:", S);  //로그값
+      // 2) 합산
+      const S = sumSelections();
+      console.log("[BUFF-DEBUG] sumSelections 최종 합산:", S);  //로그값
+      // ★ 아이템 변경으로 state.leveling이 갱신되었을 수 있으니, 모든 스킬 캐시 재계산
+      // ★ 아이템 변경으로 state.leveling이 바뀌었을 수 있으니,
+      //    현재 캐릭터의 스킬만 데미지 캐시 재계산
+      // ★ 현재 캐릭터 스킬만 데미지 캐시 재계산 (안전 키 생성)
+      try {
+        // 스킬 시트 준비
+        if (typeof ensureSkillLoaded2 === 'function') {
+          await ensureSkillLoaded2();
+        }
 
-  // 3) 렌더링 (네 기존 함수들 그대로)
-  renderStats(S);
-  const el = document.getElementById("finalDamageValue");
-  if (el) el.textContent = "47,978,023,776"; // ← 네 기존 값 갱신 로직
-}
+        // 안전 문자열 변환기
+        const toStr = (v) => (v == null ? '' : String(v));
+
+        // 현재 캐릭터 키(공백 제거) — 어떤 함수/필드가 비어도 안전
+        const rawKey =
+          (typeof currentCharKey === 'function' ? currentCharKey() : null)
+          ?? (typeof currentSkillOwnerKey === 'function' ? currentSkillOwnerKey() : null)
+          ?? [state.currentCharacter?.jobGroupLabel, state.currentCharacter?.name].filter(Boolean).join('');
+
+        const key = toStr(rawKey).replace(/\s+/g, '');
+
+        // 캐릭터 키가 없으면 재계산 스킵
+        if (!key) {
+          console.warn('[LEVELING] 캐릭터 키 없음: 재계산 스킵');
+        } else if (ST2?.rows?.length) {
+          // 현재 캐릭터 + 표시 스킬만
+          const rows = ST2.rows.filter(s => s.who === key && s.show);
+
+          // 다른 캐릭터 캐시 정리(선택)
+          for (const id of Object.keys(state.skillDmg || {})) {
+            if (!rows.some(s => s.id === id)) delete state.skillDmg[id];
+          }
+
+          // TP 0~5(또는 네 상수)에 맞춰 클램프
+          for (const s of rows) {
+            const tp = Math.max(0, Math.min(5, Number(state.skillTpLv?.[s.id] ?? 0)));
+            state.skillDmg[s.id] = calcSkillDamageWithTp(s, tp);
+          }
+          // ★★★ 스킬 사용횟수 시뮬레이션(60초 = 3600프레임) — 자동 출력 없음
+          if (typeof simulateSkillUsage === 'function') {
+            simulateSkillUsage(60);
+            // 이제 state.skillDmg[ID].uses 가 채워져 있음
+            // 로그 확인은 원하는 시점에 콘솔에서 printSkillSimLog() 호출
+          }
+
+        }
+      } catch (e) {
+        console.warn('[LEVELING] 스킬 일괄 재계산 실패:', e);
+      }
+
+
+      // 3) 렌더링 (네 기존 함수들 그대로)
+      renderStats(S);
+      // 초기엔 값 비워둠(—). 버튼 누르면 갱신.
+      //updateFinalDamageField('—');
+
+    }
 
     /* ===== 엠블렘 시스템 ===== */
 
@@ -3668,6 +4194,7 @@ async function recalcAndRenderPanel() {
             }
             state.runes[cat.key][lvl] = after;
             updateRuneCountSummary();
+            onRunesChanged();
           });
           c.appendChild(sel);
           row.appendChild(c);
@@ -3687,87 +4214,91 @@ async function recalcAndRenderPanel() {
     function toNum(v) { if (v === '' || v == null) return 0; const n = Number(String(v).replace(/[, ]/g, '')); return isNaN(n) ? 0 : n; }
     function toList(v) { return (v ? String(v).split(/[,;]/).map(s => s.trim()).filter(Boolean) : []); }
 
-    function mapRowToSkill(r) {
-      // 네가 준 컬럼 키 그대로 사용
-      const whoRaw = r['캐릭터명'];
-      const name = String(r['스킬명'] ?? '').trim();
-      const band = toNum(r['스킬렙제']);
-      const cd = (r['쿨타임'] ?? '').toString().trim();
-      const minLv = toNum(r['최소스킬레벨']);
-      const maxLv = toNum(r['최대스킬레벨']);       // (= 마스터스킬레벨)
-      const sp = toNum(r['소모 SP']); // SP 비용(레벨당)
-      const icon = cleanUrl(r['이미지']) || PLACEHOLDER_IMG;
-      // 캐릭터 식별 키: 공백 제거만(시트와 동일 포맷 가정)
-      const who = String(whoRaw ?? '').replace(/\s+/g, '').trim();
-      // 스킬ID가 시트에 없을 수 있으므로, (이름 + 밴드) 조합으로 고유 ID 구성
-      const idBase = (r['스킬ID'] ?? name).toString().trim();
-      const id = idBase ? `${idBase}#${band || 0}` : (Date.now().toString(36) + Math.random().toString(36).slice(2));
-      // 현재 단계는 UI만: TP/선행은 일단 생략(추후 컬럼 확장 시 연결)
-      return {
-        id, who, name, icon,
-        band: band || 1,
-        min: Math.max(0, minLv || 0),
-        max: Math.max(1, maxLv || 1),
-        sp: Math.max(0, sp || 0),
-        tp: 0,
-        cd,
-        prereq: [],
-        desc: ''
-      };
-    }
+function mapRowToSkill(r) {
+  // 네가 준 컬럼 키 그대로 사용
+  const whoRaw = r['캐릭터명'];
+  const name = String(r['스킬명'] ?? '').trim();
+  const band = toNum(r['스킬렙제']);
+  const cd = toNum(r['쿨타임']);
+  const castFrames = toNum(r['시전프레임']);
+  const minLv = toNum(r['최소스킬레벨']);
+  const maxLv = toNum(r['최대스킬레벨']);       // (= 마스터스킬레벨)
+  const sp = toNum(r['소모 SP']);               // SP 비용(레벨당)
+  const icon = cleanUrl(r['이미지']) || PLACEHOLDER_IMG;
+
+  const who = String(whoRaw ?? '').replace(/\s+/g, '').trim();
+
+  const idBase = (r['스킬ID'] ?? name).toString().trim();
+  const id = idBase ? `${idBase}#${band || 0}` : (Date.now().toString(36) + Math.random().toString(36).slice(2));
+
+  return {
+    id, who, name, icon,
+    band: band || 1,
+    levelGate: band || 1,     // ← 추가: 스킬렙제(레벨링 게이트) 통일 키
+    min: Math.max(0, minLv || 0),
+    max: Math.max(1, maxLv || 1),
+    sp: Math.max(0, sp || 0),
+    tp: 0,
+    cd,
+    castFrames,
+    prereq: [],
+    desc: ''
+  };
+}
+
 
 
     /* ===== 엠블렘 합연산 포함을 위해 합산 함수 확장 ===== */
-const _sumSelections_base = sumSelections;
-sumSelections = function () {
-  const S = _sumSelections_base();
+    const _sumSelections_base = sumSelections;
+    sumSelections = function () {
+      const S = _sumSelections_base();
 
-  // 누적기 안전 보정(베이스가 항상 넣지만, 혹시 모를 재정의 대비)
-  S.__skillMul = S.__skillMul || 1;
-  S.__skillAddBuff = S.__skillAddBuff || 0;
+      // 누적기 안전 보정(베이스가 항상 넣지만, 혹시 모를 재정의 대비)
+      S.__skillMul = S.__skillMul || 1;
+      S.__skillAddBuff = S.__skillAddBuff || 0;
 
-  const add = (st, src = 'other') => {
-    if (!st) return;
+      const add = (st, src = 'other') => {
+        if (!st) return;
 
-    // 1) 스증만 분기
-    if (st.skill_atk_inc) {
-      if (src === 'buff') S.__skillAddBuff += (st.skill_atk_inc || 0);  // 버프는 합산
-      else                S.__skillMul *= (1 + (st.skill_atk_inc || 0)); // 나머지는 곱산
-    }
+        // 1) 스증만 분기
+        if (st.skill_atk_inc) {
+          if (src === 'buff') S.__skillAddBuff += (st.skill_atk_inc || 0);  // 버프는 합산
+          else S.__skillMul *= (1 + (st.skill_atk_inc || 0)); // 나머지는 곱산
+        }
 
-    // 2) 나머지 스탯은 기존처럼 가산
-    S.phys_atk += st.phys_atk || 0; S.mag_atk += st.mag_atk || 0;
-    S.str += st.str || 0; S.int += st.int || 0;
-    S.phys_crit += st.phys_crit || 0; S.mag_crit += st.mag_crit || 0;
-    S.phys_crit_rate += st.phys_crit_rate || 0; S.mag_crit_rate += st.mag_crit_rate || 0;
-    S.add_damage += st.add_damage || 0;
-    S.str_pct += st.str_pct || 0; S.int_pct += st.int_pct || 0;
-    S.damage_inc += st.damage_inc || 0; S.crit_damage_inc += st.crit_damage_inc || 0;
-    S.phys_atk_pct += st.phys_atk_pct || 0; S.mag_atk_pct += st.mag_atk_pct || 0;
-    if (st.elem) { S.elem.fire += st.elem.fire || 0; S.elem.water += st.elem.water || 0; S.elem.light += st.elem.light || 0; S.elem.dark += st.elem.dark || 0; }
-    S.cdr += st.cdr || 0;
-    if (st.speed) { S.speed.attack += st.speed.attack || 0; S.speed.move += st.speed.move || 0; S.speed.cast += st.speed.cast || 0; }
-    if (st.other) { S.def_break_inc += st.other.def_break_inc || 0; }
-  };
+        // 2) 나머지 스탯은 기존처럼 가산
+        S.phys_atk += st.phys_atk || 0; S.mag_atk += st.mag_atk || 0;
+        S.str += st.str || 0; S.int += st.int || 0;
+        S.phys_crit += st.phys_crit || 0; S.mag_crit += st.mag_crit || 0;
+        S.phys_crit_rate += st.phys_crit_rate || 0; S.mag_crit_rate += st.mag_crit_rate || 0;
+        S.add_damage += st.add_damage || 0;
+        S.str_pct += st.str_pct || 0; S.int_pct += st.int_pct || 0;
+        S.damage_inc += st.damage_inc || 0; S.crit_damage_inc += st.crit_damage_inc || 0;
+        S.phys_atk_pct += st.phys_atk_pct || 0; S.mag_atk_pct += st.mag_atk_pct || 0;
+        if (st.elem) { S.elem.fire += st.elem.fire || 0; S.elem.water += st.elem.water || 0; S.elem.light += st.elem.light || 0; S.elem.dark += st.elem.dark || 0; }
+        S.cdr += st.cdr || 0;
+        if (st.speed) { S.speed.attack += st.speed.attack || 0; S.speed.move += st.speed.move || 0; S.speed.cast += st.speed.cast || 0; }
+        if (st.other) { S.def_break_inc += st.other.def_break_inc || 0; }
+      };
 
-  // 엠블렘(곱 대상)
-  Object.keys(state.emblems || {}).forEach(slotKey => {
-    (state.emblems[slotKey] || []).forEach(it => { if (it?.stats) add(it.stats, 'other'); });
-  });
+      // 엠블렘(곱 대상)
+      Object.keys(state.emblems || {}).forEach(slotKey => {
+        (state.emblems[slotKey] || []).forEach(it => { if (it?.stats) add(it.stats, 'other'); });
+      });
 
-  // 옵션(아바타/무기압)도 곱 대상
-  if (state.options?.avatarEnh?.stats) add(state.options.avatarEnh.stats, 'other');
-  if (state.options?.imprintEnh?.stats) add(state.options.imprintEnh.stats, 'other');
+      // 옵션(아바타/무기압)도 곱 대상
+      if (state.options?.avatarEnh?.stats) add(state.options.avatarEnh.stats, 'other');
+      if (state.options?.imprintEnh?.stats) add(state.options.imprintEnh.stats, 'other');
 
-  // 룬 각인(곱 대상)
-  if (state.runeEngrave?.stats) add(state.runeEngrave.stats, 'other');
+      // 룬 각인(곱 대상)
+      if (state.runeEngrave?.stats) add(state.runeEngrave.stats, 'other');
 
-  // 버프 시트(합 대상)
-  if (state.__buffStats) add(state.__buffStats, 'buff');
+      // 버프 시트(합 대상)
+      if (state.__buffStats) add(state.__buffStats, 'buff');
 
-  // ★ 아직 S.skill_atk_inc 확정하지 않음 (5번째에서 마봉·마부까지 포함 후 최종 확정)
-  return S;
-};
+      // ★ 아직 S.skill_atk_inc 확정하지 않음 (5번째에서 마봉·마부까지 포함 후 최종 확정)
+      return S;
+    };
     // 초기화
     document.addEventListener('DOMContentLoaded', () => {
       refreshEnhLabelsFromState();
@@ -3904,25 +4435,25 @@ sumSelections = function () {
       <div class="list" id="autoEnhList"></div>
     </div>
   </div>
-<div id="autoEnchantModal" class="modal simple-modal" aria-hidden="true">
-  <div class="backdrop" data-close></div>
-  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="autoEnchantTitle">
-    <header>
-      <h3 id="autoEnchantTitle">추천 마법부여</h3>
-      <button class="close" data-close>✕</button>
-    </header>
-    <div class="body two-col">
-      <div class="col left">
-        <div class="title">속성 선택</div>
-        <div class="list attrs"></div>
-      </div>
-      <div class="col right">
-        <div class="title">추천 티어</div>
-        <div class="list tiers"></div>
+  <div id="autoEnchantModal" class="modal simple-modal" aria-hidden="true">
+    <div class="backdrop" data-close></div>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="autoEnchantTitle">
+      <header>
+        <h3 id="autoEnchantTitle">추천 마법부여</h3>
+        <button class="close" data-close>✕</button>
+      </header>
+      <div class="body two-col">
+        <div class="col left">
+          <div class="title">속성 선택</div>
+          <div class="list attrs"></div>
+        </div>
+        <div class="col right">
+          <div class="title">추천 티어</div>
+          <div class="list tiers"></div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <div id="autoEmblemModal" class="modal simple-modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
@@ -3935,20 +4466,20 @@ sumSelections = function () {
   </div>
 
   <div id="autoSealModal" class="modal simple-modal" aria-hidden="true">
-  <div class="backdrop" data-close></div>
-  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="autoSealTitle">
-    <header>
-      <h3 id="autoSealTitle">추천 마법봉인</h3>
-      <button class="close" data-close>✕</button>
-    </header>
-    <div class="list">
-      <button class="opt-btn" data-ele="fire">화속성</button>
-      <button class="opt-btn" data-ele="water">수속성</button>
-      <button class="opt-btn" data-ele="light">명속성</button>
-      <button class="opt-btn" data-ele="dark">암속성</button>
+    <div class="backdrop" data-close></div>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="autoSealTitle">
+      <header>
+        <h3 id="autoSealTitle">추천 마법봉인</h3>
+        <button class="close" data-close>✕</button>
+      </header>
+      <div class="list">
+        <button class="opt-btn" data-ele="fire">화속성</button>
+        <button class="opt-btn" data-ele="water">수속성</button>
+        <button class="opt-btn" data-ele="light">명속성</button>
+        <button class="opt-btn" data-ele="dark">암속성</button>
+      </div>
     </div>
   </div>
-</div>
 
   <script>
 
@@ -4047,133 +4578,133 @@ sumSelections = function () {
       }
       recalcAndRenderPanel();
     }
-const AUTO_ATTRS = ['화속성','수속성','명속성','암속성'];
-const AUTO_TIERS = ['종결','준종결','보통','가성비'];
-const autoEnchantState = { attr:null, tier:null };
+    const AUTO_ATTRS = ['화속성', '수속성', '명속성', '암속성'];
+    const AUTO_TIERS = ['종결', '준종결', '보통', '가성비'];
+    const autoEnchantState = { attr: null, tier: null };
 
-// 전역 상태 예시:
-// const autoEnchantState = { attr: null, tier: null };
+    // 전역 상태 예시:
+    // const autoEnchantState = { attr: null, tier: null };
 
-function renderAutoEnchantChoices(){
-  const m = document.getElementById('autoEnchantModal');
-  const wrapAttrs = m.querySelector('.list.attrs');
-  const wrapTiers = m.querySelector('.list.tiers');
-  wrapAttrs.innerHTML = '';
-  wrapTiers.innerHTML = '';
+    function renderAutoEnchantChoices() {
+      const m = document.getElementById('autoEnchantModal');
+      const wrapAttrs = m.querySelector('.list.attrs');
+      const wrapTiers = m.querySelector('.list.tiers');
+      wrapAttrs.innerHTML = '';
+      wrapTiers.innerHTML = '';
 
-  const makeBtn = (txt, group) => {
-    const b = document.createElement('button');
-    b.className = 'opt-btn';
-    b.type = 'button';
-    b.textContent = txt;
-    b.setAttribute('role', 'button');
-    b.setAttribute('aria-pressed', 'false');
-    b.addEventListener('click', () => {
-      if (group === 'attr') autoEnchantState.attr = txt;
-      else autoEnchantState.tier = txt;
+      const makeBtn = (txt, group) => {
+        const b = document.createElement('button');
+        b.className = 'opt-btn';
+        b.type = 'button';
+        b.textContent = txt;
+        b.setAttribute('role', 'button');
+        b.setAttribute('aria-pressed', 'false');
+        b.addEventListener('click', () => {
+          if (group === 'attr') autoEnchantState.attr = txt;
+          else autoEnchantState.tier = txt;
 
-      updateAutoActive();        // ✅ 즉시 시각 강조
-      tryApplyAutoIfReady();     // 두 값이 모두 선택되면 적용+닫기
-    });
-    return b;
-  };
+          updateAutoActive();        // ✅ 즉시 시각 강조
+          tryApplyAutoIfReady();     // 두 값이 모두 선택되면 적용+닫기
+        });
+        return b;
+      };
 
-  ['화속성','수속성','명속성','암속성'].forEach(a => wrapAttrs.appendChild(makeBtn(a, 'attr')));
-  ['종결','준종결','보통','가성비'].forEach(t => wrapTiers.appendChild(makeBtn(t, 'tier')));
+      ['화속성', '수속성', '명속성', '암속성'].forEach(a => wrapAttrs.appendChild(makeBtn(a, 'attr')));
+      ['종결', '준종결', '보통', '가성비'].forEach(t => wrapTiers.appendChild(makeBtn(t, 'tier')));
 
-  // 열 때 초기화 상태 반영(둘 다 null이면 전부 비활성 표시)
-  updateAutoActive();
-}
-// === [ENCHANT][AUTO] 직업군 텍스트 얻기
-function getJobGroupText(opt){
-  if (!opt) return '';
-  if (opt.jobGroup) return String(opt.jobGroup).trim();
-  const raw = opt.raw || {};
-  return String(raw['직업군'] ?? raw.jobGroup ?? raw['분류'] ?? '').trim();
-}
+      // 열 때 초기화 상태 반영(둘 다 null이면 전부 비활성 표시)
+      updateAutoActive();
+    }
+    // === [ENCHANT][AUTO] 직업군 텍스트 얻기
+    function getJobGroupText(opt) {
+      if (!opt) return '';
+      if (opt.jobGroup) return String(opt.jobGroup).trim();
+      const raw = opt.raw || {};
+      return String(raw['직업군'] ?? raw.jobGroup ?? raw['분류'] ?? '').trim();
+    }
 
-// === [ENCHANT][AUTO] 직업군으로 옵션 찾기
-function findEnchantByJobGroup(typeKey, keyword){
-  const list = ENCHANT_CACHE.byType.get(String(typeKey).trim()) || [];
-  const kw = String(keyword || '').trim();
-  if (!kw) return null;
+    // === [ENCHANT][AUTO] 직업군으로 옵션 찾기
+    function findEnchantByJobGroup(typeKey, keyword) {
+      const list = ENCHANT_CACHE.byType.get(String(typeKey).trim()) || [];
+      const kw = String(keyword || '').trim();
+      if (!kw) return null;
 
-  // 1순위: 직업군열 포함
-  let hit = list.find(o => getJobGroupText(o).includes(kw));
-  if (hit) return hit;
+      // 1순위: 직업군열 포함
+      let hit = list.find(o => getJobGroupText(o).includes(kw));
+      if (hit) return hit;
 
-  // 2순위(폴백): 이름에라도 포함
-  hit = list.find(o => String(o.name||'').includes(kw));
-  return hit || null;
-}
+      // 2순위(폴백): 이름에라도 포함
+      hit = list.find(o => String(o.name || '').includes(kw));
+      return hit || null;
+    }
 
-// 두 그룹에서 단일 선택 강조
-function updateAutoActive(){
-  const modal = document.getElementById('autoEnchantModal');
-  const mark = (selector, pickedText) => {
-    modal.querySelectorAll(selector).forEach(btn => {
-      const on = (btn.textContent.trim() === (pickedText || ''));
-      btn.classList.toggle('active', on);
-      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    });
-  };
-  mark('.list.attrs .opt-btn', autoEnchantState.attr);
-  mark('.list.tiers .opt-btn', autoEnchantState.tier);
-}
+    // 두 그룹에서 단일 선택 강조
+    function updateAutoActive() {
+      const modal = document.getElementById('autoEnchantModal');
+      const mark = (selector, pickedText) => {
+        modal.querySelectorAll(selector).forEach(btn => {
+          const on = (btn.textContent.trim() === (pickedText || ''));
+          btn.classList.toggle('active', on);
+          btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+      };
+      mark('.list.attrs .opt-btn', autoEnchantState.attr);
+      mark('.list.tiers .opt-btn', autoEnchantState.tier);
+    }
 
 
-// 맨 위 편한 곳에 추가
-const $autoEnchantModal = document.getElementById('autoEnchantModal');
+    // 맨 위 편한 곳에 추가
+    const $autoEnchantModal = document.getElementById('autoEnchantModal');
 
-// 기존 함수 교체
-function tryApplyAutoIfReady(){
-  if (autoEnchantState.attr !== null && autoEnchantState.tier !== null) {
-    applyAutoEnchant(autoEnchantState.attr, autoEnchantState.tier);
-    autoEnchantState.attr = null;
-    autoEnchantState.tier = null;
-    showModal(document.getElementById('autoEnchantModal'), false);
-  }
-}
+    // 기존 함수 교체
+    function tryApplyAutoIfReady() {
+      if (autoEnchantState.attr !== null && autoEnchantState.tier !== null) {
+        applyAutoEnchant(autoEnchantState.attr, autoEnchantState.tier);
+        autoEnchantState.attr = null;
+        autoEnchantState.tier = null;
+        showModal(document.getElementById('autoEnchantModal'), false);
+      }
+    }
 
-// === [ENCHANT][AUTO] 속성+티어/티어만 규칙대로 전체 자동 적용
-async function applyAutoEnchant(attr, tier){
-  await ensureEnchantCache();
+    // === [ENCHANT][AUTO] 속성+티어/티어만 규칙대로 전체 자동 적용
+    async function applyAutoEnchant(attr, tier) {
+      await ensureEnchantCache();
 
-  const combo = `${attr}${tier}`;
+      const combo = `${attr}${tier}`;
 
-  // 무기/팔찌/목걸이/반지 = 속성+티어, 그 외 = 티어만
-  const USE_COMBO = new Set(['무기마부','팔찌마부','목걸이마부','반지마부']);
-  const USE_TIER  = new Set(['머리어깨마부','상의마부','하의마부','허리마부','신발마부','보장마부','칭호마부']);
+      // 무기/팔찌/목걸이/반지 = 속성+티어, 그 외 = 티어만
+      const USE_COMBO = new Set(['무기마부', '팔찌마부', '목걸이마부', '반지마부']);
+      const USE_TIER = new Set(['머리어깨마부', '상의마부', '하의마부', '허리마부', '신발마부', '보장마부', '칭호마부']);
 
-  const targetSlots = ['R1','R2','R3','R4','R5','L1','L2','L3','L4','L5','C2'];
+      const targetSlots = ['R1', 'R2', 'R3', 'R4', 'R5', 'L1', 'L2', 'L3', 'L4', 'L5', 'C2'];
 
-  const applied = [];
-  const prev = state.currentSlotKey;
+      const applied = [];
+      const prev = state.currentSlotKey;
 
-  for (const slotCode of targetSlots){
-    const typeKey = enchantTypeForSlot(slotCode); // 예: R1 -> '무기마부'
-    if (!typeKey) continue;
+      for (const slotCode of targetSlots) {
+        const typeKey = enchantTypeForSlot(slotCode); // 예: R1 -> '무기마부'
+        if (!typeKey) continue;
 
-    const keyToUse = USE_COMBO.has(typeKey) ? combo
-                   : USE_TIER.has(typeKey)  ? tier
-                   : null;
-    if (!keyToUse) continue;
+        const keyToUse = USE_COMBO.has(typeKey) ? combo
+          : USE_TIER.has(typeKey) ? tier
+            : null;
+        if (!keyToUse) continue;
 
-    const opt = findEnchantByJobGroup(typeKey, keyToUse); // ← 1)에서 만든 헬퍼
-    if (!opt) continue;
+        const opt = findEnchantByJobGroup(typeKey, keyToUse); // ← 1)에서 만든 헬퍼
+        if (!opt) continue;
 
-    // 실제 적용 (state 저장 + 버튼 라벨 갱신 + 재계산)
-    state.currentSlotKey = slotCode;
-    applyEnchantSelection(opt);
-    applied.push({ slot: slotCode, name: opt.name });
-  }
+        // 실제 적용 (state 저장 + 버튼 라벨 갱신 + 재계산)
+        state.currentSlotKey = slotCode;
+        applyEnchantSelection(opt);
+        applied.push({ slot: slotCode, name: opt.name });
+      }
 
-  state.currentSlotKey = prev;
+      state.currentSlotKey = prev;
 
-  if (!applied.length){
-    (typeof toast==='function' ? toast : alert)('조건에 맞는 추천 마법부여를 찾지 못했습니다.');
-  }
-}
+      if (!applied.length) {
+        (typeof toast === 'function' ? toast : alert)('조건에 맞는 추천 마법부여를 찾지 못했습니다.');
+      }
+    }
 
 
 
@@ -4187,46 +4718,46 @@ async function applyAutoEnchant(attr, tier){
       const autoEmblemList = document.getElementById('autoEmblemList');
       const autoEnchantModal = document.getElementById('autoEnchantModal');
       // ▼ 추천 마법봉인 자동 입력 버튼 활성화 + 모달 오픈
-const btnAutoSeal = document.getElementById('btnAutoSeal');
-if (btnAutoSeal) {
-  // 혹시 남아있을지 모르는 속성 정리(이중안전)
-  btnAutoSeal.disabled = false;
-  btnAutoSeal.removeAttribute('title');
+      const btnAutoSeal = document.getElementById('btnAutoSeal');
+      if (btnAutoSeal) {
+        // 혹시 남아있을지 모르는 속성 정리(이중안전)
+        btnAutoSeal.disabled = false;
+        btnAutoSeal.removeAttribute('title');
 
-  btnAutoSeal.addEventListener('click', () => {
-    const modal = document.getElementById('autoSealModal');
-    if (modal) {
-      modal.classList.add('show');
-      modal.setAttribute('aria-hidden', 'false');
-    }
-  });
-}
+        btnAutoSeal.addEventListener('click', () => {
+          const modal = document.getElementById('autoSealModal');
+          if (modal) {
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+          }
+        });
+      }
 
-// ▼ 추천 마법봉인 모달 닫기 및 버튼 클릭 처리(선택 시 닫기)
-const autoSealModal = document.getElementById('autoSealModal');
-if (autoSealModal) {
-  autoSealModal.addEventListener('click', (e) => {
-    if (
-      e.target.hasAttribute('data-close') ||
-      e.target.classList.contains('backdrop')
-    ) {
-      autoSealModal.classList.remove('show');
-      autoSealModal.setAttribute('aria-hidden', 'true');
-    }
-  });
+      // ▼ 추천 마법봉인 모달 닫기 및 버튼 클릭 처리(선택 시 닫기)
+      const autoSealModal = document.getElementById('autoSealModal');
+      if (autoSealModal) {
+        autoSealModal.addEventListener('click', (e) => {
+          if (
+            e.target.hasAttribute('data-close') ||
+            e.target.classList.contains('backdrop')
+          ) {
+            autoSealModal.classList.remove('show');
+            autoSealModal.setAttribute('aria-hidden', 'true');
+          }
+        });
 
-  // 4개 속성 버튼(화/수/명/암) 클릭 시 동작(현재는 모달만 닫기)
-  autoSealModal.querySelectorAll('.opt-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      // TODO: 여기서 선택한 속성에 맞춰 '추천 마법봉인 자동 입력' 로직을 이어가면 됩니다.
-      // const element = btn.dataset.ele; // "fire" | "water" | "light" | "dark"
+        // 4개 속성 버튼(화/수/명/암) 클릭 시 동작(현재는 모달만 닫기)
+        autoSealModal.querySelectorAll('.opt-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            // TODO: 여기서 선택한 속성에 맞춰 '추천 마법봉인 자동 입력' 로직을 이어가면 됩니다.
+            // const element = btn.dataset.ele; // "fire" | "water" | "light" | "dark"
 
-      autoSealModal.classList.remove('show');
-      autoSealModal.setAttribute('aria-hidden', 'true');
-    });
-  });
-}
- 
+            autoSealModal.classList.remove('show');
+            autoSealModal.setAttribute('aria-hidden', 'true');
+          });
+        });
+      }
+
       // Build level buttons 10~20
       if (autoEnhList) {
         autoEnhList.innerHTML = '';
@@ -4255,12 +4786,12 @@ if (autoSealModal) {
         autoEmblemModal.classList.add('show'); autoEmblemModal.setAttribute('aria-hidden', 'false');
       });
       document.getElementById('btnAutoEnchant')?.addEventListener('click', () => {
-   // 모달 열기만; 닫기는 tryApplyAutoIfReady에서 두 값이 모두 선택됐을 때만
-   autoEnchantState.attr = null;
-   autoEnchantState.tier = null;
-   renderAutoEnchantChoices();
-   showModal(document.getElementById('autoEnchantModal'), true);
-});
+        // 모달 열기만; 닫기는 tryApplyAutoIfReady에서 두 값이 모두 선택됐을 때만
+        autoEnchantState.attr = null;
+        autoEnchantState.tier = null;
+        renderAutoEnchantChoices();
+        showModal(document.getElementById('autoEnchantModal'), true);
+      });
       // Modal close bindings
       document.querySelectorAll('#autoEnhModal, #autoEmblemModal, #autoEnchantModal').forEach(modal => {
         modal.addEventListener('click', (e) => {
@@ -4271,396 +4802,397 @@ if (autoSealModal) {
       });
       /* ===== [SEAL][AUTO] 추천 마법봉인 자동 입력 ===== */
 
-// 슬롯코드 → "마법부여 종류키"와 별개로, 봉인용 "종류" 매핑
-// - 무기부위: 무기고유 / 무기일반
-// - 방어부위(L1~L5): 방어고유 / 방어일반
-// - 보조장비(R5): 보장고유 / 보장일반
-// - 액세서리(R2~R4): 악세고유 / 악세일반  (← 속성으로 찾기)
-function sealTypeForSlot(slotCode) {
-  switch (String(slotCode).toUpperCase()) {
-    case 'R1': return { unique: '무기고유',  general: '무기일반'  };
-    case 'R5': return { unique: '보장고유',  general: '보장일반'  };
-    case 'R2':
-    case 'R3':
-    case 'R4': return { unique: '악세고유',  general: '악세일반'  };
-    default:   return { unique: '방어고유',  general: '방어일반'  }; // L1~L5
-  }
-}
+      // 슬롯코드 → "마법부여 종류키"와 별개로, 봉인용 "종류" 매핑
+      // - 무기부위: 무기고유 / 무기일반
+      // - 방어부위(L1~L5): 방어고유 / 방어일반
+      // - 보조장비(R5): 보장고유 / 보장일반
+      // - 액세서리(R2~R4): 악세고유 / 악세일반  (← 속성으로 찾기)
+      function sealTypeForSlot(slotCode) {
+        switch (String(slotCode).toUpperCase()) {
+          case 'R1': return { unique: '무기고유', general: '무기일반' };
+          case 'R5': return { unique: '보장고유', general: '보장일반' };
+          case 'R2':
+          case 'R3':
+          case 'R4': return { unique: '악세고유', general: '악세일반' };
+          default: return { unique: '방어고유', general: '방어일반' }; // L1~L5
+        }
+      }
 
-// 현재 선택 캐릭터의 공격 분류를 '물리' / '마법'로 변환
-function jobGroupKeyFromState() {
-  const p = String(state?.currentCharacter?.power || '').toLowerCase();
-  return p.includes('mag') || p.includes('마법') ? '마법' : '물리';
-}
+      // 현재 선택 캐릭터의 공격 분류를 '물리' / '마법'로 변환
+      function jobGroupKeyFromState() {
+        const p = String(state?.currentCharacter?.power || '').toLowerCase();
+        return p.includes('mag') || p.includes('마법') ? '마법' : '물리';
+      }
 
-// 시트의 속성 한글 키 매핑
-const ELEM_KOR = { fire: '화', water: '수', light: '명', dark: '암' };
+      // 시트의 속성 한글 키 매핑
+      const ELEM_KOR = { fire: '화', water: '수', light: '명', dark: '암' };
 
-// byType 캐시에서 조건(직업군/속성)에 맞는 "첫 번째" 봉인 옵션을 찾아 반환
-function findSealOption(typeKey, { jobKey, elemKor }) {
-  const key = String(typeKey).trim();
-  const list = ENCHANT_CACHE.byType.get(String(typeKey).trim()) || [];
-  // 악세는 속성으로, 나머지는 직업군으로 찾는다
-  const isAcc = typeKey.startsWith('악세');
-    if (key === '무기고유') {
-    const isCommon = (v) => {
-      const s = String(v || '').trim();
-      return ['공용', '공통', 'ALL', '무기공용'].includes(s);
-    };
-    // 1순위: 직업군열이 공용/ALL류인 행
-    const pick =
-      list.find(it => isCommon((it.raw && it.raw['직업군']) ?? it.jobGroup)) ||
-      list[0] || null; // 2순위: 첫 행(없으면 null)
-    return pick;
-  }
-  for (const it of list) {
-    const raw = it.raw || {};
-    if (isAcc) {
-      const v = String(raw['직업군'] ?? raw['element'] ?? raw['elem'] ?? '').trim();
-      if (v === elemKor) return it;
-    } else {
-      const v = String(raw['직업군'] ?? it.jobGroup ?? '').trim();
-      if (v === jobKey) return it;
-    }
-  }
-  return null;
-}
+      // byType 캐시에서 조건(직업군/속성)에 맞는 "첫 번째" 봉인 옵션을 찾아 반환
+      function findSealOption(typeKey, { jobKey, elemKor }) {
+        const key = String(typeKey).trim();
+        const list = ENCHANT_CACHE.byType.get(String(typeKey).trim()) || [];
+        // 악세는 속성으로, 나머지는 직업군으로 찾는다
+        const isAcc = typeKey.startsWith('악세');
+        if (key === '무기고유') {
+          const isCommon = (v) => {
+            const s = String(v || '').trim();
+            return ['공용', '공통', 'ALL', '무기공용'].includes(s);
+          };
+          // 1순위: 직업군열이 공용/ALL류인 행
+          const pick =
+            list.find(it => isCommon((it.raw && it.raw['직업군']) ?? it.jobGroup)) ||
+            list[0] || null; // 2순위: 첫 행(없으면 null)
+          return pick;
+        }
+        for (const it of list) {
+          const raw = it.raw || {};
+          if (isAcc) {
+            const v = String(raw['직업군'] ?? raw['element'] ?? raw['elem'] ?? '').trim();
+            if (v === elemKor) return it;
+          } else {
+            const v = String(raw['직업군'] ?? it.jobGroup ?? '').trim();
+            if (v === jobKey) return it;
+          }
+        }
+        return null;
+      }
 
-// 도우미: raw에서 최소한의 스탯을 뽑아내는 보조 (시트에 stats가 없을 때 대비)
-function statsFrom(opt) {
-  if (!opt) return null;
-  // ENCHANT_CACHE 프리로드에서 이미 obj.stats를 살려둠. 없으면 raw에서 필요한 키만 최소 추출
-  return opt.stats || null; // 필요시 raw 기반 파싱 추가
-}
+      // 도우미: raw에서 최소한의 스탯을 뽑아내는 보조 (시트에 stats가 없을 때 대비)
+      function statsFrom(opt) {
+        if (!opt) return null;
+        // ENCHANT_CACHE 프리로드에서 이미 obj.stats를 살려둠. 없으면 raw에서 필요한 키만 최소 추출
+        return opt.stats || null; // 필요시 raw 기반 파싱 추가
+      }
 
-// 실제 적용: 속성 클릭 시 전 슬롯에 맞는 고유/일반을 찾아 state.seals에 저장 + 캡션 갱신
-async function applyAutoSeal(elementKey) {
-  await ensureEnchantCache();             // 시트 캐시 보장 (기존 캐시 사용)
-  const elemKor = ELEM_KOR[elementKey] || '';
-  const jobKey  = jobGroupKeyFromState(); // '물리' or '마법'
-  const targetSlots = ['R1','R2','R3','R4','R5','L1','L2','L3','L4','L5'];
+      // 실제 적용: 속성 클릭 시 전 슬롯에 맞는 고유/일반을 찾아 state.seals에 저장 + 캡션 갱신
+      async function applyAutoSeal(elementKey) {
+        await ensureEnchantCache();             // 시트 캐시 보장 (기존 캐시 사용)
+        const elemKor = ELEM_KOR[elementKey] || '';
+        const jobKey = jobGroupKeyFromState(); // '물리' or '마법'
+        const targetSlots = ['R1', 'R2', 'R3', 'R4', 'R5', 'L1', 'L2', 'L3', 'L4', 'L5'];
 
-  state.seals = state.seals || {};
+        state.seals = state.seals || {};
 
-  for (const slotCode of targetSlots) {
-    const types = sealTypeForSlot(slotCode);
-    const u = findSealOption(types.unique,  { jobKey, elemKor });
-    const g = findSealOption(types.general, { jobKey, elemKor });
+        for (const slotCode of targetSlots) {
+          const types = sealTypeForSlot(slotCode);
+          const u = findSealOption(types.unique, { jobKey, elemKor });
+          const g = findSealOption(types.general, { jobKey, elemKor });
 
-    // 슬롯키(SLOT_MAP: 'R1'→실제 내부키 등)를 얻어서 상태에 반영
-    const slotKey = (window.SLOT_MAP || {})[slotCode];
-    if (!slotKey) continue;
+          // 슬롯키(SLOT_MAP: 'R1'→실제 내부키 등)를 얻어서 상태에 반영
+          const slotKey = (window.SLOT_MAP || {})[slotCode];
+          if (!slotKey) continue;
 
-    // 적용 규칙: 고유 1개 + 일반 2개(동일 일반일 경우 g를 두 칸 복제)
-    // (시트 설계상 일반이 2종으로 구분돼 있다면 여기를 확장)
-// 적용 규칙: 고유 1 + 일반 2
-state.seals[slotKey] = {
-  unique:   u ? { name: u.name, typeKey: u.typeKey, stats: statsFrom(u), raw: u.raw } : null,
-  general1: g ? { name: g.name, typeKey: g.typeKey, stats: statsFrom(g), raw: g.raw } : null,
-  general2: g ? { name: g.name, typeKey: g.typeKey, stats: statsFrom(g), raw: g.raw } : null,
-};
+          // 적용 규칙: 고유 1개 + 일반 2개(동일 일반일 경우 g를 두 칸 복제)
+          // (시트 설계상 일반이 2종으로 구분돼 있다면 여기를 확장)
+          // 적용 규칙: 고유 1 + 일반 2
+          state.seals[slotKey] = {
+            unique: u ? { name: u.name, typeKey: u.typeKey, stats: statsFrom(u), raw: u.raw } : null,
+            general1: g ? { name: g.name, typeKey: g.typeKey, stats: statsFrom(g), raw: g.raw } : null,
+            general2: g ? { name: g.name, typeKey: g.typeKey, stats: statsFrom(g), raw: g.raw } : null,
+          };
 
-// 슬롯 칩(라벨) 즉시 갱신
-refreshSealCaptionsForSlot(slotKey);
- // 이미 코드에 존재하는 유틸 재사용 :contentReference[oaicite:5]{index=5}
-  }
-    // ✅ 여기서 전체 갱신 + 버튼 라벨 + 합산
-// 전체 칩 리프레시(화면 동기화)
-refreshSealCaptionsFromState();
+          // 슬롯 칩(라벨) 즉시 갱신
+          refreshSealCaptionsForSlot(slotKey);
+          // 이미 코드에 존재하는 유틸 재사용 :contentReference[oaicite:5]{index=5}
+        }
+        // ✅ 여기서 전체 갱신 + 버튼 라벨 + 합산
+        // 전체 칩 리프레시(화면 동기화)
+        refreshSealCaptionsFromState();
 
-// 두 번째 버튼 라벨을 '마봉 설정완료'로 일괄 갱신
-if (typeof refreshSealLabelsFromState === 'function') {
-  refreshSealLabelsFromState();
-}
+        // 두 번째 버튼 라벨을 '마봉 설정완료'로 일괄 갱신
+        if (typeof refreshSealLabelsFromState === 'function') {
+          refreshSealLabelsFromState();
+        }
 
-// 합산 재계산 + 우측 패널 렌더
-if (typeof recalcAndRenderPanel === 'function') {
-  recalcAndRenderPanel();
-}
+        // 합산 재계산 + 우측 패널 렌더
+        if (typeof recalcAndRenderPanel === 'function') {
+          recalcAndRenderPanel();
+        }
 
-  // 모달 닫기
-  const modal = document.getElementById('autoSealModal');
-  if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
-}
+        // 모달 닫기
+        const modal = document.getElementById('autoSealModal');
+        if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden', 'true'); }
+      }
 
-// ▼ 모달의 속성 버튼과 연결
-const $autoSealModal = document.getElementById('autoSealModal');
-if ($autoSealModal) {
-  $autoSealModal.querySelectorAll('.opt-btn[data-ele]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const ele = btn.getAttribute('data-ele'); // 'fire' | 'water' | 'light' | 'dark'
-      applyAutoSeal(ele);
-    });
-  });
-}
+      // ▼ 모달의 속성 버튼과 연결
+      const $autoSealModal = document.getElementById('autoSealModal');
+      if ($autoSealModal) {
+        $autoSealModal.querySelectorAll('.opt-btn[data-ele]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const ele = btn.getAttribute('data-ele'); // 'fire' | 'water' | 'light' | 'dark'
+            applyAutoSeal(ele);
+          });
+        });
+      }
 
     });
 
   </script>
   <script>
-// ===== BuffLeveling: "레벨링(N)" 합산 → BUFF_SHEET의 스킬렙제=N에 적용 =====
-// 시트 요약
-// - BUFF_SHEET: [직업군, 캐릭터, 스킬명, 스킬렙제, 증가율, (힘, 지능, 물크(%), … 레벨0 기준치들)]
-// - 아이템시트(선택 객체 sel.raw): ["레벨링(10)", "레벨링(15)", "레벨링(25)", ...] 열에 숫자(정수)
+    // ===== BuffLeveling: "레벨링(N)" 합산 → BUFF_SHEET의 스킬렙제=N에 적용 =====
+    // 시트 요약
+    // - BUFF_SHEET: [직업군, 캐릭터, 스킬명, 스킬렙제, 증가율, (힘, 지능, 물크(%), … 레벨0 기준치들)]
+    // - 아이템시트(선택 객체 sel.raw): ["레벨링(10)", "레벨링(15)", "레벨링(25)", ...] 열에 숫자(정수)
 
-const BUFF_SHEET_URL = window.BUFF_SHEET_URL || window.BUFF_SHEET;
+    const BUFF_SHEET_URL = window.BUFF_SHEET_URL || window.BUFF_SHEET;
 
-const BuffLeveling = (() => {
-  const cache = { ready:false, rows:[] };
+    const BuffLeveling = (() => {
+      const cache = { ready: false, rows: [] };
 
-  // 숫자/퍼센트 파서
-  const num = v => {
-    const n = Number(String(v ?? "").replace(/[, ]/g,""));
-    return Number.isFinite(n) ? n : 0;
-  };
-  const pct = v => num(v) / 100;
+      // 숫자/퍼센트 파서
+      const num = v => {
+        const n = Number(String(v ?? "").replace(/[, ]/g, ""));
+        return Number.isFinite(n) ? n : 0;
+      };
+      const pct = v => num(v) / 100;
 
-  // BUFF_SHEET 한 행 → 레벨0 기준 stats
-  function rowToBaseStats(r) {
-    return {
-      phys_atk: num(r["물뎀"]),  mag_atk: num(r["마뎀"]),
-      str: num(r["힘"]),        int: num(r["지능"]),
-      acc: num(r["적중"]),
-      phys_crit: num(r["물크"]) || num(r["물/마크"]),
-      mag_crit:  num(r["마크"]) || num(r["물/마크"]),
-      phys_crit_rate: pct(r["물크(%)"]),
-      mag_crit_rate:  pct(r["마크(%)"]),
-      add_damage: pct(r["추뎀(%)"]),
-      damage_inc: pct(r["뎀증(%)"]),
-      crit_damage_inc: pct(r["크증뎀(%)"]),
-      phys_atk_pct: pct(r["물공(%)"]),
-      mag_atk_pct:  pct(r["마공(%)"]),
-      skill_atk_inc: pct(r["스증(%)"]),
-      elem: {
-        fire: num(r["화"]), water: num(r["수"]), light: num(r["명"]), dark: num(r["암"]), all: 0
-      },
-      elem_add_damage: {
-        fire:pct(r["화속추"]), water:pct(r["수속추"]), light:pct(r["명속추"]), dark:pct(r["암속추"])
-      },
-      speed: { attack:pct(r["공속(%)"]), move:pct(r["이속(%)"]), cast:pct(r["캐속(%)"]) },
-      cdr: pct(r["쿨감(%)"]),
-      dot_add: { poison:0, bleed:pct(r["출혈추뎀"]), burn:pct(r["화상추뎀"]), shock:pct(r["감전추뎀"]) },
-      dot_inc: { poison:0, bleed:pct(r["출혈뎀증"]), burn:pct(r["화상뎀증"]), shock:pct(r["감전뎀증"]) },
-      other: { def_break_inc:pct(r["방깎뎀증(%)"]), enchant_bleed:num(r["인챈출혈"]) }
-    };
-  }
-
-  // base × (1 + 증가율 × level)
-  function scale(base, rate, level) {
-    const m = 1 + (Number(rate)||0) * (level|0);
-    const c = structuredClone(base);
-
-    c.phys_atk*=m; c.mag_atk*=m; c.str*=m; c.int*=m; c.acc*=m; c.phys_crit*=m; c.mag_crit*=m;
-    c.phys_crit_rate*=m; c.mag_crit_rate*=m; c.add_damage*=m; c.damage_inc*=m; c.crit_damage_inc*=m;
-    c.phys_atk_pct*=m; c.mag_atk_pct*=m; c.skill_atk_inc*=m;
-    c.elem.fire*=m; c.elem.water*=m; c.elem.light*=m; c.elem.dark*=m;
-    c.elem_add_damage.fire*=m; c.elem_add_damage.water*=m; c.elem_add_damage.light*=m; c.elem_add_damage.dark*=m;
-    c.speed.attack*=m; c.speed.move*=m; c.speed.cast*=m; c.cdr*=m;
-    c.dot_add.bleed*=m; c.dot_add.burn*=m; c.dot_add.shock*=m;
-    c.dot_inc.bleed*=m; c.dot_inc.burn*=m; c.dot_inc.shock*=m;
-    c.other.def_break_inc*=m; c.other.enchant_bleed*=m;
-    return c;
-  }
-
-  // stats 합치기 (네 sumSelections의 add 규칙과 동일하게 가산)
-  function addStats(dst, st){
-    if(!st) return dst;
-    dst.phys_atk += st.phys_atk||0; dst.mag_atk += st.mag_atk||0;
-    dst.str += st.str||0; dst.int += st.int||0;
-    dst.phys_crit += st.phys_crit||0; dst.mag_crit += st.mag_crit||0;
-    dst.phys_crit_rate += st.phys_crit_rate||0; dst.mag_crit_rate += st.mag_crit_rate||0;
-    dst.add_damage += st.add_damage||0; dst.damage_inc += st.damage_inc||0; dst.crit_damage_inc += st.crit_damage_inc||0;
-    dst.phys_atk_pct += st.phys_atk_pct||0; dst.mag_atk_pct += st.mag_atk_pct||0;
-    dst.skill_atk_inc += st.skill_atk_inc||0;
-    if(st.elem){ dst.elem.fire+=st.elem.fire||0; dst.elem.water+=st.elem.water||0; dst.elem.light+=st.elem.light||0; dst.elem.dark+=st.elem.dark||0; }
-    dst.cdr += st.cdr||0;
-    if(st.speed){ dst.speed.attack+=st.speed.attack||0; dst.speed.move+=st.speed.move||0; dst.speed.cast+=st.speed.cast||0; }
-    if(st.other){ dst.def_break_inc += st.other.def_break_inc||0; }
-    return dst;
-  }
-
-  function emptyStatsLikeSum() {
-    return {
-      phys_atk:0, mag_atk:0, str:0, int:0, acc:0,
-      phys_crit:0, mag_crit:0, phys_crit_rate:0, mag_crit_rate:0,
-      add_damage:0, damage_inc:0, crit_damage_inc:0,
-      phys_atk_pct:0, mag_atk_pct:0, skill_atk_inc:0,
-      elem:{fire:0,water:0,light:0,dark:0,all:0},
-      speed:{attack:0,move:0,cast:0},
-      cdr:0, def_break_inc:0
-    };
-  }
-
-  // 선택 아이템에서 "레벨링(N)" 컬럼 추출 → {N: sum}
-// 붙일 위치: 버프 모듈 파일(혹은 공용 util)에 선언
-function collectItemLevelings(selections) {
-  const out = Object.create(null);
-
-  // 슬롯별로 배열/단일객체 섞여도 모두 순회
-  const eachItems = (sel) => (
-    !sel ? [] :
-    Array.isArray(sel) ? sel :
-    [sel.selected || sel].filter(Boolean)
-  );
-
-  // 숫자 파서(쉼표/문자 제거)
-  const toNum = (v) => {
-    const n = Number(String(v ?? '').replace(/[^\d.-]/g, ''));
-    return Number.isFinite(n) ? n : 0;
-  };
-
-  // "레벨링(10)", "레벨링10", "Lv10", "레벨 10", "버프레벨(10)" 등 허용
-  const isLevelCol = (k) => {
-    const s = String(k || '').replace(/\s+/g, '');
-    return /^(?:레벨링|레벨|버프레벨|Lv|LV)\(?\d+\)?$/.test(s);
-  };
-  const pickLevel = (k) => {
-    const m = String(k || '').replace(/\s+/g, '').match(/(\d+)/);
-    return m ? Number(m[1]) : NaN;
-  };
-
-  for (const [, sel] of Object.entries(selections || {})) {
-    for (const it of eachItems(sel)) {
-      const raw = it?.raw || it;
-      if (!raw || typeof raw !== 'object') continue;
-
-      for (const [k, v] of Object.entries(raw)) {
-        if (!isLevelCol(k)) continue;
-        const N = pickLevel(k);           // 10 / 15 / 25 / …
-        const val = toNum(v);             // 1, 2, …
-        if (!Number.isFinite(N) || !val) continue;
-        out[N] = (out[N] || 0) + val;
-        console.log('[BUFF-DEBUG] 레벨링 감지:', { col:k, N, val, item: it?.name || raw?.이름 || '?' });
+      // BUFF_SHEET 한 행 → 레벨0 기준 stats
+      function rowToBaseStats(r) {
+        return {
+          phys_atk: num(r["물뎀"]), mag_atk: num(r["마뎀"]),
+          str: num(r["힘"]), int: num(r["지능"]),
+          acc: num(r["적중"]),
+          phys_crit: num(r["물크"]) || num(r["물/마크"]),
+          mag_crit: num(r["마크"]) || num(r["물/마크"]),
+          phys_crit_rate: pct(r["물크(%)"]),
+          mag_crit_rate: pct(r["마크(%)"]),
+          add_damage: pct(r["추뎀(%)"]),
+          damage_inc: pct(r["뎀증(%)"]),
+          crit_damage_inc: pct(r["크증뎀(%)"]),
+          phys_atk_pct: pct(r["물공(%)"]),
+          mag_atk_pct: pct(r["마공(%)"]),
+          skill_atk_inc: pct(r["스증(%)"]),
+          elem: {
+            fire: num(r["화"]), water: num(r["수"]), light: num(r["명"]), dark: num(r["암"]), all: 0
+          },
+          elem_add_damage: {
+            fire: pct(r["화속추"]), water: pct(r["수속추"]), light: pct(r["명속추"]), dark: pct(r["암속추"])
+          },
+          speed: { attack: pct(r["공속(%)"]), move: pct(r["이속(%)"]), cast: pct(r["캐속(%)"]) },
+          cdr: pct(r["쿨감(%)"]),
+          dot_add: { poison: 0, bleed: pct(r["출혈추뎀"]), burn: pct(r["화상추뎀"]), shock: pct(r["감전추뎀"]) },
+          dot_inc: { poison: 0, bleed: pct(r["출혈뎀증"]), burn: pct(r["화상뎀증"]), shock: pct(r["감전뎀증"]) },
+          other: { def_break_inc: pct(r["방깎뎀증(%)"]), enchant_bleed: num(r["인챈출혈"]) }
+        };
       }
-    }
-  }
 
-  console.log('[BUFF-DEBUG] 레벨링 합산 맵:', out); // 예: {10:8, 15:2}
-  return out;
-}
+      // base × (1 + 증가율 × level)
+      function scale(base, rate, level) {
+        const m = 1 + (Number(rate) || 0) * (level | 0);
+        const c = structuredClone(base);
 
-// 1) 강력 정규화 유틸 (기존 cleanUrl 포함 확장)
-function norm(s) {
-  // cleanUrl: 앞뒤 공백/따옴표 제거, 백슬래시 → 슬래시
-  const base = cleanUrl(s);
-  // 제로폭/비가시 공백류 추가 제거 + 모든 공백 제거
-  return String(base)
-    .normalize('NFC')
-    .replace(/[\uFEFF\u00A0\u200B-\u200D\u2060\u180E]/g, '')
-    .replace(/\s+/g, '');
-}
-// 2) BUFF 로더: __charKey 생성 보강 + 로깅 보강
-async function preload() {
-  if (cache.ready) return;
-
-  console.log('[BUFF-DEBUG] fetch URL =', window.BUFF_SHEET);
-  const text = await fetch(window.BUFF_SHEET, { cache: 'no-store' }).then(r => r.text());
-  const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
-  const rawRows = parsed.data || [];
-
-  // 1) 헤더 정규화 함수: BOM/비가시 공백/모든 공백 제거 + 소문자
-  const normKey = (k) => String(k ?? '')
-    .replace(/[\uFEFF\u00A0]/g, '')  // BOM, NBSP 제거
-    .replace(/\s+/g, '')             // 모든 공백 제거
-    .toLowerCase();
-
-  // 2) 값 정규화: 네 cleanUrl을 활용 + 내부 공백/비가시 공백 제거
-  const normVal = (v) => cleanUrl(v).replace(/[\uFEFF\u00A0]/g, '').replace(/\s+/g, '');
-
-  // 3) 각 행의 키를 정규화해서 새 객체로 만든 뒤, __charKey 생성
-  cache.rows = rawRows.map(row => {
-    const n = {};
-    for (const [k, v] of Object.entries(row)) n[normKey(k)] = v;
-
-    // 시트에 따라 다양한 표기를 모두 커버
-    const job  = n['직업군'] || n['직업'] || '';
-    const name = n['캐릭터'] || n['캐릭터명'] || n['캐릭명'] || n['직업명'] || '';
-
-    // BUFF_SHEET가 '캐릭터' 한 열에 "남귀검사소울브링어"가 들어있는 경우도 커버
-    const charKey = normVal(job + name) || normVal(name);
-    return { ...row, __charKey: charKey };  // 원본 필드 유지 + 키 추가
-  });
-
-  console.log('[BUFF-DEBUG] BUFF rows:', cache.rows.length,
-              '샘플 __charKey:', cache.rows.slice(0, 5).map(r => r.__charKey));
-
-  cache.ready = true;
-}
-
-// base 객체에서 숫자 필드(0이 아닌 곳)에만 delta를 더함 (중첩 객체도 처리)
-function addDeltaWherePresent(base, delta) {
-  const walk = (obj) => {
-    if (!obj || typeof obj !== 'object') return obj;
-    const out = Array.isArray(obj) ? [] : {};
-    for (const [k, v] of Object.entries(obj)) {
-      if (v && typeof v === 'object') {
-        out[k] = walk(v);
-      } else if (typeof v === 'number') {
-        out[k] = (v !== 0) ? (v + delta) : v;
-      } else {
-        out[k] = v;
+        c.phys_atk *= m; c.mag_atk *= m; c.str *= m; c.int *= m; c.acc *= m; c.phys_crit *= m; c.mag_crit *= m;
+        c.phys_crit_rate *= m; c.mag_crit_rate *= m; c.add_damage *= m; c.damage_inc *= m; c.crit_damage_inc *= m;
+        c.phys_atk_pct *= m; c.mag_atk_pct *= m; c.skill_atk_inc *= m;
+        c.elem.fire *= m; c.elem.water *= m; c.elem.light *= m; c.elem.dark *= m;
+        c.elem_add_damage.fire *= m; c.elem_add_damage.water *= m; c.elem_add_damage.light *= m; c.elem_add_damage.dark *= m;
+        c.speed.attack *= m; c.speed.move *= m; c.speed.cast *= m; c.cdr *= m;
+        c.dot_add.bleed *= m; c.dot_add.burn *= m; c.dot_add.shock *= m;
+        c.dot_inc.bleed *= m; c.dot_inc.burn *= m; c.dot_inc.shock *= m;
+        c.other.def_break_inc *= m; c.other.enchant_bleed *= m;
+        return c;
       }
-    }
-    return out;
-  };
-  return walk(base);
-}
 
-// ★ 가산형 스케일: "원래값 + (증가율 * 레벨링합)"
-function scaleAdd(baseStats, incRaw, levelCount) {
-  // 네가 이미 가진 toNum() 재사용 (%, 글자 등 있으면 숫자만 남기고 싶으면 아래 한 줄 활성화)
-  // incRaw = String(incRaw).replace(/[^0-9.-]/g, '');
-  const inc   = toNum(incRaw);      // 예: "4" -> 4
-  const steps = toNum(levelCount);  // 예: 8
-  const delta = inc * steps;        // 예: 32
-  return addDeltaWherePresent(baseStats, delta);
-}
+      // stats 합치기 (네 sumSelections의 add 규칙과 동일하게 가산)
+      function addStats(dst, st) {
+        if (!st) return dst;
+        dst.phys_atk += st.phys_atk || 0; dst.mag_atk += st.mag_atk || 0;
+        dst.str += st.str || 0; dst.int += st.int || 0;
+        dst.phys_crit += st.phys_crit || 0; dst.mag_crit += st.mag_crit || 0;
+        dst.phys_crit_rate += st.phys_crit_rate || 0; dst.mag_crit_rate += st.mag_crit_rate || 0;
+        dst.add_damage += st.add_damage || 0; dst.damage_inc += st.damage_inc || 0; dst.crit_damage_inc += st.crit_damage_inc || 0;
+        dst.phys_atk_pct += st.phys_atk_pct || 0; dst.mag_atk_pct += st.mag_atk_pct || 0;
+        dst.skill_atk_inc += st.skill_atk_inc || 0;
+        if (st.elem) { dst.elem.fire += st.elem.fire || 0; dst.elem.water += st.elem.water || 0; dst.elem.light += st.elem.light || 0; dst.elem.dark += st.elem.dark || 0; }
+        dst.cdr += st.cdr || 0;
+        if (st.speed) { dst.speed.attack += st.speed.attack || 0; dst.speed.move += st.speed.move || 0; dst.speed.cast += st.speed.cast || 0; }
+        if (st.other) { dst.def_break_inc += st.other.def_break_inc || 0; }
+        return dst;
+      }
+
+      function emptyStatsLikeSum() {
+        return {
+          phys_atk: 0, mag_atk: 0, str: 0, int: 0, acc: 0,
+          phys_crit: 0, mag_crit: 0, phys_crit_rate: 0, mag_crit_rate: 0,
+          add_damage: 0, damage_inc: 0, crit_damage_inc: 0,
+          phys_atk_pct: 0, mag_atk_pct: 0, skill_atk_inc: 0,
+          elem: { fire: 0, water: 0, light: 0, dark: 0, all: 0 },
+          speed: { attack: 0, move: 0, cast: 0 },
+          cdr: 0, def_break_inc: 0
+        };
+      }
+
+      // 선택 아이템에서 "레벨링(N)" 컬럼 추출 → {N: sum}
+      // 붙일 위치: 버프 모듈 파일(혹은 공용 util)에 선언
+      function collectItemLevelings(selections) {
+        const out = Object.create(null);
+
+        // 슬롯별로 배열/단일객체 섞여도 모두 순회
+        const eachItems = (sel) => (
+          !sel ? [] :
+            Array.isArray(sel) ? sel :
+              [sel.selected || sel].filter(Boolean)
+        );
+
+        // 숫자 파서(쉼표/문자 제거)
+        const toNum = (v) => {
+          const n = Number(String(v ?? '').replace(/[^\d.-]/g, ''));
+          return Number.isFinite(n) ? n : 0;
+        };
+
+        // "레벨링(10)", "레벨링10", "Lv10", "레벨 10", "버프레벨(10)" 등 허용
+        const isLevelCol = (k) => {
+          const s = String(k || '').replace(/\s+/g, '');
+          return /^(?:레벨링|레벨|버프레벨|Lv|LV)\(?\d+\)?$/.test(s);
+        };
+        const pickLevel = (k) => {
+          const m = String(k || '').replace(/\s+/g, '').match(/(\d+)/);
+          return m ? Number(m[1]) : NaN;
+        };
+
+        for (const [, sel] of Object.entries(selections || {})) {
+          for (const it of eachItems(sel)) {
+            const raw = it?.raw || it;
+            if (!raw || typeof raw !== 'object') continue;
+
+            for (const [k, v] of Object.entries(raw)) {
+              if (!isLevelCol(k)) continue;
+              const N = pickLevel(k);           // 10 / 15 / 25 / …
+              const val = toNum(v);             // 1, 2, …
+              if (!Number.isFinite(N) || !val) continue;
+              out[N] = (out[N] || 0) + val;
+              console.log('[BUFF-DEBUG] 레벨링 감지:', { col: k, N, val, item: it?.name || raw?.이름 || '?' });
+            }
+          }
+        }
+
+        console.log('[BUFF-DEBUG] 레벨링 합산 맵:', out); // 예: {10:8, 15:2}
+        return out;
+      }
+
+      // 1) 강력 정규화 유틸 (기존 cleanUrl 포함 확장)
+      function norm(s) {
+        // cleanUrl: 앞뒤 공백/따옴표 제거, 백슬래시 → 슬래시
+        const base = cleanUrl(s);
+        // 제로폭/비가시 공백류 추가 제거 + 모든 공백 제거
+        return String(base)
+          .normalize('NFC')
+          .replace(/[\uFEFF\u00A0\u200B-\u200D\u2060\u180E]/g, '')
+          .replace(/\s+/g, '');
+      }
+      // 2) BUFF 로더: __charKey 생성 보강 + 로깅 보강
+      async function preload() {
+        if (cache.ready) return;
+
+        console.log('[BUFF-DEBUG] fetch URL =', window.BUFF_SHEET);
+        const text = await fetch(window.BUFF_SHEET, { cache: 'no-store' }).then(r => r.text());
+        const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+        const rawRows = parsed.data || [];
+
+        // 1) 헤더 정규화 함수: BOM/비가시 공백/모든 공백 제거 + 소문자
+        const normKey = (k) => String(k ?? '')
+          .replace(/[\uFEFF\u00A0]/g, '')  // BOM, NBSP 제거
+          .replace(/\s+/g, '')             // 모든 공백 제거
+          .toLowerCase();
+
+        // 2) 값 정규화: 네 cleanUrl을 활용 + 내부 공백/비가시 공백 제거
+        const normVal = (v) => cleanUrl(v).replace(/[\uFEFF\u00A0]/g, '').replace(/\s+/g, '');
+
+        // 3) 각 행의 키를 정규화해서 새 객체로 만든 뒤, __charKey 생성
+        cache.rows = rawRows.map(row => {
+          const n = {};
+          for (const [k, v] of Object.entries(row)) n[normKey(k)] = v;
+
+          // 시트에 따라 다양한 표기를 모두 커버
+          const job = n['직업군'] || n['직업'] || '';
+          const name = n['캐릭터'] || n['캐릭터명'] || n['캐릭명'] || n['직업명'] || '';
+
+          // BUFF_SHEET가 '캐릭터' 한 열에 "남귀검사소울브링어"가 들어있는 경우도 커버
+          const charKey = normVal(job + name) || normVal(name);
+          return { ...row, __charKey: charKey };  // 원본 필드 유지 + 키 추가
+        });
+
+        console.log('[BUFF-DEBUG] BUFF rows:', cache.rows.length,
+          '샘플 __charKey:', cache.rows.slice(0, 5).map(r => r.__charKey));
+
+        cache.ready = true;
+      }
+
+      // base 객체에서 숫자 필드(0이 아닌 곳)에만 delta를 더함 (중첩 객체도 처리)
+      function addDeltaWherePresent(base, delta) {
+        const walk = (obj) => {
+          if (!obj || typeof obj !== 'object') return obj;
+          const out = Array.isArray(obj) ? [] : {};
+          for (const [k, v] of Object.entries(obj)) {
+            if (v && typeof v === 'object') {
+              out[k] = walk(v);
+            } else if (typeof v === 'number') {
+              out[k] = (v !== 0) ? (v + delta) : v;
+            } else {
+              out[k] = v;
+            }
+          }
+          return out;
+        };
+        return walk(base);
+      }
+
+      // ★ 가산형 스케일: "원래값 + (증가율 * 레벨링합)"
+      function scaleAdd(baseStats, incRaw, levelCount) {
+        // 네가 이미 가진 toNum() 재사용 (%, 글자 등 있으면 숫자만 남기고 싶으면 아래 한 줄 활성화)
+        // incRaw = String(incRaw).replace(/[^0-9.-]/g, '');
+        const inc = toNum(incRaw);      // 예: "4" -> 4
+        const steps = toNum(levelCount);  // 예: 8
+        const delta = inc * steps;        // 예: 32
+        return addDeltaWherePresent(baseStats, delta);
+      }
 
 
-// 3) 매칭: 현재 선택 캐릭터 키 만들기 + 필터
-async function computeBuffStats() {
-if (!(state.currentCharacter?.name)) {
-  return null; // 캐릭터 없으면 버프 미적용
-}
-  if (!cache.ready) await preload();
+      // 3) 매칭: 현재 선택 캐릭터 키 만들기 + 필터
+      async function computeBuffStats() {
+        if (!(state.currentCharacter?.name)) {
+          return null; // 캐릭터 없으면 버프 미적용
+        }
+        if (!cache.ready) await preload();
 
-  const want = (state.currentCharacter?.jobGroupLabel || '') + (state.currentCharacter?.name || '');
-  const fullName = cleanUrl(want).replace(/[\uFEFF\u00A0]/g, '').replace(/\s+/g, '');
+        const want = (state.currentCharacter?.jobGroupLabel || '') + (state.currentCharacter?.name || '');
+        const fullName = cleanUrl(want).replace(/[\uFEFF\u00A0]/g, '').replace(/\s+/g, '');
 
-  // __charKey는 이미 정규화된 상태
-  const rows = cache.rows.filter(r => r.__charKey === fullName);
-  console.log('[BUFF-DEBUG] BUFF_SHEET 매칭:', { fullName, count: rows.length });
+        // __charKey는 이미 정규화된 상태
+        const rows = cache.rows.filter(r => r.__charKey === fullName);
+        console.log('[BUFF-DEBUG] BUFF_SHEET 매칭:', { fullName, count: rows.length });
 
-  const levMap = collectItemLevelings?.(state.selections || {}) || {};
-  console.log('[BUFF-DEBUG] 레벨링 합산:', levMap);
+        const levMap = collectItemLevelings?.(state.selections || {}) || {};
+        state.leveling = levMap; // ★ 일반 스킬 레벨링 적용을 위한 전역 저장
+        console.log('[BUFF-DEBUG] 레벨링 합산:', levMap);
 
-  let total = emptyStatsLikeSum();
-  for (const r of rows) {
-    const skillName = String(r['스킬명'] || r['skillname'] || '').trim();
-    const req  = Number(r['스킬렙제'] || r['skillreq'] || 0);
-// (교체 코드: 가산형 적용)
-const incRaw = r['증가율'] || r['rate'] || 0;  // 원문 유지
-const base   = rowToBaseStats(r);
-const level  = toNum(levMap[req] || 0);
-const scaled = scaleAdd(base, incRaw, level);  // ★ 가산형
+        let total = emptyStatsLikeSum();
+        for (const r of rows) {
+          const skillName = String(r['스킬명'] || r['skillname'] || '').trim();
+          const req = Number(r['스킬렙제'] || r['skillreq'] || 0);
+          // (교체 코드: 가산형 적용)
+          const incRaw = r['증가율'] || r['rate'] || 0;  // 원문 유지
+          const base = rowToBaseStats(r);
+          const level = toNum(levMap[req] || 0);
+          const scaled = scaleAdd(base, incRaw, level);  // ★ 가산형
 
-    console.log(
-  `[BUFF-DEBUG] req=${req}, level=${level}, inc=${incRaw} → delta=${toNum(incRaw)*level}`,
-  { base, scaled });
-    total = addStats(total, scaled);
-  }
-  console.log('[BUFF-DEBUG] 최종 합산 버프 스탯:', total);
-  return total;
-}
-
-
-
+          console.log(
+            `[BUFF-DEBUG] req=${req}, level=${level}, inc=${incRaw} → delta=${toNum(incRaw) * level}`,
+            { base, scaled });
+          total = addStats(total, scaled);
+        }
+        console.log('[BUFF-DEBUG] 최종 합산 버프 스탯:', total);
+        return total;
+      }
 
 
 
-  return { computeBuffStats };
-})();
-</script>
+
+
+
+      return { computeBuffStats };
+    })();
+  </script>
 
   <script>
     /* ======== 마법봉인(슬롯별 3구역 단일 선택) & 마법부여 ======== */
@@ -4984,68 +5516,71 @@ const scaled = scaleAdd(base, incRaw, level);  // ★ 가산형
       });
 
       // 합산 함수 확장: 마봉, 마부 스탯 합산
-// 합산 함수 확장: 마봉, 마부 스탯 합산
-try {
-  const _base = window.sumSelections;
-  if (typeof _base === 'function') {
-    window.sumSelections = function () {
-      const S = _base();
+      // 합산 함수 확장: 마봉, 마부 스탯 합산
+      try {
+        const _base = window.sumSelections;
+        if (typeof _base === 'function') {
+          window.sumSelections = function () {
+            const S = _base();
 
-      // 누적기 안전 보정
-      S.__skillMul = S.__skillMul || 1;
-      S.__skillAddBuff = S.__skillAddBuff || 0;
+            // 누적기 안전 보정
+            S.__skillMul = S.__skillMul || 1;
+            S.__skillAddBuff = S.__skillAddBuff || 0;
 
-      const add = (st, src = 'other') => {
-        if (!st) return;
+            const add = (st, src = 'other') => {
+              if (!st) return;
 
-        // 1) 스증 분기
-        if (st.skill_atk_inc) {
-          if (src === 'buff') S.__skillAddBuff += (st.skill_atk_inc || 0);   // (여기선 안 씀)
-          else                S.__skillMul *= (1 + (st.skill_atk_inc || 0));  // 마봉/마부는 곱
+              // 1) 스증 분기
+              if (st.skill_atk_inc) {
+                if (src === 'buff') S.__skillAddBuff += (st.skill_atk_inc || 0);   // (여기선 안 씀)
+                else S.__skillMul *= (1 + (st.skill_atk_inc || 0));  // 마봉/마부는 곱
+              }
+
+              // 2) 나머지 스탯 가산
+              S.phys_atk += st.phys_atk || 0; S.mag_atk += st.mag_atk || 0;
+              S.str += st.str || 0; S.int += st.int || 0;
+              S.phys_crit += st.phys_crit || 0; S.mag_crit += st.mag_crit || 0;
+              S.phys_crit_rate += st.phys_crit_rate || 0; S.mag_crit_rate += st.mag_crit_rate || 0;
+              S.add_damage += st.add_damage || 0;
+              if (st.elem_add_damage) {
+                S.elem_add.fire += st.elem_add_damage.fire || 0;
+                S.elem_add.water += st.elem_add_damage.water || 0;
+                S.elem_add.light += st.elem_add_damage.light || 0;
+                S.elem_add.dark += st.elem_add_damage.dark || 0;
+              }
+              S.str_pct += st.str_pct || 0; S.int_pct += st.int_pct || 0;
+              S.damage_inc += st.damage_inc || 0; S.crit_damage_inc += st.crit_damage_inc || 0;
+              S.phys_atk_pct += st.phys_atk_pct || 0; S.mag_atk_pct += st.mag_atk_pct || 0;
+              if (st.elem) { S.elem.fire += st.elem.fire || 0; S.elem.water += st.elem.water || 0; S.elem.light += st.elem.light || 0; S.elem.dark += st.elem.dark || 0; }
+              S.cdr += st.cdr || 0;
+              if (st.speed) { S.speed.attack += st.speed.attack || 0; S.speed.move += st.speed.move || 0; S.speed.cast += st.speed.cast || 0; }
+              if (st.other) { S.def_break_inc += st.other.def_break_inc || 0; }
+              S.counter_add_damage += st.counter_add_damage || 0;
+              S.counter_damage_inc += st.counter_damage_inc || 0;
+            };
+
+            // 마봉(시일/seal)
+            Object.values(state.seals || {}).forEach(p => {
+              if (p?.unique?.stats) add(p.unique.stats, 'other');
+              if (p?.general1?.stats) add(p.general1.stats, 'other');
+              if (p?.general2?.stats) add(p.general2.stats, 'other');
+            });
+
+            // 마부(enchants)
+            Object.values(state.enchants || {}).forEach(p => {
+              if (p?.stats) add(p.stats, 'other');
+            });
+
+            // ★ 여기서 최종 스증 확정: (곱-1) + 버프합
+            S.skill_atk_inc = (S.__skillMul - 1) + S.__skillAddBuff;
+
+            // 임시 키 정리(선택)
+            // delete S.__skillMul; delete S.__skillAddBuff;
+
+            return S;
+          };
         }
-
-        // 2) 나머지 스탯 가산
-        S.phys_atk += st.phys_atk || 0; S.mag_atk += st.mag_atk || 0;
-        S.str += st.str || 0; S.int += st.int || 0;
-        S.phys_crit += st.phys_crit || 0; S.mag_crit += st.mag_crit || 0;
-        S.phys_crit_rate += st.phys_crit_rate || 0; S.mag_crit_rate += st.mag_crit_rate || 0;
-        S.add_damage += st.add_damage || 0;
-        if (st.elem_add_damage) {
-          S.elem_add_sum = (S.elem_add_sum || 0)
-            + (st.elem_add_damage.fire || 0) + (st.elem_add_damage.water || 0)
-            + (st.elem_add_damage.light || 0) + (st.elem_add_damage.dark || 0);
-        }
-        S.str_pct += st.str_pct || 0; S.int_pct += st.int_pct || 0;
-        S.damage_inc += st.damage_inc || 0; S.crit_damage_inc += st.crit_damage_inc || 0;
-        S.phys_atk_pct += st.phys_atk_pct || 0; S.mag_atk_pct += st.mag_atk_pct || 0;
-        if (st.elem) { S.elem.fire += st.elem.fire || 0; S.elem.water += st.elem.water || 0; S.elem.light += st.elem.light || 0; S.elem.dark += st.elem.dark || 0; }
-        S.cdr += st.cdr || 0;
-        if (st.speed) { S.speed.attack += st.speed.attack || 0; S.speed.move += st.speed.move || 0; S.speed.cast += st.speed.cast || 0; }
-        if (st.other) { S.def_break_inc += st.other.def_break_inc || 0; }
-      };
-
-      // 마봉(시일/seal)
-      Object.values(state.seals || {}).forEach(p => {
-        if (p?.unique?.stats) add(p.unique.stats, 'other');
-        if (p?.general1?.stats) add(p.general1.stats, 'other');
-        if (p?.general2?.stats) add(p.general2.stats, 'other');
-      });
-
-      // 마부(enchants)
-      Object.values(state.enchants || {}).forEach(p => {
-        if (p?.stats) add(p.stats, 'other');
-      });
-
-      // ★ 여기서 최종 스증 확정: (곱-1) + 버프합
-      S.skill_atk_inc = (S.__skillMul - 1) + S.__skillAddBuff;
-
-      // 임시 키 정리(선택)
-      // delete S.__skillMul; delete S.__skillAddBuff;
-
-      return S;
-    };
-  }
-} catch (e) { console.warn('Seal/Enchant sumSelections extension failed', e); }
+      } catch (e) { console.warn('Seal/Enchant sumSelections extension failed', e); }
 
 
       // 전역에서 접근 필요 시 export
@@ -5060,6 +5595,219 @@ try {
 
       window.openSealModal = openSealModal;
     })();
+
+    /* === FINAL DERIVED STATS EXTENSION (do this LAST) === */
+    try {
+      const _base = window.sumSelections;
+      if (typeof _base === 'function') {
+        window.sumSelections = function () {
+          const S = _base();
+
+          // ---- (A) 속추 합계 재확인(중복 방지: 합계는 오직 여기서만) ----
+          S.elem_add_sum =
+            (S.elem_add?.fire || 0) +
+            (S.elem_add?.water || 0) +
+            (S.elem_add?.light || 0) +
+            (S.elem_add?.dark || 0);
+
+          // ---- (B) 유효 속추: 속추 * (1.05 + 0.0045 * (속강 - 적저)) ----
+          const M = (state && state.monster) ? state.monster : {};
+          const eff = (k) => {
+            const base = (S.elem_add?.[k] || 0);
+            const atk = (S.elem?.[k] || 0);
+            const res = (M?.[k] || 0);
+            return base * (1.05 + 0.0045 * (atk - res));
+          };
+          S.elem_add_eff = {
+            fire: eff('fire'),
+            water: eff('water'),
+            light: eff('light'),
+            dark: eff('dark'),
+          };
+          S.elem_add_eff_sum =
+            S.elem_add_eff.fire +
+            S.elem_add_eff.water +
+            S.elem_add_eff.light +
+            S.elem_add_eff.dark;
+
+          // ---- (C) 최종추뎀 ----
+          S.fin_add_damage =
+            (S.add_damage || 0) +
+            (S.elem_add_eff_sum || 0) +
+            (S.counter_add_damage || 0);
+
+          // ---- (D) 최종 크리율(몬스터 레벨 적용) ----
+          const monsterLevel = Number(state?.monster?.level ?? 80);
+          const computeFinalCritPct = (critVal, critRateVal) => {
+            if (critVal == null || critRateVal == null) return 0;
+            const denom = (3.8665 * Math.pow(100 / 97.25, monsterLevel)) * 100;
+            const percent = (((critVal || 0) / denom) * 100) + ((critRateVal || 0) * 100) + 3;
+            const clamped = Math.max(0, Math.min(100, percent));
+            return clamped / 100; // 0~1
+          };
+          S.final_phys_crit_pct = computeFinalCritPct(S.phys_crit, S.phys_crit_rate);
+          S.final_mag_crit_pct = computeFinalCritPct(S.mag_crit, S.mag_crit_rate);
+
+          // ---- (E) 속성 보정계수: 4속 중 (속강-적저) 최대 ----
+          const elemMul = Math.max(
+            1.05 + 0.0045 * ((S.elem?.fire || 0) - (M.fire || 0)),
+            1.05 + 0.0045 * ((S.elem?.water || 0) - (M.water || 0)),
+            1.05 + 0.0045 * ((S.elem?.light || 0) - (M.light || 0)),
+            1.05 + 0.0045 * ((S.elem?.dark || 0) - (M.dark || 0)),
+          );
+
+          // ---- (F) 확률계수 factor (물/마 별도) ----
+          // (1 + (뎀증 + 카운터뎀증))
+          // * ( 최종크리율*(1.5+크증뎀) + (1-최종크리율) )
+          // * (1.05 + 0.0045*(속강-적저))
+          // * (1 + (최종추뎀)*1.015)
+          const baseMul1 = 1 + (S.damage_inc || 0) + (S.counter_damage_inc || 0);
+          const baseMul4 = 1 + (S.fin_add_damage || 0) * 1.015;
+
+          const baseMul2_phys =
+            (S.final_phys_crit_pct * (1.5 + (S.crit_damage_inc || 0))) +
+            (1 - S.final_phys_crit_pct);
+
+          const baseMul2_mag =
+            (S.final_mag_crit_pct * (1.5 + (S.crit_damage_inc || 0))) +
+            (1 - S.final_mag_crit_pct);
+
+          S.factor_phys = baseMul1 * baseMul2_phys * elemMul * baseMul4;
+          S.factor_mag = baseMul1 * baseMul2_mag * elemMul * baseMul4;
+          // ====== [추가] 힘/지능 계수식 및 평타/스킬 데미지 계열 ======
+
+          // 0) 준비: 총합 힘/지능, 총합 물/마공
+          const totalSTR = (S.str || 0) * (1 + (S.str_pct || 0));
+          const totalINT = (S.int || 0) * (1 + (S.int_pct || 0));
+
+          const totalPhysAtk = (S.phys_atk || 0) * (1 + (S.phys_atk_pct || 0));
+          const totalMagAtk = (S.mag_atk || 0) * (1 + (S.mag_atk_pct || 0));
+
+          // 1) 스케일러(힘/지능)
+          const strScaler = (totalSTR / 250) + 1;
+          const intScaler = (totalINT / 250) + 1;
+
+          // 2) 고뎀 상수(시트의 100*3.43 그대로)
+          const GODAM_CONST = 100 * 3.43;
+
+          // 3) “원초식” (장비/버프 등으로 만든 기초 배수)
+          S.str_perdam = strScaler * totalPhysAtk;   // 힘 퍼뎀
+          S.str_godam = strScaler * GODAM_CONST;    // 힘 고뎀
+          S.in_perdam = intScaler * totalMagAtk;    // 지능 퍼뎀
+          S.in_godam = intScaler * GODAM_CONST;    // 지능 고뎀
+
+          // 4) 몬스터 방어 보정(방어율): 값 없으면 1로 둠
+          const armorMul = state?.monster?.defRate ?? 1;
+
+          // 5) 평타/스킬 최종식 (확률계수 + 스킬공격력증가 반영)
+          //   - 확률계수: 물리 = S.factor_phys, 마법 = S.factor_mag
+          //   - 스킬공격력증가: S.skill_atk_inc (곱누적-1 + 버프합) 최종 확정값
+          const skillMul = 1 + (S.skill_atk_inc || 0);
+
+          // 힘(물리) 라인
+          S.nor_str_perdam = S.factor_phys * S.str_perdam * armorMul * 1.25;
+          S.nor_str_godam = S.factor_phys * S.str_godam * armorMul * 1.25;
+
+          S.ski_str_perdam = S.factor_phys * skillMul * S.str_perdam * 1.25;
+          S.ski_str_godam = S.factor_phys * skillMul * S.str_godam * 1.25;
+
+          // 지능(마법) 라인
+          S.nor_int_perdam = S.factor_mag * S.in_perdam * armorMul * 1.25;
+          S.nor_int_godam = S.factor_mag * S.in_godam * armorMul * 1.25;
+
+          S.ski_int_perdam = S.factor_mag * skillMul * S.in_perdam * 1.25;
+          S.ski_int_godam = S.factor_mag * skillMul * S.in_godam * 1.25;
+
+          // ===== [스킬별 최종 데미지 연결] =====
+          const skillBook = (window.skillDmg || state?.skillDmg || {});
+          const p = state?.currentCharacter?.power; // renderStats 에서 쓰던 것 그대로
+
+          // 방깎뎀증 배수
+          const defMul = 1 + (S.def_break_inc || 0);
+
+          Object.entries(skillBook).forEach(([id, sd]) => {
+            if (!sd) return;
+
+            const perBase = Number(sd.per || 0);
+            const flatBase = Number(sd.flat || 0);
+            const uses = Number(sd.uses ?? 1);
+
+            // 기본 perCoef / goCoef
+            let perCoef, goCoef;
+            if (p === 'phys') {
+              perCoef = S.ski_str_perdam;
+              goCoef = S.ski_str_godam;
+            } else if (p === 'mag') {
+              perCoef = S.ski_int_perdam;
+              goCoef = S.ski_int_godam;
+            } else {
+              perCoef = 0;
+              goCoef = 0;
+            }
+
+            // === [평타 전용 분기] ===
+            if (sd.kind === "평타") {
+              if (p === 'phys') {
+                perCoef = S.nor_str_perdam;
+                goCoef = S.nor_str_godam;
+              } else if (p === 'mag') {
+                perCoef = S.nor_int_perdam;
+                goCoef = S.nor_int_godam;
+              } else {
+                perCoef = 0;
+                goCoef = 0;
+              }
+            }
+
+            // 최종 데미지 계산
+            const final = ((perBase * perCoef) + (flatBase * goCoef)) * defMul * uses;
+
+            sd.final = final;
+            sd.finalPer = perBase * perCoef;
+            sd.finalFlat = flatBase * goCoef;
+          });
+
+
+          return S;
+        };
+      }
+    } catch (e) {
+      console.warn('Finalize(sumSelections) extension failed', e);
+    }
+
+function sumAllSkillFinal() {
+  if (typeof sumSelections === 'function') sumSelections(); // 최신 반영
+  const book = (window.skillDmg || state?.skillDmg || {});
+  let total = 0;
+  for (const sd of Object.values(book)) total += Number(sd?.final || 0);
+  return Math.round(total);
+}
+
+function setFinalDamageManually(total) {
+  const el = document.getElementById('finalDamageValue');
+  if (!el) return;
+  el.textContent = Number(total).toLocaleString();
+}
+
+// 버튼: 누를 때만 값 채움
+document.getElementById('btn-sum-all-final')?.addEventListener('click', () => {
+  const total = sumAllSkillFinal();
+  setFinalDamageManually(total);
+});
+
+function setFinalDamageManually2(total) {
+  const el = document.getElementById('finalDamageValue2');
+  if (!el) return;
+  el.textContent = Number(total).toLocaleString();
+}
+
+// 버튼: 누를 때만 값 채움
+document.getElementById('btn-sum-all-final2')?.addEventListener('click', () => {
+  const total = sumAllSkillFinal();
+  setFinalDamageManually2(total);
+});
+
+
 
   </script>
 </body>
