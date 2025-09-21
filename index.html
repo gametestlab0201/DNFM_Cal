@@ -2,6 +2,7 @@
 <html lang="ko">
 
 <head>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>게임실험연구소 계산기 (시즌5)</title>
@@ -36,6 +37,173 @@
       color: var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial;
       overflow: auto;
+    }
+
+    .wrap {
+      max-width: 1300px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    .top-title {
+      text-align: center;
+      font-weight: 800;
+      font-size: clamp(20px, 2.6vw, 36px);
+      margin: 6px 0 4px;
+    }
+
+    .sub-alert {
+      text-align: center;
+      color: #ffb3b3;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .main2 {
+      text-align: center;
+      color: #ff0000;
+      font-size: 12px;
+      margin-bottom: 10px;
+      font-weight: bold;
+      /* 글씨 두께 → 굵게 */
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.4fr 0.9fr;
+      /* 왼쪽 큰 비주얼 / 오른쪽 공지 */
+      gap: 18px;
+      align-items: start;
+    }
+
+    /* ===== 왼쪽: 메인 비주얼 + 로그인 카드 ===== */
+    .hero {
+      position: relative;
+      background: #0b0f16;
+      border: 1px solid #1f2633;
+      border-radius: 14px;
+      overflow: hidden;
+      min-height: 520px;
+    }
+
+    .hero-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: .92;
+      filter: saturate(1.05) contrast(1.05);
+    }
+
+    /* 오른쪽 컬럼: 공지 + 로그인 세로로 쌓기 */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      /* 두 박스 사이 간격 */
+    }
+
+    /* 스샷의 빨간 타원 위치: 하단 좌측에 뜨는 둥근 직사각형 */
+    .login-card {
+      position: static;
+      /* 고정 해제 */
+      width: 100%;
+      /* 오른쪽 칼럼 너비 꽉 채우기 */
+      background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .05));
+      border: 1px solid rgba(255, 255, 255, .16);
+      border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, .45), inset 0 0 0 6px rgba(110, 168, 255, .06);
+      padding: 14px 16px;
+      backdrop-filter: blur(2px);
+    }
+
+    .login-title {
+      font-weight: 700;
+      margin: 2px 0 8px;
+      font-size: 15px;
+      letter-spacing: .2px;
+    }
+
+    .login-desc {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .login-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .login-hint {
+      color: #a2ffcf;
+      font-size: 12px;
+    }
+
+    /* ===== 오른쪽: 업데이트/공지 ===== */
+    .notice {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .03));
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 14px;
+      padding: 14px 14px 18px;
+    }
+
+    .notice h3 {
+      margin: 6px 0 10px;
+      font-size: 18px;
+    }
+
+    .notice .box {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+
+    .notice ul {
+      margin: 6px 0 0 18px;
+      padding: 0;
+      line-height: 1.5;
+    }
+
+    .badge-danger {
+      color: #ff8b8b;
+      font-weight: 700
+    }
+
+    .upgrade {
+      margin-top: 10px;
+      background: #172233;
+      border: 1px solid #253148;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    .upgrade a {
+      color: #8fbaff;
+      text-decoration: underline;
+    }
+
+    /* 반응형 */
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: 420px;
+      }
+
+      .login-card {
+        left: 12px;
+        right: 12px;
+        width: auto;
+      }
     }
 
     /*클래스선택자(색상세트)*/
@@ -73,62 +241,94 @@
     }
 
     /* 레이아웃: 오른쪽에 합산 패널 열 추가 (고정폭) */
-.layout {
-  display: grid;
-  grid-template-columns: 
-  minmax(220px, 1fr)       /* 1번째 열 (왼쪽) */
-    minmax(320px, 36vw)      /* 2번째 열 (캐릭터) */
-    minmax(220px, 1fr)       /* 3번째 열 (오른쪽) */
-    300px                    /* 4번째 열 (옵션) */
-    300px;                   /* 5번째 열 (합산스탯) */
-  grid-template-rows: auto auto;
-  gap: clamp(8px, 2vw, 24px);
+    .layout {
+      display: grid;
+      grid-template-columns:
+        minmax(220px, 1fr)
+        /* 1번째 열 (왼쪽) */
+        minmax(320px, 36vw)
+        /* 2번째 열 (캐릭터) */
+        minmax(220px, 1fr)
+        /* 3번째 열 (오른쪽) */
+        300px
+        /* 4번째 열 (옵션) */
+        300px;
+      /* 5번째 열 (합산스탯) */
+      grid-template-rows: auto auto;
+      gap: clamp(8px, 2vw, 24px);
 
-  grid-template-areas:
-    "left char right options stats"
-    "save save right options stats";
-}
+      grid-template-areas:
+        "left char right options stats"
+        "save save right options stats";
+    }
 
-.left-col    { grid-area: left; }
-.char-col    { grid-area: char; }
-.right-col   { grid-area: right; grid-row: 1 / span 2; }
-.options-col { grid-area: options; grid-row: 1 / span 2; }
-.stats-col   { grid-area: stats; grid-row: 1 / span 2; }
-.save-box    { grid-area: save; }
+    .left-col {
+      grid-area: left;
+    }
 
-.save-box {
-  grid-area: save;
-  background: rgba(110, 168, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 18px;
-  padding: 12px 16px;
-  display: flex;
-  justify-content: flex-start;  /* ← 왼쪽 정렬 */
-  gap: 10px;
-  position: relative;
-  transform: translateY(-100px);  /* -6 ~ -20px 등으로 조절 */
-  z-index: 2;                    /* 겹칠 때 위에 보이게 */
-}
+    .char-col {
+      grid-area: char;
+    }
 
-.save-box button {
-  width: 48px;           /* 정사각형 */
-  height: 48px;          /* 정사각형 */
-  border-radius: 12px;   /* 둥근 모서리 */
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  font-size: 24px;       /* + 기호 크게 */
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-}
+    .right-col {
+      display: flex;
+      flex-direction: column;
+    }
 
-.save-box button:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
+    .options-col {
+      grid-area: options;
+      grid-row: 1 / span 2;
+    }
+
+    .stats-col {
+      grid-area: stats;
+      grid-row: 1 / span 2;
+    }
+
+    .save-box {
+      grid-area: save;
+    }
+
+    .save-box {
+      grid-area: save;
+      background: rgba(110, 168, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: flex-start;
+      /* ← 왼쪽 정렬 */
+      gap: 10px;
+      position: relative;
+      transform: translateY(-100px);
+      /* -6 ~ -20px 등으로 조절 */
+      z-index: 2;
+      /* 겹칠 때 위에 보이게 */
+    }
+
+    .save-box button {
+      width: 48px;
+      /* 정사각형 */
+      height: 48px;
+      /* 정사각형 */
+      border-radius: 12px;
+      /* 둥근 모서리 */
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 24px;
+      /* + 기호 크게 */
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .save-box button:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
 
 
     /* justify-content 는 가로방향정렬, align-items 은 세로방향정렬
@@ -137,8 +337,10 @@
     .column {
       display: flex;
       flex-direction: column;
-      align-self: start !important;   /* 세로축 위쪽 정렬 */
-  height: max-content !important; /* 내용만큼만 높이 */
+      align-self: start !important;
+      /* 세로축 위쪽 정렬 */
+      height: max-content !important;
+      /* 내용만큼만 높이 */
       gap: 12px;
       padding: 10px 6px;
       border-radius: 18px;
@@ -242,9 +444,11 @@
       height: 100%;
     }
 
-    .character-card {   /*메인 캐릭터 박스*/
+    .character-card {
+      /*메인 캐릭터 박스*/
       /*margin-top: 0px;  /* 원하는 값(px, %, rem 등) */
-      align-self: start;   /* ← 세로축 위쪽에 붙음 */
+      align-self: start;
+      /* ← 세로축 위쪽에 붙음 */
       width: clamp(20px, 25vw, 520px);
       aspect-ratio: 3/4;
       border-radius: 22px;
@@ -282,7 +486,8 @@
 
     /* ▼ 하단 4개 슬롯 */
     .mini-bar {
-      align-self: start;   /* 그리드 칸에서 위쪽에 붙임 */
+      align-self: start;
+      /* 그리드 칸에서 위쪽에 붙임 */
       /*margin-top: 10px;*/
       margin-bottom: 70px;
       display: flex;
@@ -715,7 +920,7 @@
       text-align: right;
     }
 
-    /* #은 고유 id를 뜻한다. 클래스와 다른점은 고유하기때문에 단한번만 사용한다는 차이가 있음
+    /* #은 고유 id를 뜻한다. 클래스와 다른점은 고유하기때문에 단한번만 사용한다는 차이가 있음 */
     /* 강화 선택 모달(텍스트 리스트) */
     #enhanceModal .dialog {
       width: min(520px, 95vw);
@@ -1565,7 +1770,7 @@
       box-shadow: 0 0 0 2px rgba(110, 168, 255, .25) inset;
     }
   </style>
-</head>
+
 
 <body>
   <div class="shell">
@@ -1585,7 +1790,66 @@
         </div>
       </div>
     </header>
+    <section id="main-view">
+      <!-- 여기에 네가 만든 메인(배경/우측 공지/빨간 타원 위치 로그인 카드) 마크업 -->
+      <!-- PC / 모바일 버튼도 여기 -->
+      <div class="wrap">
+        <h1 class="top-title">던전앤파이터 모바일 <span style="color:#ffdf6b">시즌 5</span> 데미지 계산기</h1>
+        <div class="main2">※ 본 계산기는 게임플레이에 도움이 되고자 만든 것입니다. 순수한 정보공유가 아닌, 상업적 목적으로의 블로그 게재, 개인방송, 유튜브 영상제작 등의 제작자 동의없는
+          이용을 금하며, 무단수정 및 도용도 엄격히 금지합니다.</div>
 
+        <div class="grid">
+          <!-- 왼쪽: 메인 비주얼 -->
+          <section class="hero">
+            <!-- 네가 쓰려는 메인 이미지를 넣어줘 -->
+            <img class="hero-img" src="img/main/main.png" alt="메인 비주얼" />
+          </section>
+          <!-- 오른쪽: 공지/업데이트 -->
+          <div class="sidebar">
+            <aside class="notice">
+              <h3>* 계산기는 계속해서 업데이트될 예정입니다!</h3>
+              <div class="box">
+                <div class="badge-danger">25.10.01 계산기 TEST 버전 배포</div>
+                <ul>
+                  <li>[책임 이상] 스펙 저장/불러오기 기능 추가</li>
+                  <li>스킬트리 연동 및 최종 계산 반영</li>
+                  <li>무기/칭호/보조장비 등 상한 확장</li>
+                  <li>버그 수정 및 성능 최적화</li>
+                </ul>
+              </div>
+              <div class="upgrade">
+                멤버십 업그레이드 시 <span class="main2" style="font-size:16px;">저장/불러오기</span> 등 편의 기능 이용 가능 <br> →
+                <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
+                  rel="noopener">지금 멤버십 업그레이드!!!</a>
+              </div>
+            </aside>
+            <div class="login-card">
+              <div class="login-title">계산기 접근을 위해 구글 계정으로 로그인</div>
+              <div class="login-desc">
+                허용된 계정만 접근 가능합니다. 로그인 후 자동으로 권한을 확인합니다.
+              </div>
+
+              <div class="login-row">
+                <!-- Google Sign-In 버튼 -->
+                <!-- 1) onload 세팅: client_id 교체 필수 -->
+                <div id="g_id_onload"
+                  data-client_id="110486887643-3c136grpud2llf2b31d24fqr40s1p44g.apps.googleusercontent.com"
+                  data-callback="onGoogleCredential" data-auto_prompt="false" data-itp_support="true">
+                </div>
+                <!-- 2) 버튼 렌더 -->
+                <div class="g_id_signin" data-type="standard" data-size="large" data-shape="pill" data-theme="outline"
+                  data-text="signin_with" data-logo_alignment="left">
+                </div>
+
+                <div class="login-hint">※ 버튼이 보이지 않으면 팝업/추적차단을 확인해 주세요.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+  </section>
+  <section id="calc-view" hidden>
     <section class="layout">
       <div class="column left">
         <div class="auto-box">
@@ -1675,13 +1939,13 @@
               class="rect">선택</button><button class="rect">선택</button></div>
         </div>
       </div>
-     <div class="save-box">
-  <button>+</button>
-  <button>+</button>
-  <button>+</button>
-  <button>+</button>
-  <button>+</button>
-</div>
+      <div class="save-box">
+        <button>+</button>
+        <button>+</button>
+        <button>+</button>
+        <button>+</button>
+        <button>+</button>
+      </div>
       <div class="column options">
         <div class="opt-box">
           <h4 class="opt-title">아바타 세부 선택</h4>
@@ -1782,14 +2046,14 @@
             </div>
           </div>
         </div>
-<div class="final-damage">
-            <span class="label">최종데미지</span>
-            <strong class="value" id="finalDamageValue2">&nbsp;</strong>
-            <button id="btn-sum-all-final2" type="button">계산하기</button>
-          </div>
+        <div class="final-damage">
+          <span class="label">최종데미지</span>
+          <strong class="value" id="finalDamageValue2">&nbsp;</strong>
+          <button id="btn-sum-all-final2" type="button">계산하기</button>
+        </div>
 
       </div>
-      
+
       <aside class="stats">
         <div class="stats-panel">
           <h3>합산 스탯</h3>
@@ -1801,8 +2065,9 @@
           </div>
         </div>
       </aside>
-      </section>
-      </div>
+    </section>
+  </section>
+  </div>
   <!--ㅇ-->
   <div id="charModal" class="modal" aria-hidden="true">
     <div class="backdrop" data-close></div><!--모달 뒤 배경 검정, data-close 속성 붙은 요소 클릭하면 모달 닫힘-->
@@ -1896,7 +2161,6 @@
       </div>
     </div>
   </div>
-
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
@@ -2897,36 +3161,36 @@
     };
 
     // ★ C) 효과적 스킬 레벨(레벨링 + 숙련룬 적용, 0레벨은 활성화 안 함)
-function effectiveSkillLevelForDamage(skill) {
-  // 1) 기본 스킬 레벨
-  let baseLv = Number(state.skillLv?.[skill.id] ?? 0);
-  const kind = String(skill?.kind || '').trim();
+    function effectiveSkillLevelForDamage(skill) {
+      // 1) 기본 스킬 레벨
+      let baseLv = Number(state.skillLv?.[skill.id] ?? 0);
+      const kind = String(skill?.kind || '').trim();
 
-  // 평타/연결평타는 기본 레벨이 없으면 1로 보정
-  const isNormal = (kind === '평타' || kind === '연결평타' || kind.startsWith('평타'));
-  if ((!Number.isFinite(baseLv) || baseLv <= 0) && isNormal) {
-    baseLv = 1;
-  }
-  // 평타가 아니고, 유효 베이스레벨이 없으면 0 (기존 규칙 유지)
-  if (!Number.isFinite(baseLv) || baseLv <= 0) {
-    return 0;
-  }
+      // 평타/연결평타는 기본 레벨이 없으면 1로 보정
+      const isNormal = (kind === '평타' || kind === '연결평타' || kind.startsWith('평타'));
+      if ((!Number.isFinite(baseLv) || baseLv <= 0) && isNormal) {
+        baseLv = 1;
+      }
+      // 평타가 아니고, 유효 베이스레벨이 없으면 0 (기존 규칙 유지)
+      if (!Number.isFinite(baseLv) || baseLv <= 0) {
+        return 0;
+      }
 
-  // 2) 스킬렙제(레벨링 게이트) 결정: levelGate → band → 기존 helper 순
-  const gate =
-    Number(skill?.levelGate ?? 0) ||
-    Number(skill?.band ?? 0) ||
-    (skillTierOf ? (Number(skillTierOf(skill)) || 0) : 0);
+      // 2) 스킬렙제(레벨링 게이트) 결정: levelGate → band → 기존 helper 순
+      const gate =
+        Number(skill?.levelGate ?? 0) ||
+        Number(skill?.band ?? 0) ||
+        (skillTierOf ? (Number(skillTierOf(skill)) || 0) : 0);
 
-  const lvlAddByLeveling = gate ? getLevelingCountByTier(gate) : 0;
+      const lvlAddByLeveling = gate ? getLevelingCountByTier(gate) : 0;
 
-  // 3) 숙련룬(+n)
-  const { skillLvAdd } = runeLevelAdds ? runeLevelAdds(skill) : { skillLvAdd: 0 };
+      // 3) 숙련룬(+n)
+      const { skillLvAdd } = runeLevelAdds ? runeLevelAdds(skill) : { skillLvAdd: 0 };
 
-  // 4) 최종 유효 레벨(상한 없음, 1 이상으로 보정)
-  const eff = baseLv + (lvlAddByLeveling || 0) + (skillLvAdd || 0);
-  return Math.max(1, eff);
-}
+      // 4) 최종 유효 레벨(상한 없음, 1 이상으로 보정)
+      const eff = baseLv + (lvlAddByLeveling || 0) + (skillLvAdd || 0);
+      return Math.max(1, eff);
+    }
 
 
     // ★ D) 최종 데미지: (선형 데미지 at 효과적 레벨) × (TP 배율) × (룬 배율)
@@ -2939,15 +3203,15 @@ function effectiveSkillLevelForDamage(skill) {
       // 2) 시전 프레임
       const castFrames = Number(skill.castFrames || 0);
 
-        // 3) 유효 스킬 레벨
-  let effLv = effectiveSkillLevelForDamage(skill);     // ← (A) let 으로 변경 (보정 위해)
-  const kindNorm = String(skill?.kind || '스킬').trim();
+      // 3) 유효 스킬 레벨
+      let effLv = effectiveSkillLevelForDamage(skill);     // ← (A) let 으로 변경 (보정 위해)
+      const kindNorm = String(skill?.kind || '스킬').trim();
 
-  // ★ 옵션 B: 평타(또는 연결평타)는 레벨 미지정이어도 1레벨로 보정
-  if (effLv === 0 && (kindNorm === '평타' || kindNorm === '연결평타' || kindNorm.startsWith('평타'))) {
-    effLv = 1;
-  }
-       if (effLv === 0) {
+      // ★ 옵션 B: 평타(또는 연결평타)는 레벨 미지정이어도 1레벨로 보정
+      if (effLv === 0 && (kindNorm === '평타' || kindNorm === '연결평타' || kindNorm.startsWith('평타'))) {
+        effLv = 1;
+      }
+      if (effLv === 0) {
         return {
           per: 0,
           flat: 0,
@@ -2961,7 +3225,7 @@ function effectiveSkillLevelForDamage(skill) {
           castFrames,
           dps: 0,            // ★ 조기 리턴에도 dps 명시
           uses: 0,           // ★ 시뮬 후 덮어씀
-           kind: kindNorm,
+          kind: kindNorm,
         };
       }
 
@@ -2999,7 +3263,7 @@ function effectiveSkillLevelForDamage(skill) {
         castFrames,
         dps,            // ★ 여기서 정의된 dps 사용
         uses: 0,        // ★ 시뮬 후 덮어씀
-         kind: kindNorm,
+        kind: kindNorm,
       };
     }
 
@@ -3884,8 +4148,8 @@ function effectiveSkillLevelForDamage(skill) {
       statListEl.appendChild(show('이동속도(%)', fmtPct(S.speed.move)));
       statListEl.appendChild(show('캐스팅속도(%)', fmtPct(S.speed.cast)));
 
-        const row = document.createElement('div');  // 네 UI 구조에 맞게 li/tr 등으로 바꿔도 됨
-  
+      const row = document.createElement('div');  // 네 UI 구조에 맞게 li/tr 등으로 바꿔도 됨
+
     }
 
     async function recalcAndRenderPanel() {
@@ -4214,37 +4478,37 @@ function effectiveSkillLevelForDamage(skill) {
     function toNum(v) { if (v === '' || v == null) return 0; const n = Number(String(v).replace(/[, ]/g, '')); return isNaN(n) ? 0 : n; }
     function toList(v) { return (v ? String(v).split(/[,;]/).map(s => s.trim()).filter(Boolean) : []); }
 
-function mapRowToSkill(r) {
-  // 네가 준 컬럼 키 그대로 사용
-  const whoRaw = r['캐릭터명'];
-  const name = String(r['스킬명'] ?? '').trim();
-  const band = toNum(r['스킬렙제']);
-  const cd = toNum(r['쿨타임']);
-  const castFrames = toNum(r['시전프레임']);
-  const minLv = toNum(r['최소스킬레벨']);
-  const maxLv = toNum(r['최대스킬레벨']);       // (= 마스터스킬레벨)
-  const sp = toNum(r['소모 SP']);               // SP 비용(레벨당)
-  const icon = cleanUrl(r['이미지']) || PLACEHOLDER_IMG;
+    function mapRowToSkill(r) {
+      // 네가 준 컬럼 키 그대로 사용
+      const whoRaw = r['캐릭터명'];
+      const name = String(r['스킬명'] ?? '').trim();
+      const band = toNum(r['스킬렙제']);
+      const cd = toNum(r['쿨타임']);
+      const castFrames = toNum(r['시전프레임']);
+      const minLv = toNum(r['최소스킬레벨']);
+      const maxLv = toNum(r['최대스킬레벨']);       // (= 마스터스킬레벨)
+      const sp = toNum(r['소모 SP']);               // SP 비용(레벨당)
+      const icon = cleanUrl(r['이미지']) || PLACEHOLDER_IMG;
 
-  const who = String(whoRaw ?? '').replace(/\s+/g, '').trim();
+      const who = String(whoRaw ?? '').replace(/\s+/g, '').trim();
 
-  const idBase = (r['스킬ID'] ?? name).toString().trim();
-  const id = idBase ? `${idBase}#${band || 0}` : (Date.now().toString(36) + Math.random().toString(36).slice(2));
+      const idBase = (r['스킬ID'] ?? name).toString().trim();
+      const id = idBase ? `${idBase}#${band || 0}` : (Date.now().toString(36) + Math.random().toString(36).slice(2));
 
-  return {
-    id, who, name, icon,
-    band: band || 1,
-    levelGate: band || 1,     // ← 추가: 스킬렙제(레벨링 게이트) 통일 키
-    min: Math.max(0, minLv || 0),
-    max: Math.max(1, maxLv || 1),
-    sp: Math.max(0, sp || 0),
-    tp: 0,
-    cd,
-    castFrames,
-    prereq: [],
-    desc: ''
-  };
-}
+      return {
+        id, who, name, icon,
+        band: band || 1,
+        levelGate: band || 1,     // ← 추가: 스킬렙제(레벨링 게이트) 통일 키
+        min: Math.max(0, minLv || 0),
+        max: Math.max(1, maxLv || 1),
+        sp: Math.max(0, sp || 0),
+        tp: 0,
+        cd,
+        castFrames,
+        prereq: [],
+        desc: ''
+      };
+    }
 
 
 
@@ -5775,40 +6039,160 @@ function mapRowToSkill(r) {
       console.warn('Finalize(sumSelections) extension failed', e);
     }
 
-function sumAllSkillFinal() {
-  if (typeof sumSelections === 'function') sumSelections(); // 최신 반영
-  const book = (window.skillDmg || state?.skillDmg || {});
-  let total = 0;
-  for (const sd of Object.values(book)) total += Number(sd?.final || 0);
-  return Math.round(total);
+    function sumAllSkillFinal() {
+      if (typeof sumSelections === 'function') sumSelections(); // 최신 반영
+      const book = (window.skillDmg || state?.skillDmg || {});
+      let total = 0;
+      for (const sd of Object.values(book)) total += Number(sd?.final || 0);
+      return Math.round(total);
+    }
+
+    function setFinalDamageManually(total) {
+      const el = document.getElementById('finalDamageValue');
+      if (!el) return;
+      el.textContent = Number(total).toLocaleString();
+    }
+
+    // 버튼: 누를 때만 값 채움
+    document.getElementById('btn-sum-all-final')?.addEventListener('click', () => {
+      const total = sumAllSkillFinal();
+      setFinalDamageManually(total);
+    });
+
+    function setFinalDamageManually2(total) {
+      const el = document.getElementById('finalDamageValue2');
+      if (!el) return;
+      el.textContent = Number(total).toLocaleString();
+    }
+
+    // 버튼: 누를 때만 값 채움
+    document.getElementById('btn-sum-all-final2')?.addEventListener('click', () => {
+      const total = sumAllSkillFinal();
+      setFinalDamageManually2(total);
+    });
+
+
+    (() => {
+      // ★ 1) 클라이언트 ID와 CSV URL을 넣어주세요
+      const GOOGLE_CLIENT_ID = "110486887643-3c136grpud2llf2b31d24fqr40s1p44g.apps.googleusercontent.com"; // 발급받은 웹 클라이언트 ID
+      const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=1191061058&single=true&output=csv";
+      const ALLOW_HEADER = "구글계정"; // CSV의 컬럼명
+
+      // === 유틸: CSV에서 '구글계정' 컬럼에 이메일이 있는지 검사 ===
+      function csvHasEmail(csvText, email) {
+        email = (email || "").trim().toLowerCase();
+        const lines = csvText.trim().split(/\r?\n/);
+        if (!lines.length) return false;
+
+        const headers = lines[0].split(",").map(h => h.replace(/(^"|"$)/g, "").trim());
+        const idx = headers.findIndex(h => h === ALLOW_HEADER);
+        if (idx < 0) return false;
+
+        for (let i = 1; i < lines.length; i++) {
+          if (!lines[i]) continue;
+          // 간단 파서: 쉼표가 포함되지 않는 이메일 컬럼 기준으로 충분
+          const cells = lines[i].split(",").map(c => c.replace(/(^"|"$)/g, "").trim().toLowerCase());
+          if ((cells[idx] || "") === email) return true;
+        }
+        return false;
+      }
+
+      // === 로그인 성공 콜백(GSI에서 호출) ===
+      async function onGoogleCredential({ credential }) {
+        try {
+          if (!credential) throw new Error("ID 토큰 없음");
+
+          // 1) 구글 토큰 검증(브라우저 간단 검증) → 이메일 추출
+          const v = await fetch("https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(credential));
+          if (!v.ok) throw new Error("토큰 검증 실패");
+          const payload = await v.json();
+          const email = String(payload.email || "").toLowerCase();
+          const verified = String(payload.email_verified) === "true";
+          if (!verified || !email) throw new Error("이메일 미검증");
+
+          // 2) CSV 읽어서 허용여부 확인
+          const csvRes = await fetch(CSV_URL);
+          if (!csvRes.ok) throw new Error("CSV 로드 실패");
+          const csvText = await csvRes.text();
+          const allowed = csvHasEmail(csvText, email);
+
+          // 3) 로그인 카드에 버튼/안내 렌더 (허용/비허용 모두 버튼은 보임)
+          const card = document.querySelector(".login-card");
+          if (card) {
+            card.innerHTML = `
+<div class="login-title">${allowed ? "접근 승인됨" : "접근 제한됨"}</div>
+<div class="login-desc">
+  ${allowed
+                ? "아래에서 이용할 화면을 선택하세요."
+                : '게임실험연구소 연구원만 이용 가능합니다.<br><a class="join-link" href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank" rel="noopener">게임실험연구소 연구원 가입하기</a>'}
+</div>
+<div class="login-row">
+  <button id="btnPC" class="mode-btn">PC 계산기 열기</button>
+  <button id="btnM" class="mode-btn">모바일 계산기 열기</button>
+</div>
+`;
+
+            // 스타일(한 번만 추가되도록)
+            if (!document.getElementById("mode-btn-style")) {
+              const style = document.createElement("style");
+              style.id = "mode-btn-style";
+              style.textContent = `
+.mode-btn{
+  height:40px; padding:0 14px; border-radius:999px;
+  border:1px solid rgba(255,255,255,.2); background:#111827; color:#e6e9ef; cursor:pointer;
+  transition: box-shadow .15s, border-color .15s, opacity .15s;
 }
+.mode-btn:hover{ border-color:#6ea8ff; box-shadow:0 0 0 2px rgba(110,168,255,.25) inset; }
+.mode-btn:disabled{ opacity:.5; cursor:not-allowed; filter: grayscale(30%); }
+.login-desc a.join-link{ color:#8fbaff; text-decoration: underline; }
+`;
+              document.head.appendChild(style);
+            }
 
-function setFinalDamageManually(total) {
-  const el = document.getElementById('finalDamageValue');
-  if (!el) return;
-  el.textContent = Number(total).toLocaleString();
-}
+            const btnPC = card.querySelector("#btnPC");
+            const btnM = card.querySelector("#btnM");
 
-// 버튼: 누를 때만 값 채움
-document.getElementById('btn-sum-all-final')?.addEventListener('click', () => {
-  const total = sumAllSkillFinal();
-  setFinalDamageManually(total);
-});
+            if (!allowed) {
+              btnPC?.setAttribute("disabled", "true");
+              btnM?.setAttribute("disabled", "true");
+            } else {
+              btnPC?.addEventListener("click", () => showCalcView("pc"));
+              btnM?.addEventListener("click", () => showCalcView("mobile"));
+            }
+          }
+        } catch (err) {
+          console.warn("[Login] 처리 중 오류:", err);
+        }
+      }
 
-function setFinalDamageManually2(total) {
-  const el = document.getElementById('finalDamageValue2');
-  if (!el) return;
-  el.textContent = Number(total).toLocaleString();
-}
+      // GSI가 data-callback="onGoogleCredential"로 호출할 수 있게 전역 노출
+      window.onGoogleCredential = onGoogleCredential;
 
-// 버튼: 누를 때만 값 채움
-document.getElementById('btn-sum-all-final2')?.addEventListener('click', () => {
-  const total = sumAllSkillFinal();
-  setFinalDamageManually2(total);
-});
+      // === 뷰 전환(없으면 추가) ===
+      //  - 메인 숨기고 계산기 보여주기 + 모드 클래스 토글
+      if (typeof window.showCalcView !== "function") {
+        let calcInited = false;
+        window.showCalcView = function (mode) {
+          const main = document.getElementById("main-view");
+          const calc = document.getElementById("calc-view");
+          if (main) main.hidden = true;
+          if (calc) calc.hidden = false;
+          document.body.classList.toggle("pc", mode === "pc");
+          document.body.classList.toggle("mobile", mode === "mobile");
+          if (!calcInited) {
+            // 필요 시 한 번만 초기화 로직 호출 (initCalculator 등)
+            calcInited = true;
+          }
+          window.scrollTo(0, 0);
+        };
+      }
 
-
-
+      // (선택) #g_id_onload에 client_id가 비어있으면 채워줌
+      const onloadDiv = document.getElementById("g_id_onload");
+      if (onloadDiv && !onloadDiv.dataset.clientId) {
+        onloadDiv.dataset.clientId = GOOGLE_CLIENT_ID;
+      }
+    })();
   </script>
 </body>
 
