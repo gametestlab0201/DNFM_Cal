@@ -23,1820 +23,2028 @@
     /*모든 박스*/
     * {
       box-sizing: border-box;
+    }
 
-      /*html과 body에 대해 */
-      html,
-      body {
-        height: 100%;
-      }
+    /*html과 body에 대해 */
+    html,
+    body {
+      height: 100%;
+    }
 
-      body {
-        margin: 0;
-        padding: 0;
-        background: radial-gradient(1200px 600px at 50% -10%, #1b2130 0%, #0f1115 60%);
-        color: var(--text);
-        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial;
-        overflow: auto;
-      }
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(1200px 600px at 50% -10%, #1b2130 0%, #0f1115 60%);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial;
+      overflow: auto;
+    }
 
-      .wrap {
-        max-width: 1300px;
-        margin: 20px auto;
-        padding: 0 16px;
-      }
+    .wrap {
+      max-width: 1300px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
 
-      .top-title {
-        text-align: center;
-        font-weight: 800;
-        font-size: clamp(20px, 2.6vw, 36px);
-        margin: 6px 0 4px;
-      }
+    .top-title {
+      text-align: center;
+      font-weight: 800;
+      font-size: clamp(20px, 2.6vw, 36px);
+      margin: 6px 0 4px;
+    }
 
-      .sub-alert {
-        text-align: center;
-        color: #ffb3b3;
-        font-size: 13px;
-        margin-bottom: 10px;
-      }
+    .sub-alert {
+      text-align: center;
+      color: #ffb3b3;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
 
-      .main2 {
-        text-align: center;
-        color: #ff0000;
-        font-size: 12px;
-        margin-bottom: 10px;
-        font-weight: bold;
-        /* 글씨 두께 → 굵게 */
-      }
+    .main2 {
+      text-align: center;
+      color: #ff0000;
+      font-size: 12px;
+      margin-bottom: 10px;
+      font-weight: bold;
+      /* 글씨 두께 → 굵게 */
+    }
 
+    .grid {
+      display: grid;
+      grid-template-columns: 1.4fr 0.9fr;
+      /* 왼쪽 큰 비주얼 / 오른쪽 공지 */
+      gap: 18px;
+      align-items: start;
+    }
+
+    /* ===== 왼쪽: 메인 비주얼 + 로그인 카드 ===== */
+    .hero {
+      position: relative;
+      background: #0b0f16;
+      border: 1px solid #1f2633;
+      border-radius: 14px;
+      overflow: hidden;
+      min-height: 520px;
+    }
+
+    .hero-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: .92;
+      filter: saturate(1.05) contrast(1.05);
+    }
+
+    /* 오른쪽 컬럼: 공지 + 로그인 세로로 쌓기 */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      /* 두 박스 사이 간격 */
+    }
+
+    /* 스샷의 빨간 타원 위치: 하단 좌측에 뜨는 둥근 직사각형 */
+    .login-card {
+      position: static;
+      /* 고정 해제 */
+      width: 100%;
+      /* 오른쪽 칼럼 너비 꽉 채우기 */
+      background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .05));
+      border: 1px solid rgba(255, 255, 255, .16);
+      border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, .45), inset 0 0 0 6px rgba(110, 168, 255, .06);
+      padding: 14px 16px;
+      backdrop-filter: blur(2px);
+    }
+
+    .login-title {
+      font-weight: 700;
+      margin: 2px 0 8px;
+      font-size: 15px;
+      letter-spacing: .2px;
+    }
+
+    .login-desc {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .login-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .login-hint {
+      color: #a2ffcf;
+      font-size: 12px;
+    }
+
+    /* ===== 오른쪽: 업데이트/공지 ===== */
+    .notice {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .03));
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 14px;
+      padding: 14px 14px 18px;
+    }
+
+    .notice h3 {
+      margin: 6px 0 10px;
+      font-size: 18px;
+    }
+
+    .notice .box {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+
+    .notice ul {
+      margin: 6px 0 0 18px;
+      padding: 0;
+      line-height: 1.5;
+    }
+
+    .badge-danger {
+      color: #ff8b8b;
+      font-weight: 700
+    }
+
+    .upgrade {
+      margin-top: 10px;
+      background: #172233;
+      border: 1px solid #253148;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    .upgrade a {
+      color: #8fbaff;
+      text-decoration: underline;
+    }
+
+    /* 반응형 */
+    @media (max-width: 980px) {
       .grid {
-        display: grid;
-        grid-template-columns: 1.4fr 0.9fr;
-        /* 왼쪽 큰 비주얼 / 오른쪽 공지 */
-        gap: 18px;
-        align-items: start;
+        grid-template-columns: 1fr;
       }
 
-      /* ===== 왼쪽: 메인 비주얼 + 로그인 카드 ===== */
       .hero {
-        position: relative;
-        background: #0b0f16;
-        border: 1px solid #1f2633;
-        border-radius: 14px;
-        overflow: hidden;
-        min-height: 520px;
+        min-height: 420px;
       }
 
-      .hero-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        opacity: .92;
-        filter: saturate(1.05) contrast(1.05);
-      }
-
-      /* 오른쪽 컬럼: 공지 + 로그인 세로로 쌓기 */
-      .sidebar {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        /* 두 박스 사이 간격 */
-      }
-
-      /* 스샷의 빨간 타원 위치: 하단 좌측에 뜨는 둥근 직사각형 */
       .login-card {
-        position: static;
-        /* 고정 해제 */
-        width: 100%;
-        /* 오른쪽 칼럼 너비 꽉 채우기 */
-        background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .05));
-        border: 1px solid rgba(255, 255, 255, .16);
-        border-radius: 16px;
-        box-shadow: 0 8px 40px rgba(0, 0, 0, .45), inset 0 0 0 6px rgba(110, 168, 255, .06);
-        padding: 14px 16px;
-        backdrop-filter: blur(2px);
+        left: 12px;
+        right: 12px;
+        width: auto;
       }
+    }
 
-      .login-title {
-        font-weight: 700;
-        margin: 2px 0 8px;
-        font-size: 15px;
-        letter-spacing: .2px;
-      }
+    /*클래스선택자(색상세트)*/
+    .shell {
+      height: 100dvh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
 
-      .login-desc {
-        color: var(--muted);
-        font-size: 13px;
-        line-height: 1.5;
-        margin-bottom: 10px;
-      }
+    /*맨 위 제목임*/
+    /*header는 제목, head는 메타정보*/
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      /*정렬*/
+      padding: 12px 18px;
+      /*안쪽 여백*/
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(4px);
+    }
 
-      .login-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
+    /*header : 태그선택자, title : 클래스, h1 : 태그선택자, header안 -> title안 -> h1만 선택*/
+    header .title h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
 
-      .login-hint {
-        color: #a2ffcf;
-        font-size: 12px;
-      }
+    /*앞쪽에 태그선택자가 없으므로, 전역에 actions 클래스 사용가능*/
+    .actions {
+      font-size: 12px;
+      color: var(--muted);
+    }
 
-      /* ===== 오른쪽: 업데이트/공지 ===== */
-      .notice {
-        background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .03));
-        border: 1px solid rgba(255, 255, 255, .12);
-        border-radius: 14px;
-        padding: 14px 14px 18px;
-      }
+    /* 레이아웃: 오른쪽에 합산 패널 열 추가 (고정폭) */
+    .layout {
+      display: grid;
+      grid-template-columns:
+        minmax(220px, 1fr)
+        /* 1번째 열 (왼쪽) */
+        minmax(320px, 36vw)
+        /* 2번째 열 (캐릭터) */
+        minmax(220px, 1fr)
+        /* 3번째 열 (오른쪽) */
+        300px
+        /* 4번째 열 (옵션) */
+        300px;
+      /* 5번째 열 (합산스탯) */
+      grid-template-rows: auto auto;
+      gap: clamp(8px, 2vw, 24px);
 
-      .notice h3 {
-        margin: 6px 0 10px;
-        font-size: 18px;
-      }
+      grid-template-areas:
+        "left char right options stats"
+        "save save right options stats";
+    }
 
-      .notice .box {
-        background: var(--soft);
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        padding: 10px 12px;
-        margin-bottom: 10px;
-      }
+    .left-col {
+      grid-area: left;
+    }
 
-      .notice ul {
-        margin: 6px 0 0 18px;
-        padding: 0;
-        line-height: 1.5;
-      }
+    .char-col {
+      grid-area: char;
+    }
 
-      .badge-danger {
-        color: #ff8b8b;
-        font-weight: 700
-      }
+    .right-col {
+      display: flex;
+      flex-direction: column;
+    }
 
-      .upgrade {
-        margin-top: 10px;
-        background: #172233;
-        border: 1px solid #253148;
-        border-radius: 10px;
-        padding: 10px 12px;
-        font-size: 14px;
-      }
+    .options-col {
+      grid-area: options;
+      grid-row: 1 / span 2;
+    }
 
-      .upgrade a {
-        color: #8fbaff;
-        text-decoration: underline;
-      }
+    .stats-col {
+      grid-area: stats;
+      grid-row: 1 / span 2;
+    }
 
-      /* 반응형 */
-      @media (max-width: 980px) {
-        .grid {
-          grid-template-columns: 1fr;
-        }
+    .save-box {
+      grid-area: save;
+    }
 
-        .hero {
-          min-height: 420px;
-        }
+    .save-box {
+      grid-area: save;
+      background: rgba(110, 168, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: flex-start;
+      /* ← 왼쪽 정렬 */
+      gap: 10px;
+      position: relative;
+      transform: translateY(-100px);
+      /* -6 ~ -20px 등으로 조절 */
+      z-index: 2;
+      /* 겹칠 때 위에 보이게 */
+    }
 
-        .login-card {
-          left: 12px;
-          right: 12px;
-          width: auto;
-        }
-      }
+    .save-box button {
+      width: 48px;
+      /* 정사각형 */
+      height: 48px;
+      /* 정사각형 */
+      border-radius: 12px;
+      /* 둥근 모서리 */
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 24px;
+      /* + 기호 크게 */
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
 
-      /*클래스선택자(색상세트)*/
-      .shell {
-        height: 100dvh;
-        display: grid;
-        grid-template-rows: auto 1fr;
-      }
-
-      /*맨 위 제목임*/
-      /*header는 제목, head는 메타정보*/
-      header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        /*정렬*/
-        padding: 12px 18px;
-        /*안쪽 여백*/
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        backdrop-filter: blur(4px);
-      }
-
-      /*header : 태그선택자, title : 클래스, h1 : 태그선택자, header안 -> title안 -> h1만 선택*/
-      header .title h1 {
-        margin: 0;
-        font-size: 16px;
-        font-weight: 600;
-      }
-
-      /*앞쪽에 태그선택자가 없으므로, 전역에 actions 클래스 사용가능*/
-      .actions {
-        font-size: 12px;
-        color: var(--muted);
-      }
-
-      /* 레이아웃: 오른쪽에 합산 패널 열 추가 (고정폭) */
-      .layout {
-        display: grid;
-        grid-template-columns:
-          minmax(220px, 1fr)
-          /* 1번째 열 (왼쪽) */
-          minmax(320px, 36vw)
-          /* 2번째 열 (캐릭터) */
-          minmax(220px, 1fr)
-          /* 3번째 열 (오른쪽) */
-          300px
-          /* 4번째 열 (옵션) */
-          300px;
-        /* 5번째 열 (합산스탯) */
-        grid-template-rows: auto auto;
-        gap: clamp(8px, 2vw, 24px);
-
-        grid-template-areas:
-          "left char right options stats"
-          "save save right options stats";
-      }
-
-      .left-col {
-        grid-area: left;
-      }
-
-      .char-col {
-        grid-area: char;
-      }
-
-      .right-col {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .options-col {
-        grid-area: options;
-        grid-row: 1 / span 2;
-      }
-
-      .stats-col {
-        grid-area: stats;
-        grid-row: 1 / span 2;
-      }
-
-      .save-box {
-        grid-area: save;
-      }
-
-      .save-box {
-        grid-area: save;
-        background: rgba(110, 168, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 18px;
-        padding: 12px 16px;
-        display: flex;
-        justify-content: flex-start;
-        /* ← 왼쪽 정렬 */
-        gap: 10px;
-        position: relative;
-        transform: translateY(-100px);
-        /* -6 ~ -20px 등으로 조절 */
-        z-index: 2;
-        /* 겹칠 때 위에 보이게 */
-      }
-
-      .save-box button {
-        width: 48px;
-        /* 정사각형 */
-        height: 48px;
-        /* 정사각형 */
-        border-radius: 12px;
-        /* 둥근 모서리 */
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #fff;
-        font-size: 24px;
-        /* + 기호 크게 */
-        font-weight: bold;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background 0.2s;
-      }
-
-      .save-box button:hover {
-        background: rgba(255, 255, 255, 0.2);
-      }
+    .save-box button:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
 
 
-      /* justify-content 는 가로방향정렬, align-items 은 세로방향정렬
+    /* justify-content 는 가로방향정렬, align-items 은 세로방향정렬
  flex-start는 아이템들을 시작지점에 붙여서정렬 가로면 왼쪽정렬, 세로면 위쪽정렬
  flex-end는 아이템들을 끝지점에 붙여서 정렬, 가로면 오른쪽정렬, 세로면 아래쪽정렬*/
-      .column {
-        display: flex;
-        flex-direction: column;
-        align-self: start !important;
-        /* 세로축 위쪽 정렬 */
-        height: max-content !important;
-        /* 내용만큼만 높이 */
-        gap: 12px;
-        padding: 10px 6px;
-        border-radius: 18px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
-        border: 1px solid rgba(255, 255, 255, 0.06);
-      }
+    .column {
+      display: flex;
+      flex-direction: column;
+      align-self: start !important;
+      /* 세로축 위쪽 정렬 */
+      height: max-content !important;
+      /* 내용만큼만 높이 */
+      gap: 12px;
+      padding: 10px 6px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
 
-      .slot-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
+    .slot-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-      /*slot-row 와 left 두가지 클래스 모두를 가지고 있는것, slot-row와 left 중 하나만 있으면 적용되지 않는다)
+    /*slot-row 와 left 두가지 클래스 모두를 가지고 있는것, slot-row와 left 중 하나만 있으면 적용되지 않는다)
 //slot-row left 점이 아닌 띄어쓰기를 하면, left가 앞 요소 안의 요소가 되는데, 이때 left는 태그이다. .left로 쓰게되면 클래스가 된다.
 //html(클래스)에 넣어서 쓸때는 띄어쓰기로 쓴다. class = "slot-row left" */
-      .slot-row.left {
-        justify-content: flex-end;
-      }
+    .slot-row.left {
+      justify-content: flex-end;
+    }
 
-      .slot-row.right {
-        justify-content: flex-start;
-      }
+    .slot-row.right {
+      justify-content: flex-start;
+    }
 
-      .slot {
-        width: clamp(64px, 10vh, 120px);
-        aspect-ratio: 1/1;
-        border-radius: 12px;
-        background: radial-gradient(120px 120px at 40% 35%, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.01) 100%);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        display: grid;
-        place-items: center;
-        position: relative;
-        cursor: pointer;
-        user-select: none;
-        transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) inset, 0 1px 0 rgba(255, 255, 255, 0.04);
-      }
+    .slot {
+      width: clamp(64px, 10vh, 120px);
+      aspect-ratio: 1/1;
+      border-radius: 12px;
+      background: radial-gradient(120px 120px at 40% 35%, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.01) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: grid;
+      place-items: center;
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) inset, 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
 
-      /* :는 의사클래스, hover는 마우스를 위에 올린 상태를 뜻함. 따라서 slot 클래스에 마우스를 올리면 이라는 뜻
+    /* :는 의사클래스, hover는 마우스를 위에 올린 상태를 뜻함. 따라서 slot 클래스에 마우스를 올리면 이라는 뜻
 // 그외에도 active : 클릭한 순간(마우스 버튼 누르고 있을때), focus : 입력창 클릭했을때, visited : 방문한 링크, link : 방문하지 않은 링크
 // first-child : 부모 안에서 첫번째 자식, last-child : 부모 안에서 마지막 자식, ntn-child(n) : 부모 안에서 n번째 자식
 //checked : 체크박스나 라디오버튼에 체크된상태, valid, invalid : 입력값이 유효성 검사에 맞거나 아닐때
 //root : 문서 최상위 요소 */
-      .slot:hover {
-        transform: translateY(-2px);
-        border-color: rgba(110, 168, 255, 0.5);
-        box-shadow: 0 0 0 4px var(--ring), 0 10px 24px rgba(0, 0, 0, 0.35) inset;
+    .slot:hover {
+      transform: translateY(-2px);
+      border-color: rgba(110, 168, 255, 0.5);
+      box-shadow: 0 0 0 4px var(--ring), 0 10px 24px rgba(0, 0, 0, 0.35) inset;
+    }
+
+    /* slot-label 클래스는 slot의 자손선택자이다. 따라서 slot 클래스를 선언하고 그 안에 또 slot-label 클래스를 선언해야한다. */
+    .slot .slot-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 11px;
+      color: var(--muted);
+      background: rgba(0, 0, 0, 0.35);
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      white-space: nowrap;
+      max-width: 90%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .outer-rects {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .rect {
+      width: clamp(52px, 8vh, 96px);
+      height: clamp(18px, 3vh, 28px);
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 6px 16px rgba(0, 0, 0, 0.25) inset;
+      color: var(--text);
+      font-size: 10px;
+    }
+
+    .rect:hover {
+      border-color: rgba(110, 168, 255, 0.55);
+      box-shadow: 0 0 0 3px var(--ring), 0 8px 18px rgba(0, 0, 0, 0.35) inset;
+    }
+
+    .rect.disabled {
+      opacity: .45;
+      pointer-events: none;
+    }
+
+    .center {
+      display: grid;
+      place-items: center;
+      min-width: min(34vw, 460px);
+      height: 100%;
+    }
+
+    .character-card {
+      /*메인 캐릭터 박스*/
+      /*margin-top: 0px;  /* 원하는 값(px, %, rem 등) */
+      align-self: start;
+      /* ← 세로축 위쪽에 붙음 */
+      width: clamp(20px, 25vw, 520px);
+      aspect-ratio: 3/4;
+      border-radius: 22px;
+      background: radial-gradient(60% 40% at 50% 10%, rgba(110, 168, 255, 0.08), transparent 60%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 0 0 6px rgba(110, 168, 255, 0.08) inset, 0 20px 50px rgba(0, 0, 0, 0.45);
+    }
+
+    .character-ghost {
+      width: 80%;
+      height: 80%;
+      border-radius: 24px;
+      border: 2px dashed rgba(255, 255, 255, 0.18);
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .character-img {
+      position: absolute;
+      inset: 12px;
+      width: calc(100% - 24px);
+      height: calc(100% - 24px);
+      object-fit: contain;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.45));
+      display: none;
+    }
+
+    /* ▼ 하단 4개 슬롯 */
+    .mini-bar {
+      align-self: start;
+      /* 그리드 칸에서 위쪽에 붙임 */
+      /*margin-top: 10px;*/
+      margin-bottom: 70px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mini-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .slot.mini {
+      width: clamp(64px, 10vh, 120px);
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      flex: 0 0 auto;
+    }
+
+    /*slot클래스와 mini클래스 동시에 적용하며 그 두 클래스의 자손클래스가 slot-label이 된다.*/
+    .slot.mini .slot-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      bottom: auto;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+      max-width: 90%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 50;
+    }
+
+    .modal.show {
+      display: grid;
+    }
+
+    .backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(2px);
+    }
+
+    .dialog {
+      position: relative;
+      width: min(1100px, 95vw);
+      height: min(720px, 92vh);
+      background: #0e0b09;
+      border: 1px solid #2a211a;
+      border-radius: 18px;
+      padding: 12px 14px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 10px;
+    }
+
+    /*header와 h2는 dialog의 자손태그들이다. 태그는 쓰려면 <header> </header>을 써야한다.
+//이 코드만 보고는 종속관계를 알수는 없다. header가 더 높은지, h2가 높은지 알수없다. */
+    .dialog header {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 4px 8px;
+      border-bottom: 1px solid #2a211a;
+    }
+
+    .dialog h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: #f0e6d2;
+    }
+
+    .input {
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid #3a2c21;
+      padding: 0 10px;
+      background: #1a130f;
+      color: #f0e6d2;
+    }
+
+    /* 캐릭터 카탈로그 */
+    .catalog {
+      overflow: auto;
+      padding: 10px 6px 14px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 56px 1fr 56px;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .badge-img {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #20170f;
+      border: 2px solid #6e5124;
+    }
+
+    .cards {
+      /* 카드의 스타일 */
+      display: grid;
+      /* 그리드 레이아웃 배치*/
+      grid-template-columns: repeat(5, minmax(160px, 1fr));
+      /* 가로칸(columns) 4개, 각칸은 최소 160px, 최대 1fr(=남는 공간 균등 분배) 크기 */
+      gap: 12px;
+      /*카드들 사이 가로/세로 간격 */
+    }
+
+    .char-card {
+      position: relative;
+      display: grid;
+      grid-template-rows: auto auto;
+      /*세로로 2줄 그리드 (첫줄 이미지, 두번째줄 이름*/
+      gap: 6px;
+      /* 줄 사이 6px 간격 */
+      padding: 8px;
+      /* 안쪽 여백 */
+      border-radius: 12px;
+      background: var(--card-bg);
+      cursor: pointer;
+      /*마우스 올리면 손가락 모양*/
+      border: 1px solid var(--gold-2);
+      /* 카드 테두리 (금색 계열 변수) */
+    }
+
+    .char-card:hover {
+      /*마우스 올렸을때 효과 */
+      box-shadow: inset 0 0 0 2px rgba(207, 162, 79, 0.22), 0 8px 22px rgba(0, 0, 0, 0.55);
+    }
+
+    .char-img {
+      width: 100%;
+      /* 부모 카드의 가로폭을 전부 차지 */
+      aspect-ratio: 16/7;
+      /* 가로:세로 비율 16:7 유지 */
+      object-fit: cover;
+      /* 이미지 잘리더라도 영역 꽉 채움 */
+      border-radius: 8px;
+      border: 1px solid rgba(207, 162, 79, 0.35);
+      background: #0c0a08;
+    }
+
+    .char-name {
+      font-size: 14px;
+      color: #f0e6d2;
+      font-weight: 700;
+    }
+
+    /* 무기 탭 */
+    .weapon-tabs {
+      display: flex;
+      gap: 8px;
+      margin: 0 10px;
+      flex-wrap: wrap
+    }
+
+    .weapon-tabs .tab-btn {
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      border: 1px solid #3a2c21;
+      background: #1a130f;
+      color: #c7b589
+    }
+
+    .weapon-tabs .tab-btn.active {
+      background: #2a211a;
+      border-color: #cfa24f;
+      color: #f0e6d2;
+      box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset
+    }
+
+    /*overflow는 요소크기보다 내용이 넘치면 어떻게 처리할지를 나타냄
+//auto는 자동 스크롤바 생김, visible은 그냥 밖으로 삐져나옴, hidden은 넘치는 부분 잘라냄, scroll은 항상 스크롤바 표시 */
+    /* 리스트형 카드 */
+    .items {
+      overflow: auto;
+      padding: 12px 8px 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .item-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+      gap: 12px
+    }
+
+    .item-row {
+      display: grid;
+      grid-template-columns: 72px 1fr 64px;
+      align-items: center;
+      gap: 12px;
+      background: #15100c;
+      border: 1px solid #3a2c21;
+      border-radius: 12px;
+      padding: 10px;
+      cursor: pointer
+    }
+
+    .item-row:hover {
+      border-color: #7c5b37;
+      box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset
+    }
+
+    .iconbox {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(207, 162, 79, .35);
+      background: #0c0a08
+    }
+
+    .iconbox .icon {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .badge-lv {
+      position: absolute;
+      left: 4px;
+      top: 4px;
+      font-size: 11px;
+      padding: 2px 5px;
+      border-radius: 6px;
+      background: #1e2b1e;
+      color: #9fe19f;
+      border: 1px solid #254c25
+    }
+
+    .meta .meta-top {
+      display: flex;
+      align-items: baseline;
+      gap: 8px
+    }
+
+    .meta .lvl {
+      color: #9fe19f;
+      font-weight: 700;
+      font-size: 13px
+    }
+
+    .meta .name {
+      color: #f0e6d2;
+      font-weight: 800;
+      font-size: 15px
+    }
+
+    .meta-sub {
+      color: #c7b589;
+      font-size: 12px;
+      margin-top: 4px
+    }
+
+    .rarity-chip {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 8px;
+      border: 1px solid #7c5b37;
+      background: #2a211a;
+      color: #e7c27a;
+      font-weight: 700;
+      font-size: 12px;
+      text-align: center
+    }
+
+    /* === Options panel (우측 옵션 열) === */
+    .column.options {
+      align-items: stretch;
+      /* 너비 꽉 차게 */
+      gap: 12px;
+    }
+
+    .opt-box {
+      width: 100%;
+      border-radius: 14px;
+      padding: 12px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: grid;
+      gap: 10px;
+    }
+
+    .opt-title {
+      margin: 0 0 2px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #f0e6d2;
+      letter-spacing: .2px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field .label {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .select {
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid #3a2c21;
+      padding: 0 10px;
+      background: #1a130f;
+      color: #f0e6d2;
+      outline: none;
+    }
+
+    .select:focus {
+      border-color: #cfa24f;
+      box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
+    }
+
+    /*@는 모바일 전환시 사용하는 부호. 정확히는 폭이 좁아지면.
+    /* 모바일 1열 전환 시 자연스럽게 흐르도록(기존 규칙 유지) */
+    @media (max-width: 900px) {
+      .column.options {
+        order: 3;
       }
 
-      /* slot-label 클래스는 slot의 자손선택자이다. 따라서 slot 클래스를 선언하고 그 안에 또 slot-label 클래스를 선언해야한다. */
-      .slot .slot-label {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 11px;
-        color: var(--muted);
-        background: rgba(0, 0, 0, 0.35);
-        padding: 2px 8px;
-        border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        white-space: nowrap;
-        max-width: 90%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+      /* 중앙/오른쪽 다음에 위치 */
+    }
 
-      .outer-rects {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
+    /* ▶ 합산 패널 (우측 고정 + 최종데미지) */
+    aside.stats {
+      align-self: stretch;
+      width: 100%;
+      height: 100%;
+      position: sticky;
+      top: clamp(8px, 1.6vw, 18px);
+    }
 
-      .rect {
-        width: clamp(52px, 8vh, 96px);
-        height: clamp(18px, 3vh, 28px);
-        border-radius: 10px;
-        cursor: pointer;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 6px 16px rgba(0, 0, 0, 0.25) inset;
-        color: var(--text);
-        font-size: 10px;
-      }
+    .stats-panel {
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      padding: 14px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
+    }
 
-      .rect:hover {
-        border-color: rgba(110, 168, 255, 0.55);
-        box-shadow: 0 0 0 3px var(--ring), 0 8px 18px rgba(0, 0, 0, 0.35) inset;
-      }
+    .stats-panel h3 {
+      margin: 4px 0 0;
+      font-size: 14px;
+      color: #f0e6d2;
+    }
 
-      .rect.disabled {
-        opacity: .45;
-        pointer-events: none;
+    .stat-list {
+      overflow: auto;
+      padding-right: 6px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat-value {
+      color: #e8edd6;
+      font-weight: 800;
+      font-size: 14px;
+      text-align: right;
+    }
+
+    .final-damage {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+    }
+
+    .final-damage .label {
+      color: #f0e6d2;
+      font-size: 13px;
+      line-height: 1;
+      text-align: left;
+    }
+
+    .final-damage .value {
+      color: #ff5a6a;
+      font-weight: 900;
+      font-size: 25px;
+      letter-spacing: .3px;
+      line-height: 1.15;
+      align-self: flex-end;
+      text-align: right;
+    }
+
+    /* #은 고유 id를 뜻한다. 클래스와 다른점은 고유하기때문에 단한번만 사용한다는 차이가 있음 */
+    /* 강화 선택 모달(텍스트 리스트) */
+    #enhanceModal .dialog {
+      width: min(520px, 95vw);
+      height: min(520px, 85vh);
+    }
+
+    .enh-list {
+      overflow: auto;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .enh-option {
+      height: 36px;
+      padding: 0 12px;
+      text-align: left;
+      border-radius: 10px;
+      border: 1px solid #3a2c21;
+      background: #1a130f;
+      color: #f0e6d2;
+      cursor: pointer;
+    }
+
+    .enh-option:hover {
+      border-color: #cfa24f;
+      box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+        grid-auto-rows: max-content;
+        gap: 18px;
+        height: auto;
+        overflow: auto;
       }
 
       .center {
-        display: grid;
-        place-items: center;
-        min-width: min(34vw, 460px);
-        height: 100%;
+        min-width: 0;
       }
 
-      .character-card {
-        /*메인 캐릭터 박스*/
-        /*margin-top: 0px;  /* 원하는 값(px, %, rem 등) */
-        align-self: start;
-        /* ← 세로축 위쪽에 붙음 */
-        width: clamp(20px, 25vw, 520px);
-        aspect-ratio: 3/4;
-        border-radius: 22px;
-        background: radial-gradient(60% 40% at 50% 10%, rgba(110, 168, 255, 0.08), transparent 60%),
-          linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        display: grid;
-        place-items: center;
-        position: relative;
-        overflow: hidden;
-        cursor: pointer;
-        box-shadow: 0 0 0 6px rgba(110, 168, 255, 0.08) inset, 0 20px 50px rgba(0, 0, 0, 0.45);
-      }
-
-      .character-ghost {
-        width: 80%;
-        height: 80%;
-        border-radius: 24px;
-        border: 2px dashed rgba(255, 255, 255, 0.18);
-        display: grid;
-        place-items: center;
-        color: var(--muted);
-        text-align: center;
-      }
-
-      .character-img {
-        position: absolute;
-        inset: 12px;
-        width: calc(100% - 24px);
-        height: calc(100% - 24px);
-        object-fit: contain;
-        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.45));
-        display: none;
-      }
-
-      /* ▼ 하단 4개 슬롯 */
-      .mini-bar {
-        align-self: start;
-        /* 그리드 칸에서 위쪽에 붙임 */
-        /*margin-top: 10px;*/
-        margin-bottom: 70px;
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .mini-cell {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex: 0 0 auto;
-      }
-
-      .slot.mini {
-        width: clamp(64px, 10vh, 120px);
-        aspect-ratio: 1 / 1;
-        border-radius: 12px;
-        flex: 0 0 auto;
-      }
-
-      /*slot클래스와 mini클래스 동시에 적용하며 그 두 클래스의 자손클래스가 slot-label이 된다.*/
-      .slot.mini .slot-label {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        bottom: auto;
-        transform: translate(-50%, -50%);
-        white-space: nowrap;
-        max-width: 90%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .modal {
-        position: fixed;
-        inset: 0;
-        display: none;
-        place-items: center;
-        z-index: 50;
-      }
-
-      .modal.show {
-        display: grid;
-      }
-
-      .backdrop {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.65);
-        backdrop-filter: blur(2px);
-      }
-
-      .dialog {
-        position: relative;
-        width: min(1100px, 95vw);
-        height: min(720px, 92vh);
-        background: #0e0b09;
-        border: 1px solid #2a211a;
-        border-radius: 18px;
-        padding: 12px 14px;
-        display: grid;
-        grid-template-rows: auto 1fr;
-        gap: 10px;
-      }
-
-      /*header와 h2는 dialog의 자손태그들이다. 태그는 쓰려면 <header> </header>을 써야한다.
-//이 코드만 보고는 종속관계를 알수는 없다. header가 더 높은지, h2가 높은지 알수없다. */
-      .dialog header {
-        display: grid;
-        grid-template-columns: auto 1fr auto;
-        align-items: center;
-        gap: 10px;
-        padding: 6px 4px 8px;
-        border-bottom: 1px solid #2a211a;
-      }
-
-      .dialog h2 {
-        margin: 0;
-        font-size: 15px;
-        font-weight: 700;
-        color: #f0e6d2;
-      }
-
-      .input {
-        height: 34px;
-        border-radius: 10px;
-        border: 1px solid #3a2c21;
-        padding: 0 10px;
-        background: #1a130f;
-        color: #f0e6d2;
-      }
-
-      /* 캐릭터 카탈로그 */
-      .catalog {
-        overflow: auto;
-        padding: 10px 6px 14px;
+      .cards,
+      .item-list {
+        grid-template-columns: repeat(2, 1fr);
       }
 
       .row {
-        display: grid;
-        grid-template-columns: 56px 1fr 56px;
-        align-items: center;
-        gap: 10px;
-        margin: 10px 0;
+        grid-template-columns: 40px 1fr 40px;
       }
 
       .badge-img {
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        object-fit: cover;
-        background: #20170f;
-        border: 2px solid #6e5124;
+        width: 40px;
+        height: 40px;
       }
 
-      .cards {
-        /* 카드의 스타일 */
-        display: grid;
-        /* 그리드 레이아웃 배치*/
-        grid-template-columns: repeat(5, minmax(160px, 1fr));
-        /* 가로칸(columns) 4개, 각칸은 최소 160px, 최대 1fr(=남는 공간 균등 분배) 크기 */
-        gap: 12px;
-        /*카드들 사이 가로/세로 간격 */
-      }
-
-      .char-card {
-        position: relative;
-        display: grid;
-        grid-template-rows: auto auto;
-        /*세로로 2줄 그리드 (첫줄 이미지, 두번째줄 이름*/
-        gap: 6px;
-        /* 줄 사이 6px 간격 */
-        padding: 8px;
-        /* 안쪽 여백 */
-        border-radius: 12px;
-        background: var(--card-bg);
-        cursor: pointer;
-        /*마우스 올리면 손가락 모양*/
-        border: 1px solid var(--gold-2);
-        /* 카드 테두리 (금색 계열 변수) */
-      }
-
-      .char-card:hover {
-        /*마우스 올렸을때 효과 */
-        box-shadow: inset 0 0 0 2px rgba(207, 162, 79, 0.22), 0 8px 22px rgba(0, 0, 0, 0.55);
-      }
-
-      .char-img {
-        width: 100%;
-        /* 부모 카드의 가로폭을 전부 차지 */
-        aspect-ratio: 16/7;
-        /* 가로:세로 비율 16:7 유지 */
-        object-fit: cover;
-        /* 이미지 잘리더라도 영역 꽉 채움 */
-        border-radius: 8px;
-        border: 1px solid rgba(207, 162, 79, 0.35);
-        background: #0c0a08;
-      }
-
-      .char-name {
-        font-size: 14px;
-        color: #f0e6d2;
-        font-weight: 700;
-      }
-
-      /* 무기 탭 */
-      .weapon-tabs {
-        display: flex;
-        gap: 8px;
-        margin: 0 10px;
-        flex-wrap: wrap
-      }
-
-      .weapon-tabs .tab-btn {
-        height: 30px;
-        padding: 0 12px;
-        border-radius: 999px;
-        cursor: pointer;
-        border: 1px solid #3a2c21;
-        background: #1a130f;
-        color: #c7b589
-      }
-
-      .weapon-tabs .tab-btn.active {
-        background: #2a211a;
-        border-color: #cfa24f;
-        color: #f0e6d2;
-        box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset
-      }
-
-      /*overflow는 요소크기보다 내용이 넘치면 어떻게 처리할지를 나타냄
-//auto는 자동 스크롤바 생김, visible은 그냥 밖으로 삐져나옴, hidden은 넘치는 부분 잘라냄, scroll은 항상 스크롤바 표시 */
-      /* 리스트형 카드 */
-      .items {
-        overflow: auto;
-        padding: 12px 8px 16px;
-        display: grid;
-        gap: 14px;
-      }
-
-      .item-list {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(280px, 1fr));
-        gap: 12px
-      }
-
-      .item-row {
-        display: grid;
-        grid-template-columns: 72px 1fr 64px;
-        align-items: center;
-        gap: 12px;
-        background: #15100c;
-        border: 1px solid #3a2c21;
-        border-radius: 12px;
-        padding: 10px;
-        cursor: pointer
-      }
-
-      .item-row:hover {
-        border-color: #7c5b37;
-        box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset
-      }
-
-      .iconbox {
-        position: relative;
-        width: 64px;
-        height: 64px;
-        border-radius: 10px;
-        overflow: hidden;
-        border: 1px solid rgba(207, 162, 79, .35);
-        background: #0c0a08
-      }
-
-      .iconbox .icon {
-        width: 100%;
-        height: 100%;
-        object-fit: cover
-      }
-
-      .badge-lv {
-        position: absolute;
-        left: 4px;
-        top: 4px;
-        font-size: 11px;
-        padding: 2px 5px;
-        border-radius: 6px;
-        background: #1e2b1e;
-        color: #9fe19f;
-        border: 1px solid #254c25
-      }
-
-      .meta .meta-top {
-        display: flex;
-        align-items: baseline;
-        gap: 8px
-      }
-
-      .meta .lvl {
-        color: #9fe19f;
-        font-weight: 700;
-        font-size: 13px
-      }
-
-      .meta .name {
-        color: #f0e6d2;
-        font-weight: 800;
-        font-size: 15px
-      }
-
-      .meta-sub {
-        color: #c7b589;
-        font-size: 12px;
-        margin-top: 4px
-      }
-
-      .rarity-chip {
-        display: inline-block;
-        padding: 4px 8px;
-        border-radius: 8px;
-        border: 1px solid #7c5b37;
-        background: #2a211a;
-        color: #e7c27a;
-        font-weight: 700;
-        font-size: 12px;
-        text-align: center
-      }
-
-      /* === Options panel (우측 옵션 열) === */
-      .column.options {
-        align-items: stretch;
-        /* 너비 꽉 차게 */
-        gap: 12px;
-      }
-
-      .opt-box {
-        width: 100%;
-        border-radius: 14px;
-        padding: 12px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        display: grid;
-        gap: 10px;
-      }
-
-      .opt-title {
-        margin: 0 0 2px;
-        font-size: 13px;
-        font-weight: 800;
-        color: #f0e6d2;
-        letter-spacing: .2px;
-      }
-
-      .field {
-        display: grid;
-        gap: 6px;
-      }
-
-      .field .label {
-        font-size: 11px;
-        color: var(--muted);
-      }
-
-      .select {
-        height: 34px;
-        border-radius: 10px;
-        border: 1px solid #3a2c21;
-        padding: 0 10px;
-        background: #1a130f;
-        color: #f0e6d2;
-        outline: none;
-      }
-
-      .select:focus {
-        border-color: #cfa24f;
-        box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
-      }
-
-      /*@는 모바일 전환시 사용하는 부호. 정확히는 폭이 좁아지면.
-    /* 모바일 1열 전환 시 자연스럽게 흐르도록(기존 규칙 유지) */
-      @media (max-width: 900px) {
-        .column.options {
-          order: 3;
-        }
-
-        /* 중앙/오른쪽 다음에 위치 */
-      }
-
-      /* ▶ 합산 패널 (우측 고정 + 최종데미지) */
       aside.stats {
-        align-self: stretch;
-        width: 100%;
-        height: 100%;
-        position: sticky;
-        top: clamp(8px, 1.6vw, 18px);
+        position: static;
       }
+    }
 
-      .stats-panel {
-        width: 100%;
-        height: 100%;
-        border-radius: 18px;
-        padding: 14px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        display: grid;
-        grid-template-rows: auto 1fr auto;
-        gap: 10px;
-      }
+    /* autoEnchantModal 전용 2-컬럼 레이아웃 */
+    #autoEnchantModal .dialog {
+      /* 강화설정 모달과 같은 폭/패딩을 공유한다면 생략 가능 */
+      max-width: 700px;
+      /*모달너비*/
+    }
 
-      .stats-panel h3 {
-        margin: 4px 0 0;
-        font-size: 14px;
-        color: #f0e6d2;
-      }
+    #autoEnchantModal .body.two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
 
-      .stat-list {
-        overflow: auto;
-        padding-right: 6px;
-        display: grid;
-        gap: 8px;
-      }
+    /* 각 컬럼 내부 버튼 리스트 레이아웃 */
+    #autoEnchantModal .col .list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
 
-      .stat-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        gap: 10px;
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 10px;
-        padding: 8px 10px;
-      }
+    /* 타이틀 여백/스타일도 강화설정 모달과 톤을 맞춤 */
+    #autoEnchantModal .col .title {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
 
-      .stat-label {
-        color: var(--muted);
-        font-size: 12px;
-      }
+    /* 추천 마법부여 모달: 선택 강조 */
+    #autoEnchantModal .opt-btn.active {
+      border-color: var(--brand, #2563eb);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+      /* 필요시 배경도 살짝 */
+      background: rgba(37, 99, 235, 0.06);
+    }
 
-      .stat-value {
-        color: #e8edd6;
-        font-weight: 800;
-        font-size: 14px;
-        text-align: right;
-      }
+    /* 키보드 포커스 접근성도 보정(선택과 구분되게) */
+    #autoEnchantModal .opt-btn:focus-visible {
+      outline: 2px solid var(--brand, #2563eb);
+      outline-offset: 2px;
+    }
 
-      .final-damage {
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-        padding-top: 10px;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 6px;
-      }
-
-      .final-damage .label {
-        color: #f0e6d2;
-        font-size: 13px;
-        line-height: 1;
-        text-align: left;
-      }
-
-      .final-damage .value {
-        color: #ff5a6a;
-        font-weight: 900;
-        font-size: 25px;
-        letter-spacing: .3px;
-        line-height: 1.15;
-        align-self: flex-end;
-        text-align: right;
-      }
-
-      /* #은 고유 id를 뜻한다. 클래스와 다른점은 고유하기때문에 단한번만 사용한다는 차이가 있음 */
-      /* 강화 선택 모달(텍스트 리스트) */
-      #enhanceModal .dialog {
-        width: min(520px, 95vw);
-        height: min(520px, 85vh);
-      }
-
-      .enh-list {
-        overflow: auto;
-        padding: 10px;
-        display: grid;
-        gap: 8px;
-      }
-
-      .enh-option {
-        height: 36px;
-        padding: 0 12px;
-        text-align: left;
-        border-radius: 10px;
-        border: 1px solid #3a2c21;
-        background: #1a130f;
-        color: #f0e6d2;
-        cursor: pointer;
-      }
-
-      .enh-option:hover {
-        border-color: #cfa24f;
-        box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
-      }
-
-      @media (max-width: 900px) {
-        .layout {
-          grid-template-columns: 1fr;
-          grid-auto-rows: max-content;
-          gap: 18px;
-          height: auto;
-          overflow: auto;
-        }
-
-        .center {
-          min-width: 0;
-        }
-
-        .cards,
-        .item-list {
-          grid-template-columns: repeat(2, 1fr);
-        }
-
-        .row {
-          grid-template-columns: 40px 1fr 40px;
-        }
-
-        .badge-img {
-          width: 40px;
-          height: 40px;
-        }
-
-        aside.stats {
-          position: static;
-        }
-      }
-
-      /* autoEnchantModal 전용 2-컬럼 레이아웃 */
-      #autoEnchantModal .dialog {
-        /* 강화설정 모달과 같은 폭/패딩을 공유한다면 생략 가능 */
-        max-width: 700px;
-        /*모달너비*/
-      }
-
+    /* 모바일 좁은 화면에선 1열로 떨어지도록 */
+    @media (max-width: 520px) {
       #autoEnchantModal .body.two-col {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-      }
-
-      /* 각 컬럼 내부 버튼 리스트 레이아웃 */
-      #autoEnchantModal .col .list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      /* 타이틀 여백/스타일도 강화설정 모달과 톤을 맞춤 */
-      #autoEnchantModal .col .title {
-        font-weight: 600;
-        margin-bottom: 8px;
-      }
-
-      /* 추천 마법부여 모달: 선택 강조 */
-      #autoEnchantModal .opt-btn.active {
-        border-color: var(--brand, #2563eb);
-        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
-        /* 필요시 배경도 살짝 */
-        background: rgba(37, 99, 235, 0.06);
-      }
-
-      /* 키보드 포커스 접근성도 보정(선택과 구분되게) */
-      #autoEnchantModal .opt-btn:focus-visible {
-        outline: 2px solid var(--brand, #2563eb);
-        outline-offset: 2px;
-      }
-
-      /* 모바일 좁은 화면에선 1열로 떨어지도록 */
-      @media (max-width: 520px) {
-        #autoEnchantModal .body.two-col {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      /* 고정 높이 아이템 모달 */
-      #itemModal .dialog {
-        grid-template-rows: auto auto;
-      }
-
-      #itemModal .items {
-        height: clamp(420px, 60vh, 560px);
-        max-height: clamp(420px, 60vh, 560px);
-        overflow: auto;
-      }
-
-      /* === Emblem sockets & modal — FINAL MERGED === */
-
-      /* Stack of 2 sockets (vertical) */
-      .emblem-stack {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        align-items: center;
-        justify-content: center;
-      }
-
-      /* Socket dot (small circular button) */
-      .emblem-dot {
-        width: 28px;
-        height: 28px;
-        position: relative;
-        cursor: pointer;
-        border: 1px solid rgba(255, 255, 255, .25);
-        background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02));
-        box-shadow: 0 2px 8px rgba(0, 0, 0, .35) inset, 0 0 0 3px rgba(110, 168, 255, 0);
-        display: grid;
-        place-items: center;
-        /* Hard guarantee: perfect circle in every browser */
-        border-radius: 999px !important;
-        overflow: hidden !important;
-        clip-path: circle(50% at 50% 50%) !important;
-        -webkit-mask-image: radial-gradient(circle, #000 99%, transparent 100%) !important;
-        mask-image: radial-gradient(circle, #000 99%, transparent 100%) !important;
-        -webkit-mask-size: 100% 100%;
-        mask-size: 100% 100%;
-        background-clip: padding-box;
-      }
-
-      .emblem-dot:hover {
-        box-shadow: 0 0 0 3px var(--ring);
-      }
-
-      /* When an emblem image is applied from JS as CSS var */
-      .emblem-dot.has-img {
-        background:
-          var(--emblem) center/cover no-repeat,
-          linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02)) !important;
-      }
-
-      .emblem-dot.has-img::after {
-        display: none !important;
-      }
-
-      /* hide dashed guide when filled */
-
-      /* Empty socket guide */
-      .emblem-dot.empty {
-        opacity: .45;
-      }
-
-      .emblem-dot.empty::after {
-        content: "";
-        position: absolute;
-        width: 14px;
-        height: 14px;
-        border-radius: 999px;
-        border: 2px dashed rgba(255, 255, 255, .3);
-      }
-
-      /* Images inside sockets always clipped to circle */
-      .emblem-dot img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        border-radius: 999px !important;
-        -webkit-mask-image: radial-gradient(circle, #000 99%, transparent 100%) !important;
-        mask-image: radial-gradient(circle, #000 99%, transparent 100%) !important;
-        -webkit-mask-size: 100% 100%;
-        mask-size: 100% 100%;
-      }
-
-      /* Center number (socket & picker) — bright & legible */
-      .emblem-dot .num,
-      .em-thumb .num {
-        position: absolute;
-        inset: 0;
-        display: grid;
-        place-items: center;
-        color: #fff;
-        font-weight: 900;
-        letter-spacing: .2px;
-        -webkit-text-stroke: 1px rgba(0, 0, 0, .35);
-        text-shadow:
-          0 1px 1px rgba(0, 0, 0, .55),
-          0 0 4px rgba(255, 255, 255, .65),
-          0 0 10px rgba(255, 255, 255, .45);
-      }
-
-      .emblem-dot .num {
-        font-size: 16px;
-      }
-
-      /* 28px socket */
-      .em-thumb .num {
-        font-size: 22px;
-      }
-
-      /* 56px picker */
-
-      /* Subtle center darkening behind number (not too strong) */
-      .emblem-dot .num::before,
-      .em-thumb .num::before {
-        content: "";
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: 80%;
-        height: 80%;
-        border-radius: 999px;
-        pointer-events: none;
-        background: radial-gradient(circle,
-            rgba(0, 0, 0, .18) 0%,
-            rgba(0, 0, 0, .10) 45%,
-            rgba(0, 0, 0, 0) 70%);
-      }
-
-      /* Hover: enhance number legibility */
-      .emblem-dot:hover .num,
-      .em-thumb:hover .num {
-        -webkit-text-stroke: 1px rgba(0, 0, 0, .45);
-        text-shadow:
-          0 1px 2px rgba(0, 0, 0, .75),
-          0 0 6px rgba(255, 255, 255, .60),
-          0 0 14px rgba(255, 255, 255, .50);
-      }
-
-      /* === Emblem picker rows (horizontal scrollers) === */
-      .em-rows {
-        display: grid;
-        gap: 12px;
-        padding: 12px;
-      }
-
-      .em-row {
-        display: flex;
-        gap: 8px;
-        overflow-x: auto;
-        padding-bottom: 6px;
-      }
-
-      /* Picker thumbnail (badge-like) */
-      .em-thumb {
-        width: 56px;
-        height: 56px;
-        position: relative;
-        cursor: pointer;
-        border-radius: 999px;
-        padding: 0;
-        border: 1px solid #3a2c21;
-        background: #1a130f;
-        display: grid;
-        place-items: center;
-        overflow: hidden;
-      }
-
-      .em-thumb:hover {
-        border-color: #cfa24f;
-        box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
-      }
-
-      /* Always circular images */
-      .em-thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        border-radius: 999px !important;
-        -webkit-mask-image: radial-gradient(circle, #000 99%, transparent 100%) !important;
-        mask-image: radial-gradient(circle, #000 99%, transparent 100%) !important;
-        -webkit-mask-size: 100% 100%;
-        mask-size: 100% 100%;
-      }
-
-      /* 'None' option as a circular crossed badge */
-      .em-thumb.none {
-        background: linear-gradient(135deg, #1a130f 0%, #0c0a08 100%);
-        border-radius: 999px;
-      }
-
-      .em-thumb.none::before,
-      .em-thumb.none::after {
-        content: "";
-        position: absolute;
-        left: 10px;
-        right: 10px;
-        top: 50%;
-        height: 2px;
-        background: rgba(255, 255, 255, .35);
-      }
-
-      .em-thumb.none::after {
-        transform: rotate(90deg);
-      }
-
-      /* Caption (for accessary/title slots) */
-      .emblem-caption {
-        margin-top: 4px;
-        font-size: 11px;
-        line-height: 1.1;
-        color: #e7c27a;
-        text-align: center;
-        max-width: 84px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        pointer-events: none;
-      }
-
-      /* === Seal text captions inside slots === */
-      .seal-captions {
-        position: absolute;
-        left: 6px;
-        bottom: 6px;
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        /* 행 간격 2px */
-        pointer-events: none;
-        /* 비클릭 */
-      }
-
-      .seal-captions .seal-row {
-        display: flex;
-        gap: 2px;
-        justify-content: flex-start;
-      }
-
-      /* 좌측정렬 */
-      .seal-captions .seal-chip {
-        max-width: calc(100% - 12px);
-        font-size: 9px;
-        line-height: 1.2;
-        padding: 2px 6px;
-        border-radius: 4px;
-        background: rgba(0, 0, 0, 0.45);
-        border: 1px solid rgba(207, 162, 79, 0.35);
-        /* 기존 골드 톤과 어울리게 */
-        color: inherit;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-
-
-      /* === Skill Rune === */
-      .rune-grid {
-        --col-w: minmax(64px, 1fr);
-        display: grid;
-        grid-auto-rows: 40px;
-        gap: 8px;
-        overflow: auto;
-      }
-
-      .rune-grid .row {
-        display: grid;
-        grid-template-columns: 120px repeat(8, var(--col-w));
-        align-items: center;
-        gap: 8px;
-      }
-
-      .rune-grid .head {
-        position: sticky;
-        left: 0;
-        z-index: 1;
-        padding: 0 10px;
-        border: 1px solid #3a2c21;
-        border-radius: 10px;
-        background: #1a130f;
-        color: #f0e6d2;
-        font-weight: 800;
-        font-size: 13px;
-        white-space: nowrap;
-      }
-
-      .rune-grid .cell {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .rune-select {
-        width: 100%;
-        height: 30px;
-        border-radius: 8px;
-        border: 1px solid #3a2c21;
-        background: #15100c;
-        color: #f0e6d2;
-        padding: 0 8px;
-      }
-
-      .rune-select:focus {
-        border-color: #cfa24f;
-        box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
-      }
-
-      /* 룬 각인 UI */
-      .rune-engrave-row {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-
-      .field.compact {
-        flex: 1 1 220px;
-      }
-
-      /* === Skill Tree UI — FINAL MERGED === */
-
-      /* Header row */
-      .skilltree-head {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      /* Small counters next to the Skill Tree button (outside modal) */
-      .skilltree-head .st-counters {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        color: var(--muted);
-        font-size: 13px;
-      }
-
-      .skilltree-head .st-counters b {
-        color: #9fe19f;
-        font-size: 13px;
-      }
-
-      /* Top utility bar */
-      .st-topbar {
-        display: flex;
-        gap: 14px;
-        align-items: center;
-        font-size: 12px;
-        color: #c7b589;
-      }
-
-      /* ===== Universal counter styles (base) ===== */
-      .st-counters {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .st-counter {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 10px;
-        background: rgba(0, 0, 0, .25);
-        border: 1px solid rgba(255, 255, 255, .08);
-        border-radius: 10px;
-        font-size: 13px;
-        /* base size; overridden in modal scope */
-      }
-
-      .st-counter .label {
-        font-weight: 800;
-        letter-spacing: .3px;
-        font-size: 13px;
-      }
-
-      .st-counter .label.sp {
-        color: #6ec6ff;
-      }
-
-      /* cyan-like */
-      .st-counter .label.tp {
-        color: #ff4444;
-      }
-
-      /* red */
-      .st-counter .val {
-        min-width: 18px;
-        text-align: right;
-        color: #e6e9ef;
-        font-variant-numeric: tabular-nums;
-        font-size: 13px;
-      }
-
-      /* Keep modal header balanced */
-      .modal .dialog header {
-        justify-content: space-between;
-      }
-
-      /* ===== Optional large pills elsewhere (kept for compatibility) ===== */
-      :root {
-        --sp-blue: #2BCCED;
-        --tp-red: #F03231;
-      }
-
-      .actions .sp-tp {
-        display: none;
-        gap: 18px;
-        align-items: center;
-        font-size: 20pt;
-      }
-
-      .counter-pill {
-        display: flex;
-        align-items: baseline;
-        gap: 8px;
-        font-weight: 800;
-        letter-spacing: .1px;
-        color: var(--text);
-        text-shadow: 0 1px 2px rgba(0, 0, 0, .55);
-      }
-
-      .counter-pill .lab {
-        font-size: 1em;
-        font-style: italic;
-        font-weight: 900;
-      }
-
-      .counter-pill.sp .lab {
-        color: var(--sp-blue);
-      }
-
-      .counter-pill.tp .lab {
-        color: var(--tp-red);
-      }
-
-      /* ===== Modal-only: big counters aligned to the right ===== */
-      #skillTreeModal .st-counters {
-        margin-left: auto;
-        font-size: 20pt;
-      }
-
-      #skillTreeModal .st-counter,
-      #skillTreeModal .st-counter .label,
-      #skillTreeModal .st-counter .val {
-        font-size: 20pt;
-      }
-
-      /* Modal size */
-      #skillTreeModal .dialog {
-        width: min(1600px, 98vw) !important;
-        height: min(920px, 95vh) !important;
-      }
-
-      /* ===== SkillTree v1 (legacy banded columns) ===== */
-      .st-grid {
-        grid-auto-flow: column;
-        grid-auto-columns: 320px;
-        /* generous column width */
-        gap: 12px;
-        padding: 12px;
-      }
-
-      .st-col {
-        gap: 8px;
-        align-content: start;
-      }
-
-      .st-band {
-        position: sticky;
-        top: 0;
-        z-index: 2;
-        padding: 6px 10px;
-        border: 1px solid #3a2c21;
-        border-radius: 10px;
-        background: #1a130f;
-        color: #e7c27a;
-        font-weight: 800;
-        font-size: 13px;
-        text-align: center;
-      }
-
-      /* ===== SkillTree v2 (bands / coordinate grid) ===== */
-
-      /* Wrapper for bands */
-      .st2-wrap {
-        display: grid;
-        gap: 14px;
-      }
-
-      /* Each band's grid sits a bit below its dashed label line */
-      .st2-band>.st2-grid {
-        margin-top: 3px;
-      }
-
-      /* Band container: prevent clipping; add room above/below */
-      .st2-band {
-        position: relative;
-        margin: 1px 0;
-        padding-top: 10px;
-        /* room for label/dashed line */
-        padding-bottom: 1px;
-        /* room for controls */
-        overflow: visible;
-      }
-
-      /* Band dashed line */
-      .st2-band::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        border-top: 1px dashed rgba(207, 162, 79, .55);
-      }
-
-      /* Band label sitting over dashed line */
-      .st2-band-label {
-        position: absolute;
-        left: 0;
-        top: 0;
-        transform: translateY(-50%);
-        padding: 0 6px;
-        border-radius: 8px;
-        background: #0e0b09;
-        color: #e7c27a;
-        font-weight: 800;
-        font-size: 12px;
-        line-height: 1.4;
-        z-index: 1;
-      }
-
-      /* 6-column responsive grid; variable row height */
-      .st2-grid {
-        display: grid;
-        grid-template-columns: repeat(6, minmax(100px, 1fr));
-        grid-auto-rows: minmax(164px, max-content);
-        gap: 10px;
-      }
-
-      /* ===== Skill tiles ===== */
-
-      /* Tile: icon (top) / name (middle) / controls (bottom) */
-      .st2-tile {
-        display: grid;
-        grid-template-rows: auto auto auto;
-        align-items: center;
-        justify-items: center;
-        gap: 6px;
-        max-width: 100%;
-        overflow: hidden;
-      }
-
-      /* Skill name */
-      .st2-name {
-        width: 100%;
-        max-width: 340px;
-        text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        font-size: 17px;
-        font-weight: 800;
-        line-height: 1.1;
-        color: #e7c27a;
-      }
-
-      /* Circular icon */
-      .st2-skill {
-        width: clamp(68px, 7.6vw, 92px);
-        height: clamp(68px, 7.6vw, 92px);
-        border-radius: 999px;
-        border: 1px solid #3a2c21;
-        background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02));
-        box-shadow: 0 2px 8px rgba(0, 0, 0, .35) inset;
-        display: grid;
-        place-items: center;
-        overflow: hidden;
-        -webkit-mask-image: radial-gradient(circle, #000 99%, transparent 100%);
-        mask-image: radial-gradient(circle, #000 99%, transparent 100%);
-      }
-
-      .st2-skill img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 999px;
-      }
-
-      /* Controls: left stack / center level box / right stack */
-      .st2-ctrl2 {
-        display: grid;
-        grid-template-columns: max-content auto max-content;
-        grid-template-rows: auto auto;
-        align-items: center;
-        justify-items: center;
-        column-gap: 8px;
-        row-gap: 2px;
-      }
-
-      /* Left/Right button stacks */
-      .st2-side-left,
-      .st2-side-right {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-      }
-
-      /* Central level box */
-      .st2-lv {
-        grid-column: 2;
-        grid-row: 1 / span 2;
-        min-width: 110px;
-        padding: 6px 10px;
-        border-radius: 8px;
-        border: 1px solid #3a2c21;
-        background: #1a130f;
-        color: #f0e6d2;
-        text-align: center;
-        font-weight: 800;
-        font-size: 13px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-      }
-
-      .st2-lvnums {
-        display: flex;
-        align-items: baseline;
-        gap: 8px;
-      }
-
-      .st2-lv .cur,
-      .st2-lv .tp {
-        font-size: 16px;
-        line-height: 1;
-      }
-
-      .st2-lv .sep {
-        opacity: .6;
-        margin: 0;
-      }
-
-      /* Buttons */
-      .st2-btn {
-        height: 24px;
-        padding: 0 10px;
-        font-size: 12px;
-        border-radius: 999px;
-        border: 1px solid #3a2c21;
-        background: #1a130f;
-        color: #c7b589;
-        cursor: pointer;
-        white-space: nowrap;
-      }
-
-      .st2-btn:hover {
-        border-color: #cfa24f;
-        box-shadow: 0 0 0 2px rgba(207, 162, 79, .18) inset;
-      }
-
-      .st2-btn:disabled {
-        opacity: .5;
-        cursor: default;
-        border-color: #2a211a;
-        box-shadow: none;
-      }
-
-      /* ===== Auto Input Panels ===== */
-      .auto-box {
-        width: 100%;
-        padding: 10px;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-        margin-bottom: 10px;
-      }
-
-      .auto-box h4 {
-        margin: 0 0 8px;
-        font-size: 14px;
-        color: #e7c27a;
-      }
-
-      .auto-box .btn {
-        width: 100%;
-        height: 34px;
-        border-radius: 10px;
-        border: 1px solid #3a2c21;
-        background: #1a130f;
-        color: #f0e6d2;
-        cursor: pointer;
-      }
-
-      .auto-box .btn:hover {
-        border-color: #cfa24f;
-        box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
-      }
-
-      .auto-box .btn[disabled] {
-        opacity: .5;
-        cursor: not-allowed;
-      }
-
-      /* Simple list modal */
-      .simple-modal .dialog {
-        width: min(420px, 92vw);
-      }
-
-      .simple-modal .list {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        padding: 10px;
-      }
-
-      .simple-modal .list .opt-btn {
-        height: 38px;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, .12);
-        background: #1a1b27;
-        color: #e6e9ef;
-        cursor: pointer;
-      }
-
-      .simple-modal .list .opt-btn:hover {
-        border-color: #6ea8ff;
-        box-shadow: 0 0 0 2px rgba(110, 168, 255, .25) inset;
-      }
-
-      /* ========== 로그인 이후 레이아웃 정리(PC/Mobile 공통) ========== */
-
-      /* 공통: hidden은 완전 제거 */
-      [hidden] {
-        display: none !important;
-      }
-
-      /* 1) 로그인 뷰 계열 통째로 접기 (.login-wrap, #main-view, .hero) */
-      body:is(.pc, .mobile) :is(.login-wrap, #main-view, section.hero) {
-        display: none !important;
-        height: 0 !important;
-        min-height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-
-      /* 2) .shell은 컨테이너 박스 제거(자식만 흐르게) */
-      body:is(.pc, .mobile) .shell {
-        display: contents !important;
-        height: auto !important;
-        min-height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        gap: 0 !important;
-        grid-template-rows: none !important;
-        grid-auto-rows: auto !important;
-      }
-
-      /* 3) 본문 시작 간격(필요 시 숫자만 조절) */
-      body:is(.pc, .mobile) #calc-view {
-        margin-top: 12px !important;
-      }
-
-      /* 4) 안전핀: calc-view는 위로 딱 붙게(상단 마진 초기화) */
-      #calc-view {
-        margin-top: 0 !important;
-      }
-
-      /* ===== Header 광고(오른쪽 텍스트) ===== */
-      .header-ads {
-        margin-left: auto;
-        /* 우측 정렬 */
-        margin-right: 40px;
-        /* ← 우측 여백 (원하면 12~24px 조절) */
-        display: flex;
-        align-items: center;
-        max-width: 40vw;
-      }
-
-      .header-ads .ad-text {
-        font-size: 14px;
-        font-weight: 600;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 32vw;
-        transition: opacity .25s ease;
-        opacity: 1;
-      }
-
-      .header-ads .fade-out {
-        opacity: 0;
-      }
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* 고정 높이 아이템 모달 */
+    #itemModal .dialog {
+      grid-template-rows: auto auto;
+    }
+
+    #itemModal .items {
+      height: clamp(420px, 60vh, 560px);
+      max-height: clamp(420px, 60vh, 560px);
+      overflow: auto;
+    }
+
+    /* === Emblem sockets & modal — FINAL MERGED === */
+
+    /* Stack of 2 sockets (vertical) */
+    .emblem-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Socket dot (small circular button) */
+    .emblem-dot {
+      width: 28px;
+      height: 28px;
+      position: relative;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, .25);
+      background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02));
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .35) inset, 0 0 0 3px rgba(110, 168, 255, 0);
+      display: grid;
+      place-items: center;
+      /* Hard guarantee: perfect circle in every browser */
+      border-radius: 999px !important;
+      overflow: hidden !important;
+      clip-path: circle(50% at 50% 50%) !important;
+      -webkit-mask-image: radial-gradient(circle, #000 99%, transparent 100%) !important;
+      mask-image: radial-gradient(circle, #000 99%, transparent 100%) !important;
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      background-clip: padding-box;
+    }
+
+    .emblem-dot:hover {
+      box-shadow: 0 0 0 3px var(--ring);
+    }
+
+    /* When an emblem image is applied from JS as CSS var */
+    .emblem-dot.has-img {
+      background:
+        var(--emblem) center/cover no-repeat,
+        linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02)) !important;
+    }
+
+    .emblem-dot.has-img::after {
+      display: none !important;
+    }
+
+    /* hide dashed guide when filled */
+
+    /* Empty socket guide */
+    .emblem-dot.empty {
+      opacity: .45;
+    }
+
+    .emblem-dot.empty::after {
+      content: "";
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      border: 2px dashed rgba(255, 255, 255, .3);
+    }
+
+    /* Images inside sockets always clipped to circle */
+    .emblem-dot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 999px !important;
+      -webkit-mask-image: radial-gradient(circle, #000 99%, transparent 100%) !important;
+      mask-image: radial-gradient(circle, #000 99%, transparent 100%) !important;
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+    }
+
+    /* Center number (socket & picker) — bright & legible */
+    .emblem-dot .num,
+    .em-thumb .num {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 900;
+      letter-spacing: .2px;
+      -webkit-text-stroke: 1px rgba(0, 0, 0, .35);
+      text-shadow:
+        0 1px 1px rgba(0, 0, 0, .55),
+        0 0 4px rgba(255, 255, 255, .65),
+        0 0 10px rgba(255, 255, 255, .45);
+    }
+
+    .emblem-dot .num {
+      font-size: 16px;
+    }
+
+    /* 28px socket */
+    .em-thumb .num {
+      font-size: 22px;
+    }
+
+    /* 56px picker */
+
+    /* Subtle center darkening behind number (not too strong) */
+    .emblem-dot .num::before,
+    .em-thumb .num::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      height: 80%;
+      border-radius: 999px;
+      pointer-events: none;
+      background: radial-gradient(circle,
+          rgba(0, 0, 0, .18) 0%,
+          rgba(0, 0, 0, .10) 45%,
+          rgba(0, 0, 0, 0) 70%);
+    }
+
+    /* Hover: enhance number legibility */
+    .emblem-dot:hover .num,
+    .em-thumb:hover .num {
+      -webkit-text-stroke: 1px rgba(0, 0, 0, .45);
+      text-shadow:
+        0 1px 2px rgba(0, 0, 0, .75),
+        0 0 6px rgba(255, 255, 255, .60),
+        0 0 14px rgba(255, 255, 255, .50);
+    }
+
+    /* === Emblem picker rows (horizontal scrollers) === */
+    .em-rows {
+      display: grid;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .em-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    /* Picker thumbnail (badge-like) */
+    .em-thumb {
+      width: 56px;
+      height: 56px;
+      position: relative;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 0;
+      border: 1px solid #3a2c21;
+      background: #1a130f;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .em-thumb:hover {
+      border-color: #cfa24f;
+      box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
+    }
+
+    /* Always circular images */
+    .em-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 999px !important;
+      -webkit-mask-image: radial-gradient(circle, #000 99%, transparent 100%) !important;
+      mask-image: radial-gradient(circle, #000 99%, transparent 100%) !important;
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+    }
+
+    /* 'None' option as a circular crossed badge */
+    .em-thumb.none {
+      background: linear-gradient(135deg, #1a130f 0%, #0c0a08 100%);
+      border-radius: 999px;
+    }
+
+    .em-thumb.none::before,
+    .em-thumb.none::after {
+      content: "";
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      top: 50%;
+      height: 2px;
+      background: rgba(255, 255, 255, .35);
+    }
+
+    .em-thumb.none::after {
+      transform: rotate(90deg);
+    }
+
+    /* Caption (for accessary/title slots) */
+    .emblem-caption {
+      margin-top: 4px;
+      font-size: 11px;
+      line-height: 1.1;
+      color: #e7c27a;
+      text-align: center;
+      max-width: 84px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+
+    /* === Seal text captions inside slots === */
+    .seal-captions {
+      position: absolute;
+      left: 6px;
+      bottom: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      /* 행 간격 2px */
+      pointer-events: none;
+      /* 비클릭 */
+    }
+
+    .seal-captions .seal-row {
+      display: flex;
+      gap: 2px;
+      justify-content: flex-start;
+    }
+
+    /* 좌측정렬 */
+    .seal-captions .seal-chip {
+      max-width: calc(100% - 12px);
+      font-size: 9px;
+      line-height: 1.2;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(207, 162, 79, 0.35);
+      /* 기존 골드 톤과 어울리게 */
+      color: inherit;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+
+
+    /* === Skill Rune === */
+    .rune-head {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      white-space: nowrap;
+      /* ✅ 줄바꿈 방지 */
+    }
+
+    .rune-head div {
+      font-size: 12px;
+      color: var(--muted, #6b7280);
+      white-space: nowrap;
+      /* ✅ 카운터도 줄바꿈 없음 */
+    }
+
+    .rune-head b {
+      color: #e7c27a;
+    }
+
+    .rune-grid {
+      --col-w: minmax(64px, 1fr);
+      display: grid;
+      grid-auto-rows: 40px;
+      gap: 8px;
+      overflow: auto;
+    }
+
+    .rune-grid .row {
+      display: grid;
+      grid-template-columns: 120px repeat(8, var(--col-w));
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rune-grid .head {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      padding: 0 10px;
+      border: 1px solid #3a2c21;
+      border-radius: 10px;
+      background: #1a130f;
+      color: #f0e6d2;
+      font-weight: 800;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .rune-grid .cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .rune-select {
+      width: 100%;
+      height: 30px;
+      border-radius: 8px;
+      border: 1px solid #3a2c21;
+      background: #15100c;
+      color: #f0e6d2;
+      padding: 0 8px;
+    }
+
+    .rune-select:focus {
+      border-color: #cfa24f;
+      box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
+    }
+
+    /* 룬 각인 UI */
+    .rune-engrave-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .field.compact {
+      flex: 1 1 220px;
+    }
+
+    /* === Skill Tree UI — FINAL MERGED === */
+
+    /* Header row */
+    .skilltree-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: 15px;
+      white-space: nowrap;
+      /* ✅ 줄바꿈 금지 */
+    }
+
+    .st-counters {
+      display: flex;
+      flex-direction: column;
+      /* ✅ 세로 방향으로 */
+      align-items: flex-start;
+      gap: 6px;
+      /* 위아래 간격 */
+      white-space: nowrap;
+    }
+
+    .skilltree-head .st-counters span {
+      display: inline-flex;
+      align-items: center;
+      font-size: 14px;
+      color: var(--muted, #6b7280);
+    }
+
+    .skilltree-head .st-counters b {
+      margin-left: 4px;
+      color: var(--text, #1f2937);
+    }
+
+    /* 공통 버튼(얇은 라운드, 대비 확보) */
+    .ui-btn {
+      --ui-bg: #fff;
+      --ui-fg: #1f2937;
+      --ui-bd: #e5e7eb;
+      --ui-ring: rgba(37, 99, 235, .15);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid var(--ui-bd);
+      background: var(--ui-bg);
+      color: var(--ui-fg);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .1px;
+      white-space: nowrap;
+      /* ✅ 버튼 자체도 줄바꿈 금지 */
+      user-select: none;
+      cursor: pointer;
+      transition: transform .06s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+    }
+
+    .ui-btn:hover {
+      box-shadow: 0 4px 14px rgba(31, 41, 55, .08);
+    }
+
+    .ui-btn:active {
+      transform: translateY(1px);
+    }
+
+    .ui-btn:focus-visible {
+      outline: 0;
+      box-shadow: 0 0 0 3px var(--ui-ring);
+    }
+
+    /* 담백한 변형 */
+    .ui-btn.ghost {
+      background: #f8fafc;
+    }
+
+    /* 다크 테마 대비(있으면 적용) */
+    @media (prefers-color-scheme: dark) {
+      .ui-btn {
+        --ui-bg: #0f1115;
+        --ui-fg: #e6e9ef;
+        --ui-bd: #273041;
+      }
+
+      .ui-btn.ghost {
+        background: #151922;
+      }
+    }
+
+    .ui-btn.primary {
+      --ui-bg: #2563eb;
+      /* 파란 배경 */
+      --ui-fg: #fff;
+      /* 흰 글씨 */
+      --ui-bd: #2563eb;
+      background: var(--ui-bg);
+      color: var(--ui-fg);
+      border: 1px solid var(--ui-bd);
+    }
+
+    /* Top utility bar */
+    .st-topbar {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      font-size: 12px;
+      color: #c7b589;
+    }
+
+    /* ===== Universal counter styles (base) ===== */
+    .st-counter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      background: rgba(0, 0, 0, .25);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 10px;
+      font-size: 13px;
+      /* base size; overridden in modal scope */
+    }
+
+    .st-counter .label {
+      font-weight: 800;
+      letter-spacing: .3px;
+      font-size: 13px;
+    }
+
+    .st-counter .label.sp {
+      color: #6ec6ff;
+    }
+
+    /* cyan-like */
+    .st-counter .label.tp {
+      color: #ff4444;
+    }
+
+    /* red */
+    .st-counter .val {
+      min-width: 18px;
+      text-align: right;
+      color: #e6e9ef;
+      font-variant-numeric: tabular-nums;
+      font-size: 13px;
+    }
+
+    /* Keep modal header balanced */
+    .modal .dialog header {
+      justify-content: space-between;
+    }
+
+    /* ===== Optional large pills elsewhere (kept for compatibility) ===== */
+    :root {
+      --sp-blue: #2BCCED;
+      --tp-red: #F03231;
+    }
+
+    .actions .sp-tp {
+      display: none;
+      gap: 18px;
+      align-items: center;
+      font-size: 20pt;
+    }
+
+    .counter-pill {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-weight: 800;
+      letter-spacing: .1px;
+      color: var(--text);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, .55);
+    }
+
+    .counter-pill .lab {
+      font-size: 1em;
+      font-style: italic;
+      font-weight: 900;
+    }
+
+    .counter-pill.sp .lab {
+      color: var(--sp-blue);
+    }
+
+    .counter-pill.tp .lab {
+      color: var(--tp-red);
+    }
+
+    /* ===== Modal-only: big counters aligned to the right ===== */
+    #skillTreeModal .st-counters {
+      margin-left: auto;
+      font-size: 20pt;
+    }
+
+    #skillTreeModal .st-counter,
+    #skillTreeModal .st-counter .label,
+    #skillTreeModal .st-counter .val {
+      font-size: 20pt;
+    }
+
+    /* Modal size */
+    #skillTreeModal .dialog {
+      width: min(1600px, 98vw) !important;
+      height: min(920px, 95vh) !important;
+    }
+
+    /* ===== SkillTree v1 (legacy banded columns) ===== */
+    .st-grid {
+      grid-auto-flow: column;
+      grid-auto-columns: 320px;
+      /* generous column width */
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .st-col {
+      gap: 8px;
+      align-content: start;
+    }
+
+    .st-band {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 6px 10px;
+      border: 1px solid #3a2c21;
+      border-radius: 10px;
+      background: #1a130f;
+      color: #e7c27a;
+      font-weight: 800;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /* ===== SkillTree v2 (bands / coordinate grid) ===== */
+
+    /* Wrapper for bands */
+    .st2-wrap {
+      display: grid;
+      gap: 14px;
+    }
+
+    /* Each band's grid sits a bit below its dashed label line */
+    .st2-band>.st2-grid {
+      margin-top: 3px;
+    }
+
+    /* Band container: prevent clipping; add room above/below */
+    .st2-band {
+      position: relative;
+      margin: 1px 0;
+      padding-top: 10px;
+      /* room for label/dashed line */
+      padding-bottom: 1px;
+      /* room for controls */
+      overflow: visible;
+    }
+
+    /* Band dashed line */
+    .st2-band::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      border-top: 1px dashed rgba(207, 162, 79, .55);
+    }
+
+    /* Band label sitting over dashed line */
+    .st2-band-label {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform: translateY(-50%);
+      padding: 0 6px;
+      border-radius: 8px;
+      background: #0e0b09;
+      color: #e7c27a;
+      font-weight: 800;
+      font-size: 12px;
+      line-height: 1.4;
+      z-index: 1;
+    }
+
+    /* 6-column responsive grid; variable row height */
+    .st2-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(100px, 1fr));
+      grid-auto-rows: minmax(164px, max-content);
+      gap: 10px;
+    }
+
+    /* ===== Skill tiles ===== */
+
+    /* Tile: icon (top) / name (middle) / controls (bottom) */
+    .st2-tile {
+      display: grid;
+      grid-template-rows: auto auto auto;
+      align-items: center;
+      justify-items: center;
+      gap: 6px;
+      max-width: 100%;
+      overflow: hidden;
+    }
+
+    /* Skill name */
+    .st2-name {
+      width: 100%;
+      max-width: 340px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.1;
+      color: #e7c27a;
+    }
+
+    /* Circular icon */
+    .st2-skill {
+      width: clamp(68px, 7.6vw, 92px);
+      height: clamp(68px, 7.6vw, 92px);
+      border-radius: 999px;
+      border: 1px solid #3a2c21;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02));
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .35) inset;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      -webkit-mask-image: radial-gradient(circle, #000 99%, transparent 100%);
+      mask-image: radial-gradient(circle, #000 99%, transparent 100%);
+    }
+
+    .st2-skill img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 999px;
+    }
+
+    /* Controls: left stack / center level box / right stack */
+    .st2-ctrl2 {
+      display: grid;
+      grid-template-columns: max-content auto max-content;
+      grid-template-rows: auto auto;
+      align-items: center;
+      justify-items: center;
+      column-gap: 8px;
+      row-gap: 2px;
+    }
+
+    /* Left/Right button stacks */
+    .st2-side-left,
+    .st2-side-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    /* Central level box */
+    .st2-lv {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      min-width: 110px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #3a2c21;
+      background: #1a130f;
+      color: #f0e6d2;
+      text-align: center;
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .st2-lvnums {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .st2-lv .cur,
+    .st2-lv .tp {
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .st2-lv .sep {
+      opacity: .6;
+      margin: 0;
+    }
+
+    /* Buttons */
+    .st2-btn {
+      height: 24px;
+      padding: 0 10px;
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid #3a2c21;
+      background: #1a130f;
+      color: #c7b589;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .st2-btn:hover {
+      border-color: #cfa24f;
+      box-shadow: 0 0 0 2px rgba(207, 162, 79, .18) inset;
+    }
+
+    .st2-btn:disabled {
+      opacity: .5;
+      cursor: default;
+      border-color: #2a211a;
+      box-shadow: none;
+    }
+
+    /* ===== Auto Input Panels ===== */
+    .auto-box {
+      width: 100%;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+      margin-bottom: 10px;
+    }
+
+    .auto-box h4 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: #e7c27a;
+    }
+
+    .auto-box .btn {
+      width: 100%;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid #3a2c21;
+      background: #1a130f;
+      color: #f0e6d2;
+      cursor: pointer;
+    }
+
+    .auto-box .btn:hover {
+      border-color: #cfa24f;
+      box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
+    }
+
+    .auto-box .btn[disabled] {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    /* Simple list modal */
+    .simple-modal .dialog {
+      width: min(420px, 92vw);
+    }
+
+    .simple-modal .list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .simple-modal .list .opt-btn {
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: #1a1b27;
+      color: #e6e9ef;
+      cursor: pointer;
+    }
+
+    .simple-modal .list .opt-btn:hover {
+      border-color: #6ea8ff;
+      box-shadow: 0 0 0 2px rgba(110, 168, 255, .25) inset;
+    }
+
+    /* ========== 로그인 이후 레이아웃 정리(PC/Mobile 공통) ========== */
+
+    /* 공통: hidden은 완전 제거 */
+    [hidden] {
+      display: none !important;
+    }
+
+    /* 1) 로그인 뷰 계열 통째로 접기 (.login-wrap, #main-view, .hero) */
+    body:is(.pc, .mobile) :is(.login-wrap, #main-view, section.hero) {
+      display: none !important;
+      height: 0 !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    /* 2) .shell은 컨테이너 박스 제거(자식만 흐르게) */
+    body:is(.pc, .mobile) .shell {
+      display: contents !important;
+      height: auto !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      gap: 0 !important;
+      grid-template-rows: none !important;
+      grid-auto-rows: auto !important;
+    }
+
+    /* 3) 본문 시작 간격(필요 시 숫자만 조절) */
+    body:is(.pc, .mobile) #calc-view {
+      margin-top: 12px !important;
+    }
+
+    /* 4) 안전핀: calc-view는 위로 딱 붙게(상단 마진 초기화) */
+    #calc-view {
+      margin-top: 0 !important;
+    }
+
+    /* ===== Header 광고(오른쪽 텍스트) ===== */
+    .header-ads {
+      margin-left: auto;
+      /* 우측 정렬 */
+      margin-right: 40px;
+      /* ← 우측 여백 (원하면 12~24px 조절) */
+      display: flex;
+      align-items: center;
+      max-width: 40vw;
+    }
+
+    .header-ads .ad-text {
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 32vw;
+      transition: opacity .25s ease;
+      opacity: 1;
+    }
+
+    .header-ads .fade-out {
+      opacity: 0;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, .55);
+      display: grid;
+      place-items: center;
+    }
+
+    .loading-box {
+      width: min(480px, 90vw);
+      background: #0f1115;
+      color: #e6e9ef;
+      border: 1px solid rgba(255, 255, 255, .2);
+      border-radius: 14px;
+      padding: 20px 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+    }
+
+    .loading-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .loading-bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .12);
+      overflow: hidden;
+    }
+
+    .loading-bar__fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6ea8ff, #8fe3ff);
+      transition: width .2s ease;
+    }
+
+    .loading-info {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      opacity: .9;
+    }
+
+    /* 성안의 봉인 모달 레이아웃 */
+    #castleSealModal .dialog.seal {
+      width: min(920px, 95vw);
+    }
+
+    #castleSealModal .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    #castleSealModal .list {
+      max-height: 60vh;
+      overflow: auto;
+    }
+
+    #castleSealModal .opt-row {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: 1px solid rgba(255, 255, 255, .15);
+      background: #0f1115;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin: 8px 0;
+    }
+
+    #castleSealModal .opt-row .name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    #castleSealModal .opt-row .desc {
+      opacity: .9;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    #castleSealModal .opt-row.active {
+      outline: 2px solid #8fe3ff;
+      background: #121521;
+    }
+
+    .seal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      /* 제목 왼쪽, 버튼 오른쪽 */
+      gap: 8px;
+    }
+
+    #optSeal .opt-title {
+      margin: 0;
+      font-size: 14px;
+    }
   </style>
 
-
 <body>
+  <!-- 로딩 오버레이 (기본 hidden) -->
+  <div id="loadingOverlay" class="loading-overlay" hidden>
+    <div class="loading-box">
+      <div class="loading-title">데이터 불러오는 중…</div>
+      <div class="loading-bar">
+        <div class="loading-bar__fill" style="width:0%"></div>
+      </div>
+      <div class="loading-info">
+        <span id="loadingLabel">초기화…</span>
+        <span id="loadingPct">0%</span>
+      </div>
+    </div>
+  </div>
   <div class="shell">
     <header>
       <div class="title">
@@ -2010,26 +2218,29 @@
         <button>+</button>
         <button>+</button>
       </div>
+
       <div class="column options">
         <div class="opt-box">
           <h4 class="opt-title">아바타 세부 선택</h4>
           <label class="field">
             <span class="label">아바타</span>
             <select id="selAvatar" class="select" aria-label="아바타 선택">
-              <option value="" selected disabled>아바타 선택</option>
-              <option value="rare">레어 아바타</option>
+              <option value="" disabled>아바타 선택</option>
+              <option value="rare" selected>레어 아바타</option>
               <option value="advanced">상급 아바타</option>
+              <option value="empty">없음</option>
             </select>
           </label>
           <label class="field">
             <span class="label">무기압</span>
             <select id="selImprint" class="select" aria-label="무기압 선택">
-              <option value="" selected disabled>무기압 선택</option>
+              <option value="" disabled>무기압 선택</option>
               <option value="add5">추뎀 5% 무기압</option>
-              <option value="patkmatk5">물/마공 5% 무기압</option>
+              <option value="patkmatk5" selected>물/마공 5% 무기압</option>
               <option value="patkmatk3">물/마공 3% 무기압</option>
               <option value="monster">몬스터 무기압</option>
               <option value="quest">퀘스트 무기압</option>
+              <option value="empty">없음</option>
             </select>
           </label>
         </div>
@@ -2039,9 +2250,9 @@
           <label class="field">
             <span class="label">시간 기준</span>
             <select id="selTime" class="select" aria-label="시간 기준">
-              <option value="" selected disabled>시간 기준</option>
+              <option value="" disabled>시간 기준</option>
               <option value="30s">30초딜</option>
-              <option value="1m">1분딜</option>
+              <option value="1m" selected>1분딜</option>
               <option value="3m">3분딜</option>
               <option value="5m">5분딜</option>
               <option value="10m">10분딜</option>
@@ -2051,8 +2262,8 @@
           <label class="field">
             <span class="label">몬스터 설정</span>
             <select id="selMonster" class="select" aria-label="몬스터 설정">
-              <option value="" selected disabled>몬스터 설정</option>
-              <option value="nugol">거대누골</option>
+              <option value="" disabled>몬스터 설정</option>
+              <option value="nugol" selected>거대누골</option>
               <option value="blackdragon">흑룡</option>
               <option value="anton">안톤</option>
               <option value="asmar_calix">아스마르/칼릭스</option>
@@ -2062,18 +2273,18 @@
           <label class="field">
             <span class="label">던전 난이도</span>
             <select id="selDifficulty" class="select" aria-label="던전 난이도 설정">
-              <option value="" selected disabled>던전 난이도 설정</option>
+              <option value="" disabled>던전 난이도 설정</option>
               <option value="hard">어려움</option>
               <option value="normal">보통</option>
               <option value="easy">쉬움</option>
-              <option value="nugol_room">누골방</option>
+              <option value="nugol_room" selected>누골방</option>
             </select>
           </label>
         </div>
         <div class="opt-box">
           <h4 class="opt-title">스킬룬</h4>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <button id="btnRune" class="btn" type="button" style="height:30px;padding:0 12px;border-radius:10px;">
+          <div class="rune-head">
+            <button id="btnRune" class="ui-btn ghost" type="button" aria-label="스킬룬 설정">
               스킬룬 설정
             </button>
             <div style="font-size:12px;color:var(--muted);">
@@ -2102,11 +2313,11 @@
         <div class="opt-box">
           <h4 class="opt-title">스킬트리</h4>
           <div class="skilltree-head">
-            <button id="btnSkillTree" class="btn" type="button"
-              style="height:30px;padding:0 12px;border-radius:10px;">스킬트리 설정</button>
+            <button id="btnSkillTree" class="ui-btn primary" type="button" aria-label="스킬트리 설정"
+              style="margin-top:2px;">스킬트리 설정</button>
             <div class="st-counters">
-              <span>SP 남음: <b id="stSpLeft">—</b></span>
-              <span>TP 남음: <b id="stTpLeft">—</b></span>
+              <span>남은 SP: <b id="stSpLeft">—</b></span>
+              <span>남은 TP: <b id="stTpLeft">—</b></span>
             </div>
           </div>
         </div>
@@ -2115,11 +2326,19 @@
           <strong class="value" id="finalDamageValue2">&nbsp;</strong>
           <button id="btn-sum-all-final2" type="button">계산하기</button>
         </div>
-
       </div>
 
       <aside class="stats">
         <div class="stats-panel">
+          <!-- ▼ 성안의 봉인 -->
+          <div class="opt-box" id="optSeal">
+            <div class="seal-head">
+              <h4 class="opt-title">성안의 봉인</h4>
+              <button id="btnCastleSeal" class="ui-btn primary" type="button" aria-label="옵션 선택">
+                옵션 선택
+              </button>
+            </div>
+          </div>
           <h3>합산 스탯</h3>
           <div id="statList" class="stat-list"></div>
           <div class="final-damage">
@@ -2182,6 +2401,20 @@
     </div>
   </div>
 
+  <div id="refineModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-close></div>
+    <div class="dialog sm">
+      <div class="dialog-head">
+        <h3>연마 선택</h3>
+        <button class="icon-btn" data-close aria-label="닫기">✕</button>
+      </div>
+      <div class="dialog-body">
+        <div id="refineList" class="v-list"></div>
+      </div>
+    </div>
+  </div>
+
+
   <div id="emblemModal" class="modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
     <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="emblemDlgTitle"
@@ -2226,8 +2459,133 @@
     </div>
   </div>
 
+  <!-- ▼ 성안의 봉인 모달 -->
+  <div id="castleSealModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-close></div>
+    <div class="dialog seal">
+      <div class="modal-head">
+        <div class="title">옵션 선택</div>
+        <button class="close" data-close aria-label="닫기">×</button>
+      </div>
+
+      <div class="modal-body two-col">
+        <section class="col">
+          <h5>주요 옵션</h5>
+          <div id="sealMainList" class="list"></div>
+        </section>
+        <section class="col">
+          <h5>추가 옵션</h5>
+          <div id="sealSubList" class="list"></div>
+        </section>
+      </div>
+
+      <div class="modal-foot">
+        <button id="sealCommit" class="ui-btn gold block">선택 하기</button>
+      </div>
+    </div>
+  </div>
+
+
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
+
+    // 전역 플래그
+    let __calcInited = false;
+
+    async function initCalculatorOnce() {
+      if (__calcInited) return;
+      __calcInited = true;
+
+      // 1) 룬 각인 이름 목록 구성
+      buildRuneEngraveNameOptions();
+
+      // 2) 옵션 드롭다운 바인딩
+      const $ = (id) => document.getElementById(id);
+      const bind = (id, key) => {
+        const el = $(id);
+        if (!el) return;
+        el.addEventListener('change', () => {
+          state.options[key] = el.value || null;
+          if (key === 'avatar') {
+            applyAvatarEnhFromState();
+          } else if (key === 'weaponImprint') {
+            applyImprintEnhFromState();
+          } else if (key === 'monster') {
+            const txt = el.options[el.selectedIndex]?.textContent ?? el.value;
+            onMonsterChange(txt);
+          }
+        });
+      };
+
+      bind('selAvatar', 'avatar');
+      bind('selImprint', 'weaponImprint');
+      bind('selTime', 'timeWindow');
+      bind('selMonster', 'monster');
+      bind('selDifficulty', 'difficulty');
+
+      // 3) 기본값을 실제 로직에 반영 (여기가 자동 로딩의 주범이었음 → 지금부터는 버튼 클릭 이후에만 호출)
+      document.getElementById('selAvatar')?.dispatchEvent(new Event('change'));
+      document.getElementById('selImprint')?.dispatchEvent(new Event('change'));
+      onMonsterChange(); // 기본 몬스터 반영
+
+      // === 성안의 봉인 기본값 적용 (정규화 stats 사용) ===
+      try {
+        // 1) 강화·마봉·마부 데이터 로드 보장
+        if (typeof ensureEnhLoaded === 'function') await ensureEnhLoaded();
+
+        const enh = window.DBEnh || {};
+
+        // 2) byType 없으면 list에서 즉석 그룹핑 (구버전 호환)
+        let byType = enh.byType;
+        if (!byType) {
+          const list = Array.isArray(enh.list)
+            ? enh.list
+            : Array.isArray(enh.rows)
+              ? enh.rows.map(r => ({ type: String(r['종류'] || '').trim(), name: String(r['이름'] || '').trim(), stats: r.stats || null, raw: r }))
+              : [];
+          byType = list.reduce((acc, it) => {
+            const t = String(it.type || '').trim();
+            (acc[t] ||= []).push(it);
+            return acc;
+          }, {});
+        }
+
+        // 3) 후보 목록 얻기
+        const mainList = Array.isArray(byType['주요 옵션']) ? byType['주요 옵션'] : [];
+        const subList = Array.isArray(byType['추가 옵션']) ? byType['추가 옵션'] : [];
+
+        // 데이터 없으면 조용히 통과 (계산기 열기만 진행)
+        if (!mainList.length || !subList.length) {
+          console.info('[SEAL:init] 목록 비어 있음 → 기본값 주입 생략', { mainLen: mainList.length, subLen: subList.length });
+        } else {
+          // 4) state 준비
+          if (!state.castleSeal) state.castleSeal = { main: null, sub: null };
+
+          // 5) 이미 선택돼 있지 않을 때만 기본값 주입
+          //    (특정 이름을 원하면 .find(x => x.name === '힘,지능 +170') 형태로)
+          const mainPick = state.castleSeal.main
+            || mainList.find(x => x.name === '힘,지능 +170')
+            || mainList[0];
+          const subPick = state.castleSeal.sub
+            || subList.find(x => x.name === '힘,지능 +224')
+            || subList[0];
+
+          // 6) 정규화된 형태로 저장 (합산 함수가 바로 먹게)
+          state.castleSeal.main = mainPick ? { name: mainPick.name, stats: mainPick.stats || null, raw: mainPick.raw || mainPick } : null;
+          state.castleSeal.sub = subPick ? { name: subPick.name, stats: subPick.stats || null, raw: subPick.raw || subPick } : null;
+
+          console.info('[SEAL:init] 기본값 적용:', {
+            main: state.castleSeal.main?.name || null,
+            sub: state.castleSeal.sub?.name || null
+          });
+        }
+      } catch (e) {
+        console.warn('[SEAL:init] 기본값 적용 중 오류(무시):', e);
+      }
+
+      // 필요 시 첫 렌더
+      recalcAndRenderPanel();
+    }
 
 
     /* ===== 상태/상수 ===== */
@@ -2251,6 +2609,119 @@
     state.skillDmg = state.skillDmg || {};   // ★ 스킬 현재 데미지 캐시 {id: { per, flat, lv }}
 
 
+    let __progressPct = 0;
+
+    function setProgressExactMonotonic(nextPct, label) {
+      const p = Math.max(__progressPct, Math.min(100, Math.round(nextPct)));
+      __progressPct = p;
+      const bar = document.querySelector('.loading-bar__fill');
+      const txt = document.getElementById('loadingPct');
+      const lbl = document.getElementById('loadingLabel');
+      if (bar) bar.style.width = p + '%';
+      if (txt) txt.textContent = p + '%';
+      if (lbl && label) lbl.textContent = String(label);
+    }
+    function resetProgress(label) {
+      __progressPct = 0;
+      setProgressExactMonotonic(0, label ?? '데이터 불러오는 중…');
+    }
+
+    function incProgress(dx, label) {
+      const next = Math.min(100, Math.max(0, Math.round(__progressPct + dx)));
+      setProgressExactMonotonic(next, label);
+    }
+    function showOverlay(label) {
+      __progressPct = 0;
+      setProgressExactMonotonic(0, label || '데이터 불러오는 중…');
+      document.getElementById('loadingOverlay')?.removeAttribute('hidden');
+    }
+    function hideOverlay() {
+      document.getElementById('loadingOverlay')?.setAttribute('hidden', '');
+    }
+    function hideOverlay() {
+      const ov = document.getElementById('loadingOverlay');
+      if (ov) ov.setAttribute('hidden', '');
+    }
+    function setProgress(pct, label) {
+      const bar = document.querySelector('.loading-bar__fill');
+      const l = document.getElementById('loadingLabel');
+      const t = document.getElementById('loadingPct');
+      const p = Math.max(0, Math.min(100, Math.round(pct)));
+      if (bar) bar.style.width = p + '%';
+      if (t) t.textContent = p + '%';
+      if (l && label) l.textContent = label;
+    }
+
+    // 모든 시트 한 번에 프리로드 (로그인 후에만 호출)
+    // 모든 시트 한 번에 프리로드 (로그인 후에만 호출)
+    async function preloadAllSheets({ weightCore = 30, weightSlots = 70 } = {}) {
+      await waitForIdToken();
+
+      const slots = [
+        'weapon', 'headshoulder', 'top', 'bottom', 'belt', 'shoes',
+        'bracelet', 'necklace', 'ring', 'support', 'aura', 'title',
+        'creature', 'artifact'
+      ];
+      const totalSlots = slots.length;
+
+      const coreW = Math.max(0, Math.min(100, weightCore | 0));
+      const slotsW = Math.max(0, Math.min(100 - coreW, weightSlots | 0));
+      const perCore = coreW / 4;
+      // 슬롯은 **done/total 기반으로 퍼센트 반영**
+      let slotProgress = 0;
+
+      // ── 1. 핵심 4단계 ───────────────
+      const runStep = async (label, fn) => {
+        setProgressExactMonotonic(__progressPct, `${label} 불러오는 중…`);
+        await fn();
+        __progressPct += perCore;
+        setProgressExactMonotonic(__progressPct, `${label} 불러오는 중…`);
+      };
+
+      if (typeof loadCharacterSheet === 'function')
+        await runStep('캐릭터', () => loadCharacterSheet());
+
+      if (typeof ensureSkillLoaded2 === 'function')
+        await runStep('스킬', () => ensureSkillLoaded2());
+      else if (typeof loadSkillSheet === 'function')
+        await runStep('스킬', () => loadSkillSheet());
+
+      if (typeof BuffLeveling?.preload === 'function')
+        await runStep('버프', () => BuffLeveling.preload());
+
+      if (typeof ensureEnhLoaded === 'function')
+        await runStep('강화/엠블렘', () => ensureEnhLoaded());
+
+      // ── 2. 슬롯들 ───────────────
+      const loadSlot = (s) => ensureLoaded(s);
+
+      let done = 0;
+      const promises = slots.map(s =>
+        Promise.resolve()
+          .then(() => {
+            const label = labelForSlot(s);
+            setProgressExactMonotonic(__progressPct, `${label} 불러오는 중…`);
+          })
+          .then(() => loadSlot(s))
+          .then(() => {
+            done += 1;
+            // ✅ 비율 기반 진행도
+            slotProgress = (done / totalSlots) * slotsW;
+            setProgressExactMonotonic(coreW + slotProgress, `아이템 불러오는 중… (${done}/${totalSlots})`);
+          })
+      );
+
+      await Promise.all(promises);
+
+      // ── 3. 딱 맞춰서 100% ───────────────
+      __progressPct = 100;
+      setProgressExactMonotonic(100, '모든 데이터 로딩 완료');
+    }
+
+
+
+
+
 
     // === [ENCHANT] 전역 캐시 & 프리로드 ===
     const ENCHANT_CACHE = {
@@ -2259,54 +2730,57 @@
       version: 'v1',           // 캐시 버전(시트가 바뀌면 여기 문자열만 바꿔 새로 받도록)
     };
 
+    const DBSkill = { loaded: false, headers: [], rows: [] };
+
+    // 강화/마봉/마부(ENHANCE_SHEET) 사전 로드: 백엔드(JSON) 버전
     async function preloadEnchantSheet() {
-      const urlBase = (typeof ENHANCE_SHEET_SAFE !== 'undefined' && ENHANCE_SHEET_SAFE)
-        ? ENHANCE_SHEET_SAFE
-        : (typeof ENHANCE_SHEET !== 'undefined' ? ENHANCE_SHEET : null);
+      if (ENCHANT_CACHE.ready) return;
 
-      if (!urlBase) { ENCHANT_CACHE.ready = true; return; }
+      // 1) 로그인 토큰
+      const token = await waitForIdToken();
 
-      // 캐시 허용. (필요 시 버전 쿼리로 강제 갱신)
-      const url = urlBase + (urlBase.includes('?') ? '&' : '?') + ENCHANT_CACHE.version;
+      // 2) 프록시 → GAS: ?type=enhance
+      const r = await fetch(window.WEBAPP_URL + '?type=enhance', {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-store',                  // 캐시 사용 안 함(버전 관리 원하면 쿼리로)
+        headers: { 'Content-Type': 'text/plain' },
+        body: token
+      });
+      if (!r.ok) throw new Error('enhance_fetch_failed');
+      const data = await r.json();
+      if (!data.ok || !Array.isArray(data.rows)) throw new Error('bad_enhance_payload');
 
-      const text = await fetch(url, { cache: 'default' }).then(r => r.text());
-      const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
-      const rows = parsed.data || [];
-
+      const rows = data.rows || [];
       const byType = new Map();
-      // (수정) 프리로드 루프
-      for (const r of rows) {
-        const typeKey = String(r['종류'] || '').trim();
+
+      // 3) 행 가공: 기존 mapRowToEnhance를 최우선 사용 (있으면)
+      for (const raw of rows) {
+        const obj = (typeof mapRowToEnhance === 'function') ? mapRowToEnhance(raw) : null;
+
+        const typeKey = String(obj?.type ?? raw['종류'] ?? '').trim();
         if (!typeKey) continue;
 
-        // 1) 기존 변환기가 있으면 재사용(권장)
-        const obj = (typeof mapRowToEnhance === 'function') ? mapRowToEnhance(r) : null;
-
-        // 2) 이름/스탯/직업군 안전 추출
-        const name = String(obj?.name ?? r['이름'] ?? r['name'] ?? '').trim();
+        const name = String(obj?.name ?? raw['이름'] ?? raw['name'] ?? '').trim();
         if (!name) continue;
 
-        const stats = obj?.stats ?? null;                  // ← undefined 방지
-        const jobGroup = String(r['직업군'] ?? obj?.jobGroup ?? '').trim();
+        const stats = obj?.stats ?? null;                     // 안전
+        const jobGroup = String(obj?.jobGroup ?? raw['직업군'] ?? '').trim();
 
-        // 3) 종류별 바구니 확보
         if (!byType.has(typeKey)) byType.set(typeKey, []);
-
-        // 4) 캐시에 푸시(원본도 보존)
         byType.get(typeKey).push({
           name,
           typeKey,
-          stats,            // ← 반드시 정의된 값만(없으면 null)
-          jobGroup,         // ← 추천 키 검색용
-          raw: r
+          stats,
+          jobGroup,
+          raw: raw                                         // 원본도 보존
         });
       }
-
-
 
       ENCHANT_CACHE.byType = byType;
       ENCHANT_CACHE.ready = true;
     }
+
 
     async function ensureEnchantCache() {
       if (!ENCHANT_CACHE.ready) {
@@ -2511,6 +2985,134 @@
       }
     });
 
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.rect');
+      if (!btn) return;
+
+      // [REFINE] 4번째 버튼
+      if (btn.dataset.role === 'refine') {
+        const container = btn.closest('.slot-row, .mini-cell');
+        const slotCode = container?.querySelector('.slot')?.getAttribute('data-slot'); // R1/R5
+        if (!slotCode) return;
+
+        // 1단계: 무기(R1)만 먼저 동작. R5는 추후 적용.
+        if (slotCode === 'R1') {
+          openRefineModalForWeapon(btn);
+        } else if (slotCode === 'R5') {
+          openRefineModalForSub(btn);   // ★ 새로운 함수로 연결
+        }
+      }
+    });
+
+
+    const $refineModal = document.getElementById('refineModal');
+    const $refineList = document.getElementById('refineList');
+
+    function showRefineModal(on) {
+      if (!$refineModal) return;
+      if (on) { $refineModal.classList.add('show'); $refineModal.setAttribute('aria-hidden', 'false'); }
+      else { $refineModal.classList.remove('show'); $refineModal.setAttribute('aria-hidden', 'true'); }
+    }
+    $refineModal?.addEventListener('click', (e) => {
+      if (e.target.dataset.close != null || e.target.classList.contains('backdrop')) {
+        showRefineModal(false);
+      }
+    });
+
+    async function openRefineModalForWeapon(btnEl) {    //무기연마
+      if (typeof ensureEnhLoaded === 'function') await ensureEnhLoaded();
+
+      // 버튼 목록 만들기
+      const labels = ['연마없음', '1연마', '2연마', '3연마', '4연마', '5연마', '6연마', '7연마', '8연마', '9연마'];
+      $refineList.innerHTML = '';
+      labels.forEach(name => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'btn block';    // 네 버튼 규칙에 맞춰 block 표시
+        b.textContent = name;
+        b.addEventListener('click', () => applyWeaponRefine(name, btnEl));
+        $refineList.appendChild(b);
+      });
+
+      showRefineModal(true);
+    }
+
+    async function openRefineModalForSub(btnEl) {     //보장연마
+      if (typeof ensureEnhLoaded === 'function') await ensureEnhLoaded();
+
+      const labels = ['연마없음', '1연마', '2연마', '3연마', '4연마', '5연마', '6연마', '7연마', '8연마', '9연마'];
+      $refineList.innerHTML = '';
+      labels.forEach(name => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'btn block';
+        b.textContent = name;
+        b.addEventListener('click', () => applySubRefine(name, btnEl));
+        $refineList.appendChild(b);
+      });
+
+      showRefineModal(true);
+    }
+
+
+    function applyWeaponRefine(name, btnEl) {   //무기연마 적용
+      state.refines = state.refines || {};
+      // ‘연마없음’ 이면 해제
+      if (name === '연마없음') {
+        state.refines.weapon = null;
+        if (btnEl) btnEl.textContent = '연마 설정';
+        showRefineModal(false);
+        recalcAndRenderPanel();
+        return;
+      }
+
+      // 강화/마봉/마부 시트에 이미 로드해둔 DBEnh에서 종류=무기연마 & 이름=name 행을 찾음
+      const list = (DBEnh?.byType?.['무기연마'] || (DBEnh?.list || []).filter(o => (o?.type || '') === '무기연마'));
+      const found = Array.isArray(list) ? list.find(o => String(o.name).trim() === name) : null;
+
+      if (!found) {
+        if (typeof toast === 'function') toast(`무기연마에서 '${name}'을(를) 찾을 수 없습니다.`);
+        else alert(`무기연마에서 '${name}'을(를) 찾을 수 없습니다.`);
+        return;
+      }
+
+      // 상태 저장(합산 시 곱연산 계열은 addStats에서 자동 처리)
+      state.refines.weapon = { name: found.name, stats: found.stats || null, raw: found.raw || null };
+
+      // 버튼 라벨 갱신
+      if (btnEl) btnEl.textContent = name;
+
+      showRefineModal(false);
+      recalcAndRenderPanel();
+    }
+
+    function applySubRefine(name, btnEl) {    //보장연마적용
+      state.refines = state.refines || {};
+
+      if (name === '연마없음') {
+        state.refines.sub = null;
+        if (btnEl) btnEl.textContent = '연마 설정';
+        showRefineModal(false);
+        recalcAndRenderPanel();
+        return;
+      }
+
+      const list = (DBEnh?.byType?.['보장연마'] || (DBEnh?.list || []).filter(o => (o?.type || '') === '보장연마'));
+      const found = Array.isArray(list) ? list.find(o => String(o.name).trim() === name) : null;
+
+      if (!found) {
+        if (typeof toast === 'function') toast(`보장연마에서 '${name}'을(를) 찾을 수 없습니다.`);
+        else alert(`보장연마에서 '${name}'을(를) 찾을 수 없습니다.`);
+        return;
+      }
+
+      state.refines.sub = { name: found.name, stats: found.stats || null, raw: found.raw || null };
+
+      if (btnEl) btnEl.textContent = name;
+
+      showRefineModal(false);
+      recalcAndRenderPanel();
+    }
 
 
 
@@ -2555,41 +3157,69 @@
     function noSpFeedback() { alert('SP가 부족합니다.'); }
     function noTpFeedback() { alert('TP가 부족합니다.'); }
     // ⬇ 기존 loadCharTotalsAndApply 전체를 이걸로 교체
-async function loadCharTotalsAndApply(charName) {
-  try {
-    // 로그인 토큰 필요
-    if (!idToken) { setTotals(0, 35); return; }
+    async function loadCharTotalsAndApply(charName) {
+      try {
+        // 로그인 토큰 필요
+        if (!idToken) { setTotals(0, 35); return; }
 
-    // 프록시 → GAS: 캐릭터시트(JSON)
-    const r = await fetch(window.WEBAPP_URL + '?type=char', {
-      method: 'POST',
-      mode: 'cors',
-      cache: 'no-store',
-      headers: { 'Content-Type': 'text/plain' },
-      body: idToken
-    });
-    if (!r.ok) throw new Error('char_fetch_fail');
-    const data = await r.json();
-    const rows = Array.isArray(data?.rows) ? data.rows : [];
+        // 프록시 → GAS: 캐릭터시트(JSON)
+        const r = await fetch(window.WEBAPP_URL + '?type=char', {
+          method: 'POST',
+          mode: 'cors',
+          cache: 'no-store',
+          headers: { 'Content-Type': 'text/plain' },
+          body: idToken
+        });
+        if (!r.ok) throw new Error('char_fetch_fail');
+        const data = await r.json();
+        const rows = Array.isArray(data?.rows) ? data.rows : [];
 
-    // 이름 정규화해서 1행 찾기
-    const key = String(charName || '').replace(/\s+/g, '');
-    const row = rows.find(x => String(x?.name || '').replace(/\s+/g, '') === key);
+        // 이름 정규화해서 1행 찾기
+        const key = String(charName || '').replace(/\s+/g, '');
+        const row = rows.find(x => String(x?.name || '').replace(/\s+/g, '') === key);
 
-    // 백엔드에서 내려주는 표준 키(spTotal, tpTotal)를 최우선 사용
-    const spTotal = Number(row?.spTotal ?? row?.['총SP'] ?? row?.['총스포'] ?? 0) || 0;
-    const tpTotal = Number(row?.tpTotal ?? row?.['총TP'] ?? row?.['총티피'] ?? 35) || 35;
+        // 백엔드에서 내려주는 표준 키(spTotal, tpTotal)를 최우선 사용
+        const spTotal = Number(row?.spTotal ?? row?.['총SP'] ?? row?.['총스포'] ?? 0) || 0;
+        const tpTotal = Number(row?.tpTotal ?? row?.['총TP'] ?? row?.['총티피'] ?? 35) || 35;
 
-    setTotals(spTotal, tpTotal);
-  } catch (e) {
-    console.warn('[SP/TP] load totals failed', e);
-    setTotals(0, 35);
-  }
-}
+        setTotals(spTotal, tpTotal);
+      } catch (e) {
+        console.warn('[SP/TP] load totals failed', e);
+        setTotals(0, 35);
+      }
+    }
 
 
 
     /* ===== 스킬 시트 로더 & 게임형(가로 칼럼) 렌더러 ===== */
+    // CSV -> JSON 전환: ST2.rows 를 JSON 응답으로 채움
+    async function loadSkillSheet() {
+      if (DBSkill.loaded) return;
+
+      const token = await waitForIdToken();
+
+      const r = await fetch(window.WEBAPP_URL + '?type=skill', {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'text/plain' },
+        body: token
+      });
+      if (!r.ok) throw new Error('skill_fetch_failed');
+      const data = await r.json();
+      if (!data.ok || !Array.isArray(data.rows)) throw new Error('bad_skill_payload');
+
+      // 그대로 보관 (CSV header:true 결과와 동일한 구조)
+      DBSkill.headers = Array.isArray(data.headers) ? data.headers : [];
+      DBSkill.rows = data.rows;
+
+      // 네가 기존에 쓰던 전역 핸들(ST2)을 유지하고 싶다면:
+      window.ST2 = { rows: DBSkill.rows, headers: DBSkill.headers };
+
+      DBSkill.loaded = true;
+    }
+
+
     // (스킬트리 렌더러 상단 어딘가, 중복 정의 없이 1회 선언)
     const onSkillTreeChanged = (() => {
       let t = null;
@@ -2614,37 +3244,6 @@ async function loadCharTotalsAndApply(charName) {
       let best = ST_BANDS[0], dmin = 1e9;
       for (const b of ST_BANDS) { const d = Math.abs(n - b); if (d < dmin) { dmin = d; best = b; } }
       return best;
-    }
-
-    async function ensureSkillLoaded() {
-      if (DBSkills.loaded) return;
-      const text = await fetch(SKILL_SHEET_SAFE || SKILL_SHEET, { cache: 'no-store' }).then(r => r.text());
-      const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
-      const rows = (parsed.data || [])
-        .map(r => {
-          const name = (r['이름'] || r.name || '').toString().trim();
-          if (!name) return null;
-          const icon = (r['이미지'] || r.img || '').toString().trim();
-          const id = (r.id || r.ID || name).toString().trim();
-          const band = bandOf(r['레벨'] || r['습득레벨'] || r['레벨대'] || r['권장레벨']);
-          const type = (r['분류'] || r['타입'] || '').toString().toLowerCase();
-          const max = parseNumber(r['최대레벨'] || r['Max'] || r['MAX'] || 1) || 1;
-          const sp = parseNumber(r['SP'] || r['sp']);
-          const tp = parseNumber(r['TP'] || r['tp']);
-          const cd = (r['쿨타임'] || r['쿨'] || '').toString().trim();
-          const prereq = (r['선행'] || r['선행스킬'] || '').toString().trim();
-
-          // 선택 캐릭터 필터용(있으면 사용, 없으면 전체)
-          const ownerGroup = (r['직업군'] || '').toString().trim();
-          const ownerName = (r['직업명'] || r['캐릭터'] || '').toString().trim();
-          const ownerKey = (ownerGroup + ownerName).replace(/\s+/g, '');
-
-          return { id, name, icon, band, type, max, sp, tp, cd, prereq, ownerKey };
-        })
-        .filter(Boolean);
-
-      DBSkills.rows = rows;
-      DBSkills.loaded = true;
     }
 
     function skillsForCurrentChar(rows) {
@@ -2716,15 +3315,32 @@ async function loadCharTotalsAndApply(charName) {
 
 
 
-    /** 시트 로드(1회) */
-    async function ensureSkillLoaded2() {     // SKILL_SHEET 를 Papa.parse로 읽고 각 행을 mapRowToSkill2로 표준 스킬 객체로 변환한 뒤 ST2.rows 에 캐시해둡니다
+    /** 시트 로드(1회) — 백엔드(JSON) 버전 */
+    async function ensureSkillLoaded2() {     // ST2 표준 스킬 객체를 ST2.rows에 캐시
       if (ST2.loaded) return;
-      const text = await fetch(SKILL_SHEET, { cache: 'no-store' }).then(r => r.text());
-      const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
-      const rows = (parsed.data || []).map(mapRowToSkill2).filter(s => s.id && s.name && s.who);
+
+      // 로그인 토큰 확보 (이미 가진 waitForIdToken 재사용)
+      const token = await waitForIdToken();
+
+      // 프록시 → Apps Script: ?type=skill
+      const r = await fetch(window.WEBAPP_URL + '?type=skill', {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'text/plain' },
+        body: token
+      });
+      if (!r.ok) throw new Error('skill_fetch_failed');
+      const data = await r.json();
+      if (!data.ok || !Array.isArray(data.rows)) throw new Error('bad_skill_payload');
+
+      // CSV 때와 동일: 시트 헤더명 키를 가진 각 행을 ST2 표준 스킬로 매핑
+      const rows = data.rows.map(mapRowToSkill2).filter(s => s.id && s.name && s.who);
+
       ST2.rows = rows;
       ST2.loaded = true;
     }
+
 
     /** 현재 캐릭터 키 얻기 (남귀검사+이름) */
     function currentCharKey() {
@@ -2822,6 +3438,7 @@ async function loadCharTotalsAndApply(charName) {
 
     /* ===== 렌더러 교체 ===== */
     async function renderSkillTreeBands() {   //스킬을 밴드형으로 배치
+      await waitForIdToken();
       await ensureSkillLoaded2();
 
       // 현재 캐릭터 키
@@ -3225,14 +3842,16 @@ async function loadCharTotalsAndApply(charName) {
     /* ▼ 드롭다운 value → 시트 '이름' 매핑 */
     const AVATAR_NAME = {
       rare: '레어 아바타',
-      advanced: '상급 아바타'
+      advanced: '상급 아바타',
+      empty: '없음'
     };
     const IMPRINT_NAME = {
       add5: '추뎀 5% 무기압',
       patkmatk5: '물/마공 5% 무기압',
       patkmatk3: '물/마공 3% 무기압',
       monster: '몬스터 무기압',
-      quest: '퀘스트 무기압'
+      quest: '퀘스트 무기압',
+      empty: '없음'
     };
     /* ▼ 드롭다운 value → 시트 '몬스터명' 매핑 */
     const MONSTER_NAME = {
@@ -3269,6 +3888,10 @@ async function loadCharTotalsAndApply(charName) {
       // 3) 숙련룬(+n)
       const { skillLvAdd } = runeLevelAdds ? runeLevelAdds(skill) : { skillLvAdd: 0 };
 
+      // ★ 예외규칙: 스킬레벨 가산
+      const excAdd = Number(__EXC?.addLv?.[skill.id] || 0);
+      if (excAdd) baseLv = Math.max(0, baseLv + excAdd);
+
       // 4) 최종 유효 레벨(상한 없음, 1 이상으로 보정)
       const eff = baseLv + (lvlAddByLeveling || 0) + (skillLvAdd || 0);
       return Math.max(1, eff);
@@ -3279,7 +3902,18 @@ async function loadCharTotalsAndApply(charName) {
     function calcSkillDamageWithTp(skill, baseTpLv) {
       // 1) 초 단위 쿨 계산
       const cdBase = (typeof toSec === 'function') ? toSec(skill.cd) : Number(skill.cd || 0);
-      const cdFinal = cdBase > 0 ? runeCooldown(skill, cdBase) : 0; // 허상룬
+      let cdFinal = cdBase > 0 ? runeCooldown(skill, cdBase) : 0; // 허상룬
+      // ★ 예외: 쿨타임감소(%) 적용 (여러 줄 합산 → 1 - 합계/100)
+      const excCdPct = Number(__EXC?.addCdPct?.[skill.id] || 0);
+      if (cdFinal > 0 && excCdPct) {
+        cdFinal = cdFinal * Math.max(0, 1 - excCdPct / 100);
+      }
+      // ★ 예외: 쿨초확률(%) 기대값 근사 적용 → cdFinal *= (1 - p)
+      const resetPct = Math.max(0, Math.min(100, Number(__EXC?.resetPct?.[skill.id] || 0)));
+      if (cdFinal > 0 && resetPct) {
+        cdFinal *= (1 - resetPct / 100);
+      }
+
       const cdMul = (cdBase > 0) ? (cdFinal / cdBase) : 1;
 
       // 2) 시전 프레임
@@ -3315,9 +3949,19 @@ async function loadCharTotalsAndApply(charName) {
       const base = calcSkillDamageLinear(skill, effLv); // {per, flat, lv}
 
       // 5) TP (TP 0이면 기교룬 무효 규칙 유지)
+
+      // 기존 패턴 유지: 수동 TP는 0~5
       const tpBase = Math.max(0, Math.min(5, Number(state.skillTpLv?.[skill.id] ?? 0)));
-      const tpBonus = (tpBase > 0) ? getTpBonusFromSources(skill.id) : 0;
+
+      // 예외 규칙에서 온 tp레벨 보너스
+      const tpExc = Number(__EXC?.addTp?.[skill.id] || 0);
+
+      // ★ 보너스에 얹어주기 (수동 TP>0일 때만 룬/보너스 적용 규칙 유지)
+      const tpBonus = (tpBase > 0) ? (getTpBonusFromSources(skill.id) + tpExc) : 0;
+
+      // 최종 TP 0~7
       const tpLv = Math.max(0, Math.min(7, tpBase + tpBonus));
+
       const tpPct = tpIncreasePercent(Number(skill.tpCost || 0), tpLv);
       const tpMul = 1 + (tpPct / 100);
 
@@ -3325,8 +3969,16 @@ async function loadCharTotalsAndApply(charName) {
       const rMul = runeDamageMultiplier(skill);
 
       // 7) 최종 per/flat 먼저 산출
-      const per = (base.per || 0) * tpMul * rMul;
-      const flat = (base.flat || 0) * tpMul * rMul;
+      let per = (base.per || 0) * tpMul * rMul;
+      let flat = (base.flat || 0) * tpMul * rMul;
+
+      // ★ 예외: 데미지증가(%) 적용 (여러 줄 합산 → 1 + 합계/100)
+      const excDmgPct = Number(__EXC?.addDmgPct?.[skill.id] || 0);
+      if (excDmgPct) {
+        const m = 1 + excDmgPct / 100;
+        per *= m;
+        flat *= m;
+      }
 
       // 8) 이제 dps 계산 (고뎀 제외, per만)
       const dps = cdFinal > 0 ? (per / cdFinal) : 0;
@@ -3408,6 +4060,23 @@ async function loadCharTotalsAndApply(charName) {
         const cdSec = e.cdF / FPS;
         return (cdSec > 0) ? (e.per / cdSec) : 0;
       };
+
+      function getTimeWindowSec() {
+        const el = document.getElementById('selTime');
+        const v = el?.value || '';
+        switch (v) {
+          case '30s': return 30;
+          case '1m': return 60;
+          case '3m': return 180;
+          case '5m': return 300;
+          case '10m': return 600;
+          default: return 60; // 선택 전/이상값 → 60초
+        }
+      }
+
+      document.getElementById('selTime')?.addEventListener('change', () => {
+        queueMicrotask(() => window.simulateSkillUsage?.(getTimeWindowSec()));
+      });
 
       // 메인: 60초(=3600프레임) 시뮬
       function simulateSkillUsage(totalSec = 60) {
@@ -3559,17 +4228,44 @@ async function loadCharTotalsAndApply(charName) {
 
       // 외부 노출: 실행 함수
       window.simulateSkillUsage = simulateSkillUsage;
+      (() => {
+        const el = document.getElementById('selTime');
+        if (el && !el.value) el.value = '1m';  // 혹시 공백이면 1분으로 보정
+        window.simulateSkillUsage?.(getTimeWindowSec());
+      })();
     })();
 
 
-
+    let __monsterApplyingDefault = false;
     // 드롭다운 변경 시 호출
     async function onMonsterChange(selectedName) {
       await ensureMonsterLoaded();
-      const row = DBMonster.rows.find(r => String(r['몬스터명']).trim() === selectedName);
 
+      // 1) 선택값이 비었으면 (초기 상태 등) 기본값으로 보정
+      let name = selectedName || state?.options?.monster || '거대누골';
+
+      // 2) 드롭다운(UI)과 값 동기화 (옵션 목록이 이미 채워졌다고 가정)
+      if (!selectedName && !__monsterApplyingDefault) {
+        __monsterApplyingDefault = true;
+        const sel = document.getElementById('selMonster');
+        if (sel) {
+          // value 매칭 → 실패 시 텍스트로 매칭
+          let v = name;
+          const byText = [...sel.options].find(o => o.textContent.trim() === name);
+          if (byText) v = byText.value;
+
+          // 값만 세팅 (여기서 change를 다시 쏘면 재귀되므로 '호출 없이' 동기화)
+          if (sel.value !== v) sel.value = v;
+        }
+        __monsterApplyingDefault = false;
+      }
+
+      // 3) 상태 반영
       state.options = state.options || {};
-      state.options.monster = selectedName;
+      state.options.monster = name;
+
+      // 4) DB에서 행 찾기
+      const row = DBMonster.rows.find(r => String(r['몬스터명']).trim() === name);
 
       if (row) {
         state.monster = {
@@ -3599,29 +4295,6 @@ async function loadCharTotalsAndApply(charName) {
       C1: 'aura', C2: 'title', C3: 'creature', C4: 'artifact'
     };
     window.SLOT_MAP = SLOT_MAP;   // 브라우저 전역 객체, SLOT_MAP을 전역 변수로 등록 = 다른 스크립트 파일이나 브라우저 콘솔에서도 접근 가능
-    // 시트 CSV
-    const SHEETS = {
-      weapon: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=0&single=true&output=csv',
-      headshoulder: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=1000757262&single=true&output=csv',
-      top: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=1569046334&single=true&output=csv',
-      bottom: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=1718584858&single=true&output=csv',
-      belt: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=838932361&single=true&output=csv',
-      shoes: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=1115829955&single=true&output=csv',
-      bracelet: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=536618777&single=true&output=csv',
-      necklace: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=153115539&single=true&output=csv',
-      ring: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=1055177081&single=true&output=csv',
-      support: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=764071293&single=true&output=csv',
-      aura: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=1219077337&single=true&output=csv',
-      title: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=155098088&single=true&output=csv',
-      creature: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=1416838764&single=true&output=csv',
-      artifact: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=1677465031&single=true&output=csv'
-    };
-    /* 강화마봉마부 시트(강화/엠블렘 공용) */
-    const ENHANCE_SHEET = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=680909478&single=true&output=csv';
-    /* ▼ 스킬트리 시트 (CSV Publish URL로 교체) */
-    const SKILL_SHEET = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=1356906568&single=true&output=csv';
-    const Monster_SHEET = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=1366990880&single=true&output=csv';
-    window.BUFF_SHEET = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBbUTibxtZhRBO7zEeoaJYoymn2m2RfYZ-S80O4DiUxE0r3NKzGJmikkjSUDjiFg8Kpnls7ucSIrFX/pub?gid=113170614&single=true&output=csv';
 
     const ALLOWED_WEAPON_TYPES = {
       slayer: ['소검', '도', '둔기', '대검', '광검'],
@@ -3758,49 +4431,312 @@ async function loadCharTotalsAndApply(charName) {
       return { name, type, img, tag, level_num, stats };
     }
 
+    (function () {
+      function _getTimeWindowSec() {
+        // 드롭다운(#selTime)의 값: "30s" | "1m" | "3m" | "5m" | "10m"
+        const el = document.getElementById('selTime');
+        const v = (el && el.value) ? el.value : '1m'; // 기본 1분
+        const n = Number(v.slice(0, -1));             // 앞의 숫자
+        return v.endsWith('s') ? n : n * 60;           // s→초, m→분*60
+      }
+
+      // ★ 전역에 보증 (module 스코프/중복 로드 대비)
+      if (!window.getTimeWindowSec) window.getTimeWindowSec = _getTimeWindowSec;
+    })();
+
     /* ===== 시트 로더 ===== */
     async function loadSheet(slotKey) {
       if (DB.loaded[slotKey]) return;
-      const url = SHEETS[slotKey]; if (!url) return;
-      const text = await fetch(url, { cache: 'no-store' }).then(r => r.text());
-      const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
-      const items = parsed.data.map(mapRowToItem).map(it => ({ ...it, slot: slotKey }));
+
+      const token = await waitForIdToken();
+      const r = await fetch(window.WEBAPP_URL + '?type=' + slotKey, {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'text/plain' },
+        body: token
+      });
+      if (!r.ok) throw new Error(`${slotKey}_fetch_failed`);
+      const data = await r.json();
+      if (!data.ok || !Array.isArray(data.rows)) throw new Error(`bad_${slotKey}_payload`);
+
+      // rows(시트 원문 행 객체) → 프론트 내부 아이템 구조로 매핑
+      const items = data.rows.map(mapRowToItem).map(it => ({ ...it, slot: slotKey }));
       DB.itemsBySlot[slotKey] = items;
       DB.loaded[slotKey] = true;
-      console.log(`[Sheets] ${slotKey} loaded:`, items.length);
+      console.log(`[Sheets->API] ${slotKey} loaded:`, items.length);
     }
-    async function ensureLoaded(slotKey) { if (!DB.loaded[slotKey]) await loadSheet(slotKey); }
+    const __slotState = {};  // 전역에 선언
+
+    async function ensureLoaded(slotKey) {
+      const st = (__slotState[slotKey] ||= { loaded: false, inflight: null });
+
+      if (st.loaded) return;             // 이미 끝났으면 바로 리턴
+      if (st.inflight) return st.inflight; // 진행 중이면 같은 Promise 반환
+
+      st.inflight = (async () => {
+        await loadSheet(slotKey);
+        st.loaded = true;
+        st.inflight = null;
+      })();
+
+      return st.inflight;
+    }
+
 
     /* 강화/엠블렘 시트 로더 */
+    // 강화/엠블렘 시트 로더 (백엔드 JSON 버전)
     async function ensureEnhLoaded() {
       if (DBEnh.loaded) return;
-      const text = await fetch(ENHANCE_SHEET, { cache: 'no-store' }).then(r => r.text());
-      const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
-      const rows = (parsed.data || []).map(mapRowToEnhance).filter(x => (x.name && x.type));
+
+      const token = await waitForIdToken();
+      const r = await fetch(window.WEBAPP_URL + '?type=enhance', {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'text/plain' },
+        body: token
+      });
+      if (!r.ok) throw new Error('enhance_fetch_failed');
+      const data = await r.json();
+      if (!data.ok || !Array.isArray(data.rows)) throw new Error('bad_enhance_payload');
+
+      const rows = data.rows.map(mapRowToEnhance).filter(x => (x.name && x.type));
       DBEnh.list = rows;
       DBEnh.byType = rows.reduce((acc, x) => { (acc[x.type] ||= []).push(x); return acc; }, {});
       DBEnh.loaded = true;
-      console.log('[Enhance] loaded:', rows.length);
+      console.log('[Enhance->API] loaded:', rows.length);
+
+      // ▼ 성안의 봉인: 기본값 주입 (이미 선택돼 있으면 건너뜀)
+      try {
+        const mainList = DBEnh.byType?.['주요 옵션'] || [];
+        const subList = DBEnh.byType?.['추가 옵션'] || [];
+        if (!state.castleSeal) state.castleSeal = { main: null, sub: null };
+        if (!state.castleSeal.main && mainList.length) {
+          const m = mainList.find(x => x.name === '힘,지능 +170') || mainList[0];
+          state.castleSeal.main = { name: m.name, stats: m.stats, raw: m.raw || m };
+        }
+        if (!state.castleSeal.sub && subList.length) {
+          const s = subList.find(x => x.name === '힘,지능 +224') || subList[0];
+          state.castleSeal.sub = { name: s.name, stats: s.stats, raw: s.raw || s };
+        }
+      } catch (e) { console.warn('[SEAL:init@ensureEnhLoaded] skip:', e); }
     }
+
+
 
     //몬스터 시트 로더
     let DBMonster = { loaded: false, rows: [] };
-
     async function ensureMonsterLoaded() {
       if (DBMonster.loaded) return;
-      try {
-        const res = await fetch(Monster_SHEET);
-        const text = await res.text();
+      const token = await waitForIdToken(); // 이미 네 코드에 있음 (다른 시트 로더에서 사용)
+      const r = await fetch(window.WEBAPP_URL + '?type=monster', {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'text/plain' },
+        body: token
+      });
+      if (!r.ok) throw new Error('monster_fetch_failed');
+      const data = await r.json();
+      if (!data.ok || !Array.isArray(data.rows)) throw new Error('bad_monster_payload');
+      // 백엔드가 "헤더명을 키로 한 객체"를 그대로 내려주므로 추가 매핑 불필요
+      DBMonster.rows = data.rows;
+      DBMonster.loaded = true;
+      console.log('[Monster->API] loaded:', DBMonster.rows.length);
+    }
 
-        // Papa.parse 사용
-        const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
-        DBMonster.rows = parsed.data;
+    // ===== 예외규칙 로더/캐시 =====
+    const DBException = { loaded: false, rows: [], byItem: {}, skillIdByName: {} };
 
-        DBMonster.loaded = true;
-        console.log('[Monster] 로드 성공:', DBMonster.rows.length, '행');
-      } catch (e) {
-        console.error('[Monster] 시트 로딩 실패', e);
+    function normalizeType(s) {
+      const t = String(s || '').trim().toLowerCase();
+      // 표의 '유형' 값 정규화: 스킬레벨 / tp레벨 / 데미지증가 / 쿨타임감소
+      if (t.includes('tp')) return 'tp레벨';
+      if (t.includes('버프') && t.includes('레벨')) return '버프레벨';
+      if (t.includes('cool') || t.includes('쿨')) return '쿨타임감소';
+      if (t.includes('데미') || t === 'dmg' || t === 'damage') return '데미지증가';
+      if (t.includes('레벨')) return '스킬레벨';
+      // ★ 추가: 쿨초확률
+      if (t.includes('리셋') || t.includes('초기화') || t.includes('쿨초')) return '쿨초확률';
+      return t;
+    }
+    function mapRowToException(r) {
+      return {
+        type: normalizeType(r['유형']),
+        item: String(r['아이템명'] || '').trim(),
+        skillName: String(r['적용스킬명'] || '').trim(),
+        value: toNum(r['옵션수치'])
+      };
+    }
+
+    async function ensureExceptionLoaded() {
+      if (DBException.loaded) return;
+      const token = await waitForIdToken();
+      if (!token) { console.warn('[EXC] skip: no idToken yet'); return; }
+
+      const r = await fetch(WEBAPP_URL + '?type=exception', {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'text/plain' },
+        body: token
+      });
+      const js = await r.json();
+      if (!js?.ok) { console.warn('[EXC] load failed:', js); DBException.loaded = true; return; }
+
+      DBException.rows = (js.rows || []).map(mapRowToException);
+      DBException.byItem = {};
+      DBException.rows.forEach(row => {
+        const key = row.item; if (!key) return;
+        (DBException.byItem[key] ||= []).push(row);
+      });
+      DBException.skillIdByName = {};
+      DBException.loaded = true;
+      console.log('[EXC] rows loaded =', DBException.rows.length);
+console.log('[EXC] sample rows =',
+  DBException.rows.slice(0, 10).map(r => `${r.item} | ${r.type} | ${r.skillName} : ${r.value}`));
+    }
+
+    // 스킬 시트(ST2.rows)가 준비된 뒤, 스킬명 → id 매핑 구성
+    function refreshExceptionSkillIdMap() {
+      if (!ST2?.loaded || !(ST2.rows?.length)) return;
+      DBException.skillIdByName = {};
+      ST2.rows.forEach(s => {
+        const name = String(s?.name || '').trim();
+        if (!name) return;
+        DBException.skillIdByName[name] = s.id;  // 이름이 유일하다는 가정 (동명이인 존재시 우선 일치 첫 항목)
+      });
+    }
+
+    // 현재 착용 아이템명 배열
+    function equippedItemNames() {
+      return Object.values(state.selections || {}).map(it => String(it?.name || '').trim()).filter(Boolean);
+    }
+
+    // 활성 예외효과 집계(스킬ID 키 기준)
+    function collectActiveExceptionMaps() {
+      const items = equippedItemNames();  // 착용 중 아이템 이름 배열
+      const addLv = {};       // {skillId: +레벨}
+      const addTp = {};       // {skillId: +tp레벨}
+      const addDmgPct = {};   // {skillId: +데미지증가%}
+      const addCdPct = {};    // {skillId: +쿨감%}  // 감소율(%) 그대로 저장
+      const resetPct = {};    // 쿨초
+      // ★ 추가: 버프레벨 (버프 "이름" 기준)
+      const buffLvByName = {};  // {'버프명': +레벨}
+
+      // 이름 정규화(공백/제로폭 제거 정도만)
+      const normName = s => String(s ?? '')
+        .normalize('NFC')
+        .replace(/[\uFEFF\u00A0\u200B-\u200D\u2060\u180E]/g, '')
+        .replace(/\s+/g, '');
+
+      for (const nm of items) {
+        const list = DBException.byItem[nm] || [];
+        for (const r of list) {
+          // 1) '버프레벨'은 스킬ID 없이 "버프 이름"으로 합산
+          if (r.type === '버프레벨') {
+            const key = normName(r.skillName);
+            if (key) buffLvByName[key] = (buffLvByName[key] || 0) + Number(r.value || 0);
+            continue; // ★ 이미 처리했으니 다음 규칙으로
+          }
+          const id = DBException.skillIdByName[r.skillName];
+          if (!id) continue;
+          switch (r.type) {
+            case '스킬레벨':
+              addLv[id] = (addLv[id] || 0) + r.value;
+              break;
+            case 'tp레벨':
+              addTp[id] = (addTp[id] || 0) + r.value;
+              break;
+            case '데미지증가':
+              addDmgPct[id] = (addDmgPct[id] || 0) + r.value;
+              break;
+            case '쿨타임감소':
+              addCdPct[id] = (addCdPct[id] || 0) + r.value;
+              break;
+            // ★ 추가: 쿨초확률(%) 합산
+            case '쿨초확률': resetPct[id] = (resetPct[id] || 0) + r.value; break;
+          }
+        }
       }
+      console.log('[EXC] equipped items =', equippedItemNames());
+console.log('[EXC] addLv:', addLv, 'addTp:', addTp, 'addDmgPct:', addDmgPct, 'addCdPct:', addCdPct);
+console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
+      return { addLv, addTp, addDmgPct, addCdPct, resetPct, buffLvByName };
+    }
+
+    // 전역 보관(프레임 계산/데미지 캐시에 활용)
+    let __EXC = { addLv: {}, addTp: {}, addDmgPct: {}, addCdPct: {}, resetPct: {}, buffLvByName: {} };
+    function refreshActiveExceptions() {
+      __EXC = collectActiveExceptionMaps();
+    }
+
+    /* ===== 성안의 봉인 ===== */
+    const $sealModal = document.getElementById('castleSealModal');
+    const $sealMainList = document.getElementById('sealMainList');
+    const $sealSubList = document.getElementById('sealSubList');
+    let __sealPick = { main: null, sub: null };
+
+    function showSealModal(on) {
+      if (!$sealModal) return;
+      if (on) { $sealModal.classList.add('show'); $sealModal.setAttribute('aria-hidden', 'false'); }
+      else { $sealModal.classList.remove('show'); $sealModal.setAttribute('aria-hidden', 'true'); }
+    }
+    $sealModal?.addEventListener('click', (e) => {
+      if (e.target.dataset.close != null || e.target.classList.contains('backdrop')) showSealModal(false);
+    });
+
+    document.getElementById('btnCastleSeal')?.addEventListener('click', openCastleSealModal);
+    document.getElementById('sealCommit')?.addEventListener('click', commitCastleSealSelection);
+
+    async function openCastleSealModal() {
+      // 강화/마봉/마부 시트 로드(연마에서 쓰던 캐시 재사용)
+      if (typeof ensureEnhLoaded === 'function') await ensureEnhLoaded();
+
+      // 시트에서 종류별로 분리
+      const mainList = (DBEnh?.byType?.['주요 옵션'] || (DBEnh?.list || []).filter(o => (o?.type || '') === '주요 옵션'));
+      const subList = (DBEnh?.byType?.['추가 옵션'] || (DBEnh?.list || []).filter(o => (o?.type || '') === '추가 옵션'));
+
+      // 현재 선택 복구
+      __sealPick = {
+        main: state.castleSeal?.main || null,
+        sub: state.castleSeal?.sub || null
+      };
+
+      fillSealList($sealMainList, mainList, 'main');
+      fillSealList($sealSubList, subList, 'sub');
+
+      showSealModal(true);
+    }
+
+    function fillSealList(host, list, which) {
+      host.innerHTML = '';
+      list.forEach(row => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'opt-row';
+        b.innerHTML = `
+      <div class="name">${row.name || '(이름없음)'}</div>
+      ${row.uiText ? `<div class="desc">${row.uiText}</div>` : ''}`;
+        if (__sealPick[which]?.name === row.name) b.classList.add('active');
+        b.addEventListener('click', () => {
+          __sealPick[which] = row;
+          host.querySelectorAll('.opt-row').forEach(x => x.classList.remove('active'));
+          b.classList.add('active');
+        });
+        host.appendChild(b);
+      });
+    }
+
+    function commitCastleSealSelection() {
+      // state에 저장(합산은 sumSelections에서 addStats 규칙으로 더함)
+      state.castleSeal = {
+        main: __sealPick.main ? { name: __sealPick.main.name, stats: __sealPick.main.stats, raw: __sealPick.main.raw } : null,
+        sub: __sealPick.sub ? { name: __sealPick.sub.name, stats: __sealPick.sub.stats, raw: __sealPick.sub.raw } : null
+      };
+      showSealModal(false);
+      if (typeof recalcAndRenderPanel === 'function') recalcAndRenderPanel();
     }
 
 
@@ -3884,83 +4820,83 @@ async function loadCharTotalsAndApply(charName) {
     const DBChars = { loaded: false, groups: [] }; //전역 캐시 객체, 한번 로드되면 다시 안불러오게함, loaded : 시트가 이미 로드됐는지, groups : 화면에 뿌릴 최종 데이터(그룹배열)
 
     // 로그인 토큰이 준비될 때까지 기다리는 유틸 (최대 15초)
-async function waitForIdToken(timeout = 15000) {
-  if (window.idToken) return window.idToken;
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      document.removeEventListener('gsi:issued', onReady);
-      reject(new Error('login_timeout'));
-    }, timeout);
-    function onReady() {
-      if (window.idToken) {
-        clearTimeout(timer);
-        document.removeEventListener('gsi:issued', onReady);
-        resolve(window.idToken);
-      }
+    async function waitForIdToken(timeout = 15000) {
+      if (window.idToken) return window.idToken;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          document.removeEventListener('gsi:issued', onReady);
+          reject(new Error('login_timeout'));
+        }, timeout);
+        function onReady() {
+          if (window.idToken) {
+            clearTimeout(timer);
+            document.removeEventListener('gsi:issued', onReady);
+            resolve(window.idToken);
+          }
+        }
+        document.addEventListener('gsi:issued', onReady);
+      });
     }
-    document.addEventListener('gsi:issued', onReady);
-  });
-}
 
 
     // ===== 캐릭터 시트 로더 (백엔드 JSON 버전) =====
-async function loadCharacterSheet() {
-  if (DBChars.loaded) return;
+    async function loadCharacterSheet() {
+      if (DBChars.loaded) return;
 
-  // ⬇ 추가: 로그인 완료까지 대기하고 토큰 확보
-  const token = await waitForIdToken();
+      // ⬇ 추가: 로그인 완료까지 대기하고 토큰 확보
+      const token = await waitForIdToken();
 
-  try {
-    // 프록시 → 백엔드 호출: ?type=char
-    const r = await fetch(window.WEBAPP_URL + '?type=char', {
-      method: 'POST',
-      mode: 'cors',
-      cache: 'no-store',
-      headers: { 'Content-Type': 'text/plain' },
-      body: token                    // ⬅ 전역 idToken 대신 지역 token 사용
-    });
-    if (!r.ok) throw new Error("char_load_failed");
-    const data = await r.json();
-    if (!data.ok || !Array.isArray(data.rows)) throw new Error("bad_char_payload");
+      try {
+        // 프록시 → 백엔드 호출: ?type=char
+        const r = await fetch(window.WEBAPP_URL + '?type=char', {
+          method: 'POST',
+          mode: 'cors',
+          cache: 'no-store',
+          headers: { 'Content-Type': 'text/plain' },
+          body: token                    // ⬅ 전역 idToken 대신 지역 token 사용
+        });
+        if (!r.ok) throw new Error("char_load_failed");
+        const data = await r.json();
+        if (!data.ok || !Array.isArray(data.rows)) throw new Error("bad_char_payload");
 
-    // rows: [{jobGroup, name, thumb, full, spTotal?, tpTotal?}]
-const groupsMap = new Map();
+        // rows: [{jobGroup, name, thumb, full, spTotal?, tpTotal?}]
+        const groupsMap = new Map();
 
-data.rows.forEach(row => {
-  const groupTitle = (row.jobGroup || '').trim();
-  const name = (row.name || '').trim();
-  if (!groupTitle || !name) return;
+        data.rows.forEach(row => {
+          const groupTitle = (row.jobGroup || '').trim();
+          const name = (row.name || '').trim();
+          if (!groupTitle || !name) return;
 
-  const badge = cleanUrl(row.badge || '');  // ⬅ 종류 컬럼(뱃지)
-  const thumb = cleanUrl(row.thumb || '');  // ⬅ 렙제 컬럼(카드)
-  const full  = cleanUrl(row.full  || '');  // ⬅ 이미지(선택 후)
+          const badge = cleanUrl(row.badge || '');  // ⬅ 종류 컬럼(뱃지)
+          const thumb = cleanUrl(row.thumb || '');  // ⬅ 렙제 컬럼(카드)
+          const full = cleanUrl(row.full || '');  // ⬅ 이미지(선택 후)
 
-  if (!groupsMap.has(groupTitle)) {
-    groupsMap.set(groupTitle, { badgeSrc: badge, items: [] });
-  }
-  const g = groupsMap.get(groupTitle);
-  if (!g.badgeSrc && badge) g.badgeSrc = badge; // 첫 유효값 고정(혹시 행마다 달라도 첫값 사용)
+          if (!groupsMap.has(groupTitle)) {
+            groupsMap.set(groupTitle, { badgeSrc: badge, items: [] });
+          }
+          const g = groupsMap.get(groupTitle);
+          if (!g.badgeSrc && badge) g.badgeSrc = badge; // 첫 유효값 고정(혹시 행마다 달라도 첫값 사용)
 
-  g.items.push({
-    name,
-    thumbSrc: thumb,
-    fullSrc : full,
-    power   : row.power || 'phys'   // ★ 백엔드에서 내려준 power 값을 item에 추가
-  });
-});
+          g.items.push({
+            name,
+            thumbSrc: thumb,
+            fullSrc: full,
+            power: row.power || 'phys'   // ★ 백엔드에서 내려준 power 값을 item에 추가
+          });
+        });
 
-// Map → 배열 (뱃지 포함)
-DBChars.groups = Array.from(groupsMap.entries()).map(([title, g]) => ({
-  title,
-  badgeSrc: g.badgeSrc,   // ⬅ 프론트 렌더에서 group.badgeSrc 사용
-  items   : g.items
-}));
-DBChars.loaded = true;
-  } catch (e) {
-    console.error("[CHAR] 로드 실패:", e);
-    throw e;
-  }
-}
+        // Map → 배열 (뱃지 포함)
+        DBChars.groups = Array.from(groupsMap.entries()).map(([title, g]) => ({
+          title,
+          badgeSrc: g.badgeSrc,   // ⬅ 프론트 렌더에서 group.badgeSrc 사용
+          items: g.items
+        }));
+        DBChars.loaded = true;
+      } catch (e) {
+        console.error("[CHAR] 로드 실패:", e);
+        throw e;
+      }
+    }
 
 
     async function ensureCharactersLoaded() {   //필요 할때만 loadCharactersheet() 호출
@@ -4223,6 +5159,13 @@ DBChars.loaded = true;
       Object.values(state.selections).forEach(it => addStats(it?.stats));   //선택 장비들 모두 누적해서 최종 s반환
       // 장비 합
       Object.values(state.upgrades).forEach(up => addStats(up?.stats));   // 선택 강화들 모두 누적해서 최종 s반환
+      // [REFINE] 무기연마 (곱연산 계열은 addStats 내부에서 자동 곱)
+      if (state.refines?.weapon?.stats) addStats(state.refines.weapon.stats);
+      // [REFINE] 보조연마 (덧연산)
+      if (state.refines?.sub?.stats) addStats(state.refines.sub.stats);
+      // ▼▼▼ 여기 추가: 성안의 봉인(덧연산) ▼▼▼
+      if (state.castleSeal?.main?.stats) addStats(state.castleSeal.main.stats);
+      if (state.castleSeal?.sub?.stats) addStats(state.castleSeal.sub.stats);
       // 강화 합(요청: 합연산)
       //Object.values(state.enchants || {}).forEach(en => addStats(en?.stats));
       // 마법부여 합산
@@ -4242,6 +5185,7 @@ DBChars.loaded = true;
 
     function renderStats(S) {     //물공캐 마공캐에 따라 라벨과 값 선택을 바꿔줌
       statListEl.innerHTML = '';
+      const HIDE_MOVE_CAST = true; // ← UI 비표시 플래그
       const p = state.currentCharacter.power; // 'phys' | 'mag' | null
       const atkLabel = (p ? powerLabel(p) : '물리/마법') + ' 공격력';
       const mainStatLabel = (p === 'phys' ? '힘' : p === 'mag' ? '지능' : '힘/지능');
@@ -4277,8 +5221,10 @@ DBChars.loaded = true;
       statListEl.appendChild(show('방어력감소(%)', fmtPct(S.def_break_inc)));
       statListEl.appendChild(show('전체 쿨타임 감소(%)', fmtPct(S.cdr)));
       statListEl.appendChild(show('공격속도(%)', fmtPct(S.speed.attack)));
-      statListEl.appendChild(show('이동속도(%)', fmtPct(S.speed.move)));
-      statListEl.appendChild(show('캐스팅속도(%)', fmtPct(S.speed.cast)));
+      statListEl.appendChild(show('캐스팅속도', fmtPct(S.speed.cast)));
+      if (!HIDE_MOVE_CAST) {
+        statListEl.appendChild(show('이동속도', fmtPct(S.speed.move)));
+      }
 
       const row = document.createElement('div');  // 네 UI 구조에 맞게 li/tr 등으로 바꿔도 됨
 
@@ -4286,12 +5232,15 @@ DBChars.loaded = true;
 
     async function recalcAndRenderPanel() {
       // 1) 버프 먼저 계산
+      await waitForIdToken();
+      await BuffLeveling.preload();
       state.__buffStats = await BuffLeveling.computeBuffStats();
       console.log("[BUFF-DEBUG] state.__buffStats 저장됨:", state.__buffStats); //로그값
 
       // 2) 합산
       const S = sumSelections();
       console.log("[BUFF-DEBUG] sumSelections 최종 합산:", S);  //로그값
+
       // ★ 아이템 변경으로 state.leveling이 갱신되었을 수 있으니, 모든 스킬 캐시 재계산
       // ★ 아이템 변경으로 state.leveling이 바뀌었을 수 있으니,
       //    현재 캐릭터의 스킬만 데미지 캐시 재계산
@@ -4299,7 +5248,12 @@ DBChars.loaded = true;
       try {
         // 스킬 시트 준비
         if (typeof ensureSkillLoaded2 === 'function') {
+          await waitForIdToken();
           await ensureSkillLoaded2();
+          // ★ 스킬시트 로딩 직후: 예외규칙 매핑/활성화
+          await ensureExceptionLoaded();
+          refreshExceptionSkillIdMap();
+          refreshActiveExceptions();
         }
 
         // 안전 문자열 변환기
@@ -4331,11 +5285,7 @@ DBChars.loaded = true;
             state.skillDmg[s.id] = calcSkillDamageWithTp(s, tp);
           }
           // ★★★ 스킬 사용횟수 시뮬레이션(60초 = 3600프레임) — 자동 출력 없음
-          if (typeof simulateSkillUsage === 'function') {
-            simulateSkillUsage(60);
-            // 이제 state.skillDmg[ID].uses 가 채워져 있음
-            // 로그 확인은 원하는 시점에 콘솔에서 printSkillSimLog() 호출
-          }
+          queueMicrotask(() => window.simulateSkillUsage?.(getTimeWindowSec()));
 
         }
       } catch (e) {
@@ -4743,6 +5693,27 @@ DBChars.loaded = true;
         });
       });
 
+      // === [REFINE] 4번째 세부버튼 라벨/역할 세팅 ===
+      document.querySelectorAll('.slot-row').forEach(row => {
+        const slotEl = row.querySelector('.slot');
+        const code = slotEl?.getAttribute('data-slot');       // 예: R1, R5 ...
+        const rects = row.querySelectorAll('.outer-rects .rect');
+        if (!code || rects.length < 4) return;
+
+        // R1(무기)과 R5(보조장비)만 활성화
+        if (code === 'R1' || code === 'R5') {
+          const fourth = rects[3]; // 4번째 버튼
+          fourth.textContent = '연마 설정';
+          fourth.dataset.role = 'refine';
+          fourth.removeAttribute('data-unused');
+          fourth.removeAttribute('aria-disabled');
+          fourth.disabled = false;
+          fourth.classList.remove('disabled', 'is-disabled');
+          fourth.style.pointerEvents = '';
+        }
+      });
+
+
 
       // 칭호 왼쪽 두 선택칸 비활성화
       document.querySelectorAll('[data-unused="true"]').forEach(b => { b.classList.add('disabled'); b.title = '추후 사용 예정'; });
@@ -4787,40 +5758,27 @@ DBChars.loaded = true;
         });
       }
 
-      // 초기 이름 목록 구성
-      buildRuneEngraveNameOptions();
-
-      recalcAndRenderPanel();
-      // 옵션 드롭다운 상태 반영 (아바타/무기압은 시트 연동)
-      const $ = (id) => document.getElementById(id);
-      const bind = (id, key) => {
-        const el = $(id);
-        if (!el) return;
-        el.addEventListener('change', () => {
-          state.options[key] = el.value || null;
-
-          // 위쪽 2개만 시트연동 즉시 반영
-          if (key === 'avatar') {
-            applyAvatarEnhFromState();      // async 함수지만 대기 불필요
-          } else if (key === 'weaponImprint') {
-            applyImprintEnhFromState();      // async 함수지만 대기 불필요
-          } else if (key === 'monster') {
-            const txt = el.options[el.selectedIndex]?.textContent ?? el.value;
-            onMonsterChange(txt);
-          }
-          // 아래 3개(시간/몬스터/난이도)는 계산과 연결하지 않음(요청대로)
-        });
-      }; // ← bind 함수 닫힘 (중요)
-
-      bind('selAvatar', 'avatar');
-      bind('selImprint', 'weaponImprint');
-      bind('selTime', 'timeWindow');
-      bind('selMonster', 'monster');
-      bind('selDifficulty', 'difficulty');
-
-
       console.log('[Init] Ready. Click slots to load sheets. First select = 강화. Dots = 엠블렘.');
     });
+
+    // === 데이터 로더들 (loadCharacterSheet, loadSkillSheet 등) 정의 끝난 뒤 ===
+    // 전역 한 번만
+    let __preloadingPromise = null;
+    let __preloaded = false;
+
+    async function preloadAllSheetsOnce(opts) {
+      if (__preloaded) return;
+      if (__preloadingPromise) return __preloadingPromise;
+      __preloadingPromise = (async () => {
+        try { await preloadAllSheets(opts); __preloaded = true; }
+        finally { __preloadingPromise = null; }
+      })();
+      return __preloadingPromise;
+    }
+    // ★ 추가: 모든 시트를 미리 로드
+    // ⬇ 기존 preloadAllSheets 정의를 '완전히' 아래 코드로 교체
+
+
   </script>
   <div id="autoEnhModal" class="modal simple-modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
@@ -5216,9 +6174,9 @@ DBChars.loaded = true;
 
       // 현재 선택 캐릭터의 공격 분류를 '물리' / '마법'로 변환
       function jobGroupKeyFromState() {
-  const p = state?.currentCharacter?.power;
-  return p === 'mag' ? '마법' : '물리';
-}
+        const p = state?.currentCharacter?.power;
+        return p === 'mag' ? '마법' : '물리';
+      }
 
       // 시트의 속성 한글 키 매핑
       const ELEM_KOR = { fire: '화', water: '수', light: '명', dark: '암' };
@@ -5325,24 +6283,20 @@ DBChars.loaded = true;
 
   </script>
   <script>
-    // ===== BuffLeveling: "레벨링(N)" 합산 → BUFF_SHEET의 스킬렙제=N에 적용 =====
-    // 시트 요약
-    // - BUFF_SHEET: [직업군, 캐릭터, 스킬명, 스킬렙제, 증가율, (힘, 지능, 물크(%), … 레벨0 기준치들)]
-    // - 아이템시트(선택 객체 sel.raw): ["레벨링(10)", "레벨링(15)", "레벨링(25)", ...] 열에 숫자(정수)
+    // ===== BuffLeveling: "레벨링(N)" 합산 →의 스킬렙제=N에 적용 =====
+    // (기존 모듈 구조 유지, preload()만 교체)
 
-    const BUFF_SHEET_URL = window.BUFF_SHEET_URL || window.BUFF_SHEET;
-
-    const BuffLeveling = (() => {
+    window.BuffLeveling = (() => {
       const cache = { ready: false, rows: [] };
 
-      // 숫자/퍼센트 파서
+      // 숫자/퍼센트 파서 — 그대로 유지
       const num = v => {
         const n = Number(String(v ?? "").replace(/[, ]/g, ""));
         return Number.isFinite(n) ? n : 0;
       };
       const pct = v => num(v) / 100;
 
-      // BUFF_SHEET 한 행 → 레벨0 기준 stats
+      // 레벨0 기준 stats — 그대로 유지
       function rowToBaseStats(r) {
         return {
           phys_atk: num(r["물뎀"]), mag_atk: num(r["마뎀"]),
@@ -5372,6 +6326,54 @@ DBChars.loaded = true;
         };
       }
 
+      // 키 정규화 유틸
+      function normVal(s) {
+        return String(s ?? '')
+          .normalize('NFC')
+          .replace(/[\uFEFF\u00A0\u200B-\u200D\u2060\u180E]/g, '')
+          .replace(/\s+/g, '');
+      }
+
+      // ★ preload(): CSV → (변경) 프록시&백엔드 JSON
+      async function preload() {
+        if (cache.ready) return;
+
+        // 1) 로그인 토큰 확보
+        const token = await waitForIdToken();
+
+        // 2) 프록시 → Apps Script: ?type=buff
+        const r = await fetch(window.WEBAPP_URL + '?type=buff', {
+          method: 'POST',
+          mode: 'cors',
+          cache: 'no-store',
+          headers: { 'Content-Type': 'text/plain' },
+          body: token
+        });
+        if (!r.ok) throw new Error('buff_fetch_failed');
+        const data = await r.json();
+        if (!data.ok || !Array.isArray(data.rows)) throw new Error('bad_buff_payload');
+
+        // 3) __charKey 생성(직업군+캐릭터명 정규화) + 원본 컬럼 유지
+        const normVal = (v) => String(v ?? '')
+          .normalize('NFC')
+          .replace(/[\uFEFF\u00A0\u200B-\u200D\u2060\u180E]/g, '')
+          .replace(/\s+/g, '');
+
+        cache.rows = data.rows.map(row => {
+          const job = row['직업군'] || row['직업'] || '';
+          const name = row['캐릭터'] || row['캐릭터명'] || row['캐릭명'] || row['직업명'] || '';
+          const charKey = normVal(job + name) || normVal(name);
+          return { ...row, __charKey: charKey };
+        });
+
+        console.log('[BUFF-DEBUG] BUFF rows:', cache.rows.length,
+          '샘플 __charKey:', cache.rows.slice(0, 5).map(r => r.__charKey));
+
+        cache.ready = true;
+      }
+
+      // (중략) — 네 코드의 computeBuffStats(), addStats/scaleAdd 등 기존 로직은 그대로 사용
+      // 단, computeBuffStats()가 cache.rows를 참조하도록 유지하면 됨
       // base × (1 + 증가율 × level)
       function scale(base, rate, level) {
         const m = 1 + (Number(rate) || 0) * (level | 0);
@@ -5477,42 +6479,6 @@ DBChars.loaded = true;
           .replace(/\s+/g, '');
       }
       // 2) BUFF 로더: __charKey 생성 보강 + 로깅 보강
-      async function preload() {
-        if (cache.ready) return;
-
-        console.log('[BUFF-DEBUG] fetch URL =', window.BUFF_SHEET);
-        const text = await fetch(window.BUFF_SHEET, { cache: 'no-store' }).then(r => r.text());
-        const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
-        const rawRows = parsed.data || [];
-
-        // 1) 헤더 정규화 함수: BOM/비가시 공백/모든 공백 제거 + 소문자
-        const normKey = (k) => String(k ?? '')
-          .replace(/[\uFEFF\u00A0]/g, '')  // BOM, NBSP 제거
-          .replace(/\s+/g, '')             // 모든 공백 제거
-          .toLowerCase();
-
-        // 2) 값 정규화: 네 cleanUrl을 활용 + 내부 공백/비가시 공백 제거
-        const normVal = (v) => cleanUrl(v).replace(/[\uFEFF\u00A0]/g, '').replace(/\s+/g, '');
-
-        // 3) 각 행의 키를 정규화해서 새 객체로 만든 뒤, __charKey 생성
-        cache.rows = rawRows.map(row => {
-          const n = {};
-          for (const [k, v] of Object.entries(row)) n[normKey(k)] = v;
-
-          // 시트에 따라 다양한 표기를 모두 커버
-          const job = n['직업군'] || n['직업'] || '';
-          const name = n['캐릭터'] || n['캐릭터명'] || n['캐릭명'] || n['직업명'] || '';
-
-          // BUFF_SHEET가 '캐릭터' 한 열에 "남귀검사소울브링어"가 들어있는 경우도 커버
-          const charKey = normVal(job + name) || normVal(name);
-          return { ...row, __charKey: charKey };  // 원본 필드 유지 + 키 추가
-        });
-
-        console.log('[BUFF-DEBUG] BUFF rows:', cache.rows.length,
-          '샘플 __charKey:', cache.rows.slice(0, 5).map(r => r.__charKey));
-
-        cache.ready = true;
-      }
 
       // base 객체에서 숫자 필드(0이 아닌 곳)에만 delta를 더함 (중첩 객체도 처리)
       function addDeltaWherePresent(base, delta) {
@@ -5550,13 +6516,18 @@ DBChars.loaded = true;
           return null; // 캐릭터 없으면 버프 미적용
         }
         if (!cache.ready) await preload();
-
-        const want = (state.currentCharacter?.jobGroupLabel || '') + (state.currentCharacter?.name || '');
-        const fullName = cleanUrl(want).replace(/[\uFEFF\u00A0]/g, '').replace(/\s+/g, '');
+        // ★ 예외규칙: 버프레벨 적용을 위해 로드/활성화
+        await ensureExceptionLoaded();   // 토큰 보장 후 예외 시트 로드
+        refreshActiveExceptions();       // __EXC.buffLvByName 갱신
+        console.log('[EXC] buffLvByName =', __EXC?.buffLvByName || {});
+        const fullName = normVal(
+          (state.currentCharacter?.jobGroupLabel || '') +
+          (state.currentCharacter?.name || '')
+        );
 
         // __charKey는 이미 정규화된 상태
         const rows = cache.rows.filter(r => r.__charKey === fullName);
-        console.log('[BUFF-DEBUG] BUFF_SHEET 매칭:', { fullName, count: rows.length });
+        console.log('[BUFF-DEBUG] 매칭:', { fullName, count: rows.length });
 
         const levMap = collectItemLevelings?.(state.selections || {}) || {};
         state.leveling = levMap; // ★ 일반 스킬 레벨링 적용을 위한 전역 저장
@@ -5569,24 +6540,32 @@ DBChars.loaded = true;
           // (교체 코드: 가산형 적용)
           const incRaw = r['증가율'] || r['rate'] || 0;  // 원문 유지
           const base = rowToBaseStats(r);
-          const level = toNum(levMap[req] || 0);
-          const scaled = scaleAdd(base, incRaw, level);  // ★ 가산형
+          // 버프 이름 정규화(공백/제로폭 제거)
+          const normName = s => String(s ?? '')
+            .normalize('NFC')
+            .replace(/[\uFEFF\u00A0\u200B-\u200D\u2060\u180E]/g, '')
+            .replace(/\s+/g, '');
 
+          const baseLevel = toNum(levMap[req] || 0);  // 아이템 레벨링 합
+          const excBonus = Number(__EXC?.buffLvByName?.[normName(skillName)] || 0); // ★ 예외 '버프레벨'
+          const level = baseLevel + excBonus;     // ← 합산 적용
+          const scaled = scaleAdd(base, incRaw, level);  // ★ 가산형
+          // ★ 확인용 로그
+          if (excBonus) {
+            console.log(`[BUFF-BONUS] '${skillName}' 레벨 +${excBonus} (base=${baseLevel} → level=${level})`);
+          } else {
+            console.log(`[BUFF-DEBUG] '${skillName}' 레벨 보너스 없음 (base=${baseLevel})`);
+          }
           console.log(
             `[BUFF-DEBUG] req=${req}, level=${level}, inc=${incRaw} → delta=${toNum(incRaw) * level}`,
-            { base, scaled });
+  { base, scaled }
+          );
           total = addStats(total, scaled);
         }
         console.log('[BUFF-DEBUG] 최종 합산 버프 스탯:', total);
         return total;
       }
-
-
-
-
-
-
-      return { computeBuffStats };
+      return { preload, computeBuffStats };
     })();
   </script>
 
@@ -6212,6 +7191,8 @@ DBChars.loaded = true;
 
       window.idToken ??= null; // 로그인 후 받은 ID 토큰 저장용
 
+      const DBSkill = { loaded: false, headers: [], rows: [] }; // 스킬 로딩 상태 저장용(원하는 네이밍 사용)
+
       // === 로그인 성공 콜백(GSI에서 호출) ===
       async function onGoogleCredential({ credential }) {
         try {
@@ -6220,7 +7201,7 @@ DBChars.loaded = true;
           // 토큰 준비 알림(대기 중인 로더들이 받을 수 있게)
           document.dispatchEvent(new Event('gsi:issued'));
 
-        // 백엔드에 가볍게 '핑'을 보내 허용 여부 확인
+          // 백엔드에 가볍게 '핑'을 보내 허용 여부 확인
           // (백엔드에서 ALLOW 화이트리스트를 켜놨다면, 200/ok가 아니면 거부됨)
           const res = await fetch(WEBAPP_URL, {
             method: "POST",
@@ -6233,7 +7214,14 @@ DBChars.loaded = true;
           const data = await res.json().catch(() => ({ ok: false, error: 'bad json' }));
           const allowed = !!data.ok;
           if (!allowed) console.warn("허용 안 됨:", data);
-
+          // ★ 로그인 성공 & 허용이면 예외규칙 먼저 1회 로드(토큰 붙어서 401 방지)
+          if (allowed) {
+            try {
+              await ensureExceptionLoaded();   // 여기선 "로드만" 해두면 됨 (스킬 맵은 나중에)
+            } catch (e) {
+              console.warn('[EXC] preload after login failed:', e);
+            }
+          }
           const card = document.querySelector(".login-card");
           if (card) {
             card.innerHTML = `
@@ -6274,8 +7262,37 @@ DBChars.loaded = true;
             if (allowed) {
               btnPC.removeAttribute("disabled");
               btnM.removeAttribute("disabled");
-              btnPC.addEventListener("click", () => showCalcView("pc"));
-              btnM.addEventListener("click", () => showCalcView("mobile"));
+              btnPC.addEventListener('click', async () => {
+                showOverlay('준비 중…');
+                try {
+                  await preloadAllSheetsOnce();   // ← 싱글톤
+                  +   refreshExceptionSkillIdMap();   // ← 스킬명 → ID 매핑 갱신
+                  +   refreshActiveExceptions();      // ← 현재 착용아이템 기준으로 예외효과 활성화
+                  await initCalculatorOnce();
+                  showCalcView('pc');
+                } catch (e) {
+                  console.error('[INIT] preload 실패:', e);
+                  alert('초기 로딩에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+                } finally {
+                  hideOverlay();
+                }
+              });
+
+              btnM.addEventListener('click', async () => {
+                showOverlay('준비 중…');
+                try {
+                  await preloadAllSheetsOnce();
+                  +   refreshExceptionSkillIdMap();   // ← 스킬명 → ID 매핑 갱신
+                  +   refreshActiveExceptions();      // ← 현재 착용아이템 기준으로 예외효과 활성화
+                  await initCalculatorOnce();
+                  showCalcView('mobile');
+                } catch (e) {
+                  console.error('[INIT] preload 실패:', e);
+                  alert('초기 로딩에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+                } finally {
+                  hideOverlay();
+                }
+              });
             }
           }
         } catch (err) {
@@ -6410,6 +7427,7 @@ DBChars.loaded = true;
         onloadDiv.dataset.clientId = GOOGLE_CLIENT_ID;
       }
     })();
+
   </script>
 </body>
 
