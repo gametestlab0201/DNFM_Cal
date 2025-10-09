@@ -79,12 +79,15 @@
 
     /* ===== 왼쪽: 메인 비주얼 + 로그인 카드 ===== */
     .hero {
+      display: flex;
+      align-items: center;
+      /* 세로 가운데 */
       position: relative;
       background: #0b0f16;
       border: 1px solid #1f2633;
       border-radius: 14px;
       overflow: hidden;
-      min-height: 520px;
+      min-height: 460px;
     }
 
     .hero-img {
@@ -840,11 +843,15 @@
 
     /* ▶ 합산 패널 (우측 고정 + 최종데미지) */
     aside.stats {
-      align-self: stretch;
+      align-self: start;
+      /* 그리드 안에서 위쪽 정렬 */
       width: 100%;
+      position: static;
+      /* 기본 흐름으로 */
+      top: auto;
+      /* sticky 기준 제거 */
       height: 100%;
-      position: sticky;
-      top: clamp(8px, 1.6vw, 18px);
+      /* 불필요한 100% 높이 제거 */
     }
 
     .stats-panel {
@@ -1926,6 +1933,124 @@
       opacity: 0;
     }
 
+    /* 한마디 공통 */
+    .header-ads .line .hdrmsg {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .header-ads .line .hdrmsg .msg-bullet {
+      opacity: 0.6;
+    }
+
+    .header-ads .line .hdrmsg .msg-text {
+      opacity: 0.95;
+    }
+
+    /* 배지 기본 */
+    .header-ads .line .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    /* 책임 = 차분한 중립톤 */
+    .header-ads .line .tag-lead {
+      background: rgba(120, 120, 120, 0.12);
+      color: rgba(120, 120, 120, 1);
+      border: 1px solid rgba(120, 120, 120, 0.25);
+    }
+
+    /* 수석 = 골드 그라데이션 + 은은한 광택 */
+    /* 공통 레이아웃 */
+    .hdrmsg {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .hdrmsg .msg-bullet {
+      opacity: 0.6;
+    }
+
+    .hdrmsg .msg-text {
+      opacity: 0.95;
+    }
+
+    /* 수석 배지(👑만 들어가도 예쁘게 보이게) */
+    .tag-senior {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 10px;
+      /* pill 모양이 보이도록 패딩 */
+      min-width: 32px;
+      /* 너무 작게 붙지 않게 최소 폭 */
+      height: 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      /* 👑 크기 */
+      line-height: 1;
+      background: linear-gradient(135deg, #ffe08a 0%, #ffd257 45%, #ffc63a 100%);
+      border: 1px solid rgba(172, 124, 22, 0.55);
+      color: #2a1b00;
+      /* 이모지 외 글자색(혹시 텍스트가 추가되어도) */
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 은은한 반짝임 */
+    .tag-senior::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, .45) 35%, transparent 70%);
+      transform: translateX(-120%);
+      animation: shimmer 2.4s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-120%);
+      }
+
+      100% {
+        transform: translateX(120%);
+      }
+    }
+
+    /* 책임 배지: 아주 작은 회색 점 */
+    .tag-lead {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(120, 120, 120, .7);
+      box-shadow: 0 0 0 1px rgba(120, 120, 120, .25);
+      margin-right: 2px;
+      /* 닉네임과 살짝 간격 */
+      vertical-align: middle;
+    }
+
+    /* 수석 닉네임 살짝 강조 (옵션) */
+    .hdrmsg.senior .msg-nick {
+      font-weight: 600;
+      text-decoration: underline;
+      text-decoration-color: rgba(255, 198, 58, .7);
+      text-underline-offset: 2px;
+    }
+
+    /* 책임은 배지 없으니 별도 스타일 불필요 (원하면 아주 옅은 점 배지 추가 가능) */
+
     .loading-overlay {
       position: fixed;
       inset: 0;
@@ -2081,16 +2206,17 @@
             <aside class="notice">
               <h3>* 계산기는 계속해서 업데이트될 예정입니다!</h3>
               <div class="box">
-                <div class="badge-danger">25.10.01 계산기 TEST 버전 배포</div>
+                <div class="badge-danger">25.10.27 신규 계산기 블레이드 버전 배포</div>
                 <ul>
-                  <li>[책임 이상] 스펙 저장/불러오기 기능 추가</li>
-                  <li>스킬트리 연동 및 최종 계산 반영</li>
-                  <li>무기/칭호/보조장비 등 상한 확장</li>
-                  <li>버그 수정 및 성능 최적화</li>
+                  <li>게임실험연구소 신규 계산기 오픈!</li>
+                  <li>"블레이드" 캐릭 스킬트리 연동 및 최종 계산 반영</li>
+                  <li>타캐릭 추후 구현 예정</li>
+                  <li>스펙 저장/불러오기 기능 추후 구현 예정 </li>
                 </ul>
               </div>
               <div class="upgrade">
-                멤버십 업그레이드 시 <span class="main2" style="font-size:16px;">저장/불러오기</span> 등 편의 기능 이용 가능 <br> →
+                멤버십 업그레이드 시 <span class="main2" style="font-size:16px;">편의 기능</span> 이용가능 <br> →
+                <!--멤버십 업그레이드 시 <span class="main2" style="font-size:16px;">저장/불러오기</span> 등 편의 기능 이용 가능 <br> →-->
                 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                   rel="noopener">지금 멤버십 업그레이드!!!</a>
               </div>
@@ -2666,31 +2792,30 @@
 
       const coreW = Math.max(0, Math.min(100, weightCore | 0));
       const slotsW = Math.max(0, Math.min(100 - coreW, weightSlots | 0));
-      const perCore = coreW / 4;
+      // ── 동적 코어 단계 구성 ─────────────────────────────
+      const steps = [];
+      if (typeof loadCharacterSheet === 'function') steps.push(['캐릭터', () => loadCharacterSheet()]);
+      if (typeof ensureSkillLoaded2 === 'function') steps.push(['스킬', () => ensureSkillLoaded2()]);
+      else if (typeof loadSkillSheet === 'function') steps.push(['스킬', () => loadSkillSheet()]);
+      if (typeof BuffLeveling?.preload === 'function') steps.push(['버프', () => BuffLeveling.preload()]);
+      if (typeof ensureEnhLoaded === 'function') steps.push(['강화/엠블렘', () => ensureEnhLoaded()]);
+      if (typeof ensureSetLoaded === 'function') steps.push(['세트', () => ensureSetLoaded()]);
+      if (typeof ensureExceptionLoaded === 'function') steps.push(['예외규칙', () => ensureExceptionLoaded()]);
+      const perCore = steps.length ? (coreW / steps.length) : coreW;
       // 슬롯은 **done/total 기반으로 퍼센트 반영**
       let slotProgress = 0;
 
-      // ── 1. 핵심 4단계 ───────────────
+      // ── 1. 코어 단계(동적) ───────────────
       const runStep = async (label, fn) => {
         setProgressExactMonotonic(__progressPct, `${label} 불러오는 중…`);
         await fn();
         __progressPct += perCore;
         setProgressExactMonotonic(__progressPct, `${label} 불러오는 중…`);
       };
+      for (const [label, fn] of steps) {
+        await runStep(label, fn);
+      }
 
-      if (typeof loadCharacterSheet === 'function')
-        await runStep('캐릭터', () => loadCharacterSheet());
-
-      if (typeof ensureSkillLoaded2 === 'function')
-        await runStep('스킬', () => ensureSkillLoaded2());
-      else if (typeof loadSkillSheet === 'function')
-        await runStep('스킬', () => loadSkillSheet());
-
-      if (typeof BuffLeveling?.preload === 'function')
-        await runStep('버프', () => BuffLeveling.preload());
-
-      if (typeof ensureEnhLoaded === 'function')
-        await runStep('강화/엠블렘', () => ensureEnhLoaded());
 
       // ── 2. 슬롯들 ───────────────
       const loadSlot = (s) => ensureLoaded(s);
@@ -3900,20 +4025,29 @@
 
     // ★ D) 최종 데미지: (선형 데미지 at 효과적 레벨) × (TP 배율) × (룬 배율)
     function calcSkillDamageWithTp(skill, baseTpLv) {
-      // 1) 초 단위 쿨 계산
+      // 1) 초 단위 쿨 계산 (★ 순서 중요)
       const cdBase = (typeof toSec === 'function') ? toSec(skill.cd) : Number(skill.cd || 0);
-      let cdFinal = cdBase > 0 ? runeCooldown(skill, cdBase) : 0; // 허상룬
-      // ★ 예외: 쿨타임감소(%) 적용 (여러 줄 합산 → 1 - 합계/100)
+
+      // ★ (A) '쿨타임고정감소'(초) — 가장 먼저 적용
+      const excCdFlat = Number(__EXC?.addCdFlat?.[skill.id] || 0);
+      const cdAfterFlat = (cdBase > 0) ? Math.max(0, cdBase - excCdFlat) : 0;
+
+      // ★ (B) 허상룬/룬 보정 — 고정감소 적용된 값에 대해 수행
+      let cdFinal = (cdAfterFlat > 0) ? runeCooldown(skill, cdAfterFlat) : 0;
+
+      // ★ (C) '쿨타임감소'(%) — 그 다음 곱
       const excCdPct = Number(__EXC?.addCdPct?.[skill.id] || 0);
       if (cdFinal > 0 && excCdPct) {
-        cdFinal = cdFinal * Math.max(0, 1 - excCdPct / 100);
+        cdFinal *= Math.max(0, 1 - excCdPct / 100);
       }
-      // ★ 예외: 쿨초확률(%) 기대값 근사 적용 → cdFinal *= (1 - p)
+
+      // ★ (D) '쿨초확률'(%) — 기대값 근사
       const resetPct = Math.max(0, Math.min(100, Number(__EXC?.resetPct?.[skill.id] || 0)));
       if (cdFinal > 0 && resetPct) {
         cdFinal *= (1 - resetPct / 100);
       }
 
+      // 최종 배수(원래 기본 쿨 대비)
       const cdMul = (cdBase > 0) ? (cdFinal / cdBase) : 1;
 
       // 2) 시전 프레임
@@ -4546,6 +4680,52 @@
       console.log('[Monster->API] loaded:', DBMonster.rows.length);
     }
 
+    // ===== 세트 시트 로더/캐시 =====
+    const DBSet = { loaded: false, list: [], byType: {} };
+
+    // 세트 시트는 '강화' 매핑과 컬럼 구성이 동일하다고 가정:
+    // => 파싱 로직을 재사용합니다.
+    function mapRowToSet(r) {
+      // 기본 파싱
+      const base = mapRowToEnhance(r);
+
+      // ▶ 세트 전용: type 강제 보정 (종류가 비어 있거나 헤더명이 다를 때 대비)
+      const get = (k) => r[k] ?? r[k?.toLowerCase()] ?? '';
+      const rawType =
+        (get('종류') || get('세트') || get('분류') || get('타입') || get('유형') ||
+          get('type') || get('Type') || get('이름') || '').toString().trim();
+
+      // 이름만 있고 종류가 비었을 가능성까지 커버
+      base.type = rawType;
+
+      return base;
+    }
+
+    async function ensureSetLoaded() {
+      if (DBSet.loaded) return;
+      const token = await waitForIdToken();
+      const r = await fetch(window.WEBAPP_URL + '?type=set', {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'text/plain' },
+        body: token
+      });
+      if (!r.ok) throw new Error('set_fetch_failed');
+      const data = await r.json();
+      if (!data.ok || !Array.isArray(data.rows)) throw new Error('bad_set_payload');
+
+      const rows = data.rows.map(mapRowToSet).filter(x => (x?.name && x?.type));
+      DBSet.list = rows;
+      DBSet.byType = rows.reduce((acc, x) => {
+        const k = String(x.type || '').trim();
+        (acc[k] ||= []).push(x);
+        return acc;
+      }, {});
+      DBSet.loaded = true;
+      console.log('[Set->API] loaded:', rows.length);
+    }
+
     // ===== 예외규칙 로더/캐시 =====
     const DBException = { loaded: false, rows: [], byItem: {}, skillIdByName: {} };
 
@@ -4553,6 +4733,9 @@
       const t = String(s || '').trim().toLowerCase();
       // 표의 '유형' 값 정규화: 스킬레벨 / tp레벨 / 데미지증가 / 쿨타임감소
       if (t.includes('tp')) return 'tp레벨';
+      // ★ 먼저 고정감소부터 캐치 (쿨/고정/감소 키워드)
+      if ((t.includes('쿨') || t.includes('cool')) && t.includes('고정') && (t.includes('감소') || t.includes('down')))
+        return '쿨타임고정감소';
       if (t.includes('버프') && t.includes('레벨')) return '버프레벨';
       if (t.includes('cool') || t.includes('쿨')) return '쿨타임감소';
       if (t.includes('데미') || t === 'dmg' || t === 'damage') return '데미지증가';
@@ -4594,8 +4777,8 @@
       DBException.skillIdByName = {};
       DBException.loaded = true;
       console.log('[EXC] rows loaded =', DBException.rows.length);
-console.log('[EXC] sample rows =',
-  DBException.rows.slice(0, 10).map(r => `${r.item} | ${r.type} | ${r.skillName} : ${r.value}`));
+      console.log('[EXC] sample rows =',
+        DBException.rows.slice(0, 10).map(r => `${r.item} | ${r.type} | ${r.skillName} : ${r.value}`));
     }
 
     // 스킬 시트(ST2.rows)가 준비된 뒤, 스킬명 → id 매핑 구성
@@ -4624,6 +4807,8 @@ console.log('[EXC] sample rows =',
       const resetPct = {};    // 쿨초
       // ★ 추가: 버프레벨 (버프 "이름" 기준)
       const buffLvByName = {};  // {'버프명': +레벨}
+      // ★ 추가: 고정 쿨감(초)
+      const addCdFlat = {};   // { skillId: secondsToReduce }
 
       // 이름 정규화(공백/제로폭 제거 정도만)
       const normName = s => String(s ?? '')
@@ -4657,17 +4842,19 @@ console.log('[EXC] sample rows =',
               break;
             // ★ 추가: 쿨초확률(%) 합산
             case '쿨초확률': resetPct[id] = (resetPct[id] || 0) + r.value; break;
+            // ★ 신규: 쿨타임고정감소(초)
+            case '쿨타임고정감소': addCdFlat[id] = (addCdFlat[id] || 0) + Number(r.value || 0); break;
           }
         }
       }
       console.log('[EXC] equipped items =', equippedItemNames());
-console.log('[EXC] addLv:', addLv, 'addTp:', addTp, 'addDmgPct:', addDmgPct, 'addCdPct:', addCdPct);
-console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
-      return { addLv, addTp, addDmgPct, addCdPct, resetPct, buffLvByName };
+      console.log('[EXC] addLv:', addLv, 'addTp:', addTp, 'addDmgPct:', addDmgPct, 'addCdPct:', addCdPct);
+      console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
+      return { addLv, addTp, addDmgPct, addCdPct, resetPct, buffLvByName, addCdFlat };
     }
 
     // 전역 보관(프레임 계산/데미지 캐시에 활용)
-    let __EXC = { addLv: {}, addTp: {}, addDmgPct: {}, addCdPct: {}, resetPct: {}, buffLvByName: {} };
+    let __EXC = { addLv: {}, addTp: {}, addDmgPct: {}, addCdPct: {}, resetPct: {}, buffLvByName: {}, addCdFlat: {} };
     function refreshActiveExceptions() {
       __EXC = collectActiveExceptionMaps();
     }
@@ -4881,7 +5068,9 @@ console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
             name,
             thumbSrc: thumb,
             fullSrc: full,
-            power: row.power || 'phys'   // ★ 백엔드에서 내려준 power 값을 item에 추가
+            power: row.power || 'phys',
+            spTotal: Number(row.spTotal ?? 0) || 0,  // 👈 추가
+            tpTotal: Number(row.tpTotal ?? 35) || 35 // 👈 추가
           });
         });
 
@@ -4929,10 +5118,12 @@ console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
           card.addEventListener('click', () => {    /*이 카드 버튼 클릭하면 applyCharacter() 함수 실행되어 캐릭터 정보 넘김*/
             applyCharacter({
               src: item.fullSrc || PLACEHOLDER_IMG,
-              jobGroup: normalizeJobGroup(group.title),   // 내부 코드용 그룹명(slayer, mage 등)
-              jobGroupLabel: group.title,                  // 사용자 표시용 그룹명(예: 남귀검사, 여마법사 등)
+              jobGroup: normalizeJobGroup(group.title),
+              jobGroupLabel: group.title,
               name: item.name,
-              power: item.power
+              power: item.power,
+              spTotal: item.spTotal,   // 👈 추가
+              tpTotal: item.tpTotal    // 👈 추가
             });
             closeCharacterPicker(); /*모달 닫기*/
           });
@@ -4954,7 +5145,8 @@ console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
       charModal.classList.remove('show');   // show 제거 - 숨김
       charModal.setAttribute('aria-hidden', 'true');    // 접근성 : 숨김 상태 알림
     }
-    async function applyCharacter({ src, jobGroup, jobGroupLabel, name, power }) {    //카드 클릭 시 이 함수가 호출됨, ui 이미지 교체 - 상태 업데이트 - 파생 ui업데이트까지 한번에 처리
+    async function applyCharacter({ src, jobGroup, jobGroupLabel, name, power, spTotal, tpTotal }) {
+      //카드 클릭 시 이 함수가 호출됨, ui 이미지 교체 - 상태 업데이트 - 파생 ui업데이트까지 한번에 처리
       characterImg.src = src;   // 메인 캐릭터 이미지 교체
       characterImg.style.display = 'block';   // 실제 이미지 보이기
       characterGhost.style.display = 'none';    // 플레이스홀더(유령 이미지) 숨김
@@ -4968,8 +5160,12 @@ console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
       state.skillLv = {}; state.skillTpLv = {}; // 현재 사용한 SP/TP 초기화
       state.skillDmg = {};
       state.stUsedSP = 0; state.stUsedTP = 0;
-      await loadCharTotalsAndApply(name);   // 캐릭터 이름 기준으로 누적값/상세값 불러와 적용
-      recalcAndRenderPanel();   // 장비/스탯/버프 등 계산 후 표시를 갱신하는 내부 함수
+      if (Number.isFinite(spTotal) && Number.isFinite(tpTotal)) {
+        setTotals(spTotal, tpTotal);        // 👈 즉시 반영 (무네트워크)
+      } else {
+        await loadCharTotalsAndApply(name); // 👈 예외적으로 값이 없을 때만 백업 경로
+      }
+      recalcAndRenderPanel();
     }
 
     characterCard.addEventListener('click', openCharacterPicker);
@@ -5170,7 +5366,68 @@ console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
       //Object.values(state.enchants || {}).forEach(en => addStats(en?.stats));
       // 마법부여 합산
       // 기본(원시) 총합도 유지
+      // ▼▼▼ 세트 옵션 계산/적용 (장비 선택 이후) ▼▼▼
+      try {
+        // 세트 데이터가 아직이면 비동기 로딩 시도(대기하지 않음)
+        if (!DBSet.loaded) { ensureSetLoaded().catch(() => { }); }
 
+        // 세트 카운트 대상 슬롯(방어구 5부위 + 악세 3부위)
+        // 동일 기준은 엠블렘 자동 적용 코드에서도 사용 중. :contentReference[oaicite:7]{index=7}
+        const SET_SLOTS = ['headshoulder', 'top', 'bottom', 'belt', 'shoes', 'bracelet', 'necklace', 'ring'];
+
+        // 1) 내가 착용한 아이템들의 "종류" 카운트
+        const counts = Object.create(null);
+        for (const sk of SET_SLOTS) {
+          const it = state?.selections?.[sk];
+          const k = String(it?.type || '').trim();      // 각 아이템 시트의 '종류' 컬럼 매핑 값
+          if (!k) continue;
+          counts[k] = (counts[k] || 0) + 1;
+        }
+
+        // 2) 예외 플래그(차단 규칙)
+        const blockBaseSets = (counts['엘리트상의'] || 0) >= 1; // 맹공/규율/음율 미적용
+        const blockKH = (counts['엘리트팔찌'] || 0) >= 1; // 칼날/함성 미적용
+
+        // 3) 적용할 세트 타입 결정
+        const want = [];
+
+        if (!blockBaseSets) {
+          if ((counts['맹공'] || 0) >= 3) want.push('맹공');
+          if ((counts['규율'] || 0) >= 3) want.push('규율');
+          if ((counts['음율'] || 0) >= 3) want.push('음율');
+        }
+        if (!blockKH) {
+          const k = counts['칼날'] || 0;
+          if (k >= 3) {                 // 3개 이상이면 2셋+3셋 모두
+            want.push('칼날2셋', '칼날3셋');
+          } else if (k >= 2) {
+            want.push('칼날2셋');
+          }
+
+          const h = counts['함성'] || 0;
+          if (h >= 3) {                 // 3개 이상이면 2셋+3셋 모두
+            want.push('함성2셋', '함성3셋');
+          } else if (h >= 2) {
+            want.push('함성2셋');
+          }
+        }
+
+        // 4) 세트 스탯 적용 (여러 행이면 전부 더함)
+        if (Array.isArray(DBSet.list) && want.length) {
+          for (const t of want) {
+            const tt = String(t).trim();
+            const list = (DBSet.byType?.[tt] || DBSet.list.filter(o => String(o.type || '').trim() === tt));
+            for (const o of list) addStats(o.stats);
+          }
+        }
+
+        // (디버그/표시용) 이번 합산에 적용된 세트 목록 저장
+        state.appliedSets = want.slice();
+      } catch (e) {
+        console.warn('Set bonus apply failed:', e);
+      }
+      // ▲▲▲ 세트 옵션 계산/적용 끝 ▲▲▲
+      S.skill_atk_inc = (S.__skillMul - 1) + S.__skillAddBuff;
       return S;
     }
 
@@ -5240,6 +5497,7 @@ console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
       // 2) 합산
       const S = sumSelections();
       console.log("[BUFF-DEBUG] sumSelections 최종 합산:", S);  //로그값
+      console.log("[SET] applied:", state.appliedSets);
 
       // ★ 아이템 변경으로 state.leveling이 갱신되었을 수 있으니, 모든 스킬 캐시 재계산
       // ★ 아이템 변경으로 state.leveling이 바뀌었을 수 있으니,
@@ -5626,6 +5884,7 @@ console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
         if (st.speed) { S.speed.attack += st.speed.attack || 0; S.speed.move += st.speed.move || 0; S.speed.cast += st.speed.cast || 0; }
         if (st.other) { S.def_break_inc += st.other.def_break_inc || 0; }
       };
+
 
       // 엠블렘(곱 대상)
       Object.keys(state.emblems || {}).forEach(slotKey => {
@@ -6558,7 +6817,7 @@ console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
           }
           console.log(
             `[BUFF-DEBUG] req=${req}, level=${level}, inc=${incRaw} → delta=${toNum(incRaw) * level}`,
-  { base, scaled }
+            { base, scaled }
           );
           total = addStats(total, scaled);
         }
@@ -7200,7 +7459,16 @@ console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
           window.idToken = credential; // 토큰 보관
           // 토큰 준비 알림(대기 중인 로더들이 받을 수 있게)
           document.dispatchEvent(new Event('gsi:issued'));
-
+          const card0 = document.querySelector(".login-card");
+          if (card0) {
+            card0.innerHTML = `
+  <div class="login-title">접근 확인 중…</div>
+  <div class="login-desc">권한 확인 중입니다. 잠시만 기다려 주세요.</div>
+  <div class="login-row">
+    <button id="btnPC" class="mode-btn" disabled>PC 계산기 열기</button>
+    <button id="btnM" class="mode-btn" disabled>모바일 계산기 열기</button>
+  </div>`;
+          }
           // 백엔드에 가볍게 '핑'을 보내 허용 여부 확인
           // (백엔드에서 ALLOW 화이트리스트를 켜놨다면, 200/ok가 아니면 거부됨)
           const res = await fetch(WEBAPP_URL, {
@@ -7214,14 +7482,6 @@ console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
           const data = await res.json().catch(() => ({ ok: false, error: 'bad json' }));
           const allowed = !!data.ok;
           if (!allowed) console.warn("허용 안 됨:", data);
-          // ★ 로그인 성공 & 허용이면 예외규칙 먼저 1회 로드(토큰 붙어서 401 방지)
-          if (allowed) {
-            try {
-              await ensureExceptionLoaded();   // 여기선 "로드만" 해두면 됨 (스킬 맵은 나중에)
-            } catch (e) {
-              console.warn('[EXC] preload after login failed:', e);
-            }
-          }
           const card = document.querySelector(".login-card");
           if (card) {
             card.innerHTML = `
@@ -7266,8 +7526,8 @@ console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
                 showOverlay('준비 중…');
                 try {
                   await preloadAllSheetsOnce();   // ← 싱글톤
-                  +   refreshExceptionSkillIdMap();   // ← 스킬명 → ID 매핑 갱신
-                  +   refreshActiveExceptions();      // ← 현재 착용아이템 기준으로 예외효과 활성화
+                  refreshExceptionSkillIdMap();   // ← 스킬명 → ID 매핑 갱신
+                  refreshActiveExceptions();      // ← 현재 착용아이템 기준으로 예외효과 활성화
                   await initCalculatorOnce();
                   showCalcView('pc');
                 } catch (e) {
@@ -7282,8 +7542,8 @@ console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
                 showOverlay('준비 중…');
                 try {
                   await preloadAllSheetsOnce();
-                  +   refreshExceptionSkillIdMap();   // ← 스킬명 → ID 매핑 갱신
-                  +   refreshActiveExceptions();      // ← 현재 착용아이템 기준으로 예외효과 활성화
+                  refreshExceptionSkillIdMap();   // ← 스킬명 → ID 매핑 갱신
+                  refreshActiveExceptions();      // ← 현재 착용아이템 기준으로 예외효과 활성화
                   await initCalculatorOnce();
                   showCalcView('mobile');
                 } catch (e) {
@@ -7328,6 +7588,8 @@ console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
             header.appendChild(ads);
           }
           const adTextEl = ads.querySelector(".ad-text");
+          if (ads.dataset.inited) return;
+          ads.dataset.inited = "1";
 
           // 백엔드에서 목록(JSON) 로드
           const r = await fetch(WEBAPP_URL + '?public=1', {
@@ -7341,37 +7603,82 @@ console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
 
           // data.items는 Apps Script가 내려주는 정규화 객체 배열
           //  { ingame, position, youtube, google, message }
+          // "수석" + "책임" 모두 허용 (앞에 접두어가 붙은 "수석연구원"/"책임연구원"도 포함)
+          function escapeHTML(s = '') {
+            return String(s)
+              .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+              .replace(/'/g, '&#39;').replace(/`/g, '&#96;');
+          }
+
+          function shuffleInPlace(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+
           let messages = (data.items || [])
-            .filter(x => (x.position || "").trim() === "수석" && (x.message || "").trim())
+            .filter(x => {
+              const pos = (x.position || '').trim();
+              const msg = (x.message || '').trim();
+              return !!msg && /^(수석|책임)/.test(pos);
+            })
             .map(x => {
-              const nick = (x.ingame || "").trim() || (x.youtube || "").trim();
-              const msg = (x.message || "").trim();
-              return nick ? `${nick} 님  ${msg}` : msg;
+              const pos = (x.position || '').trim();
+              const nick = (x.ingame || '').trim() || (x.youtube || '').trim();
+              const msg = (x.message || '').trim();
+              const isSenior = /^수석/.test(pos);
+              const roleBadge = isSenior
+                ? '<span class="tag tag-senior" aria-label="수석" title="수석"><span class="badge-emoji">👑</span></span>'
+                : '<span class="tag-lead" aria-hidden="true"></span>';
+
+              return `
+      <span class="hdrmsg ${isSenior ? 'senior' : 'lead'}">
+        ${roleBadge}
+        ${nick ? `<span class="msg-nick">${escapeHTML(nick)} 님</span>` : ''}
+        <span class="msg-bullet">·</span>
+        <span class="msg-text">${escapeHTML(msg)}</span>
+      </span>
+    `.trim();
             });
 
           messages = [...new Set(messages)];
+          messages = shuffleInPlace(messages);
           if (!messages.length) {
             adTextEl.textContent = "등록된 한마디가 없습니다.";
             return;
           }
+          // 6초마다 순환할 이모지 목록
+          const SENIOR_EMOJIS = ['👑', '⭐', '🏅', '✨'];
+          let __emojiIdx = 0;
 
+          // 현재 표시된 한마디 컨테이너에서 수석 배지 이모지만 교체
+          function applySeniorEmoji(target) {
+            const node = target.querySelector('.tag-senior .badge-emoji');
+            if (node) node.textContent = SENIOR_EMOJIS[__emojiIdx];
+          }
           // 순환 표시
           let i = 0, timer = null, paused = false;
           function show(idx) {
             adTextEl.classList.add("fade-out");
             setTimeout(() => {
-              adTextEl.textContent = messages[idx % messages.length];
+              adTextEl.innerHTML = messages[idx % messages.length];
               adTextEl.classList.remove("fade-out");
-            }, 200);
+              // 👇 새 DOM이 들어간 뒤, 해당 라운드의 이모지를 적용
+              applySeniorEmoji(adTextEl);
+            }, 200); // 이 값(200ms)은 페이드 시간과 맞추세요
           }
+          const DISPLAY_MS = 6000;
+
           function start() {
             if (timer) clearInterval(timer);
             timer = setInterval(() => {
               if (paused) return;
+              // 👇 이모지 인덱스 먼저 순환
+              __emojiIdx = (__emojiIdx + 1) % SENIOR_EMOJIS.length;
+              // 메시지도 다음으로
               i = (i + 1) % messages.length;
-              show(i);
-            }, 5000);
+              show(i); // show() 안에서 방금 인덱스의 이모지를 적용
+            }, DISPLAY_MS);
           }
+
+          // 최초 1회 표시 시에도 이모지 반영되도록 show(0)만 호출하면 OK
           show(0);
           start();
 
