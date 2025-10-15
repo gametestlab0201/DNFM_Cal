@@ -641,6 +641,21 @@
       box-shadow: inset 0 0 0 2px rgba(207, 162, 79, 0.22), 0 8px 22px rgba(0, 0, 0, 0.55);
     }
 
+    .char-card.disabled {
+      filter: grayscale(1) saturate(0) brightness(.8);
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .char-card.disabled:hover {
+      box-shadow: none;
+      /* 호버 효과 제거 */
+    }
+
+    .char-card.disabled .char-img {
+      filter: grayscale(1) contrast(.9);
+    }
+
     .char-img {
       width: 100%;
       /* 부모 카드의 가로폭을 전부 차지 */
@@ -989,51 +1004,264 @@
         position: static;
       }
     }
-
-    /* autoEnchantModal 전용 2-컬럼 레이아웃 */
-    #autoEnchantModal .dialog {
-      /* 강화설정 모달과 같은 폭/패딩을 공유한다면 생략 가능 */
-      max-width: 700px;
-      /*모달너비*/
+    /* ───── 자동 관련 모달들 ───── */
+    .auto-box {
+      width: 100%;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+      margin-bottom: 10px;
     }
 
-    #autoEnchantModal .body.two-col {
+    .auto-box h4 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: #e7c27a;
+    }
+
+    .auto-box .btnetc {
+      width: 100%;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid #3a2c21;
+      background: #1a130f;
+      color: #f0e6d2;
+      cursor: pointer;
+    }
+
+    .auto-box .btnetc:hover {
+      border-color: #cfa24f;
+      box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
+    }
+
+    .auto-box .btnetc[disabled] {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+    /* ───── 기본 모달 크기 조정 ───── */
+    .dialogetc {
+      position: relative;
+      background: #0e0b09;
+      border: 1px solid #2a211a;
+      border-radius: 18px;
+      padding: 12px 14px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 10px;
+    }
+    #autoEnhModal .dialogetc {
+      width: min(300px, 95vw);
+      height: min(720px, 92vh);
+    }
+    #autoSealModal .dialogetc {
+      width: min(550px, 95vw);
+      height: min(250px, 85vh);
+    }
+    #autoEnchantModal .dialogetc {
+      width: min(1000px, 96vw);
+      height: min(250px, 85vh);
+    }
+    #autoEmblemModal .dialogetc {
+      width: min(400px, 95vw);
+      height: min(720px, 92vh);
+    }
+    #castleSealModal .dialogetc {
+      width: min(1000px, 95vw);
+      height: min(1000px, 92vh);
+    }
+
+    /* 기본 컬럼 중앙 정렬 */
+    .cols {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 14px;
+    }
+
+    /* ───── 기본 소제목 조정 ───── */
+    .cols .titles {
+      margin-bottom: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #e7c27a;
+      text-align: center;
+    }
+    #autoSealModal .cols .titles {
+      margin-bottom: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #e7c27a;
+      text-align: center;
+    }
+        /* 타이틀 여백/스타일도 강화설정 모달과 톤을 맞춤 */
+    #autoEnchantModal .cols .titles {
+      margin-bottom: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #e7c27a;
+      text-align: center;
+    }
+
+     /* ───── 기본 버튼리스트 조정 ───── */
+    .cols .lists {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+    #autoEnhModal .cols .lists {
+      flex-direction: column;
+    }
+    #autoSealModal .cols .lists {
+      align-items: center;
+    }
+
+    #autoSealModal .cols {
+  display: flex;
+  flex-direction: column; /* 세로로 쌓이게 */
+  align-items: center;
+  width: 100%;
+}
+
+    #autoEnchantModal .cols .lists {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 12px;
     }
 
-    /* 각 컬럼 내부 버튼 리스트 레이아웃 */
-    #autoEnchantModal .col .list {
+    /* ----- 제목 모양 정리 -----*/
+    .dialogetc header {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* 가운데 정렬 */
+      padding: 6px 0 8px;
+      border-bottom: 1px solid #2a211a;
     }
 
-    /* 타이틀 여백/스타일도 강화설정 모달과 톤을 맞춤 */
-    #autoEnchantModal .col .title {
+     #castleSealModal .dialogetc header {
+font-size: 17px;
+    }
+
+    .dialogetc header h2 {
+      margin: 0;
+      font-size: 15px;
+      color: #f0e6d2;
+      font-weight: 700;
+      flex: none;
+      text-align: center;
+    }
+
+
+    /* 기본 닫기 버튼 크기·모양 정리 */
+    .dialogetc header button {
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #f0e6d2;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 26px;
+      height: 26px;
+    }
+
+    .dialogetc header button:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+   
+    /* ───── 기본 버튼 크기 통일 ───── */
+    .opt-btnetc {
+      width: 110px;
+      /* ✅ 고정 너비 */
+      height: 38px;
+      /* 약간 여유 있는 높이 */
+      border-radius: 10px;
+      font-size: 13px;
       font-weight: 600;
-      margin-bottom: 8px;
+      background: #1a130f;
+      color: #f0e6d2;
+      border: 1px solid #3a2c21;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    #autoEnhModal .opt-btnetc {
+      flex-direction: column;
+    }
+    #autoEnchantModal .opt-btnetc {
+      width: 100px;
     }
 
-    /* 추천 마법부여 모달: 선택 강조 */
-    #autoEnchantModal .opt-btn.active {
-      border-color: var(--brand, #2563eb);
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
-      /* 필요시 배경도 살짝 */
-      background: rgba(37, 99, 235, 0.06);
+
+    .opt-btnetc:hover {
+      border-color: #cfa24f;
+      box-shadow: 0 0 0 2px rgba(207, 162, 79, 0.25) inset;
     }
 
-    /* 키보드 포커스 접근성도 보정(선택과 구분되게) */
-    #autoEnchantModal .opt-btn:focus-visible {
-      outline: 2px solid var(--brand, #2563eb);
-      outline-offset: 2px;
+    .opt-btnetc.active {
+      border-color: #cfa24f;
+      background: rgba(207, 162, 79, 0.1);
+      box-shadow: 0 0 0 2px rgba(207, 162, 79, 0.25) inset;
+    }
+
+    /* ───── 모바일 대응 (1열 전환 시) ───── */
+    @media (max-width: 520px) {
+      #autoSealModal .body.two-col {
+        grid-template-columns: 1fr;
+      }
+
+      #autoSealModal .body.two-col::after {
+        display: none;
+      }
+    }
+
+ 
+    /* 추천 마법부여 모달: 속성선택 ↔ 추천티어 구분선 */
+    .body.two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      position: relative;
+      /* 구분선 기준 위치 지정 */
+    }
+
+    .body.two-col::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      /* 정확히 가운데 배치 */
+      width: 1px;
+      background: rgba(255, 255, 255, 0.12);
+      /* 은은한 라인 색 */
+      pointer-events: none;
+      /* 클릭 방해 없음 */
     }
 
     /* 모바일 좁은 화면에선 1열로 떨어지도록 */
     @media (max-width: 520px) {
       #autoEnchantModal .body.two-col {
         grid-template-columns: 1fr;
+      }
+
+      #autoEnchantModal .body.two-col::after {
+        display: none;
       }
     }
 
@@ -1807,42 +2035,6 @@
       box-shadow: none;
     }
 
-    /* ===== Auto Input Panels ===== */
-    .auto-box {
-      width: 100%;
-      padding: 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-      margin-bottom: 10px;
-    }
-
-    .auto-box h4 {
-      margin: 0 0 8px;
-      font-size: 14px;
-      color: #e7c27a;
-    }
-
-    .auto-box .btn {
-      width: 100%;
-      height: 34px;
-      border-radius: 10px;
-      border: 1px solid #3a2c21;
-      background: #1a130f;
-      color: #f0e6d2;
-      cursor: pointer;
-    }
-
-    .auto-box .btn:hover {
-      border-color: #cfa24f;
-      box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
-    }
-
-    .auto-box .btn[disabled] {
-      opacity: .5;
-      cursor: not-allowed;
-    }
-
     /* Simple list modal */
     .simple-modal .dialog {
       width: min(420px, 92vw);
@@ -2050,6 +2242,9 @@
     }
 
     /* 책임은 배지 없으니 별도 스타일 불필요 (원하면 아주 옅은 점 배지 추가 가능) */
+    .loading {
+      opacity: 0.7;
+    }
 
     .loading-overlay {
       position: fixed;
@@ -2100,20 +2295,7 @@
     }
 
     /* 성안의 봉인 모달 레이아웃 */
-    #castleSealModal .dialog.seal {
-      width: min(920px, 95vw);
-    }
 
-    #castleSealModal .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    #castleSealModal .list {
-      max-height: 60vh;
-      overflow: auto;
-    }
 
     #castleSealModal .opt-row {
       display: block;
@@ -2252,9 +2434,9 @@
       <div class="column left">
         <div class="auto-box">
           <h4>자동 입력</h4>
-          <button id="btnAutoEnh" class="btn">강화 자동 입력</button>
+          <button id="btnAutoEnh" class="btnetc">강화 자동 입력</button>
           <div style="height:8px;"></div>
-          <button id="btnAutoSeal" class="btn">추천 마법봉인 자동 입력</button>
+          <button id="btnAutoSeal" class="btnetc">추천 마법봉인 자동 입력</button>
         </div>
 
         <div class="slot-row left">
@@ -2306,9 +2488,9 @@
       <div class="column right">
         <div class="auto-box">
           <h4>자동 입력</h4>
-          <button id="btnAutoEnchant" class="btn">추천 마법부여 자동 입력</button>
+          <button id="btnAutoEnchant" class="btnetc">추천 마법부여 자동 입력</button>
           <div style="height:8px;"></div>
-          <button id="btnAutoEmblem" class="btn">엠블렘 자동 입력</button>
+          <button id="btnAutoEmblem" class="btnetc">엠블렘 자동 입력</button>
         </div>
 
         <div class="slot-row right">
@@ -2586,22 +2768,21 @@
   </div>
 
   <!-- ▼ 성안의 봉인 모달 -->
-  <div id="castleSealModal" class="modal" aria-hidden="true">
+  <div id="castleSealModal" class="modal simple-modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
-    <div class="dialog seal">
-      <div class="modal-head">
-        <div class="title">옵션 선택</div>
-        <button class="close" data-close aria-label="닫기">×</button>
-      </div>
-
-      <div class="modal-body two-col">
-        <section class="col">
-          <h5>주요 옵션</h5>
-          <div id="sealMainList" class="list"></div>
+    <div class="dialogetc" role="dialog" aria-modal="true" aria-labelledby="castleSealTitle">
+      <header>
+        <h3 id="castleSealTitle">성안의 봉인</h3>
+        <button class="close" data-close>✕</button>
+      </header>
+      <div class="body two-col">
+        <section class="cols left">
+           <div class="titles">◈ 주요 옵션 ◈</div>
+          <div id="sealMainList" class="lists"></div>
         </section>
-        <section class="col">
-          <h5>추가 옵션</h5>
-          <div id="sealSubList" class="list"></div>
+        <section class="cols right">
+          <div class="titles">◈ 추가 옵션 ◈</div>
+          <div id="sealSubList" class="lists"></div>
         </section>
       </div>
 
@@ -2614,6 +2795,121 @@
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
+
+/** !@#$ ───────── DEV: noload 스위치 ─────────
+ *  URL에 ?dev=noload 붙이거나, Alt+D 로 토글 (localStorage('DEV_NOLOAD')=1)
+ *  - 로그인/시트 로딩/프리로드 전부 스킵
+ *  - calc-view 즉시 진입
+ *  - 옵션: 더미데이터 주입으로 모달에 리스트 표시
+ */
+const DEV_NOLOAD =
+  /(?:^|[?&#])dev=noload(?:=1|&|$)/i.test(location.href) ||
+  localStorage.getItem('DEV_NOLOAD') === '1';
+
+if (DEV_NOLOAD) {
+  console.log('[DEV] NOLOAD 모드 활성화');
+
+  // 1) 로딩 오버레이 강제 끄기
+  addEventListener('DOMContentLoaded', () => {
+    document.getElementById('loadingOverlay')?.setAttribute('hidden','');
+    document.documentElement.classList.add('dev-noload');
+  });
+
+  // 2) 로컬 토글: Alt + D
+  addEventListener('keydown', (e)=>{
+    if (e.altKey && e.code === 'KeyD') {
+      const on = !(localStorage.getItem('DEV_NOLOAD') === '1');
+      localStorage.setItem('DEV_NOLOAD', on ? '1' : '');
+      location.reload();
+    }
+  });
+
+  // 3) 프리로드/토큰을 호출하더라도 즉시 성공처럼 보이게 가짜 구현
+  window.idToken = 'dev-token';
+  window.waitForIdToken = async () => 'dev-token';
+  window.preloadAllSheets = async () => {};           // 무게 큰 프리로드 전체 skip
+  window.preloadAllSheetsOnce = async () => {};       // once 래퍼도 skip
+
+  // 특정 로더를 호출해도 즉시 반환되게 가짜 구현
+  window.ensureSkillLoaded2   = async () => { window.ST2 = { loaded:true, rows:[] }; };
+  window.ensureEnhLoaded      = async () => { window.DBEnh = window.DBEnh || { }; DBEnh.loaded = true; DBEnh.list = []; DBEnh.byType = {}; };
+  window.ensureSetLoaded      = async () => { window.DBSet = { loaded:true, list:[], byType:{} }; };
+  window.ensureExceptionLoaded= async () => { window.DBException = { loaded:true, rows:[], byItem:{}, skillIdByName:{} }; };
+  window.ensureLoaded         = async (slot) => { window.DB = window.DB || { itemsBySlot:{}, loaded:{} }; DB.itemsBySlot[slot] = DB.itemsBySlot[slot] || []; DB.loaded[slot] = true; };
+
+  // (선택) 모달에 보여줄 더미데이터 — 성안의 봉인 등 리스트가 비어 보일 때 유용
+  window.__devSeedModalData = function(){
+  // 공통 강화/마봉/마부 시트 더미
+  window.DBEnh ??= { byType:{}, list:[] };
+
+  DBEnh.byType['강화'] = [
+    { name:'강화 +10', type:'강화', uiText:'모든 공격력 +10%' },
+    { name:'증폭 +8', type:'강화', uiText:'힘,지능 +180' },
+  ];
+  DBEnh.byType['마봉'] = [
+    { name:'스킬 공격력 +7%', type:'마봉', uiText:'스킬공격력 증가 7%' },
+    { name:'물리크리티컬 +10%', type:'마봉', uiText:'물크 증가 10%' },
+  ];
+  DBEnh.byType['마법부여'] = [
+    { name:'화속성 강화 +20', type:'마법부여', uiText:'화속강 +20' },
+    { name:'모든속성강화 +15', type:'마법부여', uiText:'모속강 +15' },
+  ];
+  DBEnh.byType['주요 옵션'] = [
+    { name:'힘,지능 +170', type:'주요 옵션', uiText:'힘,지능 +170' },
+    { name:'스킬 공격력 +8%', type:'주요 옵션', uiText:'스증 +8%' },
+  ];
+  DBEnh.byType['추가 옵션'] = [
+    { name:'크리티컬 데미지 +10%', type:'추가 옵션', uiText:'크증 +10%' },
+    { name:'모든속성강화 +25', type:'추가 옵션', uiText:'모속강 +25' },
+  ];
+  DBEnh.list = Object.values(DBEnh.byType).flat();
+
+  window.state ??= {};
+  state.castleSeal ??= {
+    main: DBEnh.byType['주요 옵션'][0],
+    sub:  DBEnh.byType['추가 옵션'][0],
+  };
+
+  console.log('[DEV] 강화/마봉/마부/성안의 봉인 더미 데이터 주입 완료');
+  };
+}
+// !@#$ 지워야함 ----------------------------------------------------------------------------------------------
+
+
+    function detectIsMobile() {
+      const uaData = navigator.userAgentData;
+      if (uaData && 'mobile' in uaData) return !!uaData.mobile;
+
+      const ua = navigator.userAgent.toLowerCase();
+      const isPhoneUA = /iphone|ipod|android.*mobile|windows phone|blackberry|bb10/.test(ua);
+      const isTabletUA = /ipad|android(?!.*mobile)/.test(ua);
+      const coarsePtr = matchMedia?.('(pointer:coarse)')?.matches;
+      const narrowSide = Math.min(screen.width, screen.height) <= 820;
+      return isPhoneUA || isTabletUA || (coarsePtr && narrowSide);
+    }
+
+    // 파일 상단 어딘가(전역)
+    window.__loginPingSent = false;
+
+    async function loginPingOnce() {
+      if (window.__loginPingSent) return;        // 중복 방지
+      window.__loginPingSent = true;
+      try {
+        await waitForIdToken?.();                 // id_token 확보
+        await fetch(WEBAPP_URL + '?type=login_ping', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id_token: window.idToken,
+            ua: navigator.userAgent,
+            screen: `${screen.width}x${screen.height}@${(window.devicePixelRatio || 1)}`,
+            is_mobile: detectIsMobile()
+          })
+        });
+      } catch (e) {
+        console.warn('login_ping failed:', e);    // 로깅 실패해도 무시
+      }
+    }
 
     // 전역 플래그
     let __calcInited = false;
@@ -4902,7 +5198,7 @@
       list.forEach(row => {
         const b = document.createElement('button');
         b.type = 'button';
-        b.className = 'opt-row';
+        b.className = 'opt-btnetc';
         b.innerHTML = `
       <div class="name">${row.name || '(이름없음)'}</div>
       ${row.uiText ? `<div class="desc">${row.uiText}</div>` : ''}`;
@@ -5070,7 +5366,10 @@
             fullSrc: full,
             power: row.power || 'phys',
             spTotal: Number(row.spTotal ?? 0) || 0,  // 👈 추가
-            tpTotal: Number(row.tpTotal ?? 35) || 35 // 👈 추가
+            tpTotal: Number(row.tpTotal ?? 35) || 35, // 👈 추가
+            base: row.base,
+            // ↓↓↓ 추가: 백엔드에서 보낸 enabled(없으면 기본 true)
+            enabled: (row.enabled ?? true)
           });
         });
 
@@ -5115,18 +5414,28 @@
           img.onerror = () => { img.src = PLACEHOLDER_IMG; };
           const name = document.createElement('div'); name.className = 'char-name'; name.textContent = item.name;
           card.appendChild(img); card.appendChild(name);
-          card.addEventListener('click', () => {    /*이 카드 버튼 클릭하면 applyCharacter() 함수 실행되어 캐릭터 정보 넘김*/
-            applyCharacter({
-              src: item.fullSrc || PLACEHOLDER_IMG,
-              jobGroup: normalizeJobGroup(group.title),
-              jobGroupLabel: group.title,
-              name: item.name,
-              power: item.power,
-              spTotal: item.spTotal,   // 👈 추가
-              tpTotal: item.tpTotal    // 👈 추가
+          // ↓↓↓ 추가: 활성화여부에 따라 비활성 처리
+          const isDisabled = (item.enabled === false || item.enabled === 0);
+          if (isDisabled) {
+            card.classList.add('disabled');
+            card.setAttribute('aria-disabled', 'true');
+            // 클릭 리스너를 아예 붙이지 않음
+          } else {
+
+            card.addEventListener('click', () => {    /*이 카드 버튼 클릭하면 applyCharacter() 함수 실행되어 캐릭터 정보 넘김*/
+              applyCharacter({
+                src: item.fullSrc || PLACEHOLDER_IMG,
+                jobGroup: normalizeJobGroup(group.title),
+                jobGroupLabel: group.title,
+                name: item.name,
+                power: item.power,
+                spTotal: item.spTotal,   // 👈 추가
+                tpTotal: item.tpTotal,    // 👈 추가
+                base: item.base
+              });
+              closeCharacterPicker(); /*모달 닫기*/
             });
-            closeCharacterPicker(); /*모달 닫기*/
-          });
+          }
           cards.appendChild(card);    //만든 캐릭터 카드들을 cards 컨테이너에 추가
         });
         const right = document.createElement('div'); right.textContent = '✶'; right.style.opacity = '.3'; right.style.textAlign = 'center';
@@ -5145,7 +5454,7 @@
       charModal.classList.remove('show');   // show 제거 - 숨김
       charModal.setAttribute('aria-hidden', 'true');    // 접근성 : 숨김 상태 알림
     }
-    async function applyCharacter({ src, jobGroup, jobGroupLabel, name, power, spTotal, tpTotal }) {
+    async function applyCharacter({ src, jobGroup, jobGroupLabel, name, power, spTotal, tpTotal, base }) {
       //카드 클릭 시 이 함수가 호출됨, ui 이미지 교체 - 상태 업데이트 - 파생 ui업데이트까지 한번에 처리
       characterImg.src = src;   // 메인 캐릭터 이미지 교체
       characterImg.style.display = 'block';   // 실제 이미지 보이기
@@ -5155,7 +5464,8 @@
         jobGroupLabel: jobGroupLabel || null,  // ← 한글 직업군 라벨(예: 남귀검사)
         name,
         imgSrc: src,
-        power: power || null
+        power: power || null,
+        base: base || null
       };
       state.skillLv = {}; state.skillTpLv = {}; // 현재 사용한 SP/TP 초기화
       state.skillDmg = {};
@@ -5352,6 +5662,38 @@
         if (s.speed) { S.speed.attack += s.speed.attack || 0; S.speed.move += s.speed.move || 0; S.speed.cast += s.speed.cast || 0; }
         if (s.other) { S.def_break_inc += s.other.def_break_inc || 0; }
       };
+
+      // === [PATCH] 캐릭터 기본스탯 13개 선적용 ===
+      // state.currentCharacter.base는 백엔드 ?type=char 응답에 포함된 base(퍼센트는 0~1로 변환)라고 가정
+      {
+        const B = state?.currentCharacter?.base;
+        if (B) {
+          addStats({
+            // 주의: 너의 S에는 'phys_dmg/mag_dmg' 키가 없으므로 '물리/마법 데미지'를 'phys_atk/mag_atk'로 더한다
+            phys_atk: Number(B.phys_dmg || 0),
+            mag_atk: Number(B.mag_dmg || 0),
+
+            str: Number(B.str || 0),
+            int: Number(B.int || 0),
+
+            phys_crit: Number(B.phys_crit || 0),
+            mag_crit: Number(B.mag_crit || 0),
+            phys_crit_rate: Number(B.phys_crit_rate || 0), // 0~1
+            mag_crit_rate: Number(B.mag_crit_rate || 0), // 0~1
+
+            // 속성강화(절대값)
+            elem: {
+              fire: Number(B.elem?.fire || 0),
+              water: Number(B.elem?.water || 0),
+              light: Number(B.elem?.light || 0),
+              dark: Number(B.elem?.dark || 0),
+            },
+
+            // 참고: base.acc(적중)는 현재 S 스키마에 키가 없어 합산되지 않음
+          });
+        }
+      }
+
       Object.values(state.selections).forEach(it => addStats(it?.stats));   //선택 장비들 모두 누적해서 최종 s반환
       // 장비 합
       Object.values(state.upgrades).forEach(up => addStats(up?.stats));   // 선택 강화들 모두 누적해서 최종 s반환
@@ -6041,28 +6383,31 @@
   </script>
   <div id="autoEnhModal" class="modal simple-modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="autoEnhTitle">
+    <div class="dialogetc" role="dialog" aria-modal="true" aria-labelledby="autoEnhTitle">
       <header>
         <h3 id="autoEnhTitle">강화 자동 입력</h3><button class="close" data-close>✕</button>
       </header>
-      <div class="list" id="autoEnhList"></div>
+      <div class="cols">
+        <div class="titles">강화 선택</div> <!-- ✅ 추가 -->
+      <div class="lists" id="autoEnhList"></div>
     </div>
+  </div>
   </div>
   <div id="autoEnchantModal" class="modal simple-modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="autoEnchantTitle">
+    <div class="dialogetc" role="dialog" aria-modal="true" aria-labelledby="autoEnchantTitle">
       <header>
         <h3 id="autoEnchantTitle">추천 마법부여</h3>
         <button class="close" data-close>✕</button>
       </header>
       <div class="body two-col">
-        <div class="col left">
-          <div class="title">속성 선택</div>
-          <div class="list attrs"></div>
+        <div class="cols left">
+          <div class="titles">속성 선택</div>
+          <div class="lists attrs"></div>
         </div>
-        <div class="col right">
-          <div class="title">추천 티어</div>
-          <div class="list tiers"></div>
+        <div class="cols right">
+          <div class="titles">추천 티어</div>
+          <div class="lists tiers"></div>
         </div>
       </div>
     </div>
@@ -6070,26 +6415,32 @@
 
   <div id="autoEmblemModal" class="modal simple-modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="autoEmblemTitle">
+    <div class="dialogetc" role="dialog" aria-modal="true" aria-labelledby="autoEmblemTitle">
       <header>
         <h3 id="autoEmblemTitle">엠블렘 자동 입력</h3><button class="close" data-close>✕</button>
       </header>
-      <div class="list" id="autoEmblemList"></div>
+            <div class="cols">
+        <div class="titles">단계 선택</div> <!-- ✅ 추가 -->
+      <div class="lists" id="autoEmblemList"></div>
+    </div>
     </div>
   </div>
 
   <div id="autoSealModal" class="modal simple-modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="autoSealTitle">
+    <div class="dialogetc" role="dialog" aria-modal="true" aria-labelledby="autoSealTitle">
       <header>
         <h3 id="autoSealTitle">추천 마법봉인</h3>
         <button class="close" data-close>✕</button>
       </header>
-      <div class="list">
-        <button class="opt-btn" data-ele="fire">화속성</button>
-        <button class="opt-btn" data-ele="water">수속성</button>
-        <button class="opt-btn" data-ele="light">명속성</button>
-        <button class="opt-btn" data-ele="dark">암속성</button>
+      <div class="cols">
+        <div class="titles">속성 선택</div> <!-- ✅ 추가 -->
+        <div class="lists">
+          <button class="opt-btnetc" data-ele="fire">화속성</button>
+          <button class="opt-btnetc" data-ele="water">수속성</button>
+          <button class="opt-btnetc" data-ele="light">명속성</button>
+          <button class="opt-btnetc" data-ele="dark">암속성</button>
+        </div>
       </div>
     </div>
   </div>
@@ -6200,14 +6551,14 @@
 
     function renderAutoEnchantChoices() {
       const m = document.getElementById('autoEnchantModal');
-      const wrapAttrs = m.querySelector('.list.attrs');
-      const wrapTiers = m.querySelector('.list.tiers');
+      const wrapAttrs = m.querySelector('.lists.attrs');
+      const wrapTiers = m.querySelector('.lists.tiers');
       wrapAttrs.innerHTML = '';
       wrapTiers.innerHTML = '';
 
       const makeBtn = (txt, group) => {
         const b = document.createElement('button');
-        b.className = 'opt-btn';
+        b.className = 'opt-btnetc';
         b.type = 'button';
         b.textContent = txt;
         b.setAttribute('role', 'button');
@@ -6261,8 +6612,8 @@
           btn.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
       };
-      mark('.list.attrs .opt-btn', autoEnchantState.attr);
-      mark('.list.tiers .opt-btn', autoEnchantState.tier);
+      mark('.lists.attrs .opt-btnetc', autoEnchantState.attr);
+      mark('.lists.tiers .opt-btnetc', autoEnchantState.tier);
     }
 
 
@@ -6375,7 +6726,7 @@
       if (autoEnhList) {
         autoEnhList.innerHTML = '';
         for (let lv = 10; lv <= 20; lv++) {
-          const b = document.createElement('button'); b.className = 'opt-btn'; b.textContent = `${lv}강`;
+          const b = document.createElement('button'); b.className = 'opt-btnetc'; b.textContent = `${lv}강`;
           b.addEventListener('click', async () => { await autoEnhanceApply(lv); autoEnhModal.classList.remove('show'); autoEnhModal.setAttribute('aria-hidden', 'true'); });
           autoEnhList.appendChild(b);
         }
@@ -6385,7 +6736,7 @@
         autoEmblemList.innerHTML = '';
         for (let lv = 5; lv <= 15; lv++) {
           const b = document.createElement('button');
-          b.className = 'opt-btn'; b.textContent = `${lv}단계`;
+          b.className = 'opt-btnetc'; b.textContent = `${lv}단계`;
           b.addEventListener('click', async () => { await autoEmblemApply(lv); autoEmblemModal.classList.remove('show'); autoEmblemModal.setAttribute('aria-hidden', 'true'); });
           autoEmblemList.appendChild(b);
         }
@@ -7275,7 +7626,7 @@
           const computeFinalCritPct = (critVal, critRateVal) => {
             if (critVal == null || critRateVal == null) return 0;
             const denom = (3.8665 * Math.pow(100 / 97.25, monsterLevel)) * 100;
-            const percent = (((critVal || 0) / denom) * 100) + ((critRateVal || 0) * 100) + 3;
+            const percent = (((critVal || 0) / denom) * 100) + ((critRateVal || 0) * 100) + 0;
             const clamped = Math.max(0, Math.min(100, percent));
             return clamped / 100; // 0~1
           };
@@ -7352,56 +7703,6 @@
           S.ski_int_perdam = S.factor_mag * skillMul * S.in_perdam * 1.25;
           S.ski_int_godam = S.factor_mag * skillMul * S.in_godam * 1.25;
 
-          // ===== [스킬별 최종 데미지 연결] =====
-          const skillBook = (window.skillDmg || state?.skillDmg || {});
-          const p = state?.currentCharacter?.power; // renderStats 에서 쓰던 것 그대로
-
-          // 방깎뎀증 배수
-          const defMul = 1 + (S.def_break_inc || 0);
-
-          Object.entries(skillBook).forEach(([id, sd]) => {
-            if (!sd) return;
-
-            const perBase = Number(sd.per || 0);
-            const flatBase = Number(sd.flat || 0);
-            const uses = Number(sd.uses ?? 1);
-
-            // 기본 perCoef / goCoef
-            let perCoef, goCoef;
-            if (p === 'phys') {
-              perCoef = S.ski_str_perdam;
-              goCoef = S.ski_str_godam;
-            } else if (p === 'mag') {
-              perCoef = S.ski_int_perdam;
-              goCoef = S.ski_int_godam;
-            } else {
-              perCoef = 0;
-              goCoef = 0;
-            }
-
-            // === [평타 전용 분기] ===
-            if (sd.kind === "평타") {
-              if (p === 'phys') {
-                perCoef = S.nor_str_perdam;
-                goCoef = S.nor_str_godam;
-              } else if (p === 'mag') {
-                perCoef = S.nor_int_perdam;
-                goCoef = S.nor_int_godam;
-              } else {
-                perCoef = 0;
-                goCoef = 0;
-              }
-            }
-
-            // 최종 데미지 계산
-            const final = ((perBase * perCoef) + (flatBase * goCoef)) * defMul * uses;
-
-            sd.final = final;
-            sd.finalPer = perBase * perCoef;
-            sd.finalFlat = flatBase * goCoef;
-          });
-
-
           return S;
         };
       }
@@ -7409,36 +7710,115 @@
       console.warn('Finalize(sumSelections) extension failed', e);
     }
 
-    function sumAllSkillFinal() {
-      if (typeof sumSelections === 'function') sumSelections(); // 최신 반영
-      const book = (window.skillDmg || state?.skillDmg || {});
-      let total = 0;
-      for (const sd of Object.values(book)) total += Number(sd?.final || 0);
-      return Math.round(total);
+
+    // 전역 1줄(파일 어딘가 상단): 최신 호출만 반영하기 위한 시퀀스
+    window.__computeReqSeq = 0;
+
+    async function computeViaBackend(targetId) {
+      // ── 0) UI: 로딩 표시 선반영 ─────────────────────────────
+      const box = document.getElementById(targetId);
+      const prevText = box ? box.textContent : '';
+      if (box) {
+        box.dataset.prev = prevText || '';
+        box.textContent = '계산중입니다…';
+        box.classList.add('loading');          // 원하면 CSS로 스피너 스타일링
+      }
+
+      // 계산 버튼들 잠깐 비활성화(원하면 HTML에 data-compute-btn 달아두세요)
+      const computeBtns = document.querySelectorAll('[data-compute-btn]');
+      computeBtns.forEach(btn => { btn.disabled = true; btn.dataset._wasDisabledByCompute = '1'; });
+
+      // 최신 호출 식별자 (race condition 방지)
+      const myReqId = ++window.__computeReqSeq;
+
+      try {
+        // ── 1) 입력 수집 ──────────────────────────────────────
+        await waitForIdToken?.();
+
+        const S = (typeof sumSelections === 'function') ? (sumSelections() || {}) : {};
+        const p = (state?.currentCharacter?.power) || 'phys';
+
+        const bookObj = (state?.skillDmg || skillDmg || {});
+        const book = Object.values(bookObj).map(sd => ({
+          per: Number(sd?.per || 0),
+          flat: Number(sd?.flat || 0),
+          uses: Number(sd?.uses ?? 1),
+          kind: String(sd?.kind || '')
+        }));
+
+        const payload = {
+          p,
+          S: {
+            nor_str_perdam: Number(S.nor_str_perdam || 0),
+            nor_str_godam: Number(S.nor_str_godam || 0),
+            ski_str_perdam: Number(S.ski_str_perdam || 0),
+            ski_str_godam: Number(S.ski_str_godam || 0),
+            nor_int_perdam: Number(S.nor_int_perdam || 0),
+            nor_int_godam: Number(S.nor_int_godam || 0),
+            ski_int_perdam: Number(S.ski_int_perdam || 0),
+            ski_int_godam: Number(S.ski_int_godam || 0),
+            defMul: 1 + Number(S.def_break_inc || 0),
+          },
+          book
+        };
+
+        // ── 2) 서버 호출 ───────────────────────────────────────
+        const r = await fetch(WEBAPP_URL + '?type=compute', {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id_token: window.idToken, type: 'compute', payload })
+        });
+
+        const data = await r.json().catch(() => ({ ok: false, error: 'bad_json' }));
+        if (!data.ok) {
+          if (data.code === 403 && data.error === 'forbidden_role') {
+            alert('권한이 없습니다. (허용 직책: 수석 / 책임 / 선임 / 전임)\n내 직책: ' + (data.role || '—'));
+            return;
+          }
+          throw new Error(data.error || 'compute_failed');
+        }
+
+        // ── 3) 최신 호출만 반영 (연타 시 이전 응답 무시) ────────
+        if (myReqId !== window.__computeReqSeq) return;
+
+        // ── 4) UI: 결과 반영 ───────────────────────────────────
+        if (box) {
+          const v = Number(data.total || 0);
+          box.textContent = new Intl.NumberFormat().format(v);
+          box.classList.remove('loading');
+        }
+      } catch (e) {
+        console.error('[COMPUTE] 실패:', e);
+        if (box) {
+          box.textContent = '계산 실패';
+          box.classList.remove('loading');
+          // 필요하면 이전 값 복구:
+          // box.textContent = box.dataset.prev || '—';
+        }
+        alert('서버 계산 실패: ' + (e.message || e));
+      } finally {
+        // ── 5) 버튼 되살리기 ──────────────────────────────────
+        computeBtns.forEach(btn => {
+          if (btn.dataset._wasDisabledByCompute === '1') {
+            btn.disabled = false;
+            delete btn.dataset._wasDisabledByCompute;
+          }
+        });
+      }
     }
 
-    function setFinalDamageManually(total) {
-      const el = document.getElementById('finalDamageValue');
-      if (!el) return;
-      el.textContent = Number(total).toLocaleString();
-    }
+    document.getElementById('btn-sum-all-final')?.setAttribute('data-compute-btn', '');
+    document.getElementById('btn-sum-all-final2')?.setAttribute('data-compute-btn', '');
 
     // 버튼: 누를 때만 값 채움
     document.getElementById('btn-sum-all-final')?.addEventListener('click', () => {
-      const total = sumAllSkillFinal();
-      setFinalDamageManually(total);
+      computeViaBackend('finalDamageValue');
     });
-
-    function setFinalDamageManually2(total) {
-      const el = document.getElementById('finalDamageValue2');
-      if (!el) return;
-      el.textContent = Number(total).toLocaleString();
-    }
 
     // 버튼: 누를 때만 값 채움
     document.getElementById('btn-sum-all-final2')?.addEventListener('click', () => {
-      const total = sumAllSkillFinal();
-      setFinalDamageManually2(total);
+      computeViaBackend('finalDamageValue2');
     });
 
 
@@ -7481,6 +7861,7 @@
 
           const data = await res.json().catch(() => ({ ok: false, error: 'bad json' }));
           const allowed = !!data.ok;
+          await loginPingOnce();
           if (!allowed) console.warn("허용 안 됨:", data);
           const card = document.querySelector(".login-card");
           if (card) {
@@ -7522,6 +7903,21 @@
             if (allowed) {
               btnPC.removeAttribute("disabled");
               btnM.removeAttribute("disabled");
+
+              // (로그인 허가 후) PC/모바일 버튼 !@#$ 여기부터 없애기
+if (DEV_NOLOAD) {
+  btnPC?.addEventListener('click', () => {
+    document.getElementById('loadingOverlay')?.setAttribute('hidden','');
+    // (선택) 모달에 리스트를 보고 싶으면 더미데이터 주입
+    window.__devSeedModalData?.();
+    showCalcView('pc');   // 즉시 진입
+  });
+  btnM?.addEventListener('click', () => {
+    document.getElementById('loadingOverlay')?.setAttribute('hidden','');
+    window.__devSeedModalData?.();
+    showCalcView('mobile'); // 즉시 진입
+  });
+} else {    // !@#$여기까지 없애기 
               btnPC.addEventListener('click', async () => {
                 showOverlay('준비 중…');
                 try {
@@ -7553,7 +7949,7 @@
                   hideOverlay();
                 }
               });
-            }
+            }}    // !@#$중괄호 하나 없애기
           }
         } catch (err) {
           console.warn("[Login] 처리 중 오류:", err);
@@ -7733,6 +8129,18 @@
       if (onloadDiv && !onloadDiv.dataset.clientId) {
         onloadDiv.dataset.clientId = GOOGLE_CLIENT_ID;
       }
+
+      if (DEV_NOLOAD) { //!@#$ 삭제요망
+  // 전체 로드 끝나면 바로 계산기 화면으로
+  window.addEventListener('load', () => {
+    // 로딩 오버레이 강제 OFF
+    document.getElementById('loadingOverlay')?.setAttribute('hidden','');
+    // 모달 목록이 비어 보이면 더미 주입(선택)
+    window.__devSeedModalData?.();
+    // PC 레이아웃로 바로 진입 (원하면 'mobile'로 바꿔도 됨)
+    showCalcView('pc');
+  });
+}   // !@#$ 삭제요망
     })();
 
   </script>
