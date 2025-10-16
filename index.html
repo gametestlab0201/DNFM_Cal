@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -1063,12 +1064,12 @@
       height: min(250px, 85vh);
     }
     #autoEmblemModal .dialogetc {
-      width: min(400px, 95vw);
-      height: min(720px, 92vh);
-    }
+  width: min(1200px, 96vw);   /* ✅ 5~10 (6개) 1줄도 여유 */
+  height: min(400px, 90vh);  /* ✅ 두 줄 구조에 맞게 높이 조정 */
+}
     #castleSealModal .dialogetc {
-      width: min(1000px, 95vw);
-      height: min(1000px, 92vh);
+      width: min(870px, 95vw);
+      height: min(770px, 92vh);
     }
 
     /* 기본 컬럼 중앙 정렬 */
@@ -1133,6 +1134,26 @@
       gap: 12px;
     }
 
+    #castleSealModal .cols .lists {
+      flex-direction: column;
+    }
+
+#autoEmblemModal .lists.attrs,
+#autoEmblemModal .lists.tiers {
+  display: flex;
+  flex-direction: column;     /* 각 행(row)을 세로로 쌓기 */
+  align-items: center;        /* 행 자체를 중앙 배치 */
+  row-gap: 1px;
+}
+
+#autoEmblemModal .lists.attrs .row,
+#autoEmblemModal .lists.tiers .row {
+  display: flex;
+  justify-content: center;    /* 행 안의 버튼을 중앙 정렬 */
+  row-gap: 6px;
+  flex-wrap: nowrap;          /* 정확히 1줄 유지 */
+}
+
     /* ----- 제목 모양 정리 -----*/
     .dialogetc header {
       display: flex;
@@ -1188,9 +1209,7 @@ font-size: 17px;
     /* ───── 기본 버튼 크기 통일 ───── */
     .opt-btnetc {
       width: 110px;
-      /* ✅ 고정 너비 */
       height: 38px;
-      /* 약간 여유 있는 높이 */
       border-radius: 10px;
       font-size: 13px;
       font-weight: 600;
@@ -1206,7 +1225,11 @@ font-size: 17px;
     #autoEnchantModal .opt-btnetc {
       width: 100px;
     }
-
+    #castleSealModal .opt-btnetc {
+      width: 300px;
+      height: 80px;
+      font-size: 15px;
+    }
 
     .opt-btnetc:hover {
       border-color: #cfa24f;
@@ -1219,6 +1242,39 @@ font-size: 17px;
       box-shadow: 0 0 0 2px rgba(207, 162, 79, 0.25) inset;
     }
 
+    #castleSealModal .opt-btnetc .name {
+  gap : 2px;
+}
+
+    .ui-btnetc {
+      display: inline-block;
+  padding: 14px 34px;
+  border-radius: 6px;           /* 끝이 아주 살짝 둥글게 */
+  background: #ecc947;          /* 고급스러운 노란색 */
+  color: #111;                  /* 글자는 검은색 */
+  font-size: 17px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  text-align: center;
+  margin: 12px auto;            /* 가운데 정렬 */
+  display: block;               /* 중앙 배치 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 마우스 올렸을 때 밝아지는 효과 */
+.ui-btnetc:hover {
+  background: #ffe263;          /* 조금 더 밝은 노란색 */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* 클릭 시 살짝 눌리는 효과 (선택 사항) */
+.ui-btnetc:active {
+  transform: scale(0.98);
+}
+
+
     /* ───── 모바일 대응 (1열 전환 시) ───── */
     @media (max-width: 520px) {
       #autoSealModal .body.two-col {
@@ -1229,6 +1285,19 @@ font-size: 17px;
         display: none;
       }
     }
+
+/* (기존) #autoEnchantModal 전용 ↓ 이 줄을 이렇게 바꾼다 */
+@media (max-width: 520px) {
+  #autoEnchantModal .body.two-col,
+  #autoEmblemModal .body.two-col {   /* ✅ 추가 */
+    grid-template-columns: 1fr;
+  }
+  #autoEnchantModal .body.two-col::after,
+  #autoEmblemModal .body.two-col::after {  /* ✅ 추가 */
+    display: none;
+  }
+}
+
 
  
     /* 추천 마법부여 모달: 속성선택 ↔ 추천티어 구분선 */
@@ -2787,7 +2856,7 @@ font-size: 17px;
       </div>
 
       <div class="modal-foot">
-        <button id="sealCommit" class="ui-btn gold block">선택 하기</button>
+        <button id="sealCommit" class="ui-btnetc">선택 하기</button>
       </div>
     </div>
   </div>
@@ -5200,12 +5269,12 @@ if (DEV_NOLOAD) {
         b.type = 'button';
         b.className = 'opt-btnetc';
         b.innerHTML = `
-      <div class="name">${row.name || '(이름없음)'}</div>
+      <div class="name">${(row.name || '(이름없음)').replace(/\n/g, '<br>')}</div>
       ${row.uiText ? `<div class="desc">${row.uiText}</div>` : ''}`;
         if (__sealPick[which]?.name === row.name) b.classList.add('active');
         b.addEventListener('click', () => {
           __sealPick[which] = row;
-          host.querySelectorAll('.opt-row').forEach(x => x.classList.remove('active'));
+          host.querySelectorAll('.opt-btnetc').forEach(x => x.classList.remove('active'));
           b.classList.add('active');
         });
         host.appendChild(b);
@@ -6413,18 +6482,39 @@ if (DEV_NOLOAD) {
     </div>
   </div>
 
-  <div id="autoEmblemModal" class="modal simple-modal" aria-hidden="true">
-    <div class="backdrop" data-close></div>
-    <div class="dialogetc" role="dialog" aria-modal="true" aria-labelledby="autoEmblemTitle">
-      <header>
-        <h3 id="autoEmblemTitle">엠블렘 자동 입력</h3><button class="close" data-close>✕</button>
-      </header>
-            <div class="cols">
-        <div class="titles">단계 선택</div> <!-- ✅ 추가 -->
-      <div class="lists" id="autoEmblemList"></div>
-    </div>
+<div id="autoEmblemModal" class="modal simple-modal" aria-hidden="true">
+  <div class="backdrop" data-close></div>
+  <div class="dialogetc" role="dialog" aria-modal="true" aria-labelledby="autoEmblemTitle">
+    <header>
+      <h3 id="autoEmblemTitle">엠블렘 자동 입력</h3>
+      <button class="close" data-close>✕</button>
+    </header>
+    <!-- ✅ 추천 마법부여 자동입력과 동일한 2열 UI -->
+    <div class="body two-col">
+      <div class="cols left">
+        <div class="titles">속성 선택</div>
+        <div class="lists attrs" id="autoEmblemAttrs">
+  <div class="row attr-row1">
+    <button class="opt-btnetc" data-ele="fire">화속성</button>
+    <button class="opt-btnetc" data-ele="water">수속성</button>
+    <button class="opt-btnetc" data-ele="light">명속성</button>
+    <button class="opt-btnetc" data-ele="dark">암속성</button>
+  </div>
+  <div class="row attr-row2">
+    <button class="opt-btnetc" data-ele="all">모속</button>
+    <button class="opt-btnetc" data-ele="str">힘</button>
+    <button class="opt-btnetc" data-ele="int">지능</button>
+  </div>
+</div>
+      </div>
+
+      <div class="cols right">
+        <div class="titles">단계 선택</div>
+        <div class="lists tiers" id="autoEmblemTiers"></div>
+      </div>
     </div>
   </div>
+</div>
 
   <div id="autoSealModal" class="modal simple-modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
@@ -6518,30 +6608,151 @@ if (DEV_NOLOAD) {
 
 
     /* ===== Auto Emblem Apply: stage 5~15 ===== */
-    async function autoEmblemApply(stage) {
-      await ensureEnhLoaded();
-      const stageNum = Number(stage) || 0;
-      const slots = ['headshoulder', 'top', 'bottom', 'belt', 'shoes', 'bracelet', 'necklace', 'ring', 'weapon'];
-      for (const sk of slots) {
-        ensureEmblemArray(sk);
-        const types = SOCKET_RULES[sk] || [];
-        let useTypes = types.slice();
-        if (sk === 'weapon') useTypes = ['붉은빛엠블렘']; // 요구사항
-        const picks = [];
-        useTypes.forEach(t => {
-          const arr = (DBEnh.byType[t] || []).filter(it => it.level_num === stageNum);
-          if (arr.length) picks.push(arr[0]);
-        });
-        const pick = picks[0] || null;
-        const count = SOCKET_COUNT(sk);
-        for (let i = 0; i < count; i++) {
-          state.emblems[sk][i] = pick ?
-            { img: pick.img, level_num: pick.level_num, stats: pick.stats, tag: pick.tag } : null;
-          paintEmblemDot(sk, i);
-        }
-      }
-      recalcAndRenderPanel();
+    /* ===== [EMBLEM][AUTO] 상태 & 렌더 ===== */
+const autoEmblemState = { attr: null, stage: null };
+
+function renderAutoEmblemChoices() {
+  const modal = document.getElementById('autoEmblemModal');
+  const $attrs = modal?.querySelector('#autoEmblemAttrs');
+  const $tiers = modal?.querySelector('#autoEmblemTiers');
+  if (!$attrs || !$tiers) return;
+
+  // 속성 버튼 (화/수/명/암)
+  $attrs.querySelectorAll('button').forEach(btn => {
+    const k = btn.getAttribute('data-ele'); // 'fire'|'water'|'light'|'dark'
+    btn.classList.toggle('active', autoEmblemState.attr === k);
+    btn.onclick = () => {
+      autoEmblemState.attr = k;
+      renderAutoEmblemChoices();
+      tryApplyAutoEmblemIfReady();
+    };
+  });
+
+  // 단계 버튼 (5~15) → 2줄(1줄: 5~10, 2줄: 11~15)
+$tiers.innerHTML = '';
+
+const makeRow = (from, to, cls) => {
+  const row = document.createElement('div');
+  row.className = `row ${cls}`;
+  for (let lv = from; lv <= to; lv++) {
+    const b = document.createElement('button');
+    b.className = 'opt-btnetc';
+    b.textContent = `${lv}단계`;
+    if (autoEmblemState.stage === lv) b.classList.add('active');
+    b.onclick = () => {
+      autoEmblemState.stage = lv;
+      renderAutoEmblemChoices();
+      tryApplyAutoEmblemIfReady();
+    };
+    row.appendChild(b);
+  }
+  return row;
+};
+
+$tiers.appendChild(makeRow(5, 8, 'tier-row1'));
+$tiers.appendChild(makeRow(9, 12, 'tier-row2'));
+$tiers.appendChild(makeRow(13, 15, 'tier-row3'));
+
+}
+
+function closeAutoEmblemModal() {
+  const modal = document.getElementById('autoEmblemModal');
+  if (!modal) return;
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+async function tryApplyAutoEmblemIfReady() {
+  const { attr, stage } = autoEmblemState;
+  if (!attr || !stage) return;
+  await autoEmblemApply(attr, stage);
+  closeAutoEmblemModal();
+}
+
+   /* 속성 → 플래티넘 엠블렘 매칭 */
+function pickPlatForAttr(attrKey, stageNum) {
+  // ENH 데이터(강화/마봉/마부/엠블렘) 로딩 보장
+  const list = (DBEnh && DBEnh.byType && DBEnh.byType['플래티넘엠블렘']) ? DBEnh.byType['플래티넘엠블렘'] : [];
+  if (!Array.isArray(list) || !list.length) return null;
+
+  // tag(=렙제)에서 속성 분류, name(=이름)에서 "n단계" 파싱된 level_num 사용
+  const want = {
+    fire: ['화', '화속', '화속성', '불'],
+    water: ['수', '수속', '수속성', '물'],
+    light: ['명', '명속', '명속성', '빛'],
+    dark: ['암', '암속', '암속성', '어둠'],
+    all: ['모속', '전체', '모든속성'],
+   str: ['힘'],
+    int: ['지능'],
+  }[attrKey] || [];
+
+    const byAttr = list.filter(o => {
+    const tag = String(o.tag || o.raw?.['렙제'] || '');
+    return want.length ? want.some(w => tag.includes(w)) : true;
+  });
+
+  // 1) 속성+단계 정확 매칭
+  const stage = Number(stageNum);
+  const hit1 = byAttr.find(o => Number(o.level_num) === stage
+    || String(o.name||'').includes(`${stage}단계`));
+  if (hit1) return hit1;
+
+  // 2) 속성만 매칭
+  if (byAttr.length) return byAttr[0];
+
+  // 3) 아무거나
+  return list[0] || null;
+}
+
+/* ===== Auto Emblem Apply (attr + stage) ===== */
+async function autoEmblemApply(attrKey, stage) {
+  await ensureEnhLoaded();
+
+  // 1) 일반 엠블렘: 단계별 자동 주입 (무기는 붉은빛 고정 규칙 유지)
+  const stageNum = Number(stage) || 0;
+  const slots = ['headshoulder', 'top', 'bottom', 'belt', 'shoes', 'bracelet', 'necklace', 'ring', 'weapon'];
+  for (const sk of slots) {
+    ensureEmblemArray(sk);
+    const types = SOCKET_RULES[sk] || [];
+    let useTypes = types.slice();
+    if (sk === 'weapon') useTypes = ['붉은빛엠블렘']; // 무기 강제 규칙 (기존 동작)
+
+    // 해당 단계의 첫 아이템 선택
+    const picks = [];
+    useTypes.forEach(t => {
+      const arr = (DBEnh.byType[t] || []).filter(it => it.level_num === stageNum);
+      if (arr.length) picks.push(arr[0]);
+    });
+    const pick = picks[0] || null;
+
+    const count = SOCKET_COUNT(sk);
+    for (let i = 0; i < count; i++) {
+      state.emblems[sk][i] = pick
+        ? { img: pick.img, level_num: pick.level_num, stats: pick.stats, tag: pick.tag }
+        : null;
+      paintEmblemDot(sk, i);
     }
+  }
+
+  // 2) 속성 기반 플래티넘: 보조장비(support) + 칭호(title)
+  const plat = pickPlatForAttr(attrKey, stageNum);
+  if (plat) {
+    // 보조장비
+    ensureEmblemArray('support');
+    for (let i = 0; i < SOCKET_COUNT('support'); i++) {
+      state.emblems.support[i] = { img: plat.img, level_num: plat.level_num, stats: plat.stats, tag: plat.tag };
+      paintEmblemDot('support', i);
+    }
+    // 칭호(타이틀) — 보통 1개 소켓(주입/표시 로직은 이미 준비됨) :contentReference[oaicite:7]{index=7}
+    ensureEmblemArray('title');
+    state.emblems.title[0] = { img: plat.img, level_num: plat.level_num, stats: plat.stats, tag: plat.tag };
+    paintEmblemDot('title', 0);
+  }
+
+  // 3) 재계산/리렌더
+  if (typeof recalcAndRenderPanel === 'function') recalcAndRenderPanel();
+}
+
     const AUTO_ATTRS = ['화속성', '수속성', '명속성', '암속성'];
     const AUTO_TIERS = ['종결', '준종결', '보통', '가성비'];
     const autoEnchantState = { attr: null, tier: null };
@@ -6711,7 +6922,7 @@ if (DEV_NOLOAD) {
         });
 
         // 4개 속성 버튼(화/수/명/암) 클릭 시 동작(현재는 모달만 닫기)
-        autoSealModal.querySelectorAll('.opt-btn').forEach(btn => {
+        autoSealModal.querySelectorAll('.opt-btnetc').forEach(btn => {
           btn.addEventListener('click', () => {
             // TODO: 여기서 선택한 속성에 맞춰 '추천 마법봉인 자동 입력' 로직을 이어가면 됩니다.
             // const element = btn.dataset.ele; // "fire" | "water" | "light" | "dark"
@@ -6731,24 +6942,19 @@ if (DEV_NOLOAD) {
           autoEnhList.appendChild(b);
         }
       }
-      // Build emblem stage buttons 5~15
-      if (autoEmblemList) {
-        autoEmblemList.innerHTML = '';
-        for (let lv = 5; lv <= 15; lv++) {
-          const b = document.createElement('button');
-          b.className = 'opt-btnetc'; b.textContent = `${lv}단계`;
-          b.addEventListener('click', async () => { await autoEmblemApply(lv); autoEmblemModal.classList.remove('show'); autoEmblemModal.setAttribute('aria-hidden', 'true'); });
-          autoEmblemList.appendChild(b);
-        }
-      }
 
       // Openers
       document.getElementById('btnAutoEnh')?.addEventListener('click', () => {
         autoEnhModal.classList.add('show'); autoEnhModal.setAttribute('aria-hidden', 'false');
       });
       document.getElementById('btnAutoEmblem')?.addEventListener('click', () => {
-        autoEmblemModal.classList.add('show'); autoEmblemModal.setAttribute('aria-hidden', 'false');
-      });
+  const modal = document.getElementById('autoEmblemModal');
+  autoEmblemState.attr = null;
+  autoEmblemState.stage = null;
+  renderAutoEmblemChoices();
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden', 'false');
+});
       document.getElementById('btnAutoEnchant')?.addEventListener('click', () => {
         // 모달 열기만; 닫기는 tryApplyAutoIfReady에서 두 값이 모두 선택됐을 때만
         autoEnchantState.attr = null;
@@ -6881,7 +7087,7 @@ if (DEV_NOLOAD) {
       // ▼ 모달의 속성 버튼과 연결
       const $autoSealModal = document.getElementById('autoSealModal');
       if ($autoSealModal) {
-        $autoSealModal.querySelectorAll('.opt-btn[data-ele]').forEach(btn => {
+        $autoSealModal.querySelectorAll('.opt-btnetc[data-ele]').forEach(btn => {
           btn.addEventListener('click', () => {
             const ele = btn.getAttribute('data-ele'); // 'fire' | 'water' | 'light' | 'dark'
             applyAutoSeal(ele);
