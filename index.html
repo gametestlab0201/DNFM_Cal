@@ -238,6 +238,55 @@
       /* 아이콘과 제목 사이 간격 */
     }
 
+/* 상단 제목 옆 관리자 문의 아이콘 버튼 */
+header .title .contact-btn {
+  margin-left: 18px;          /* 제목과 아이콘 사이 여유를 크게 줌 */
+  border: none;
+  padding: 0;
+  background: transparent;
+  display: none;              /* 로그인 후 JS에서 inline-flex로 변경 */
+  cursor: pointer;
+  line-height: 0;
+  display: none;
+  align-items: center;
+  gap: 6px;                   /* 아이콘과 '문의하기' 텍스트 간격 */
+}
+
+/* 아이콘 크기 */
+header .title .contact-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* 봉투 선 스타일 (라인 아이콘) */
+header .title .contact-btn svg rect,
+header .title .contact-btn svg path {
+  fill: none;
+  stroke: #e5e7eb;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* '문의하기' 텍스트 스타일 */
+header .title .contact-btn .contact-label {
+  font-size: 12px;
+  color: #e5e7eb;
+}
+
+/* 호버 시 살짝 강조 */
+header .title .contact-btn:hover svg rect,
+header .title .contact-btn:hover svg path {
+  stroke: #ffffff;
+}
+
+header .title .contact-btn:hover .contact-label {
+  color: #ffffff;
+}
+
+
+
+
     /* 로고 아이콘 박스 */
     header .title .logo-box {
       width: 24px;
@@ -531,6 +580,106 @@
       background: #cfa24f;
       color: #0b0f15;
       border-color: #facc15;
+    }
+
+    /* 관리자 문의 모달 */
+    .contact-dialog {
+      width: min(620px, 95vw);
+      height: auto;
+      padding: 14px 18px 16px;
+      grid-template-rows: auto 1fr;
+    }
+
+    .contact-body {
+      padding: 12px 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .contact-notice {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #f5e3c3;
+      background: #1a130f;
+      border: 1px solid #3a2c21;
+      border-radius: 8px;
+      padding: 10px 12px;
+      white-space: normal;
+    }
+
+    .contact-textarea {
+      min-height: 140px;
+      resize: vertical;
+      border-radius: 8px;
+      border: 1px solid #3a2c21;
+      background: #0f1115;
+      color: #f0e6d2;
+      padding: 8px 10px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    .contact-textarea::placeholder {
+      color: #6b7280;
+    }
+
+    .reply-block {
+      margin-top: 6px;
+    }
+    .reply-label {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 2px;
+    }
+    .reply-text {
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      border-radius: 6px;
+      padding: 6px 8px;
+    }
+    .reply-text.original {
+      background: #111827;
+      border: 1px solid #1f2937;
+    }
+    .reply-text.answer {
+      background: #0f172a;
+      border: 1px solid #1d4ed8;
+       min-height: 330px;   /* ★ 답변 상자 기본 높이 늘리기 */
+    }
+
+    .reply-actions {
+  margin-top: 4px;              /* 답변 상자에 꽤 붙게 */
+  display: flex;
+  flex-direction: column;       /* 윗줄: 체크박스, 아랫줄: 버튼 */
+  align-items: center;          /* 버튼을 가운데로 */
+  gap: 8px;
+}
+
+.reply-dontshow {
+  align-self: flex-start;       /* 체크박스는 왼쪽으로 붙이고 */
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #e5e7eb;
+}
+
+.reply-dontshow input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+}
+
+/* (옵션) 버튼 폭 살짝 키우고 싶으면 */
+.reply-actions .ui-btnetc {
+  min-width: 120px;
+}
+    .reply-actions .btn {
+      flex: 0 0 auto;
+      min-width: 72px;
+      height: 30px;
+      font-size: 12px;
     }
 
 
@@ -934,6 +1083,24 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
+    /* 장비 접두사 라벨 (슬롯 좌측 상단) */
+.slot .equip-prefix {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 9px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.95), rgba(37, 99, 235, 0.95));
+  color: #fff;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: 3;
+}
 
     .outer-rects {
       display: flex;
@@ -1507,6 +1674,7 @@
       box-shadow: 0 0 0 1px rgba(110, 168, 255, 0.35);
     }
 
+
     /* 툴팁 본문 */
     .info-tip-content {
       position: absolute;
@@ -1540,7 +1708,14 @@
       transform: translateX(5%) translateY(-50%);
       pointer-events: auto;
     }
-
+    /* 장비 설명 / 합산 스탯 헤더 전용: 툴팁을 아래로 띄우기 */
+.info-tip.info-tip-bottom .info-tip-content {
+  top: 100%;        /* 아래쪽으로 */
+  bottom: auto;     /* 위쪽 기준 제거 */
+  left: 50%;        /* 가운데 정렬 */
+  right: auto;
+  transform: translate(-50%, 8px);  /* 약간 아래로 간격 */
+}
     .select {
       height: 34px;
       border-radius: 10px;
@@ -1593,32 +1768,153 @@
       /* 불필요한 100% 높이 제거 */
     }
 
-    .stats-panel {
-      width: 100%;
-      height: 890px;
-      border-radius: 18px;
-      padding: 14px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      gap: 10px;
-    }
+.stats-panel {
+  width: 100%;
+  height: 890px;
+  border-radius: 18px;
+  padding: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: grid;
+  /* 1행: 성안(자동) / 2행: 장비설명·합산스탯(1fr) / 3행: 최종데미지(자동) */
+  grid-template-rows: auto 1fr auto;
+  gap: 10px;
+}
+
+/* 합산스탯 가운데 영역 (장비설명 / 합산스탯) */
+.stats-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;   /* flex 내부에서 스크롤 되도록 */
+}
 
     .stats-panel h3 {
-      margin: 4px 0 0;
-      font-size: 14px;
-      color: #f0e6d2;
-    }
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #f0e6d2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+    .stats-toggle-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #e5e7eb;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stats-toggle-btn:hover {
+  background: rgba(148, 163, 184, 0.25);
+}
+
+
+
+/* 장비 설명 프리뷰 박스 */
+.stat-preview {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+
+  padding: 6px 8px;
+  margin-bottom: 0;       /* 아래쪽 여백은 stats-main gap으로 처리 */
+  font-size: 12px;
+  line-height: 1.5;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+
+.stat-preview-empty {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.stat-preview-line {
+  margin-bottom: 10px;
+}
+
+.stat-preview-line .slot-tag {
+  display: inline-block;
+  margin-bottom: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(148, 163, 184, 0.35);
+  color: #e5e7eb;
+  font-size: 11px;    /* 라벨 글자 크기 */
+  font-weight: 600;
+}
+.stat-preview-line .desc-text {
+  font-size: 11px;       /* 설명 글자 크기 */
+  line-height: 1.7;      /* 줄 간격 여유 있게 */
+  color: #e5e7eb;
+  white-space: pre-line; /* 설명에 줄바꿈 있으면 그대로 살리기 */
+}
+/* 커스텀옵 라벨 전용 색상 */
+.stat-preview-line .slot-tag.custom-tag {
+  border: 1px solid transparent;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.45);
+}
+
+/* 빨간 계열: 분쇄 / 선봉 */
+.stat-preview-line .slot-tag.custom-tag.tag-red {
+  border-color: #f97373;
+  background: rgba(248, 113, 113, 0.15);
+  color: #fecaca;
+}
+
+/* 초록 계열: 선명 / 이상 */
+.stat-preview-line .slot-tag.custom-tag.tag-green {
+  border-color: #4ade80;
+  background: rgba(74, 222, 128, 0.15);
+  color: #bbf7d0;
+}
+
+/* 파란 계열: 의지 / 광채 */
+.stat-preview-line .slot-tag.custom-tag.tag-blue {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+  color: #e0f2fe;
+}
+
+/* 노란 계열: 강타 */
+.stat-preview-line .slot-tag.custom-tag.tag-yellow {
+  border-color: #facc15;
+  background: rgba(250, 204, 21, 0.15);
+  color: #facc15;
+}
+
+/* 기타/기본 */
+.stat-preview-line .slot-tag.custom-tag.tag-neutral {
+  border-color: var(--line);
+  background: rgba(148, 163, 184, 0.35);
+  color: #e5e7eb;
+}
 
     .stat-list {
-      overflow: auto;
-      padding-right: 6px;
-      display: grid;
-      gap: 8px;
-      overflow-y: auto;
-      /* 내용 많으면 안쪽에서 스크롤 */
-    }
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 6px;
+  display: grid;
+  gap: 8px;
+  overflow-y: auto;
+  /* 내용 많으면 안쪽에서 스크롤 */
+}
 
     .stat-row {
       display: flex;
@@ -3492,6 +3788,19 @@
           <img src="img/gametestlab.png" alt="게임실험연구소 로고">
         </div>
         <h1>게임실험연구소 계산기 (시즌5)</h1>
+          <!-- 관리자 문의 아이콘 버튼 (로그인 후에만 보이도록 JS에서 표시) -->
+        <button
+    id="btnContactAdmin"
+    class="contact-btn"
+    type="button"
+    title="게임실험연구소에 문의"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-mail">
+      <rect x="3" y="5" width="18" height="14" rx="2" ry="2"></rect>
+      <path d="M3 7l9 6 9-6"></path>
+    </svg>
+    <span class="contact-label">문의하기</span>
+  </button>
       </div>
       <!--span 은 한줄에서 특별히 강조 할때 쓴다. div는 한줄이 강제로 나뉘기때문에 쓴다.-->
       <div class="actions">
@@ -3523,16 +3832,17 @@
             <aside class="notice">
               <h3>* 계산기는 계속해서 업데이트될 예정입니다!</h3>
               <div class="box">
-                <div class="badge-danger">25.11.20 신규 계산기 배포</div>
+                <div class="badge-danger">25.11.26 시즌5 신규 계산기 배포</div>
                 <ul>
                   <li>게임실험연구소 신규 계산기 오픈!</li>
-                  <li>"블레이드" 캐릭 스킬트리 연동 및 최종 계산 반영</li>
-                  <li>타캐릭 추후 구현 예정</li>
-                  <li>스펙 저장/불러오기 기능 추후 구현 예정 </li>
+                  <li>신규 아이템 및 고유효과 적용 완료</li>
+                  <li>각 아이템별 설명도 한눈에 확인 가능!</li>
+                  <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
+                  rel="noopener">영상 보러가기</a> </li>
                 </ul>
               </div>
               <div class="upgrade">
-                멤버십 업그레이드 시 <span class="main2" style="font-size:16px;">편의 기능</span> 이용가능 <br> →
+                멤버십 업그레이드 시 <span class="main2" style="font-size:16px;">저장/불러오기 기능</span> 이용가능 <br> →
                 <!--멤버십 업그레이드 시 <span class="main2" style="font-size:16px;">저장/불러오기</span> 등 편의 기능 이용 가능 <br> →-->
                 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                   rel="noopener">지금 멤버십 업그레이드!!!</a>
@@ -3604,7 +3914,7 @@
           <div class="slot" data-slot="L2">
             <span class="slot-label">상의</span>
           </div>
-          <button class="rect" id="btnCustomOptArmor">커스텀옵(상의)</button>
+          <button class="rect" id="btnCustomOptArmor">고유효과(상의)</button>
 
           <!-- 3열: 엠블렘 스택은 JS가 자동으로 <div class="emblem-stack">...</div> 를 appendChild 해줌 -->
         </div>
@@ -3638,7 +3948,7 @@
           </div>
 
           <!-- 2열: 커스텀옵(귀걸이) 버튼(위) -->
-          <button class="rect" id="btnCustomOptEarring">커스텀옵(귀걸이)</button>
+          <button class="rect" id="btnCustomOptEarring">고유효과(귀걸이)</button>
 
           <!-- 3열: 엠블렘 스택은 JS가 <div class="emblem-stack">를 appendChild 해줌 -->
         </div>
@@ -3758,7 +4068,7 @@
           </div>
 
           <!-- 2열: 위에 커스텀옵 버튼, 아래에 무기 슬롯 (그리드에서 위치 지정) -->
-          <button class="rect" id="btnCustomOptBracelet">커스텀옵(팔찌)</button>
+          <button class="rect" id="btnCustomOptBracelet">고유효과(팔찌)</button>
         </div>
 
         <div class="slot-row right">
@@ -3970,25 +4280,53 @@
       </div>
 
       <aside class="stats">
-        <div class="stats-panel">
-          <!-- ▼ 성안의 봉인 -->
-          <div class="opt-box" id="optSeal">
-            <div class="seal-head">
-              <h4 class="opt-title">성안의 봉인</h4>
-              <button id="btnCastleSeal" class="ui-btn primary" type="button" aria-label="옵션 선택">
-                옵션 선택
-              </button>
-            </div>
-          </div>
-          <h3>합산 스탯</h3>
-          <div id="statList" class="stat-list"></div>
-          <div class="final-damage">
-            <span class="label">최종데미지</span>
-            <strong class="value" id="finalDamageValue">&nbsp;</strong>
-            <button id="btn-sum-all-final" type="button">계산하기</button>
-          </div>
-        </div>
-      </aside>
+  <div class="stats-panel">
+    <!-- ▼ 성안의 봉인 -->
+    <div class="opt-box" id="optSeal">
+      <div class="seal-head">
+        <h4 class="opt-title">성안의 봉인</h4>
+        <button id="btnCastleSeal" class="ui-btn primary" type="button" aria-label="옵션 선택">
+          옵션 선택
+        </button>
+      </div>
+    </div>
+
+    <!-- ▲ 여기까지 1행 / 아래부터 2행(1fr) -->
+    <div class="stats-main">
+      <h3>
+  <span class="label-with-tip">
+    <span id="statsHeaderLabel">장비 설명</span>
+    <span class="info-tip info-tip-bottom" tabindex="0" aria-label="장비 설명 / 합산 스탯 패널 설명">
+      i
+      <span class="info-tip-content">
+        이 패널에서는 장비 개별 옵션 설명과 합산 스탯을 번갈아 확인할 수 있습니다.<br>
+        오른쪽 ▶ 버튼을 눌러 장비 설명과 합산 스탯 화면을 전환하세요.
+      </span>
+    </span>
+  </span>
+  <button id="btnToggleStatsPanel"
+          type="button"
+          class="stats-toggle-btn"
+          aria-label="장비 설명 / 합산 스탯 전환">
+    ▶
+  </button>
+</h3>
+
+
+      <!-- 장비 설명 / 합산 스탯 영역 (2행 1fr 안에서만 스크롤) -->
+      <div id="equipDescPreview" class="stat-preview"></div>
+      <div id="statList" class="stat-list"></div>
+    </div>
+
+    <!-- ▼ 항상 맨 아래 행(3행 auto) -->
+    <div class="final-damage">
+      <span class="label">최종데미지</span>
+      <strong class="value" id="finalDamageValue">&nbsp;</strong>
+      <button id="btn-sum-all-final" type="button">계산하기</button>
+    </div>
+  </div>
+</aside>
+
     </section>
   </section>
   </div>
@@ -4295,6 +4633,76 @@
     </div>
   </div>
 
+  <!-- 관리자 문의 모달 -->
+  <div id="contactModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-contact-close></div>
+    <div class="dialog contact-dialog" role="dialog" aria-modal="true" aria-labelledby="contactTitle"
+      style="width:min(620px,96vw);max-height:min(430px,90vh);">
+      <header>
+        <div style="width:32px;"></div>
+        <h2 id="contactTitle">게임실험연구소에 문의하기</h2>
+        <button type="button" class="close" data-contact-close>✕</button>
+        </button>
+      </header>
+
+      <div class="contact-body">
+        <div class="contact-notice">
+          계산기 이용 중 정상적이지 않은 동작들이나 오류, 버그들을 제보해주세요.<br>
+          계산기 업데이트에 큰 힘이 됩니다!<br>
+          그 외 멤버십 관련, 한마디 문구 변경 등도 적어주시면 확인하도록 하겠습니다.<br>
+          실시간 문의는 저희 게임실험연구소 <a href="https://open.kakao.com/o/sEvtIGpf" target="_blank"
+                  rel="noopener">오픈채팅</a> 으로 문의주시면 되겠습니다.
+        </div>
+
+        <textarea id="contactTalk" class="contact-textarea"
+          placeholder="문의하실 내용을 최대한 상세하게 적어주셔야 빠르고 정확한 답변이 가능합니다.
+
+소울브링어 계산이 안됩니다.  (X)
+소울브링어, 암흑의 별 선택시 계산값이 0으로 나옵니다.  (O)"></textarea>
+          <div class="contact-actions">
+      <button id="btnContactSend" class="ui-btnetc">문의 보내기</button>
+    </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 관리자 답장 팝업 -->
+<div id="replyModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-reply-close></div>
+  <div class="dialog contact-dialog" role="dialog" aria-modal="true" aria-labelledby="replyTitle"
+    style="width:min(620px,96vw);max-height:min(820px,90vh);">
+    <header>
+      <div style="width:32px;"></div>
+      <h2 id="replyTitle">관리자 답장 도착</h2>
+      <button type="button" class="close" data-reply-close>✕</button>
+      </button>
+    </header>
+
+    <div class="contact-body">
+      <div class="contact-notice">
+        최근에 남기신 문의에 대한 답장이 도착했습니다.
+      </div>
+
+      <div class="reply-block">
+        <div class="reply-label">내 문의</div>
+        <div class="reply-text original" id="replyOriginal"></div>
+      </div>
+
+      <div class="reply-block">
+        <div class="reply-label">관리자 답장</div>
+        <div class="reply-text answer" id="replyAnswer"></div>
+      </div>
+      <!-- ★ 아래 추가 -->
+      <div class="reply-actions">
+        <label class="reply-dontshow">
+          <input type="checkbox" id="replyDontShow">
+          더 이상 보지 않기
+        </label>
+        <button type="button" id="replyConfirmBtn" class="ui-btnetc">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -4340,27 +4748,6 @@
       return res.json();        // 항상 JSON 객체를 돌려줌
     }
 
-
-
-
-    // ★ 마법부여 서버 커밋 헬퍼 (성공해야만 합산 진행)
-    // ★ 마법부여 서버 커밋 헬퍼 (성공해야만 합산 진행)
-    async function postEnchantSelect(slotKey, serverName, typeKey) {
-      const serverSlot = slotCodeToServerSlot(slotKey);
-      if (!serverSlot || !serverName || !typeKey) {
-        throw new Error('bad_enchant_args');
-      }
-
-      const j = await apiJSON('enchant_select', {
-        slot: serverSlot,
-        name: serverName,
-        enchType: typeKey
-      });
-
-      if (!j || !j.ok) throw new Error('enchant_select_failed');
-      return j;
-    }
-
     async function populateMonsterSelect() {
       const sel = document.getElementById('selMonster');
       if (!sel) return;
@@ -4395,7 +4782,7 @@
         // 4) 기본값 1회 적용 (세션 반영 + 합산/렌더)
         if (names.length) {
           sel.value = def;
-          await onMonsterChange(); // 내부에서 monster_select → recalcAndRenderPanel
+          await onMonsterChange(); 
         } else {
           console.warn('[MON] monster:list empty from CORE.lists/CORE_DATA');
         }
@@ -4477,7 +4864,17 @@
               console.warn('[preset UI] update 실패:', e);
             }
           }
+            // ★ 여기! pendingReply 있으면 팝업 띄우기
+  if (data.pendingReply && data.pendingReply.reply) {
+    openReplyPopup(data.pendingReply);
+  }
+                    // 🔹 로그인 성공 후에만 관리자 문의 아이콘 보여주기
+          const contactBtn = document.getElementById('btnContactAdmin');
+          if (contactBtn) {
+            contactBtn.style.display = 'inline-flex';
+          }
         }
+        
         window.__loginPingResult = data;
         return data;
       } catch (e) {
@@ -4486,6 +4883,63 @@
         return window.__loginPingResult;
       }
     }
+
+    // 문의 전송 세팅
+(function setupContactForm() {
+  const btnContact = document.getElementById('btnContact');      // 제목 우측 아이콘 버튼
+  const modal      = document.getElementById('contactModal');
+  const textarea   = document.getElementById('contactTalk');
+  const btnSend    = document.getElementById('btnContactSend');
+
+  if (!modal || !textarea || !btnSend) return; // 요소가 없으면 조용히 종료
+
+  // (아이콘 버튼으로 모달 열기 – 이미 있으시면 생략)
+  if (btnContact && !btnContact._bound) {
+    btnContact._bound = true;
+    btnContact.addEventListener('click', () => {
+      modal.classList.add('show');
+      textarea.focus();
+    });
+  }
+
+  // 보내기 버튼 클릭 → contact_admin 호출
+  if (!btnSend._bound) {
+    btnSend._bound = true;
+    btnSend.addEventListener('click', async () => {
+      const talk = textarea.value.trim();
+      if (!talk) {
+        (window.toast || alert)('문의 내용을 입력해 주세요.');
+        return;
+      }
+
+      try {
+        btnSend.disabled = true;
+
+        const roleInfo = window.__userRole || {};
+        const res = await apiJSON('contact_admin', {
+          talk,
+          // 필요하면 나중에 인게임 / 유튜브도 같이 넘길 수 있음
+          ingame:  '...',
+          youtube: '...',
+          role: roleInfo.label || '',
+        });
+
+        if (!res || !res.ok) {
+          throw new Error(res?.error || 'contact_fail');
+        }
+
+        textarea.value = '';
+        modal.classList.remove('show');
+        (window.toast || alert)('문의가 전송되었습니다. 감사합니다!');
+      } catch (e) {
+        console.error('[contact_admin] 실패:', e);
+        (window.toast || alert)('전송에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      } finally {
+        btnSend.disabled = false;
+      }
+    });
+  }
+})();
 
 
     // --- [ENCHANT] 마부 타입만 허용 ---
@@ -4542,25 +4996,6 @@
         body: JSON.stringify({ id_token })
       });
       return r.json();
-    }
-
-    /** === [NEW] 성안의 봉인 옵션 확정 === */
-    async function apiCastleSealSelect(mainName, subName) {
-      const token = await waitForIdToken();
-      const res = await fetch(`${WEBAPP_URL}?type=castle_seal_select`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          id_token: token,
-          mainName,
-          subName,
-        }),
-      });
-      if (!res.ok) throw new Error(`castle_seal_select_http_${res.status}`);
-      return res.json();
     }
 
     // 전역 플래그
@@ -5886,15 +6321,15 @@
 
 
 
-    async function saveSkillSelections() {
+        async function saveSkillSelections() {
       const arr = [];
       for (const s of (ST2.rows || [])) {
         const lv = Number(state.skillLv?.[s.id] ?? 0);
         const tp = Number(state.skillTpLv?.[s.id] ?? 0);
         if (lv > 0) arr.push({ name: s.name, lv, tp });
       }
+
       try {
-        const token = await waitForIdToken();
         // ownerKey 계산 (1순위: 합산캐시, 2순위: 현재 캐릭 정보)
         const raw = state.CurrentSumStats || {};
         let ownerKey = String(raw.ownerKey || '').trim();
@@ -5903,17 +6338,29 @@
           const nm = String(state.currentCharacter.name || '').trim();
           ownerKey = (jg + nm).replace(/\s+/g, '');
         }
-        let res = await apiJSON('skill_state_set', { ownerKey, skills: arr });
-        let j = await res.json();
+
+        // ★ skill_state_set 호출 (이미 JSON 객체 반환)
+        const res = await apiJSON('skill_state_set', { ownerKey, skills: arr });
+
+        // ★ 여기서 브라우저 콘솔에 스킬 정보 출력
+        if (Array.isArray(res?.skillsDebug)) {
+          console.log('[skill_state_set] skillsDebug =', res.skillsDebug);
+        }
+
         // SumStats 증발 등으로 no_ownerKey가 오면 1회 복구 후 재시도
-        if (j?.error === 'no_ownerKey') {
-          //try { await recalcAndRenderPanel(); } catch (_) { }
-          // recalc 후 ownerKey 갱신 재계산
+        if (res?.error === 'no_ownerKey') {
           const raw2 = state.CurrentSumStats || {};
           ownerKey = String(raw2.ownerKey || ownerKey || '').trim();
-          await apiJSON('skill_state_set', { ownerKey, skills: arr }).then(r => r.json());
+
+          const res2 = await apiJSON('skill_state_set', { ownerKey, skills: arr });
+
+          if (Array.isArray(res2?.skillsDebug)) {
+            console.log('[skill_state_set] skillsDebug (retry) =', res2.skillsDebug);
+          }
         }
-      } catch (_) { }
+      } catch (e) {
+        console.error('[saveSkillSelections] skill_state_set 실패', e);
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -6258,6 +6705,7 @@
         window.printUses?.();
       };
       window.simulateSkillUsage = simulateSkillUsage;
+      window.getTimeKey = getTimeKey;
 
       // 시간창 변경 시 재시뮬
       document.getElementById('selTime')?.addEventListener('change', () => {
@@ -6274,20 +6722,16 @@
 
     let __monsterApplyingDefault = false;
     // 드롭다운 변경 시 호출
-    async function onMonsterChange() {
+        async function onMonsterChange() {
       const sel = document.getElementById('selMonster');
       const name = sel?.value || '거대누골';
 
-      // 1) 선택 반영 (세션 s.MonStats 저장)
-      await apiJSON('monster_select', {
-        name
-      });
-
-      // (선택) UI에 표시가 필요하면 유지
+      // 1) 서버 호출 없이, 로컬 state에만 반영
+      window.state = window.state || {};
       state.monster = { name };
 
-      // 합산 재계산 + 렌더 (내부에서 sum_stats 호출/렌더까지 끝냄)
-      //await recalcAndRenderPanel();
+      // 2) 합산 스탯(sum_stats)은 몬스터와 무관하므로 여기서 서버 호출은 하지 않는다.
+      //    최종 데미지 계산 시 computeViaBackend에서 이 state.monster를 서버 세션(s.MonStats)에 반영한다.
     }
 
     /* 선택된 시트 아이템(스탯 묶음) 보관 슬롯 */
@@ -6677,7 +7121,7 @@
       if (!btn) return;
 
       // 텍스트 초기화
-      btn.textContent = '커스텀옵';
+      btn.textContent = '고유효과(무기)';
 
       // 색상 클래스 제거
       const allNames = ['강타', '광채', '분쇄', '선명', '없음'];
@@ -6706,7 +7150,7 @@
 
           const pickedMain = cs.type || cs.customType || '';
           if (!pickedMain) {
-            btnMain.textContent = '커스텀옵';
+            btnMain.textContent = '고유효과(무기)';
           } else {
             btnMain.textContent = pickedMain;
             btnMain.classList.add('customopt-' + pickedMain);
@@ -6727,7 +7171,7 @@
           // 예전 스냅샷 호환용으로 customArmorLabel도 같이 봄
           let pickedArmor = cs.armorType || s.customArmorLabel || '';
           if (!pickedArmor) {
-            btnArmor.textContent = '커스텀옵(상의)';
+            btnArmor.textContent = '고유효과(상의)';
           } else {
             btnArmor.textContent = pickedArmor;
             btnArmor.classList.add('armor-customopt-' + pickedArmor);
@@ -6746,7 +7190,7 @@
 
           let pickedBracelet = cs.braceletType || s.customBraceletLabel || '';
           if (!pickedBracelet) {
-            btnBracelet.textContent = '커스텀옵';
+            btnBracelet.textContent = '고유효과(팔찌)';
           } else {
             btnBracelet.textContent = pickedBracelet;
             btnBracelet.classList.add('bracelet-customopt-' + pickedBracelet);
@@ -6764,7 +7208,7 @@
 
           let pickedEarring = cs.earringType || s.customEarringLabel || '';
           if (!pickedEarring) {
-            btnEarring.textContent = '커스텀옵(귀걸이)';
+            btnEarring.textContent = '고유효과(귀걸이)';
           } else {
             btnEarring.textContent = pickedEarring;
             btnEarring.classList.add('earring-customopt-' + pickedEarring);
@@ -6772,7 +7216,125 @@
         }
       }
     }
+   // ★★★ 커스텀옵 조건 강제 리셋 함수 추가 ★★★
+    
+   function enforceCustomSkillConstraints() {
+      if (!window.state) return;
+      const state = window.state;
+      state.selections = state.selections || {};
+      state.customSkills = state.customSkills || {};
 
+      const cs   = state.customSkills;
+      const sels = state.selections;
+
+      const norm = (v) => String(v ?? '').trim();
+      const toLevel = (v) => {
+        if (v == null) return 0;
+        const n = parseInt(String(v).replace(/[^\d.-]/g, ''), 10);
+        return Number.isFinite(n) ? n : 0;
+      };
+
+      let changed = false;
+
+      // ─────────────────────────────────────
+      // 1) 무기 커스텀: 렙제 70 이상 + 에픽 아니면 강제 제거
+      // ─────────────────────────────────────
+      {
+        const selWeapon = sels.weapon || null;
+        let wLevel = 0;
+        let wRarity = '';
+
+        if (selWeapon) {
+          wLevel  = toLevel(selWeapon.level ?? selWeapon.levelVal);
+          wRarity = norm(selWeapon.rarity);
+        }
+
+        const low = wRarity.toLowerCase();
+        const isEpic = (wRarity === '에픽' || low === 'epic');
+
+        const ok = !!selWeapon && isEpic && wLevel >= 70;
+
+        if (!ok) {
+          if (cs.type || cs.weaponName || state.customOptLabel) {
+            changed = true;
+          }
+          cs.type = '';
+          cs.weaponName = '';
+          state.customOptLabel = null;   // 모달 하이라이트용
+        }
+      }
+
+      // ─────────────────────────────────────
+      // 2) 상의 커스텀: 레어리티 익시드 아닐 때 제거
+      // ─────────────────────────────────────
+      {
+        const selTop = sels.top || null;
+        let r = '';
+        if (selTop) r = norm(selTop.rarity);
+        const low = r.toLowerCase();
+        const isExceed = (r === '익시드' || low === 'exceed');
+        const ok = !!selTop && isExceed;
+
+        if (!ok) {
+          if (cs.armorType || state.customArmorLabel || (state.customArmor && state.customArmor.type)) {
+            changed = true;
+          }
+          cs.armorType = '';
+          state.customArmorLabel = null;
+          if (state.customArmor) state.customArmor.type = '';
+        }
+      }
+
+      // ─────────────────────────────────────
+      // 3) 팔찌 커스텀: 레어리티 익시드 아닐 때 제거
+      // ─────────────────────────────────────
+      {
+        const selBracelet = sels.bracelet || null;
+        let r = '';
+        if (selBracelet) r = norm(selBracelet.rarity);
+        const low = r.toLowerCase();
+        const isExceed = (r === '익시드' || low === 'exceed');
+        const ok = !!selBracelet && isExceed;
+
+        if (!ok) {
+          if (cs.braceletType || state.customBraceletLabel) {
+            changed = true;
+          }
+          cs.braceletType = '';
+          state.customBraceletLabel = null;
+        }
+      }
+
+      // ─────────────────────────────────────
+      // 4) 귀걸이 커스텀: 레어리티 익시드 아닐 때 제거
+      // ─────────────────────────────────────
+      {
+        const selEarring = sels.earring || null;
+        let r = '';
+        if (selEarring) r = norm(selEarring.rarity);
+        const low = r.toLowerCase();
+        const isExceed = (r === '익시드' || low === 'exceed');
+        const ok = !!selEarring && isExceed;
+
+        if (!ok) {
+          if (cs.earringType || state.customEarringLabel) {
+            changed = true;
+          }
+          cs.earringType = '';
+          state.customEarringLabel = null;
+        }
+      }
+
+      // 뭔가 하나라도 리셋됐으면 버튼/설명 UI 갱신
+      if (changed) {
+        if (typeof applyCustomOptUIFromState === 'function') {
+          applyCustomOptUIFromState();
+        }
+        if (typeof updateEquipDescPreview === 'function') {
+          updateEquipDescPreview();
+        }
+      }
+    }
     // ─────────────────────────────────────────────
     // 상의 커스텀옵 적용 버튼 처리
     // ─────────────────────────────────────────────
@@ -6803,7 +7365,7 @@
       const btn = document.getElementById('btnCustomOptArmor');
       if (btn) {
         // 라벨
-        btn.textContent = picked || '커스텀옵(상의)';
+        btn.textContent = picked || '고유효과(상의)';
 
         // 색상 클래스(armor-customopt-*) 리셋 후 선택한 것만 부여
         armorNames.forEach(name => {
@@ -6813,7 +7375,10 @@
           btn.classList.add('armor-customopt-' + picked);
         }
       }
-
+   // ★ 장비 설명 프리뷰 갱신
+      if (typeof updateEquipDescPreview === 'function') {
+        updateEquipDescPreview();
+      }
       // 3) 모달 닫기
       closeArmorCustomOptModal();
     });
@@ -6843,7 +7408,7 @@
       // 버튼 텍스트/색상 갱신
       const btn = document.getElementById('btnCustomOptEarring');
       if (btn) {
-        btn.textContent = picked || '커스텀옵(귀걸이)';
+        btn.textContent = picked || '고유효과(귀걸이)';
 
         earringNames.forEach(name => {
           btn.classList.remove('earring-customopt-' + name);
@@ -6852,7 +7417,10 @@
           btn.classList.add('earring-customopt-' + picked);
         }
       }
-
+     // ★ 장비 설명 프리뷰 갱신
+      if (typeof updateEquipDescPreview === 'function') {
+        updateEquipDescPreview();
+      }
       closeEarringCustomOptModal();
     });
 
@@ -7101,13 +7669,18 @@
       // 3) 버튼 텍스트/색상 갱신
       // ─────────────────────────────────────
       const allNames = ['강타', '광채', '분쇄', '선명', '없음'];
-      btn.textContent = picked || '커스텀옵';
+      btn.textContent = picked || '고유효과(무기)';
 
       allNames.forEach(name => {
         btn.classList.remove('customopt-' + name);
       });
       if (picked) {
         btn.classList.add('customopt-' + picked);   // customopt-강타 / customopt-광채 ... 클래스
+      }
+
+        // ★ 장비 설명 프리뷰 갱신
+      if (typeof updateEquipDescPreview === 'function') {
+        updateEquipDescPreview();
       }
 
       closeCustomOptModal();
@@ -7159,7 +7732,28 @@
           }
           return;
         }
+      // ★ 커스텀옵 활성 조건: 렙제 70 이상 + 에픽 무기
+      const state = window.state || {};
+      const selections = state.selections || {};
+      const selWeapon = selections.weapon || null;
 
+      let weaponLevel = 0;
+      let weaponRarity = '';
+
+      if (selWeapon) {
+        if (selWeapon.level != null) {
+          weaponLevel = parseInt(String(selWeapon.level), 10) || 0;
+        }
+        weaponRarity = String(selWeapon.rarity || '').trim();
+      }
+
+      const lowR = weaponRarity.toLowerCase();
+      const isEpic = (weaponRarity === '에픽' || lowR === 'epic');
+
+      if (!(isEpic && weaponLevel >= 70)) {
+        toast('고유효과는 70제 에픽 무기에서만 사용할 수 있습니다.');
+        return;
+      }
         // 이제는 단순히 모달만 열고,
         // 실제 커스텀옵 적용은 모달 내 "적용" 버튼에서 state.customSkills 에만 기록
         openCustomOptModal();
@@ -7250,7 +7844,7 @@
       state.customBraceletLabel = (picked === '없음') ? null : picked;
 
       // 버튼 텍스트/색상 갱신
-      btn.textContent = picked || '커스텀옵';
+      btn.textContent = picked || '고유효과(팔찌)';
 
       const allNames = ['선봉', '의지', '이상', '없음'];
       allNames.forEach(name => {
@@ -7259,7 +7853,10 @@
       if (picked) {
         btn.classList.add('bracelet-customopt-' + picked);
       }
-
+ // ★ 장비 설명 프리뷰 갱신
+      if (typeof updateEquipDescPreview === 'function') {
+        updateEquipDescPreview();
+      }
       closeBraceletCustomOptModal();
     });
 
@@ -7274,7 +7871,7 @@
       }
 
       // 초기 라벨
-      btnBracelet.textContent = state.customBraceletLabel || '커스텀옵';
+      btnBracelet.textContent = state.customBraceletLabel || '고유효과(팔찌)';
 
       btnBracelet.addEventListener('click', async (e) => {
         e.stopPropagation();
@@ -7288,11 +7885,28 @@
         }
         const hasBracelet = !!(braceletTile && braceletTile.querySelector('img'));
 
-        if (!hasBracelet) {
+         if (!hasBracelet) {
           toast('팔찌를 먼저 선택해주세요');
           if (typeof openItemPicker === 'function') {
             await openItemPicker('bracelet');
           }
+          return;
+        }
+
+        // ★ 레어리티 체크: 익시드일 때만
+        const state = window.state || {};
+        const selections = state.selections || {};
+        const selBracelet = selections.bracelet || null;
+
+        let braceletRarity = '';
+        if (selBracelet) {
+          braceletRarity = String(selBracelet.rarity || '').trim();
+        }
+        const braceletLower = braceletRarity.toLowerCase();
+        const isExceed = (braceletRarity === '익시드' || braceletLower === 'exceed');
+
+        if (!isExceed) {
+          toast('팔찌 고유효과는 익시드 아이템에만 부여하는 옵션입니다.');
           return;
         }
 
@@ -7325,6 +7939,23 @@
           return;
         }
 
+        // ★ 레어리티 체크: 익시드일 때만
+        const state = window.state || {};
+        const selections = state.selections || {};
+        const selTop = selections.top || null;
+
+        let topRarity = '';
+        if (selTop) {
+          topRarity = String(selTop.rarity || '').trim();
+        }
+        const topLower = topRarity.toLowerCase();
+        const isExceed = (topRarity === '익시드' || topLower === 'exceed');
+
+        if (!isExceed) {
+          toast('상의 고유효과는 익시드 아이템에만 부여하는 옵션입니다.');
+          return;
+        }
+
         // 상의 커스텀옵 모달 열기
         openArmorCustomOptModal();
       });
@@ -7347,11 +7978,28 @@
         }
         const hasEarring = !!(earringTile && earringTile.querySelector('img'));
 
-        if (!hasEarring) {
+         if (!hasEarring) {
           toast('귀걸이 아이템을 먼저 선택해주세요');
           if (typeof openItemPicker === 'function') {
             await openItemPicker('earring');
           }
+          return;
+        }
+
+        // ★ 레어리티 체크: 익시드일 때만
+        const state = window.state || {};
+        const selections = state.selections || {};
+        const selEarring = selections.earring || null;
+
+        let earringRarity = '';
+        if (selEarring) {
+          earringRarity = String(selEarring.rarity || '').trim();
+        }
+        const earringLower = earringRarity.toLowerCase();
+        const isExceed = (earringRarity === '익시드' || earringLower === 'exceed');
+
+        if (!isExceed) {
+          toast('귀걸이 고유효과는 익시드 아이템에만 부여하는 옵션입니다.');
           return;
         }
 
@@ -7426,6 +8074,7 @@
     }
 
     /** === [NEW] 성안의 봉인 옵션 선택 확정 === */
+        /** === [NEW] 성안의 봉인 옵션 선택 확정 === */
     let __sealCommitPending = false;
 
     async function commitCastleSealSelection() {
@@ -7440,41 +8089,32 @@
         }
 
         // 규칙: undefined = 유지, '' = 해제, '이름' = 설정
-        const mainName = (__sealPick.main?.name ?? '');
-        const subName = (__sealPick.sub?.name ?? '');
+        const mainName = (__sealPick.main?.name ?? '').trim();
+        const subName = (__sealPick.sub?.name ?? '').trim();
 
-        // 서버 반영 (apiJSON 사용)
-        const res = await apiJSON('castle_seal_select', {
-          mainName, subName
-        });
-
-        if (!res?.ok) {
-          console.error('[castle_seal_select] fail:', res);
-          toast('성안의 봉인 저장 실패');
-          return;
-        }
-
-        // 프론트 상태 동기화
+        // ★ 서버 호출 없이, 프론트 state 만 갱신
         state.castleSeal = {
-          main: __sealPick.main ? { name: __sealPick.main.name } : null,
-          sub: __sealPick.sub ? { name: __sealPick.sub.name } : null,
+          main: mainName ? { name: mainName } : null,
+          sub: subName ? { name: subName } : null,
         };
-        state.CastleStats = res.CastleStats || null;
+        // CastleStats 는 calc_all / compute 시 서버에서 다시 계산하므로 여기선 건드리지 않음
+        // state.CastleStats = null;   // 굳이 초기화하고 싶으면 이 줄 추가
 
-        // 라벨/캡션/합산 갱신
+        // 라벨/캡션 등 필요시 갱신 (지금은 효과 거의 없음)
         if (typeof refreshSealLabelsFromState === 'function') {
           refreshSealLabelsFromState();
         }
-        if (typeof recalcAndRenderPanel === 'function') {
-          //await recalcAndRenderPanel();
-        }
 
-        //toast('성안의 봉인이 적용되었습니다.');
+        // 바로 합산 스탯까지 다시 땡기고 싶으면 여기서
+        // if (typeof recalcAndRenderPanel === 'function') {
+        //   await recalcAndRenderPanel();
+        // }
+
         closecastleSealModal();
 
       } catch (err) {
         console.error('[commitCastleSealSelection] error', err);
-        toast('성안의 봉인 저장 실패');
+        toast('성안의 봉인 설정 중 오류가 발생했습니다.');
       } finally {
         __sealCommitPending = false;
       }
@@ -7653,43 +8293,6 @@
       empty: '없음',
     };
 
-    /* 서버 세션에 선택 저장: ★ enhType은 무조건 '아바타' */
-    async function selectEnhOnServer(slot, name) {
-      const token = await waitForIdToken();
-      const r = await fetch(`${WEBAPP_URL}?type=enh_select`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id_token: token,
-          slot,               // 'avatar' | 'imprint' 등 세션 키
-          name,               // 시트 '이름'과 정확히 일치
-          enhType: '아바타',   // ★ 여기 핵심!
-        }),
-      });
-      const j = await r.json().catch(() => null);
-      if (!j?.ok) throw new Error(`enh_select_failed:${j?.error || 'unknown'}`);
-    }
-
-    /* 아바타 선택 → 서버 저장 + 로컬 미러링 + 합산 갱신 */
-    async function applyAvatarEnhFromState() {
-      const name = AVATAR_NAME?.[state?.options?.avatar] || '';
-      await selectEnhOnServer('avatar', name);
-      await ensureEnhLoaded();
-      state.options.avatarEnh = name ? findEnhByExactName(name) : null;
-      if (typeof requestSumStats === 'function') requestSumStats();
-      //else if (typeof recalcAndRenderPanel === 'function') recalcAndRenderPanel();
-    }
-
-    /* 무기압 선택 → 서버 저장 + 로컬 미러링 + 합산 갱신
-       ★ 무기압도 종류는 '아바타'로 보낸다 */
-    async function applyImprintEnhFromState() {
-      const name = IMPRINT_NAME?.[state?.options?.weaponImprint] || '';
-      await selectEnhOnServer('imprint', name);  // enhType은 함수 내부에서 '아바타'
-      await ensureEnhLoaded();
-      state.options.imprintEnh = name ? findEnhByExactName(name) : null;
-      if (typeof requestSumStats === 'function') requestSumStats();
-      //else if (typeof recalcAndRenderPanel === 'function') recalcAndRenderPanel();
-    }
     /* ===== 캐릭터 시트 로더 ===== */
     const characterCard = document.getElementById('characterCard');
     characterCard.addEventListener('click', openCharacterPicker)
@@ -7908,6 +8511,73 @@
       });
     }
 
+function openReplyPopup(info) {   //문의 답장 팝업
+  const $m = document.getElementById('replyModal');
+  if (!$m) return;
+
+  const $orig = document.getElementById('replyOriginal');
+  const $ans  = document.getElementById('replyAnswer');
+  const $chk  = document.getElementById('replyDontShow');
+
+  if ($orig) {
+    $orig.textContent = info.talk || '(문의 내용 없음)';
+  }
+  if ($ans) {
+    $ans.textContent = info.reply || '';
+  }
+    if ($chk) {
+    $chk.checked = false;   // 항상 체크 해제 상태로 시작
+  }
+
+  // ★ 현재 답장 행 번호를 전역에 기억
+  window.__pendingReplyRow = info.row || null;
+
+  $m.classList.add('show');
+  $m.setAttribute('aria-hidden', 'false');
+}
+
+// 닫기 처리
+(function bindReplyModalClose() {
+  const $m = document.getElementById('replyModal');
+  if (!$m) return;
+
+  $m.addEventListener('click', (e) => {
+    const t = e.target;
+    if (t.hasAttribute('data-reply-close') || t.classList.contains('backdrop')) {
+      $m.classList.remove('show');
+      $m.setAttribute('aria-hidden', 'true');
+    }
+  });
+})();
+// 답장 모달 확인 버튼 처리
+(function bindReplyConfirm() {
+  const btn = document.getElementById('replyConfirmBtn');
+  const modal = document.getElementById('replyModal');
+  const chk = document.getElementById('replyDontShow');
+  if (!btn || !modal) return;
+  if (btn._bound) return;
+  btn._bound = true;
+
+  btn.addEventListener('click', async () => {
+    const dontShow = chk && chk.checked;
+    const row = window.__pendingReplyRow;
+
+    // 모달 닫기
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+
+    // 체크 안 했으면 서버에 아무것도 안 보내고 끝
+    if (!dontShow || !row) return;
+
+    try {
+      await apiJSON('contact_ack', { row });
+    } catch (e) {
+      console.warn('[replyConfirm] contact_ack 실패:', e);
+      // 실패해도 사용자 입장에선 모달은 이미 닫혔으니, 여기선 조용히 로그만
+    }
+  });
+})();
+
 
     // 모달 열기 / 닫기
     async function openCharacterPicker() {
@@ -8036,6 +8706,8 @@
       const 방어구포인트 = row['방어구포인트'] ?? row.armpoint ?? '';
       const 악세포인트 = row['악세포인트'] ?? row.accpoint ?? '';
       const 보조장비포인트 = row['보조장비포인트'] ?? row.subpoint ?? '';
+      const 접두사 = row['접두사'] ?? row.prefix ?? '';
+      const 설명 = row['설명'] ?? row.desc ?? row.description ?? '';
       return {
         name: S(이름),
         type: S(종류),
@@ -8046,9 +8718,20 @@
         armpoint: S(방어구포인트),
         accpoint: S(악세포인트),
         subpoint: S(보조장비포인트),
+        prefix: S(접두사),
+        desc: S(설명),
         _raw: row
       };
     }
+
+    // 장비 접두사 텍스트를 라벨용으로 정리 (공백/콜론 제거)
+function makeEquipPrefixLabel(raw) {
+  if (raw == null) return '';
+  const txt = String(raw).trim();
+  if (!txt) return '';
+  return txt.replace(/\s+/g, '').replace(/:/g, '');
+}
+
 
     // --- 직업군 매칭 유틸 ---
 
@@ -8299,52 +8982,107 @@
     }
     function closeItemPicker() { itemModal.classList.remove('show'); itemModal.setAttribute('aria-hidden', 'true'); }
     itemModal.addEventListener('click', (e) => { if (e.target.hasAttribute('data-close') || e.target.classList.contains('backdrop')) closeItemPicker(); });
-    async function applyItemToSlot(slotKey, item) {
-      try {
-        if (!window.state) window.state = {};
+    // 아이템 선택 후 슬롯에 적용
+async function applyItemToSlot(slotKey, item) {
+  try {
+    if (!window.state) window.state = {};
+    const state = window.state;
+    state.selections = state.selections || {};
 
-        // 1) 프론트 상태에 현재 장비 정보 저장
-        state.selections = state.selections || {};
-        state.selections[slotKey] = {
-          name: item.name,
-          img: item.img || null,
-          code: item.code || null,
-          // 나중에 calc_all 에서 쓸 수 있도록 확장 여지
-          // stats: item.stats || null,
-        };
+    // ★ 접두사 원본 문자열 가져오기
+    const rawPrefix =
+      (item && item.prefix) ||
+      (item && item._raw && (item._raw['접두사'] ?? item._raw.prefix)) ||
+      '';
 
-        // 2) 슬롯 타일 이미지 교체
-        const tile = tileElForSlot(slotKey);
-        if (tile) {
-          const safeAlt = String(item.name || '').replace(/"/g, '&quot;');
-          const src = item.img || PLACEHOLDER_IMG;
+    // ★ 슬롯 라벨에 쓸 짧은 텍스트로 변환
+    const prefixLabel = makeEquipPrefixLabel(rawPrefix);
 
-          tile.innerHTML =
-            `<img class="item-img" alt="${safeAlt}"` +
-            ` src="${src}" style="width:70%;height:70%;border-radius:8px;">`;
-          tile.classList.add('selected');
-        }
+        // ★ state.selections 안에도 prefixLabel + 기본 메타(레벨/레어리티) 저장
+    const rawLevel =
+      (item && (item.level ?? item.levelVal ?? (item._raw && (item._raw['렙제'] ?? item._raw.level)))) ?? '';
+    const levelVal = parseInt(String(rawLevel).replace(/[^\d.-]/g, ''), 10);
 
-        // 3) (선택) 캐슬 씰 같은 부가 UI 갱신은 그대로 유지
-        try {
-          if (typeof refreshSealCaptionsForSlot === 'function') {
-            refreshSealCaptionsForSlot(slotKey);
-          }
-          if (typeof refreshSealLabelsFromState === 'function') {
-            refreshSealLabelsFromState();
-          }
-        } catch (e2) {
-          console.warn('[applyItemToSlot] extra UI refresh failed:', e2);
-        }
+    const rawRarity = String(
+      (item && (item.rarity ?? '')) ||
+      (item && item._raw && (item._raw.rarity || item._raw['레어리티'] || item._raw['희귀도'] || item._raw['등급'])) ||
+      ''
+    ).trim();
 
-        // ✅ 여기서 더 이상 서버로 equip_select / sum_stats 보내지 않음
-        //    합산스탯/최종 데미지는 "계산하기" 버튼에서 calc_all 호출 시 한 번에 처리할 예정.
-
-      } catch (e) {
-        console.error('[applyItemToSlot]', e);
-        alert('아이템 적용에 실패했습니다.');
-      }
+    let rarityNorm = rawRarity;
+    const rarityLower = rarityNorm.toLowerCase();
+    if (rarityNorm === '에픽' || rarityLower === 'epic') {
+      rarityNorm = '에픽';
+    } else if (rarityNorm === '익시드' || rarityLower === 'exceed') {
+      rarityNorm = '익시드';
     }
+
+    state.selections[slotKey] = {
+      name: item.name,
+      img: item.img || null,
+      code: item.code || null,
+      type: item.type || '',      // ★ 세트 매칭용 타입 추가
+      prefixLabel: prefixLabel || null,
+      desc:
+        item.desc ||
+        (item._raw && (item._raw['설명'] ?? item._raw.desc)) ||
+        '',
+      level: Number.isFinite(levelVal) ? levelVal : null,
+      rarity: rarityNorm || null,
+    };
+
+
+    // ★ 세트 경량리스트 헬퍼 (CORE.lists['set:list'] 사용)
+function getLightSetList() {
+  const core = (window.CORE && window.CORE.lists) || {};
+  const list = core['set:list'];
+  return Array.isArray(list) ? list : [];
+}
+    // ★ 슬롯 타일에 라벨 + 이미지 그리기
+    const tile = tileElForSlot(slotKey);
+    if (tile) {
+      const safeAlt = String(item.name || '').replace(/"/g, '&quot;');
+      const src = item.img || PLACEHOLDER_IMG;
+      const labelHtml = prefixLabel
+        ? `<div class="equip-prefix">${prefixLabel}</div>`
+        : '';
+
+      tile.innerHTML =
+        labelHtml +
+        `<img class="item-img" alt="${safeAlt}"` +
+        ` src="${src}" style="width:70%;height:70%;border-radius:8px;">`;
+      tile.classList.add('selected');
+    }
+
+    // 모달 닫기
+    const modal = document.getElementById('itemModal');
+    if (modal) {
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    // 엠블렘/성안의 봉인/강화 라벨 등 부가 UI 리프레시
+    if (typeof refreshAllDots === 'function') {
+      refreshAllDots();   // 엠블렘 도트
+    }
+    if (typeof refreshSealLabelsFromState === 'function') {
+      refreshSealLabelsFromState();
+    }
+    if (typeof refreshEnhLabelsFromState === 'function') {
+      refreshEnhLabelsFromState();
+    }
+    // ★ 커스텀옵 조건 검사 → 안 맞는 건 자동 초기화
+    if (typeof enforceCustomSkillConstraints === 'function') {
+      enforceCustomSkillConstraints();
+    }
+    // ★ 장비 설명 프리뷰 갱신
+if (typeof updateEquipDescPreview === 'function') {
+  updateEquipDescPreview();
+}
+  } catch (e) {
+    console.warn('[applyItemToSlot] 실패:', e);
+  }
+}
 
     function tileElForSlot(slotKey) { const domKey = Object.keys(SLOT_MAP).find(k => SLOT_MAP[k] === slotKey); return document.querySelector(`.slot[data-slot="${domKey}"]`); }
     function labelForSlot(slotKey) {
@@ -8354,6 +9092,508 @@
         aura: '오라', title: '칭호', creature: '크리쳐', artifact: '아티팩트', earring: '귀걸이', magestone: '마법석'
       })[slotKey] || '아이템';
     }
+    // 장비 설명 프리뷰 갱신
+function updateEquipDescPreview() {
+  const box = document.getElementById('equipDescPreview');
+  if (!box) return;
+
+  const state = window.state || {};
+  const selections = state.selections || {};
+
+  const lines = [];
+
+  // 슬롯 분류
+  const ARMOR_SLOTS = new Set(['headshoulder', 'top', 'bottom', 'belt', 'shoes']);
+  const ACC_SLOTS   = new Set(['bracelet', 'necklace', 'ring']);
+  const SPEC_SLOTS  = new Set(['sub', 'magestone', 'earring']);
+
+  const norm = (v) => String(v ?? '').trim();
+  const toNum = (v) => {
+    const n = Number(String(v ?? '').replace(/[^\d.-]/g, ''));
+    return Number.isFinite(n) ? n : 0;
+  };
+
+    // "신속: 버닝 플레이트" 같은 문자열에서 ": " 뒤만 남기는 유틸
+  const stripSetPrefix = (v) => {
+    const s = String(v ?? '').trim();
+    if (!s) return '';
+    const marker = ': ';
+    const idx = s.indexOf(marker);
+    if (idx < 0) return s;
+    return s.slice(idx + marker.length).trim();
+  };
+
+
+   // 1) type별 방어구/악세/특수 개수 카운트
+  //    + 방어구/악세/특수용 베이스(접두사 제거) 카운트
+  const typeCounts = {};
+  const armorBaseCounts = {}; // 방어구: 베이스 타입 기준 개수
+  const accBaseCounts   = {}; // 악세:   베이스 타입 기준 개수
+  const specBaseCounts  = {}; // 특수:   베이스 타입 기준 개수
+
+  for (const [slotKey, info] of Object.entries(selections)) {
+    if (!info || !info.type) continue;
+
+    const t = norm(info.type);      // 원본 type (접두사 포함)
+    if (!t) continue;
+
+    if (!typeCounts[t]) {
+      typeCounts[t] = { armor: 0, acc: 0, spec: 0 };
+    }
+
+    const base = stripSetPrefix(t);
+
+    if (ARMOR_SLOTS.has(slotKey)) {
+      typeCounts[t].armor++;
+
+      if (base) {
+        armorBaseCounts[base] = (armorBaseCounts[base] || 0) + 1;
+      }
+    } else if (ACC_SLOTS.has(slotKey)) {
+      typeCounts[t].acc++;
+
+      if (base) {
+        accBaseCounts[base] = (accBaseCounts[base] || 0) + 1;
+      }
+    } else if (SPEC_SLOTS.has(slotKey)) {
+      typeCounts[t].spec++;
+
+      if (base) {
+        specBaseCounts[base] = (specBaseCounts[base] || 0) + 1;
+      }
+    }
+  }
+
+
+  // 2) 세트 시트 정보 준비
+  let setList = [];
+  try {
+    setList =
+      (window.CORE && window.CORE.lists && window.CORE.lists['set:list']) ||
+      [];
+    if (!Array.isArray(setList)) setList = [];
+  } catch (e) {
+    console.warn('[updateEquipDescPreview] set preview failed (load set:list):', e);
+    setList = [];
+  }
+
+  const rowsByType = {};
+  setList.forEach((r) => {
+    const t = norm(r.type);
+    if (!t) return;
+    (rowsByType[t] = rowsByType[t] || []).push(r);
+  });
+
+  const activeArmorSetTypes = new Set(); // 방어구 5세트 완성된 type/base
+  const activeAccSetTypes   = new Set(); // 악세 3세트 완성된 type/base
+  const activeSpecSetTypes  = new Set(); // 특수 3세트 완성된 type/base
+  const setLines = [];
+
+  // 방어구: baseKey + n(3/5) 기록
+  const prefixSetHit = {}; // baseKey → { 세트수(n): true }
+
+  // 악세/특수: baseKey 단위로 "원본문자열 세트가 이미 있다"는 표시
+  const accPrefixSetHit  = new Set(); // baseKey
+  const specPrefixSetHit = new Set(); // baseKey
+
+
+
+  const pushSetLine = (labelText, rawDesc) => {
+    if (!rawDesc) return;
+    const safeLabel = (typeof escapeHTML === 'function')
+      ? escapeHTML(labelText)
+      : String(labelText);
+    const safeDesc = rawDesc.includes('<')
+      ? rawDesc
+      : ((typeof escapeHTML === 'function')
+          ? escapeHTML(rawDesc)
+          : String(rawDesc)
+        ).replace(/\n/g, '<br>');
+
+    setLines.push(
+      `<div class="stat-preview-line">
+         <div class="slot-tag">${safeLabel}</div>
+         <div class="desc-text">${safeDesc}</div>
+       </div>`
+    );
+  };
+
+  // 3) type별로 방어구 / 악세 / 특수 세트 활성화 여부 + 세트 설명 계산
+  try {
+    Object.entries(typeCounts).forEach(([t, counts]) => {
+      const rows = rowsByType[t];
+      if (!rows || !rows.length) return;
+
+      const armorRows = [];
+      const accRows   = [];
+      const specRows  = [];
+
+      rows.forEach((r) => {
+        const cat = norm(r.category || r['분류'] || '');
+        if (cat === '방어구') {
+          armorRows.push(r);
+        } else if (cat === '악세' || cat === '악세사리') {
+          accRows.push(r);
+        } else if (cat === '특수' || cat === '특수장비') {
+          specRows.push(r);
+        } else {
+          // 분류가 없으면 포인트로 추정
+          const ap  = toNum(r.armpoint);
+          const acp = toNum(r.accpoint);
+          const sp  = toNum(r.subpoint);
+          if (ap)  armorRows.push(r);
+          if (acp) accRows.push(r);
+          if (sp)  specRows.push(r);
+        }
+      });
+ const armorCountPrefix = counts.armor;
+      const accCount         = counts.acc;
+      const specCount        = counts.spec;
+      const baseKey          = stripSetPrefix(t);
+
+      // 3-1) 방어구 접두사/원본 세트: 원본 type 기준으로 세트 달성 계산
+      if (armorCountPrefix >= 3 && armorRows.length) {
+        let candidates = armorRows
+          .map((r) => ({ row: r, n: toNum(r.num) }))
+          .filter((x) => x.n > 0 && x.n <= armorCountPrefix);
+
+        if (candidates.length) {
+          // 예: 3세트 → 5세트 순으로
+          candidates.sort((a, b) => a.n - b.n);
+
+          candidates.forEach(({ row: r, n }) => {
+            const rawName = r.name || t;
+            const desc    = r.desc || '';
+            const label   = `${rawName} (${n}세트)`;
+            pushSetLine(label, desc);
+
+            // 이 baseKey + n 세트는 "접두사(or 원본 type)"로 이미 하나 있는 상태라고 기록
+            const key = baseKey || rawName;
+            if (key) {
+              if (!prefixSetHit[key]) prefixSetHit[key] = {};
+              prefixSetHit[key][n] = true;
+            }
+
+            // 5세트 이상이면 해당 베이스 타입에 대해 개별 옵션 숨김
+            if (n >= 5 && key) {
+              activeArmorSetTypes.add(key);
+            }
+          });
+        }
+      }
+
+            // 3-2) 악세사리 세트: 원본문자열(type) 기준 3세트 먼저 처리
+      if (accCount >= 3 && accRows.length) {
+        // 악세는 3세트만 존재한다고 가정
+        const r = accRows[0];
+        const rawName = r.name || t;
+        const desc    = r.desc || '';
+        const label   = `${rawName} (악세 3세트)`;
+        pushSetLine(label, desc);
+
+        const key = baseKey || rawName;
+        if (key) {
+          // 이 baseKey는 "접두사/원본" 악세 세트가 이미 존재
+          accPrefixSetHit.add(key);
+          // 개별 장비 설명 숨길 때도 base 기준으로 숨길 수 있게 저장
+          activeAccSetTypes.add(key);
+        }
+      }
+
+      // 3-3) 특수장비 세트: 원본문자열(type) 기준 3세트 먼저 처리
+      if (specCount >= 3 && specRows.length) {
+        const r = specRows[0];
+        const rawName = r.name || t;
+        const desc    = r.desc || '';
+        const label   = `${rawName} (특수 3세트)`;
+        pushSetLine(label, desc);
+
+        const key = baseKey || rawName;
+        if (key) {
+          specPrefixSetHit.add(key);
+          activeSpecSetTypes.add(key);
+        }
+      }
+
+    });
+
+    // 3-4) 베이스 이름(접두사 제거 문자열) 기준 세트 설명 추가
+    //      → 여기서는 armorBaseCounts(전체 조각 수)를 사용하고,
+    //         rowsByType[baseKey] 로 "일반 세트" 설명을 다시 찾아온다.
+    Object.entries(armorBaseCounts).forEach(([baseKey, totalArmorCount]) => {
+      const rows = rowsByType[baseKey];
+      if (!rows || !rows.length) return;
+      if (totalArmorCount < 3) return;
+
+      const armorRows = [];
+      rows.forEach((r) => {
+        const cat = norm(r.category || r['분류'] || '');
+        if (cat === '방어구') {
+          armorRows.push(r);
+        } else if (!cat) {
+          const ap = toNum(r.armpoint);
+          if (ap) armorRows.push(r);
+        }
+      });
+      if (!armorRows.length) return;
+
+      let candidates = armorRows
+        .map((r) => ({ row: r, n: toNum(r.num) }))
+        .filter((x) => x.n > 0 && x.n <= totalArmorCount);
+
+      if (!candidates.length) return;
+
+      candidates.sort((a, b) => a.n - b.n);
+
+      candidates.forEach(({ row: r, n }) => {
+        // 접두사 세트와 일반 세트가 "같은 baseKey + 같은 n(3세트/5세트)"라면
+        // → 일반 세트는 숨기고, 접두사 세트만 남긴다.
+        const hitMap = prefixSetHit[baseKey];
+        if (hitMap && hitMap[n]) return;
+
+        const name  = r.name || baseKey;
+        const desc  = r.desc || '';
+        const label = `${name} (${n}세트)`;
+        pushSetLine(label, desc);
+
+        if (n >= 5) {
+          activeArmorSetTypes.add(baseKey);
+        }
+      });
+    });
+     // 3-5) 악세사리: 베이스 이름 기준 3세트 설명 (원본문자열 세트가 없을 때만)
+    Object.entries(accBaseCounts).forEach(([baseKey, totalAccCount]) => {
+      if (totalAccCount < 3) return;
+
+      const rows = rowsByType[baseKey];
+      if (!rows || !rows.length) return;
+
+      const accRows = [];
+      rows.forEach((r) => {
+        const cat = norm(r.category || r['분류'] || '');
+        if (cat === '악세' || cat === '악세사리') {
+          accRows.push(r);
+        } else if (!cat) {
+          const acp = toNum(r.accpoint);
+          if (acp) accRows.push(r);
+        }
+      });
+      if (!accRows.length) return;
+
+      // 이 baseKey에 대해 이미 접두사/원본 세트가 있었다면 베이스 세트는 숨김
+      if (accPrefixSetHit.has(baseKey)) return;
+
+      const r   = accRows[0];
+      const name  = r.name || baseKey;
+      const desc  = r.desc || '';
+      const label = `${name} (악세 3세트)`;
+      pushSetLine(label, desc);
+
+      activeAccSetTypes.add(baseKey);
+    });
+
+    // 3-6) 특수장비: 베이스 이름 기준 3세트 설명 (원본문자열 세트가 없을 때만)
+    Object.entries(specBaseCounts).forEach(([baseKey, totalSpecCount]) => {
+      if (totalSpecCount < 3) return;
+
+      const rows = rowsByType[baseKey];
+      if (!rows || !rows.length) return;
+
+      const specRows = [];
+      rows.forEach((r) => {
+        const cat = norm(r.category || r['분류'] || '');
+        if (cat === '특수' || cat === '특수장비') {
+          specRows.push(r);
+        } else if (!cat) {
+          const sp = toNum(r.subpoint);
+          if (sp) specRows.push(r);
+        }
+      });
+      if (!specRows.length) return;
+
+      if (specPrefixSetHit.has(baseKey)) return;
+
+      const r   = specRows[0];
+      const name  = r.name || baseKey;
+      const desc  = r.desc || '';
+      const label = `${name} (특수 3세트)`;
+      pushSetLine(label, desc);
+
+      activeSpecSetTypes.add(baseKey);
+    });
+  } catch (e) {
+    console.warn('[updateEquipDescPreview] set preview failed (set calc):', e);
+  }
+
+  // 4) 개별 장비 설명 추가 (완성된 세트에 속한 슬롯은 건너뛴다)
+  for (const [slotKey, info] of Object.entries(selections)) {
+    if (!info) continue;
+
+    const desc = info.desc || info.description || '';
+    if (!desc) continue;
+
+        const t    = norm(info.type || '');
+    const base = stripSetPrefix(t);
+
+    // ★ 방어구 5세트 / 악세 3세트 / 특수 3세트면 개별 설명 숨김
+    if (t) {
+      // 방어구: base 기준으로 숨김
+      if (ARMOR_SLOTS.has(slotKey) && activeArmorSetTypes.has(base || t)) continue;
+
+      // 악세: 원본 type 또는 baseKey 둘 중 하나라도 세트 완성된 경우 숨김
+      if (ACC_SLOTS.has(slotKey) &&
+          (activeAccSetTypes.has(t) || activeAccSetTypes.has(base || t))) {
+        continue;
+      }
+
+      // 특수: 위와 동일
+      if (SPEC_SLOTS.has(slotKey) &&
+          (activeSpecSetTypes.has(t) || activeSpecSetTypes.has(base || t))) {
+        continue;
+      }
+    }
+
+
+
+    const slotName = labelForSlot(slotKey);
+    const safeSlot = (typeof escapeHTML === 'function')
+      ? escapeHTML(slotName)
+      : String(slotName);
+    const safeDesc = desc.includes('<')
+      ? desc
+      : ((typeof escapeHTML === 'function')
+          ? escapeHTML(desc)
+          : String(desc)
+        ).replace(/\n/g, '<br>');
+
+    lines.push(
+      `<div class="stat-preview-line">
+         <div class="slot-tag">${safeSlot}</div>
+         <div class="desc-text">${safeDesc}</div>
+       </div>`
+    );
+  }
+
+  // 5) 커스텀옵 설명 추가 (custom:list + state.customSkills)
+  const customLines = [];
+  try {
+    let customList =
+      (window.CORE && window.CORE.lists && window.CORE.lists['custom:list']) ||
+      [];
+    if (!Array.isArray(customList)) customList = [];
+
+    const char = state.currentCharacter || {};
+    const jobGroup = norm(char.jobGroupLabel || char.jobGroup || '');
+    const charName = norm(char.name || '');
+
+    if (customList.length && (jobGroup || charName)) {
+      const cs = state.customSkills || {};
+      const picks = [];
+
+      const addPick = (kind, val) => {
+        const v = norm(val);
+        if (!v || v === '없음') return;
+        picks.push({ kind, label: v });
+      };
+
+      addPick('weapon',   cs.type);
+      addPick('armor',    cs.armorType);
+      addPick('bracelet', cs.braceletType);
+      addPick('earring',  cs.earringType);
+
+      if (!picks.length) {
+        // 선택된 커스텀옵 없으면 스킵
+      } else {
+        const counts = {};
+        picks.forEach(p => {
+          counts[p.label] = (counts[p.label] || 0) + 1;
+        });
+
+        Object.entries(counts).forEach(([customName, count]) => {
+          // 1차 필터: 같은 커스텀 이름
+          let rowsBase = customList.filter(r => norm(r.type) === customName);
+          if (!rowsBase.length) return;
+
+          // 2차 필터: 직업군/캐릭명 우선 매칭, 없으면 공용/전체 행도 허용
+          let candidates = rowsBase.filter(r =>
+            (!jobGroup || norm(r.jobGroup) === jobGroup || !norm(r.jobGroup)) &&
+            (!charName || norm(r.name) === charName || !norm(r.name))
+          );
+
+          if (!candidates.length) {
+            candidates = rowsBase; // 그래도 없으면 그냥 이 커스텀 이름 전체 중에서 고름
+          }
+
+          // 3차: 갯수(num) 기준 점수 매기기 (동일갯수 > 1개 기본 > 나머지)
+          candidates = candidates
+            .map(r => {
+              const rawNum = norm(r.num);
+              const rowNum = rawNum ? (parseInt(rawNum, 10) || 0) : 1;
+              return { r, rowNum };
+            })
+            .filter(x => x.rowNum > 0);
+
+          if (!candidates.length) return;
+
+          let best =
+            candidates.find(x => x.rowNum === count) ||
+            candidates.find(x => x.rowNum === 1) ||
+            candidates[0];
+
+          const r = best.r;
+          const parts = [r.desc1, r.desc2, r.desc3, r.desc4, r.desc5]
+            .map(v => norm(v))
+            .filter(Boolean);
+
+          if (!parts.length) return;
+
+          const rawDesc = parts.join('\n');
+          const labelText = `고유효과 - ${customName} (${count}개)`;
+
+// 커스텀 이름 → 색상 클래스 매핑
+const colorClass =
+  (customName === '분쇄' || customName === '선봉') ? 'tag-red' :
+  (customName === '선명' || customName === '이상') ? 'tag-green' :
+  (customName === '의지' || customName === '광채') ? 'tag-blue' :
+  (customName === '강타') ? 'tag-yellow' :
+  'tag-neutral';
+
+const safeLabel = (typeof escapeHTML === 'function')
+  ? escapeHTML(labelText)
+  : String(labelText);
+const safeDesc = rawDesc.includes('<')
+  ? rawDesc
+  : ((typeof escapeHTML === 'function')
+      ? escapeHTML(rawDesc)
+      : String(rawDesc)
+    ).replace(/\n/g, '<br>');
+
+customLines.push(
+  `<div class="stat-preview-line">
+     <div class="slot-tag custom-tag ${colorClass}">${safeLabel}</div>
+     <div class="desc-text">${safeDesc}</div>
+   </div>`
+);
+        });
+      }
+    }
+  } catch (e) {
+    console.warn('[updateEquipDescPreview] custom preview failed:', e);
+  }
+
+  // 6) 세트 + 커스텀 라인들을 뒤에 붙인다
+  lines.push(...setLines);
+  lines.push(...customLines);
+
+  // 7) 출력
+  if (!lines.length) {
+    box.innerHTML =
+      '<div class="stat-preview-empty">장비를 선택하면 여기 설명이 표시됩니다.</div>';
+  } else {
+    box.innerHTML = lines.join('');
+  }
+}
+
 
     window.__DBG = window.__DBG || { once: new Set() };
     function dbgOnce(key, ...args) {
@@ -8442,6 +9682,15 @@
 
       fill($selAvatar, avatarRows);
       fill($selImprint, imprintRows);
+      
+      // ▼ 현재 드롭다운 선택값을 state.avatar에 초기 미러링
+      state.avatar = state.avatar || {};
+      if ($selAvatar && $selAvatar.value) {
+        state.avatar.avatarName = String($selAvatar.value).trim();
+      }
+      if ($selImprint && $selImprint.value) {
+        state.avatar.imprintName = String($selImprint.value).trim();
+      }
     }
 
     // 백엔드 avatar_select 호출 유틸
@@ -8938,6 +10187,46 @@
       statListEl.appendChild(show('캐스팅속도(%)', fmtPct(speedCast)));
     }
 
+        // === 합산스탯 / 장비설명 토글 ===
+    let _statsPanelMode = 'desc'; // 'stats' | 'desc'
+
+    function applyStatsPanelMode() {
+      const labelEl   = document.getElementById('statsHeaderLabel');
+      const descEl    = document.getElementById('equipDescPreview');
+      const statListEl = document.getElementById('statList');
+
+      if (!labelEl || !descEl || !statListEl) return;
+
+      if (_statsPanelMode === 'desc') {
+        // 장비 설명 모드
+        labelEl.textContent = '장비 설명';
+        descEl.style.display = '';
+        statListEl.style.display = 'none';
+      } else {
+        // 합산 스탯 모드
+        labelEl.textContent = '합산 스탯';
+        descEl.style.display = 'none';
+        statListEl.style.display = '';
+      }
+    }
+
+    function initStatsPanelToggle() {
+      const btn = document.getElementById('btnToggleStatsPanel');
+      if (!btn) return;
+
+      // 초기 모드는 합산 스탯
+       applyStatsPanelMode();
+
+      btn.addEventListener('click', () => {
+        _statsPanelMode = (_statsPanelMode === 'stats') ? 'desc' : 'stats';
+        applyStatsPanelMode();
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initStatsPanelToggle();
+    });
+
 
     // 이미 있는 함수 이름 재사용 가능
     async function recalcAndRenderPanel() {
@@ -9071,7 +10360,10 @@
         dot.style.removeProperty('--emblem');
       }
       /* ▼ 보조장비/칭호(플래티넘)일 때 캡션 표시 */
-      const isPlatSocket = (slotKey === 'sub' || slotKey === 'title');
+      const isPlatSocket =
+  SOCKET_RULES[slotKey] &&
+  SOCKET_RULES[slotKey].length === 1 &&
+  SOCKET_RULES[slotKey][0] === '플래티넘엠블렘';
       if (isPlatSocket) {
         // dot 바로 아래에 .emblem-caption을 만들거나 찾아서 갱신
         let cap = dot.nextElementSibling;
@@ -9192,11 +10484,20 @@
       await ensureEnhLoaded();
       ensureEmblemArray(slotKey);
 
+      
+  // 🔸 혹시라도 ui가 날아간 경우를 대비한 방어 코드
+  if (!state.ui || typeof state.ui !== 'object') {
+    state.ui = {};
+  }
+  
       state.ui.emblemTarget = { slotKey, sockIndex };
       emblemRows.innerHTML = '';
 
       const allow = SOCKET_RULES[slotKey] || [];
-      const isPlatSocket = (slotKey === 'sub' || slotKey === 'title');
+      const isPlatSocket =
+  SOCKET_RULES[slotKey]
+  && SOCKET_RULES[slotKey].length === 1
+  && SOCKET_RULES[slotKey][0] === '플래티넘엠블렘';
       const isPlatinumOnly = isPlatSocket || (allow.length === 1 && allow[0] === '플래티넘엠블렘');
 
       if (isPlatinumOnly) {
@@ -9280,7 +10581,7 @@
 
         state.emblems[slotKey][sockIndex] = {
           img,
-          tag: `${levelVal}\n${levelNum}단계`,   // 기존 태그 형식 유지(줄바꿈 포함)
+          tag: `${levelVal}`,   // 기존 태그 형식 유지(줄바꿈 포함)
           name: item?.name || '',
           level_num: levelNum,
           levelVal: levelVal,
@@ -9958,7 +11259,7 @@
         if (btn) btn.textContent = opt.name;
       }
 
-      alert(`${level}강 자동강화가 적용되었습니다. (calc_all 시 반영됩니다)`);
+      //alert(`${level}강 자동강화가 적용되었습니다. (calc_all 시 반영됩니다)`);
     }
 
 
@@ -11645,6 +12946,25 @@
       // 여기부터는 target을 로컬 변수로 사용 (state라는 이름은 쓰지 않음)
       const s = target;
 
+      
+  // 🔸 UI 전용 상태는 프리셋 스냅샷에 안 들어오므로 여기서 기본 객체 다시 세팅
+  if (!s.ui || typeof s.ui !== 'object') {
+    s.ui = {
+      weaponTypeTab: null,
+      enhTargetSlot: null,
+      enhTargetBtn: null,
+      emblemTarget: { slotKey: null, sockIndex: 0 },
+    };
+  } else {
+    // 혹시 일부만 있을 수도 있으니 최소한 안전장치
+    if (typeof s.ui.weaponTypeTab === 'undefined') s.ui.weaponTypeTab = null;
+    if (typeof s.ui.enhTargetSlot === 'undefined') s.ui.enhTargetSlot = null;
+    if (typeof s.ui.enhTargetBtn === 'undefined') s.ui.enhTargetBtn = null;
+    if (!s.ui.emblemTarget) {
+      s.ui.emblemTarget = { slotKey: null, sockIndex: 0 };
+    }
+  }
+
       // ★ SP/TP 기본 구조 보정 (스냅샷에 없으면라도)
       if (!s.sp || typeof s.sp !== 'object') {
         s.sp = { total: 0, left: 0 };
@@ -11657,6 +12977,15 @@
       } else {
         s.tp.total = Number(s.tp.total || 0);
         s.tp.left = Number(s.tp.left ?? s.tp.total ?? 0);
+      }
+
+            // ★ 프리셋 적용 직후 SP/TP UI 갱신
+      try {
+        if (typeof renderSpTp === 'function') {
+          renderSpTp();
+        }
+      } catch (e) {
+        console.warn('[applyFrontPresetState] renderSpTp 실패:', e);
       }
 
       // 4) 캐릭터 라벨/이미지 반영
@@ -11696,85 +13025,102 @@
         console.warn('[applyFrontPresetState] 캐릭터 UI 갱신 실패:', e);
       }
 
-      // 5) 장비 슬롯 타일 UI 반영
-      try {
-        const selections = s.selections || {};
+ // 5) 장비 슬롯 타일 UI 반영
+try {
+  const selections = s.selections || {};
 
-        // 모든 슬롯 기본 라벨로 초기화
-        if (typeof SLOT_BASE_LABELS === 'object') {
-          document.querySelectorAll('.slot[data-slot]').forEach((slotEl) => {
-            const domKey = slotEl.dataset.slot;
-            const base = (SLOT_BASE_LABELS && SLOT_BASE_LABELS[domKey]) || '';
-            const labelEl = document.createElement('span');
-            labelEl.className = 'slot-label';
-            labelEl.textContent = base;
-            slotEl.innerHTML = '';
-            slotEl.appendChild(labelEl);
-            slotEl.classList.remove('selected');
-          });
-        }
+  // 5-1) 모든 슬롯 기본 라벨로 초기화
+  if (typeof SLOT_BASE_LABELS === 'object') {
+    document.querySelectorAll('.slot[data-slot]').forEach((slotEl) => {
+      const domKey = slotEl.dataset.slot;
+      const base = (SLOT_BASE_LABELS && SLOT_BASE_LABELS[domKey]) || '';
+      const labelEl = document.createElement('span');
+      labelEl.className = 'slot-label';
+      labelEl.textContent = base;
+      slotEl.innerHTML = '';
+      slotEl.appendChild(labelEl);
+      slotEl.classList.remove('selected');
+    });
+  }
 
-        // equip → DOM 슬롯 매핑
-        const EQUIP_TO_DOM = {
-          headshoulder: 'L1',
-          top: 'L2',
-          bottom: 'L3',
-          belt: 'L4',
-          shoes: 'L5',
-          earring: 'L6',
+  // 5-2) equip → DOM 슬롯 매핑
+  const EQUIP_TO_DOM = {
+    headshoulder: 'L1',
+    top: 'L2',
+    bottom: 'L3',
+    belt: 'L4',
+    shoes: 'L5',
+    earring: 'L6',
 
-          weapon: 'R1',
-          bracelet: 'R2',
-          necklace: 'R3',
-          ring: 'R4',
-          sub: 'R5',
-          magestone: 'R6',
+    weapon: 'R1',
+    bracelet: 'R2',
+    necklace: 'R3',
+    ring: 'R4',
+    sub: 'R5',
+    magestone: 'R6',
 
-          aura: 'C1',
-          title: 'C2',
-          creature: 'C3',
-          artifact: 'C4',
-        };
+    aura: 'C1',
+    title: 'C2',
+    creature: 'C3',
+    artifact: 'C4',
+  };
 
-        Object.entries(selections).forEach(([slotKey, info]) => {
-          const domKey = EQUIP_TO_DOM[slotKey];
-          if (!domKey) return;
+  // 5-3) 각 selection 을 슬롯에 반영 (접두사 라벨 포함)
+  Object.entries(selections).forEach(([slotKey, info]) => {
+    const domKey = EQUIP_TO_DOM[slotKey];
+    if (!domKey) return;
 
-          const slotEl = document.querySelector(`.slot[data-slot="${domKey}"]`);
-          if (!slotEl) return;
+    const slotEl = document.querySelector(`.slot[data-slot="${domKey}"]`);
+    if (!slotEl) return;
 
-          const safeAlt = String(info?.name || '').replace(/"/g, '&quot;');
-          const srcImg =
-            info?.img ||
-            (typeof PLACEHOLDER_IMG !== 'undefined' ? PLACEHOLDER_IMG : '');
-          if (!srcImg) return;
+    // 접두사 라벨 복원
+    const rawPrefix =
+      info?.prefixLabel ||    // 프리셋 스냅샷에 이미 저장된 값
+      info?.prefix ||         // 혹시 prefix 필드만 있을 때
+      '';
+    const prefixLabel = makeEquipPrefixLabel(rawPrefix);
+    const labelHtml = prefixLabel
+      ? `<div class="equip-prefix">${prefixLabel}</div>`
+      : '';
 
-          slotEl.innerHTML =
-            `<img class="item-img" alt="${safeAlt}" src="${srcImg}"` +
-            ` style="width:70%;height:70%;border-radius:8px;">`;
-          slotEl.classList.add('selected');
-        });
+    const safeAlt = String(info?.name || '').replace(/"/g, '&quot;');
+    const srcImg =
+      info?.img ||
+      (typeof PLACEHOLDER_IMG !== 'undefined' ? PLACEHOLDER_IMG : '');
+    if (!srcImg) return;
 
-        // 캐슬 씰/엠블렘/강화 라벨 등 부가 UI도 상태 기반으로 리프레시
-        try {
-          if (typeof refreshSealCaptionsFromState === 'function') {
-            refreshSealCaptionsFromState();
-          }
-          if (typeof refreshSealLabelsFromState === 'function') {
-            refreshSealLabelsFromState();
-          }
-          if (typeof refreshEnhLabelsFromState === 'function') {
-            refreshEnhLabelsFromState();
-          }
-          if (typeof refreshAllDots === 'function') {
-            refreshAllDots();   // 엠블렘 도트
-          }
-        } catch (e2) {
-          console.warn('[applyFrontPresetState] extra UI refresh 실패:', e2);
-        }
-      } catch (e) {
-        console.warn('[applyFrontPresetState] 슬롯 UI 갱신 실패:', e);
-      }
+    slotEl.innerHTML =
+      labelHtml +
+      `<img class="item-img" alt="${safeAlt}" src="${srcImg}"` +
+      ` style="width:70%;height:70%;border-radius:8px;">`;
+    slotEl.classList.add('selected');
+  });
+
+  // 5-4) 캐슬 씰/엠블렘/강화 라벨 등 부가 UI도 상태 기반으로 리프레시
+  try {
+    if (typeof refreshSealCaptionsFromState === 'function') {
+      refreshSealCaptionsFromState();
+    }
+    if (typeof refreshSealLabelsFromState === 'function') {
+      refreshSealLabelsFromState();
+    }
+    if (typeof refreshEnhLabelsFromState === 'function') {
+      refreshEnhLabelsFromState();
+    }
+    if (typeof refreshAllDots === 'function') {
+      refreshAllDots();   // 엠블렘 도트
+    }
+    // ★ 장비 설명 프리뷰 갱신
+if (typeof updateEquipDescPreview === 'function') {
+  updateEquipDescPreview();
+}
+  } catch (e2) {
+    console.warn('[applyFrontPresetState] extra UI refresh 실패:', e2);
+  }
+} catch (e) {
+  console.warn('[applyFrontPresetState] 슬롯 UI 갱신 실패:', e);
+}
+
 
 
       // 4) 마법부여(마부) 버튼 라벨 갱신
@@ -12256,6 +13602,15 @@
         // 1) 프론트 state 교체 + 슬롯/캐릭터 UI 반영
         applyFrontPresetState(snap);
 
+            // 1-1) 스킬트리 프리셋도 바로 반영되도록, 스킬트리 그리드/데이터 미리 로딩
+    if (typeof renderSkillTreeBands === 'function') {
+      try {
+        await renderSkillTreeBands();   // ST2.rows 로드 + state.skillLv / TP 반영
+      } catch (e) {
+        console.warn('[fpreset_load] renderSkillTreeBands 실패:', e);
+      }
+    }
+
         alert(`슬롯 ${slot}의 프리셋을 불러왔습니다.`);
       } catch (err) {
         console.error('[fpreset_load] 에러:', err);
@@ -12524,27 +13879,32 @@
           console.warn('[computeViaBackend] rune_engrave_select failed:', e);
         }
 
-        // 2-6) 아바타 / 무기압 선택내용을 계산 시점에 세션에 반영
-        try {
-          const a = state.avatar || {};
-          const jobs = [];
+        // 2-6) 아바타 / 무기압 스냅샷 payload 구성
+const avatarPayload = (() => {
+  const a = state.avatar || {};
+  const out = {};
+  if (a.avatarName) {
+    out.avatarName = String(a.avatarName).trim();
+  }
+  if (a.imprintName) {
+    out.imprintName = String(a.imprintName).trim();
+  }
+  return out;
+})();
 
-          if (a.avatarName) {
-            jobs.push(postAvatarSelect('아바타', a.avatarName));
-          }
-          if (a.imprintName) {
-            jobs.push(postAvatarSelect('무기압', a.imprintName));
-          }
+// 2-7) 커스텀옵(customSkills) 스냅샷 payload 구성
+const customSkillsPayload = state.customSkills || null;
 
-          if (jobs.length) {
-            await Promise.all(jobs);
+        // 2-8) 성안의 봉인(castleSeal) 스냅샷 payload 구성
+        const castleSealState = state.castleSeal || state.CastleSeal || null;
+        let castleSealPayload = null;
+        if (castleSealState) {
+          const mainName = castleSealState.main?.name || castleSealState.main || '';
+          const subName = castleSealState.sub?.name || castleSealState.sub || '';
+          if (mainName || subName) {
+            castleSealPayload = { mainName, subName };
           }
-        } catch (e) {
-          console.warn('[computeViaBackend] avatar_select failed:', e);
         }
-
-        // 2-7) 커스텀옵(customSkills) 스냅샷 payload 구성
-        const customSkillsPayload = state.customSkills || null;
 
         // 3) 최종 payload 구성
         const payload = { char: charPayload };
@@ -12566,11 +13926,18 @@
         if (Object.keys(refinePayload || {}).length > 0) {
           payload.refines = refinePayload;   // ★ 연마 추가
         }
+        // ★ 아바타/무기압 payload 추가
+        if (avatarPayload && (avatarPayload.avatarName || avatarPayload.imprintName)) {
+          payload.avatar = avatarPayload;
+        }
         // ★ 커스텀옵은 객체 자체를 그대로 전송
         if (customSkillsPayload) {
           payload.customSkills = customSkillsPayload;
         }
-
+                // ★ 성안의 봉인 선택 사항
+        if (castleSealPayload) {
+          payload.castleSeal = castleSealPayload;
+        }
 
         // 3) calc_all: 캐릭터 + 장비를 세션에 반영
         const resCalc = await fetch(`${WEBAPP_URL}?type=calc_all`, {
@@ -12587,6 +13954,7 @@
           throw new Error(resCalc?.message || resCalc?.error || 'calc_all_failed');
         }
 
+
         // 4) 합산/패널 갱신 (sum_stats 분기 사용)
         if (typeof recalcAndRenderPanel === 'function') {
           try {
@@ -12596,16 +13964,23 @@
           }
         }
 
-        await saveSkillSelections();
+         await saveSkillSelections();
         await simulateSkillUsage();
 
         // 5) 최종 데미지 계산 (compute 분기 호출)
+        const monster = state.monster || null;   // { name } 형태
+        const timeKey = (typeof getTimeKey === 'function'
+          ? getTimeKey()
+          : '1m');   // 혹시 몰라서 기본값 1분
+
         const resCompute = await fetch(`${WEBAPP_URL}?type=compute`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             id_token,
             p: p || null,
+            monster,
+            window: timeKey,   // ★ 시간 기준 같이 전송
           }),
         }).then(r => r.json());
 
@@ -12692,9 +14067,10 @@
                 : '게임실험연구소 연구원만 이용 가능합니다.<br><a class="join-link" href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank" rel="noopener">게임실험연구소 연구원 가입하기</a>'}
         </div>
         <div class="login-row">
-          <button id="btnPC" class="mode-btn">PC 계산기 열기</button>
-          <button id="btnM" class="mode-btn">모바일 계산기 열기</button>
-        </div>
+      <button id="btnPC" class="mode-btn">PC 계산기 열기</button>
+      <!-- ★ 모바일은 항상 비활성 + 툴팁 -->
+      <button id="btnM" class="mode-btn" disabled title="Comming Soon...">모바일 계산기 열기</button>
+    </div>
       `;
 
             if (!document.getElementById("mode-btn-style")) {
@@ -12720,9 +14096,14 @@
             btnPC?.setAttribute("disabled", "true");
             btnM?.setAttribute("disabled", "true");
 
+            // ★ 모바일 버튼은 항상 비활성 + 툴팁만 (호버 시 브라우저 기본 tooltip)
+if (btnM) {
+  btnM.setAttribute('title', 'Comming Soon...');
+}
+
             if (allowed) {
               btnPC.removeAttribute("disabled");
-              btnM.removeAttribute("disabled");
+           //   btnM.removeAttribute("disabled");
 
               // 한 번만 부팅되도록 가드
               let __booting = false;
@@ -12862,12 +14243,32 @@
     `.trim();
             });
 
+                   // 중복 제거
           messages = [...new Set(messages)];
+
+          // ★ 수석/책임 비율 조절: 수석 한마디를 책임보다 약 1.5배 자주 나오게 가중치 부여
+          const seniorMsgs = messages.filter(html => html.includes('hdrmsg senior'));
+          const leadMsgs   = messages.filter(html => html.includes('hdrmsg lead'));
+
+          if (seniorMsgs.length && leadMsgs.length) {
+            const weighted = [];
+
+            // 수석: 3번씩, 책임: 2번씩 넣어서 3:2 ≒ 1.5배 비율 만들기
+            seniorMsgs.forEach(m => { weighted.push(m, m, m); }); // 수석 3회
+            leadMsgs.forEach(m   => { weighted.push(m, m);     }); // 책임 2회
+
+            messages = weighted;
+          }
+          // (만약 수석만 있거나 책임만 있으면 그대로 messages 사용)
+
+          // 섞기
           messages = shuffleInPlace(messages);
+
           if (!messages.length) {
             adTextEl.textContent = "등록된 한마디가 없습니다.";
             return;
           }
+
           // 6초마다 순환할 이모지 목록
           const SENIOR_EMOJIS = ['👑', '⭐', '🏅', '✨'];
           let __emojiIdx = 0;
@@ -12957,6 +14358,47 @@
       if (onloadDiv && !onloadDiv.dataset.clientId) {
         onloadDiv.dataset.clientId = window.GOOGLE_CLIENT_ID;
       }
+            // ==========================
+      // 관리자 문의 모달 열기/닫기
+      // ==========================
+      function openContactModal() {
+        const $m = document.getElementById('contactModal');
+        if (!$m) return;
+        $m.classList.add('show');
+        $m.setAttribute('aria-hidden', 'false');
+
+        const $ta = document.getElementById('contactMessage');
+        if ($ta) {
+          $ta.focus();
+        }
+      }
+
+      function closeContactModal() {
+        const $m = document.getElementById('contactModal');
+        if (!$m) return;
+        $m.classList.remove('show');
+        $m.setAttribute('aria-hidden', 'true');
+      }
+
+      // 상단 "문의하기" 버튼 클릭 시 모달 열기
+      const $contactBtn = document.getElementById('btnContactAdmin');
+      if ($contactBtn) {
+        $contactBtn.addEventListener('click', () => {
+          openContactModal();
+        });
+      }
+
+      // 모달 내부 닫기 버튼 / 배경 클릭 시 닫기
+      const $contactModal = document.getElementById('contactModal');
+      if ($contactModal) {
+        $contactModal.addEventListener('click', (e) => {
+          const t = e.target;
+          if (t.hasAttribute('data-contact-close') || t.classList.contains('backdrop')) {
+            closeContactModal();
+          }
+        });
+      }
+
     })();
 
   </script>
