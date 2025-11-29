@@ -12238,7 +12238,9 @@ if (Array.isArray(res?.dbgLightDevotee)) {
         }
 
         const elemKor = (ELEM_KOR && ELEM_KOR[elementKey]) || '';
-        const jobKey = state.CurrentSumStats?.powerType || '물리'; // '물리' | '마법'
+const jobKey = (typeof jobGroupKeyFromState === 'function')
+  ? jobGroupKeyFromState()   // '물리' 또는 '마법' 문자열 반환
+  : '물리';
 
         const targetCodes = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6'];
 
