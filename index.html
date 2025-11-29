@@ -413,7 +413,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s;
+        /* 🔹 호버 애니메이션용 전환 */
+  transition:
+  background 0.2s,
+    transform 0.15s ease-out,
+    box-shadow 0.15s ease-out,
+    border-color 0.15s ease-out,
+    background-color 0.15s ease-out;
     }
 
     .save-box .preset-btn:hover {
@@ -429,10 +435,18 @@
 
       /* ★ 저장된 캐릭터 이미지용 (이미지 사용시) */
       background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      overflow: hidden;
+  background-position: 13% center; /* ← 필요하면 이렇게 */
+  background-repeat: no-repeat;
+  overflow: hidden;
     }
+
+    /* 🔹 프리셋 버튼 호버 시 살짝 떠오르는 효과 */
+.save-box .preset-btn:hover:not(:disabled),
+.save-box .preset-btn:focus-visible:not(:disabled) {
+  transform: translateY(-2px);              /* 위로 2px 떠오르게 */
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25); /* 아래쪽에 살짝 진한 그림자 */
+  border-color: #facc6b;                    /* 살짝 더 강조되는 테두리 (원하는 색으로 바꿔도 됨) */
+}
 
     /* 프리셋 슬롯+휴지통 래퍼 */
     .save-box {
@@ -544,6 +558,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: 13% center;
     }
 
     .preset-char-name {
@@ -3926,7 +3941,7 @@
             <aside class="notice">
               <h3>* 계산기는 계속해서 업데이트될 예정입니다!</h3>
               <div class="box">
-                <div class="badge-danger">25.11.26 시즌5 신규 계산기 배포</div>
+                <div class="badge-danger">25.11.29 시즌5 신규 계산기 배포</div>
                 <ul>
                   <li>게임실험연구소 신규 계산기 오픈!</li>
                   <li>신규 아이템 및 고유효과 적용 완료</li>
@@ -4969,7 +4984,7 @@
           is_mobile: detectIsMobile()
         });
 
-        console.log('login_ping success:', data);
+        //console.log('login_ping success:', data);
 
 
         if (data && data.ok) {
@@ -5420,8 +5435,7 @@
       // 디버그 시작
       const _t0 = performance.now();
       if (window.__SEAL_DBG) {
-        console.group('[ENCHANT] preload (CORE.lists 기반)');
-        console.log('[ENCHANT] has CORE?', !!window.CORE, !!CORE?.lists, Array.isArray(CORE?.lists?.['enh:list']));
+       
       }
 
       // 1) CORE.lists['enh:list'] 확보
@@ -5471,13 +5485,7 @@
       ENCHANT_CACHE.ready = true;
 
       // 디버그 요약
-      if (window.__SEAL_DBG) {
-        const dist = Object.fromEntries(Array.from(byType.entries()).map(([k, v]) => [k, v.length]));
-        console.log('[ENCHANT] types:', Object.keys(dist));
-        console.table(dist);
-        console.log('[ENCHANT] elapsed(ms)=', Math.round(performance.now() - _t0));
-        console.groupEnd();
-      }
+      
     }
 
 
@@ -6502,6 +6510,9 @@ if (!ownerKey) {
   // ★ skill_state_set 호출 (이미 JSON 객체 반환)
   const res = await apiJSON('skill_state_set', { ownerKey, skills: arr });
 
+if (Array.isArray(res?.dbgLightDevotee)) {
+  console.table(res.dbgLightDevotee);
+}
         // ★ 여기서 브라우저 콘솔에 스킬 정보 출력
        // if (Array.isArray(res?.skillsDebug)) {
         //  console.log('[skill_state_set] skillsDebug =', res.skillsDebug);
@@ -6515,7 +6526,7 @@ if (!ownerKey) {
           const res2 = await apiJSON('skill_state_set', { ownerKey, skills: arr });
 
           if (Array.isArray(res2?.skillsDebug)) {
-            console.log('[skill_state_set] skillsDebug (retry) =', res2.skillsDebug);
+            //console.log('[skill_state_set] skillsDebug (retry) =', res2.skillsDebug);
           }
         }
       } catch (e) {
@@ -6555,10 +6566,20 @@ if (!ownerKey) {
       return o;
     }
     function ensureRunesInitialized() {
-      if (!state.runes) state.runes = emptyRunes();
-      // skillrune 은 항상 runes와 같은 객체를 가리키게
-      state.skillrune = state.runes;
+  // 1) runes가 없는데 skillrune만 있다면,
+  //    프리셋에서 가져온 스킬룬이므로 그걸 그대로 runes로 사용
+  if (!state.runes) {
+    if (state.skillrune) {
+      // 같은 객체를 가리키게 해서 항상 동기화
+      state.runes = state.skillrune;
+    } else {
+      state.runes = emptyRunes();
     }
+  }
+
+  // 2) 항상 skillrune은 runes를 따라가게 (소스 오브 트루스 = runes)
+  state.skillrune = state.runes;
+}
     /* ===== 스킬룬 코어 ===== */
     // 카테고리 키: RUNE_CATS에서 쓰는 키 그대로 사용(각성/마력/허상/숙련/기교)
     const RUNE_KEYS = {
@@ -6850,13 +6871,13 @@ if (!ownerKey) {
         if (j?.ok) {
           // ① 원본 uses를 보관 (평타/연결평타 포함)
           state.lastUses = j.uses || {};
-          state.lastDamage = j.damage || {};
+          //state.lastDamage = j.damage || {};
           // 서버 결과 → state.skillDmg[].uses 반영
           for (const s of (ST2.rows || [])) {
             state.skillDmg[s.id] ||= {};
             state.skillDmg[s.id].uses = Number(j.uses?.[s.name] || 0);
           }
-          state.skillSimLog = Array.isArray(j.log) ? j.log : [];
+          //state.skillSimLog = Array.isArray(j.log) ? j.log : [];
         }
       }
       // (A) 모든 결과(평타/연결평타 포함)를 그대로 표로 보기
@@ -6870,9 +6891,11 @@ if (!ownerKey) {
       // (B) 프레임 로그 요약 (있으면)
       window.printSkillSimLog = function () {
         const L = state?.skillSimLog || [];
-        if (!L.length) { console.log('[SIM] 로그 없음'); return; }
+        if (!L.length) { 
+          //console.log('[SIM] 로그 없음'); 
+          return; }
         for (const row of L) {
-          console.log(`[f=${row.fStart}~${row.fEnd}] 사용: [${row.kind}] ${row.name}`);
+          //console.log(`[f=${row.fStart}~${row.fEnd}] 사용: [${row.kind}] ${row.name}`);
         }
         // 요약: lastUses 기준(평타 포함)
         window.printUses?.();
@@ -7092,7 +7115,7 @@ if (!ownerKey) {
       const items = data.rows.map(mapRowToItem).map(it => ({ ...it, slot: slotKey }));
       DB.itemsBySlot[slotKey] = items;
       DB.loaded[slotKey] = true;
-      console.log(`[Sheets->API] ${slotKey} loaded:`, items.length);
+    
     }
     const __slotState = {};  // 전역에 선언
 
@@ -7125,7 +7148,7 @@ if (!ownerKey) {
       // 백엔드가 "헤더명을 키로 한 객체"를 그대로 내려주므로 추가 매핑 불필요
       DBMonster.rows = data.rows;
       DBMonster.loaded = true;
-      console.log('[Monster->API] loaded:', DBMonster.rows.length);
+   
     }
 
     // ===== 세트 시트 로더/캐시 =====
@@ -7163,7 +7186,7 @@ if (!ownerKey) {
         return acc;
       }, {});
       DBSet.loaded = true;
-      console.log('[Set->API] loaded:', rows.length);
+    
     }
 
     // ===== 예외규칙 로더/캐시 =====
@@ -7194,9 +7217,8 @@ if (!ownerKey) {
       });
       DBException.skillIdByName = {};
       DBException.loaded = true;
-      console.log('[EXC] rows loaded =', DBException.rows.length);
-      console.log('[EXC] sample rows =',
-        DBException.rows.slice(0, 10).map(r => `${r.item} | ${r.type} | ${r.skillName} : ${r.value}`));
+
+        DBException.rows.slice(0, 10).map(r => `${r.item} | ${r.type} | ${r.skillName} : ${r.value}`);
     }
 
     // 스킬 시트(ST2.rows)가 준비된 뒤, 스킬명 → id 매핑 구성
@@ -7265,9 +7287,6 @@ if (!ownerKey) {
           }
         }
       }
-      console.log('[EXC] equipped items =', equippedItemNames());
-      console.log('[EXC] addLv:', addLv, 'addTp:', addTp, 'addDmgPct:', addDmgPct, 'addCdPct:', addCdPct);
-      console.log('[EXC] buffLvByName:', buffLvByName);   // ★ 버프레벨 핵심
       return { addLv, addTp, addDmgPct, addCdPct, resetPct, buffLvByName, addCdFlat };
     }
 
@@ -8304,7 +8323,6 @@ if (!ownerKey) {
 
     // 이름 목록(중복 제거, “시트 순서 유지”)
     async function buildRuneEngraveNameOptions() {
-      console.log('① buildRuneEngraveNameOptions');
       await ensureEnhLoaded();
       const rows = getRuneEngraveRows();
       const seen = new Set();
@@ -8338,7 +8356,7 @@ if (!ownerKey) {
 
     // 세부 설정(levelVal) 옵션 채우기 — 이름과 종류=룬각인 일치 행들의 levelVal(없으면 tag)만
     async function populateRuneDetailOptions(name) {
-      console.log('② populateRuneDetailOptions');
+
       await ensureEnhLoaded();
       const sel2 = document.getElementById('selRuneDetail');
       if (!sel2) return;
@@ -8369,7 +8387,7 @@ if (!ownerKey) {
 
     // 룬 각인 적용 함수 (apiJSON 사용)
     async function applyRuneEngraveByNameTag(name, tagOrLevelVal) {
-      console.log('④ applyRuneEngraveByNameTag 호출');
+
       try {
         const res = await apiJSON('run_engrave_select', {
           type: '룬각인',
@@ -8404,7 +8422,6 @@ if (!ownerKey) {
 
     // 이벤트 연결 (룬각인 선택 → 세부설정 채움 / 세부설정 선택 → state에만 저장)
     function bindRuneEngraveEvents() {
-      console.log('③ bindRuneEngraveEvents');
       const sel1 = document.getElementById('selRuneEngrave');
       const sel2 = document.getElementById('selRuneDetail');
       if (!sel1 || !sel2) return;
@@ -8643,9 +8660,75 @@ if (!ownerKey) {
                   }
                 }
 
-                // 4) 스킬트리 상태 초기화 (캐릭터 바뀔 때마다 초기화)
-                state.skillLv = {};
-                state.skillTpLv = {};
+     // 3-1) 캐릭터를 바꾸면 무기 무조건 비우기
+(function () {
+  try {
+    const s = window.state || state || {};
+    s.selections = s.selections || {};
+
+    if (!s.selections.weapon) {
+      console.log('[char change] weapon: 없음, 건너뜀');
+      return;
+    }
+
+    console.log('[char change] 캐릭터 변경 → 무기 초기화');
+
+    // 1) 상태에서 무기 삭제
+    delete s.selections.weapon;
+
+    // 2) 슬롯 DOM 찾아서 기본 라벨로 초기화
+    let slotEl = null;
+    if (typeof tileElForSlot === 'function') {
+      slotEl = tileElForSlot('weapon');      // 서버 슬롯키 기준
+    } else {
+      slotEl = document.querySelector('.slot[data-slot="R1"]');
+    }
+
+    if (slotEl) {
+      const domKey = slotEl.dataset.slot || 'R1';
+      const baseLabel =
+        (typeof SLOT_BASE_LABELS === 'object' && SLOT_BASE_LABELS[domKey]) ||
+        (typeof labelForSlot === 'function' ? labelForSlot('weapon') : '무기');
+
+      const labelEl = document.createElement('span');
+      labelEl.className = 'slot-label';
+      labelEl.textContent = baseLabel;
+
+      slotEl.innerHTML = '';
+      slotEl.appendChild(labelEl);
+      slotEl.classList.remove('selected');
+      slotEl.removeAttribute('data-name');
+    }
+
+    // 3) 장비 설명/도트 등 의존 UI도 같이 리프레시 (있으면)
+    try {
+      if (typeof updateEquipDescPreview === 'function') {
+        updateEquipDescPreview();
+      }
+      if (typeof refreshAllDots === 'function') {
+        refreshAllDots();
+      }
+      if (typeof refreshEnhLabelsFromState === 'function') {
+        refreshEnhLabelsFromState();
+      }
+      if (typeof refreshSealLabelsFromState === 'function') {
+        refreshSealLabelsFromState();
+      }
+    } catch (inner) {
+      console.warn('[char change] extra UI refresh error', inner);
+    }
+
+  } catch (e2) {
+    console.warn('[char change] weapon auto-reset failed', e2);
+  }
+})();
+
+
+    // 4) 스킬트리 상태 초기화 (캐릭터 바뀔 때마다 초기화)
+    state.skillLv = {};
+    state.skillTpLv = {};
+
+
 
                 // 5) SP/TP 표시만 로컬에서 갱신 (합산스탯은 이제 계산하기 버튼에서)
                 if (typeof setTotals === "function") {
@@ -9772,7 +9855,7 @@ if (!ownerKey) {
     function dbgOnce(key, ...args) {
       if (!window.__DBG.once.has(key)) {
         window.__DBG.once.add(key);
-        console.log('[DBG]', key, ...args);
+
       }
     }
     /* ===== 강화 선택 ===== */
@@ -9814,9 +9897,9 @@ if (!ownerKey) {
       window.DBEnh.loaded = true;
 
       // 디버그: 타입별 개수
-      console.log('[Enh loaded (CORE.lists)]', Object.fromEntries(
-        Object.keys(byType).map(k => [k, byType[k].length])
-      ));
+     // console.log('[Enh loaded (CORE.lists)]', Object.fromEntries(
+     //   Object.keys(byType).map(k => [k, byType[k].length])
+     // ));
     }
 
     // === 아바타/무기압 드롭다운 채우기 ===
@@ -10407,7 +10490,7 @@ if (!ownerKey) {
         // 1) 서버에서 total + buckets 가져오기
         //    (map=false → sum 그대로 받음)
         const sum = await fetchServerSumStats();
-        console.log("[DEBUG sum]", sum);
+
         // 2) 패널용 total 저장
         state.CurrentSumStats = sum;
 
@@ -10420,7 +10503,7 @@ if (!ownerKey) {
 
         // 4) 기본 표시 source = total(=mapped)
         let panelSource = sum;
-        console.log("[DEBUG panelSource]", panelSource);
+
         // 5) buckets가 있다면 선택 상태에 따라 표시
         const buckets = state.SumBuckets;
         if (buckets && typeof buckets === "object") {
@@ -10438,7 +10521,7 @@ if (!ownerKey) {
         // 6) 패널 렌더링
         renderStats(panelSource);
 
-        console.log("[recalcAndRenderPanel] 최신 합산 스탯 + 버킷 반영 완료");
+
       } catch (err) {
         console.error("[recalcAndRenderPanel] 합산 스탯 갱신 실패:", err);
       }
@@ -11166,13 +11249,13 @@ if (!ownerKey) {
         const token = await waitForIdToken();
         const res = await apiJSON('session_dump', {});
         if (!res?.ok) {
-          console.warn('session_dump 실패:', res);
+         // console.warn('session_dump 실패:', res);
           return;
         }
 
         const S = res.session;
 
-        console.group('[장비 모달 오픈 — 세션 전체 상태]');
+       /* console.group('[장비 모달 오픈 — 세션 전체 상태]');
         console.log('CharStats:', S.CharStats);
         console.log('MonStats:', S.MonStats);
         console.log('SumStats:', S.SumStats);
@@ -11188,7 +11271,7 @@ if (!ownerKey) {
         console.log('EnchantStats:', S.EnchantStats);
         console.log('EmblemStats:', S.EmblemStats);
         console.log('CastleStats:', S.CastleStats);
-        console.groupEnd();
+        console.groupEnd();*/
       } catch (err) {
         console.error('debug session error', err);
       }
@@ -11290,7 +11373,7 @@ if (!ownerKey) {
              // if (name && tag) applyRuneEngraveByNameTag(name, tag);
             });*/
 
-      console.log('[Init] Ready. Click slots to load sheets. First select = 강화. Dots = 엠블렘.');
+
     });
 
     // === 데이터 로더들 (loadCharacterSheet, loadSkillSheet 등) 정의 끝난 뒤 ===
@@ -12325,9 +12408,6 @@ if (!ownerKey) {
           const charKey = normVal(job + name) || normVal(name);
           return { ...row, __charKey: charKey };
         });
-        console.log('[BUFF-DEBUG] BUFF rows:', cache.rows.length,
-          '샘플 __charKey:', cache.rows.slice(0, 5).map(r => r.__charKey));
-
         cache.ready = true;
       }
 
@@ -12418,12 +12498,12 @@ if (!ownerKey) {
               const val = toNum(v);             // 1, 2, …
               if (!Number.isFinite(N) || !val) continue;
               out[N] = (out[N] || 0) + val;
-              console.log('[BUFF-DEBUG] 레벨링 감지:', { col: k, N, val, item: it?.name || raw?.이름 || '?' });
+
             }
           }
         }
 
-        console.log('[BUFF-DEBUG] 레벨링 합산 맵:', out); // 예: {10:8, 15:2}
+
         return out;
       }
 
@@ -12478,7 +12558,7 @@ if (!ownerKey) {
         // ★ 예외규칙: 버프레벨 적용을 위해 로드/활성화
         await ensureExceptionLoaded();   // 토큰 보장 후 예외 시트 로드
         refreshActiveExceptions();       // __EXC.buffLvByName 갱신
-        console.log('[EXC] buffLvByName =', __EXC?.buffLvByName || {});
+
         const fullName = normVal(
           (state.currentCharacter?.jobGroupLabel || '') +
           (state.currentCharacter?.name || '')
@@ -12486,11 +12566,10 @@ if (!ownerKey) {
 
         // __charKey는 이미 정규화된 상태
         const rows = cache.rows.filter(r => r.__charKey === fullName);
-        console.log('[BUFF-DEBUG] 매칭:', { fullName, count: rows.length });
+
 
         const levMap = collectItemLevelings?.(state.selections || {}) || {};
         state.leveling = levMap; // ★ 일반 스킬 레벨링 적용을 위한 전역 저장
-        console.log('[BUFF-DEBUG] 레벨링 합산:', levMap);
 
         let total = emptyStatsLikeSum();
         for (const r of rows) {
@@ -12511,17 +12590,14 @@ if (!ownerKey) {
           const scaled = scaleAdd(base, incRaw, level);  // ★ 가산형
           // ★ 확인용 로그
           if (excBonus) {
-            console.log(`[BUFF-BONUS] '${skillName}' 레벨 +${excBonus} (base=${baseLevel} → level=${level})`);
+
           } else {
-            console.log(`[BUFF-DEBUG] '${skillName}' 레벨 보너스 없음 (base=${baseLevel})`);
+
           }
-          console.log(
-            `[BUFF-DEBUG] req=${req}, level=${level}, inc=${incRaw} → delta=${toNum(incRaw) * level}`,
-            { base, scaled }
-          );
+
           total = addStats(total, scaled);
         }
-        console.log('[BUFF-DEBUG] 최종 합산 버프 스탯:', total);
+
         return total;
       }
       return { preload, computeBuffStats };
@@ -12748,20 +12824,16 @@ if (!ownerKey) {
           await ensureEnhLoaded();
 
         const keys = sealTypeKeysForSlot(slotKey);
-        console.log('[SEAL modal] slotKey:', slotKey, '→ keys:', keys);
+
         if (!keys) return;
 
         const uniq = (DBEnh?.byType?.[keys.u] || (DBEnh?.list || []).filter(o => (o?.type || '') === keys.u)).slice();
         const gen = (DBEnh?.byType?.[keys.g] || (DBEnh?.list || []).filter(o => (o?.type || '') === keys.g)).slice();
 
-        console.log('[SEAL modal lists]', {
-          uKey: keys.u, uLen: uniq.length, exampleU: uniq.slice(0, 3).map(x => x.name),
-          gKey: keys.g, gLen: gen.length, exampleG: gen.slice(0, 3).map(x => x.name),
-        });
 
         // ★ 여기서 실제 모달 DOM이 있는지 확인
         const modals = document.getElementById('sealModal');
-        console.log('[SEAL modal] element:', modals);
+
         if (!modals) { console.error('sealModal element is missing!'); return; }
 
         state.ui = state.ui || {};
@@ -13098,7 +13170,7 @@ if (!ownerKey) {
         SLOT_BASE_LABELS[key] = labelEl.textContent.trim();
       }
     });
-    console.log('[preset] SLOT_BASE_LABELS =', SLOT_BASE_LABELS);
+
 
     // 슬롯 버튼 UI(테두리/툴팁) 갱신
     function updatePresetButtonsUI() {
@@ -13110,6 +13182,7 @@ if (!ownerKey) {
         const slotNum = Number(slotStr || '0');
         const info = presetSlots.data[slotStr];
 
+        const meta = info && info.meta ? info.meta : null;
         const isAllowed = slotNum > 0 && slotNum <= maxSlot;
 
         // 🔹 직책에 따라 enable/disable
@@ -13120,8 +13193,20 @@ if (!ownerKey) {
           const label = info.label || '';
           const charName = info.meta?.charName || '';
           btn.title = label || charName || `슬롯 ${slotNum}`;
+          // 🔹 저장된 캐릭터 썸네일을 버튼 배경으로 사용
+      const thumb = meta && meta.thumb ? meta.thumb : '';
+      if (thumb) {
+        btn.style.backgroundImage = `url("${thumb}")`;
+        btn.textContent = '';      // 이미지만 보이게 ➜ 플러스 문자 제거
+      } else {
+        // 메타는 있지만 썸네일이 없으면 그냥 기본 버튼처럼
+        btn.style.backgroundImage = '';
+        btn.textContent = '+';     // 플러스 표시 유지
+      }
         } else {
           btn.classList.remove('has-data');
+          btn.style.backgroundImage = '';
+           btn.textContent = '+';       // 항상 플러스 표시
           btn.title = isAllowed
             ? `슬롯 ${slotNum}`
             : `게임실험연구소 멤버십 업그레이드가 필요합니다!`;
@@ -13169,6 +13254,7 @@ if (!ownerKey) {
 
         // ★ 커스텀옵
         'customSkills',
+        'specialRunes',  // ← 이 줄 추가하면 프리셋에 특수룬도 같이 저장
       ];
 
       for (const k of keys) {
@@ -13473,13 +13559,26 @@ if (!ownerKey) {
       if (typeof applyCustomOptUIFromState === 'function') {
         applyCustomOptUIFromState();
       }
+        // 🔹 프리셋 적용 후 스킬룬 개수 UI도 갱신
+      try {
+        if (typeof ensureRunesInitialized === 'function') {
+          // 프리셋 스냅샷에서 가져온 skillrune → runes 로 동기화
+          ensureRunesInitialized();
+        }
+        if (typeof updateRuneCountSummary === 'function') {
+          // runes 기준으로 "선택한 스킬룬 개수" 라벨 업데이트
+          updateRuneCountSummary();
+        }
+      } catch (e) {
+        console.warn('[applyFrontPresetState] runeCount 갱신 실패:', e);
+      }
     }
 
 
     // ★ 프리셋 스냅샷 → 화면 슬롯/캐릭터 UI 반영
     // ★ preset_load 응답의 snapshot → 캐릭터/슬롯 이미지 + 라벨까지 싹 반영
     async function applyPresetSnapshotToUI(snapshot) {
-      console.log('[preset] applyPresetSnapshotToUI called, snapshot =', snapshot);
+      
       if (!snapshot || typeof snapshot !== 'object') return;
 
       const charStats = snapshot.CharStats || {};
@@ -13555,7 +13654,7 @@ if (!ownerKey) {
 
       // ───────── 3) 장비 슬롯 이미지/라벨 교체 ─────────
       const equip = snapshot.equip || {};
-      console.log('[preset] snapshot.equip =', equip);
+    
 
       if (!window.SLOT_MAP) {
         console.warn('[preset] SLOT_MAP 없음, 슬롯 UI 갱신 건너뜀');
@@ -13650,8 +13749,6 @@ if (!ownerKey) {
         }
       }
 
-      console.log('[preset] UI restore done. state.currentCharacter =', state.currentCharacter);
-      console.log('[preset] state.selections =', state.selections);
     }
 
 
@@ -13780,7 +13877,7 @@ if (!ownerKey) {
       // 기존 이름 있으면 기본값으로 보여줌
       const oldLabel = presetSlots.data[String(slot)]?.label || '';
       const input = window.prompt(
-        `프리셋 ${slot}번의 이름을 입력하세요.`,
+        `캐릭터 슬롯 ${slot}번의 이름을 입력하세요.`,
         oldLabel
       );
 
@@ -13836,7 +13933,7 @@ if (!ownerKey) {
         // 아래 5개 슬롯 버튼 UI 갱신
         updatePresetButtonsUI();
 
-        alert(`슬롯 ${slot}에 현재 세팅을 저장했습니다.`);
+        alert(`캐릭터 슬롯 ${slot}번에 현재 스펙을 저장했습니다.`);
       } catch (err) {
         console.error('[fpreset_save] 에러:', err);
         alert('프리셋 저장 중 오류가 발생했습니다.');
@@ -13848,11 +13945,10 @@ if (!ownerKey) {
       const slot = presetSlots.currentSlot;
       if (!slot) return;
 
-      if (!window.confirm(`슬롯 ${slot}의 프리셋을 불러와 현재 상태를 덮어쓸까요?`)) return;
+      if (!window.confirm(`캐릭터 슬롯 ${slot}번의 스펙을 불러와 현재 상태로 덮어쓸까요?`)) return;
 
       try {
         const res = await apiJSON('fpreset_load', { slot });
-        console.log('[fpreset_load] response =', res);
 
         if (!res || !res.ok) {
           alert('프리셋 불러오기 실패: ' + (res?.message || res?.error || '알 수 없는 오류'));
@@ -13895,19 +13991,18 @@ if (!ownerKey) {
       const key = String(slot);
       const info = presetSlots.data[key];
       if (!info) {
-        alert('이 슬롯에는 저장된 스펙이 없습니다.');
+        alert('이 슬롯에는 저장된 캐릭터가 없습니다.');
         return;
       }
 
       // 확인창
-      if (!window.confirm('저장된 스펙을 초기화 합니다.\n정말 초기화할까요?')) {
+      if (!window.confirm('저장된 캐릭터 슬롯을 초기화 합니다.\n\n정말 초기화 할까요?')) {
         return;
       }
 
       try {
         // 서버에 해당 슬롯 프리셋 삭제 요청
         const res = await apiJSON('fpreset_clear', { slot });
-        console.log('[fpreset_clear] response =', res);
 
         if (!res || !res.ok) {
           alert('프리셋 초기화 실패: ' + (res?.message || res?.error || '알 수 없는 오류'));
@@ -14051,6 +14146,7 @@ if (!ownerKey) {
             // 종류(type)는 시트 상의 타입(예: '무기', '방어구' 등)이면 사용,
             // 없으면 나중에 슬롯코드로 서버에서 유추 가능하니 빈 문자열 허용
             type: up.type || '',
+            level: up.level ?? null,   // ★ 여기 추가
           };
         }
 
@@ -14333,7 +14429,6 @@ const specialRunesPayload = state.specialRunes || null;
           // ✅ 로그인 핑 결과로 허용 여부 판정
           const ping = await loginPingOnce();
           const allowed = !!(ping && ping.ok);
-          console.log('login_ping result:', ping);
 
           if (!allowed) console.warn("허용 안 됨:", ping);
 
