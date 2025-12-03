@@ -288,6 +288,35 @@
     }
 
 
+.notice-list .job-highlight {
+  font-weight: 700;
+  color: #f97316;              /* 포인트 색 (주황 계열) */
+  background: rgba(249, 115, 22, 0.08);
+  padding: 2px 6px;
+  border-radius: 999px;        /* 동그란 알약 모양 */
+  border: 1px solid rgba(249, 115, 22, 0.35);
+}
+
+.notice-list .notice-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 999px; /* 알약 형태 */
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: linear-gradient(135deg, #fff7dd, #ffe6a3); /* 살짝 골드톤 그라데이션 */
+  color: #92400e;
+  box-shadow:
+    0 0 0 1px rgba(248, 191, 88, 0.7),
+    0 2px 6px rgba(0, 0, 0, 0.12); /* 수석 한마디처럼 살짝 떠 보이는 효과 */
+}
+
+.notice-list .notice-badge::before {
+  content: "★";
+  font-size: 0.8rem;
+  margin-top: -1px;
+}
 
 
     /* 로고 아이콘 박스 */
@@ -3942,14 +3971,15 @@
               <h3>* 계산기는 계속해서 업데이트될 예정입니다!</h3>
               <div class="box">
                 <div class="badge-danger">25.11.29 시즌5 신규 계산기 배포</div>
-                <ul>
+                <ul class="notice-list">
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>11.29 아수라 캐릭 '분쇄' 옵션 오류 패치</li>
                   <li>11.30 익시드 고유효과 복리 적용 계산 수정</li>
                   <li>11.30 남레인저 헤드샷, 웨스턴파이어 쿨타임 개별 적용</li>
                   <li>11.30 남스핏, 아수라, SP 총량 모자람 현상 수정 완료</li>
-                  <li>12.01 '미스트리스' 캐릭 추가 완료</li>
+                  <li>12.01 <span class="notice-badge">'미스트리스'</span> 캐릭 추가 완료</li>
+                  <li>12.03 <span class="notice-badge">'넨마스터'</span> 캐릭 추가 완료</li>
                 </ul>
               </div>
               <div class="upgrade">
