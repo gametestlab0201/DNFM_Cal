@@ -14249,30 +14249,26 @@ const jobKey = (typeof jobGroupKeyFromState === 'function')
           };
         }
 
-        // 2-6) 스킬룬(runes) 상태를 세션에 반영 (계산 시점에 한 번만)
-        try {
+                // 2-6) 스킬룬(runes) 스냅샷 payload 구성
+        const runesPayload = (() => {
           const runesState = state.runes || state.skillrune || null;
-          if (runesState) {
-            // rune_state_set 은 기존 스킬룬 모달에서 쓰던 분기 그대로 사용
-            await apiJSON('rune_state_set', { runes: runesState });
-          }
-        } catch (e) {
-          console.warn('[computeViaBackend] rune_state_set failed:', e);
-        }
+          if (!runesState) return null;
+          return runesState;   // 그대로 서버로 넘겨서 calc_all에서 처리
+        })();
 
-        // 2-6) 룬 각인 선택 내용 세션에 반영 (계산 시점에 한 번만 호출)
-        try {
+        // 2-6) 룬 각인 선택 스냅샷 payload 구성
+        const runeEngravePayload = (() => {
           const re = state.runeEngrave || state.runeengrave || null;
           const runeName = re?.name ? String(re.name).trim() : '';
           const runeLevel = re?.level ? String(re.level).trim() : '';
+          if (!runeName || !runeLevel) return null;
 
-          if (runeName && runeLevel) {
-            // 기존에 만들어둔 API 유틸을 재사용
-            await applyRuneEngraveByNameTag(runeName, runeLevel);
-          }
-        } catch (e) {
-          console.warn('[computeViaBackend] rune_engrave_select failed:', e);
-        }
+          return {
+            type: '룬각인',
+            name: runeName,
+            level: runeLevel,
+          };
+        })();
 
         // 2-6) 아바타 / 무기압 스냅샷 payload 구성
         const avatarPayload = (() => {
@@ -14346,6 +14342,16 @@ const specialRunesPayload = state.specialRunes || null;
         // ★ 성안의 봉인 선택 사항
         if (castleSealPayload) {
           payload.castleSeal = castleSealPayload;
+        }
+
+                // ★ 일반 스킬룬 payload
+        if (runesPayload) {
+          payload.runes = runesPayload;
+        }
+
+        // ★ 룬 각인 payload
+        if (runeEngravePayload) {
+          payload.runeEngrave = runeEngravePayload;
         }
 
         // 3) calc_all: 캐릭터 + 장비를 세션에 반영
