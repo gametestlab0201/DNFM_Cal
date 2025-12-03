@@ -8488,6 +8488,59 @@ if (Array.isArray(res?.dbgLightDevotee)) {
       sel1._bound = true;
     }
 
+    // 프리셋/초기 상태에서 state.runeEngrave 값을 드롭다운 UI에 반영하는 헬퍼
+    function updateRuneEngraveUIFromState() {
+      try {
+        const sel1 = document.getElementById('selRuneEngrave');
+        const sel2 = document.getElementById('selRuneDetail');
+        if (!sel1 || !sel2) return;
+
+        const s = window.state || {};
+        const re = s.runeEngrave || s.runeengrave || {};
+        const name = re.name ? String(re.name).trim() : '';
+        const levelVal = re.level ? String(re.level).trim() : '';
+
+        // 기본 상태로 리셋
+        sel1.value = '';
+        sel2.innerHTML = `<option value="" selected disabled>세부 설정</option>`;
+        sel2.disabled = true;
+
+        // 프리셋에 룬각인 정보가 없으면 여기서 종료
+        if (!name) return;
+
+        // 1) 이름 드롭다운 값 맞추기
+        const opt = Array.from(sel1.options || []).find(
+          (o) => String(o.value).trim() === name
+        );
+        if (!opt) {
+          // 프리셋에 저장된 이름이 현재 옵션 목록에는 없으면 그냥 무시
+          return;
+        }
+        sel1.value = name;
+
+        // 2) 세부 설정 옵션 채운 뒤 levelVal 적용
+        populateRuneDetailOptions(name)
+          .then(() => {
+            if (!levelVal) return;
+
+            const sel2Now = document.getElementById('selRuneDetail');
+            if (!sel2Now) return;
+
+            const opt2 = Array.from(sel2Now.options || []).find(
+              (o) => String(o.value).trim() === levelVal
+            );
+            if (opt2) {
+              sel2Now.value = levelVal;
+              sel2Now.disabled = false;
+            }
+          })
+          .catch((e) => {
+            console.warn('[updateRuneEngraveUIFromState] populate 실패:', e);
+          });
+      } catch (e) {
+        console.warn('[updateRuneEngraveUIFromState] 실패:', e);
+      }
+    }
 
 
 
@@ -10432,13 +10485,14 @@ if (Array.isArray(res?.dbgLightDevotee)) {
 
       // 파워 의존 라벨/값
       const atkLabel = label('물리 데미지', '마법 데미지', '물리/마법 데미지');
-      const atkVal = pick(S.phys_atk, S.mag_atk);
+      const atkVal = pick(((S.phys_atk*(1+S.str_rate/100))/250+1)*(1*(S.phys_atk)*(1+S.phys_atk_rate/100)), 
+      ((S.mag_atk*(1+S.int_rate/100))/250+1)*(1*(S.mag_atk)*(1+S.mag_atk_rate/100)));
 
       const atkPctLabel = label('물리 공격력(%)', '마법 공격력(%)', '물리/마법 공격력(%)');
       const atkPctVal = pick(S.phys_atk_rate, S.mag_atk_rate);
 
       const mainStatLabel = label('힘', '지능', '힘/지능');
-      const mainStatVal = pick(S.str, S.int);
+      const mainStatVal = pick(S.str*(1+S.str_rate/100), S.int*(1+S.int_rate/100));
 
       const mainPctLabel = label('힘(%)', '지능(%)', '힘/지능(%)');
       const mainPctVal = pick(S.str_rate, S.int_rate);
@@ -13602,8 +13656,17 @@ const jobKey = (typeof jobGroupKeyFromState === 'function')
           // runes 기준으로 "선택한 스킬룬 개수" 라벨 업데이트
           updateRuneCountSummary();
         }
-      } catch (e) {
+      } 
+      catch (e) {
         console.warn('[applyFrontPresetState] runeCount 갱신 실패:', e);
+      }
+            // 🔹 프리셋 적용 후 룬각인 드롭다운 UI도 state.runeEngrave 기준으로 동기화
+      try {
+        if (typeof updateRuneEngraveUIFromState === 'function') {
+          updateRuneEngraveUIFromState();
+        }
+      } catch (e) {
+        console.warn('[applyFrontPresetState] runeEngrave UI 갱신 실패:', e);
       }
     }
 
