@@ -8577,13 +8577,65 @@ if (Array.isArray(res?.dbgLightDevotee)) {
     const catalogEl = document.getElementById('catalog'); /*<div id="catalog" class="catalog"></div> 를 JS변수 catalogEl로 참조*/
     if (!window.DBChars) window.DBChars = { loaded: false, groups: [] };
     // 로그인 토큰이 준비될 때까지 기다리는 유틸 (최대 15초)
-    async function waitForIdToken(timeout = 15000) {
-      if (window.idToken) return window.idToken;
+// - 토큰이 없으면 google.accounts.id.prompt()를 호출해서 로그인/재로그인을 띄움
+async function waitForIdToken(timeout = 15000) {
+  // 1) 이미 토큰 있으면 바로 반환
+  if (window.idToken) return window.idToken;
+
+  // 2) 없으면 gsi:issued 이벤트를 기다리면서, 필요 시 로그인 프롬프트도 띄움
+  return new Promise((resolve, reject) => {
+    let done = false;
+
+    function cleanup() {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      document.removeEventListener('gsi:issued', onReady);
+    }
+
+    function onReady() {
+      // Google GSI가 새 토큰을 발급하면 onGoogleCredential에서
+      // window.idToken을 세팅하고 gsi:issued 이벤트를 쏘기 때문에 여기로 옴
+      if (window.idToken) {
+        cleanup();
+        resolve(window.idToken);
+      }
+    }
+
+    // 3) 최대 timeout ms까지 기다리다가 못 받으면 login_timeout
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error('login_timeout'));
+    }, timeout);
+
+    document.addEventListener('gsi:issued', onReady);
+
+    // 4) 가능하면 즉시 로그인/재로그인 팝업 띄우기
+    try {
+      if (window.google?.accounts?.id?.prompt) {
+        window.google.accounts.id.prompt();
+      } else {
+        console.warn('[waitForIdToken] google.accounts.id.prompt 없음; One Tap 토큰을 수동으로 기다립니다.');
+      }
+    } catch (err) {
+      cleanup();
+      reject(err);
+    }
+  });
+}
+
+
+        // ID 토큰을 강제로 다시 받는 유틸 (자동 재로그인용)
+    async function forceReissueIdToken(timeout = 15000) {
+      // 이전 토큰은 버리고 새로 받는다
+      window.idToken = null;
+
       return new Promise((resolve, reject) => {
         const timer = setTimeout(() => {
           document.removeEventListener('gsi:issued', onReady);
-          reject(new Error('login_timeout'));
+          reject(new Error('relogin_timeout'));
         }, timeout);
+
         function onReady() {
           if (window.idToken) {
             clearTimeout(timer);
@@ -8591,7 +8643,21 @@ if (Array.isArray(res?.dbgLightDevotee)) {
             resolve(window.idToken);
           }
         }
+
         document.addEventListener('gsi:issued', onReady);
+
+        try {
+          // Google One Tap / 로그인 프롬프트 다시 띄우기
+          if (window.google?.accounts?.id?.prompt) {
+            window.google.accounts.id.prompt();
+          } else {
+            console.warn('[forceReissueIdToken] google.accounts.id.prompt 없음; 사용자가 직접 다시 로그인해야 합니다.');
+          }
+        } catch (e) {
+          clearTimeout(timer);
+          document.removeEventListener('gsi:issued', onReady);
+          reject(e);
+        }
       });
     }
 
@@ -14204,7 +14270,7 @@ const jobKey = (typeof jobGroupKeyFromState === 'function')
           box.classList.add('loading');
         }
 
-        const id_token = await waitForIdToken();
+        let id_token = await waitForIdToken();
 
         // 1) 캐릭터 payload 구성 및 체크
         const char = state.currentCharacter || {};
@@ -14417,20 +14483,45 @@ const specialRunesPayload = state.specialRunes || null;
           payload.runeEngrave = runeEngravePayload;
         }
 
-        // 3) calc_all: 캐릭터 + 장비를 세션에 반영
-        const resCalc = await fetch(`${WEBAPP_URL}?type=calc_all`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id_token,
-            payload,
-            p: p || null,
-          }),
-        }).then(r => r.json());
+                // 3) calc_all: 캐릭터 + 장비를 세션에 반영
+        async function callCalcAllOnce(token) {
+          return fetch(`${WEBAPP_URL}?type=calc_all`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id_token: token,
+              payload,
+              p: p || null,
+            }),
+          }).then(r => r.json());
+        }
+
+        let resCalc = await callCalcAllOnce(id_token);
+
+        // 🔄 토큰 만료(401)인 경우: 한 번만 자동 재로그인 후 재시도
+        if (
+          !resCalc?.ok &&
+          resCalc?.code === 401 &&
+          (resCalc?.error === 'invalid token' ||
+           resCalc?.error === 'token_verify_fail' ||
+           resCalc?.error === 'missing token')
+        ) {
+          try {
+            const newToken = await forceReissueIdToken();
+            if (newToken) {
+              id_token = newToken;
+              resCalc = await callCalcAllOnce(id_token);
+            }
+          } catch (reErr) {
+            toast('로그인 시간이 만료되었습니다.\n로그인 화면에서 다시 로그인해 주세요.');
+            throw new Error('login_expired');
+          }
+        }
 
         if (!resCalc?.ok) {
           throw new Error(resCalc?.message || resCalc?.error || 'calc_all_failed');
         }
+
 
 
         // 4) 합산/패널 갱신 (sum_stats 분기 사용)
@@ -14445,22 +14536,53 @@ const specialRunesPayload = state.specialRunes || null;
         await saveSkillSelections();
         await simulateSkillUsage();
 
-        // 5) 최종 데미지 계산 (compute 분기 호출)
+                // 5) 최종 데미지 계산 (compute 분기 호출)
         const monster = state.monster || null;   // { name } 형태
         const timeKey = (typeof getTimeKey === 'function'
           ? getTimeKey()
           : '1m');   // 혹시 몰라서 기본값 1분
 
-        const resCompute = await fetch(`${WEBAPP_URL}?type=compute`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id_token,
-            p: p || null,
-            monster,
-            window: timeKey,   // ★ 시간 기준 같이 전송
-          }),
-        }).then(r => r.json());
+        async function callComputeOnce(token) {
+          return fetch(`${WEBAPP_URL}?type=compute`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id_token: token,
+              p: p || null,
+              monster,
+              window: timeKey,
+            }),
+          }).then(r => r.json());
+        }
+
+        let resCompute = await callComputeOnce(id_token);
+
+        // calc_all 이후에라도 토큰이 만료되었을 수 있으니 한 번 더 방어
+        if (
+          !resCompute?.ok &&
+          resCompute?.code === 401 &&
+          (resCompute?.error === 'invalid token' ||
+           resCompute?.error === 'token_verify_fail' ||
+           resCompute?.error === 'missing token')
+        ) {
+          try {
+            const newToken2 = await forceReissueIdToken();
+            if (newToken2) {
+              id_token = newToken2;
+
+              // 새 토큰 세션에는 캐릭/장비 정보가 없으므로 calc_all부터 다시 한 번
+              const resCalc2 = await callCalcAllOnce(id_token);
+              if (!resCalc2?.ok) {
+                throw new Error(resCalc2?.message || resCalc2?.error || 'calc_all_failed');
+              }
+
+              resCompute = await callComputeOnce(id_token);
+            }
+          } catch (reErr) {
+            toast('로그인 시간이 만료되었습니다.\n로그인 화면에서 다시 로그인해 주세요.');
+            throw new Error('login_expired');
+          }
+        }
 
         if (!resCompute?.ok) {
           throw new Error(resCompute?.message || resCompute?.error || 'compute_failed');
@@ -14473,18 +14595,28 @@ const specialRunesPayload = state.specialRunes || null;
           box.textContent = n;
           box.classList.remove('loading');
         }
-      } catch (e) {
+            } catch (e) {
         console.error('[computeViaBackend / calc_all+compute]', e);
         if (box) {
-          // 캐릭터 미선택 에러는 그대로 보여주고, 나머지는 공통 메시지
-          if (String(e?.message || '').includes('캐릭터를 먼저')) {
+          const msg = String(e?.message || e || '');
+
+          if (msg.includes('캐릭터를 먼저')) {
+            // 캐릭터 미선택 에러는 그대로
             box.textContent = e.message;
+          } else if (msg.includes('login_expired') || msg.includes('login_timeout') || msg.includes('relogin_timeout')) {
+            // 로그인 관련 에러는 별도 안내
+            box.textContent = '로그인 시간이 만료되었습니다.\n위쪽 로그인 영역에서 다시 로그인한 뒤, 계산 버튼을 다시 눌러 주세요.';
+            if (typeof toast === 'function') {
+              toast('로그인 시간이 만료되었습니다. 다시 로그인 후 계산을 다시 시도해 주세요.');
+            }
           } else {
             box.textContent = '계산 실패';
           }
+
           box.classList.remove('loading');
         }
       } finally {
+
         btns.forEach(b => b.disabled = false);
       }
     }
