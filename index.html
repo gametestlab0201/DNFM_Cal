@@ -3543,6 +3543,7 @@
       font-size: 16px;
       line-height: 1;
     }
+    
 
     .st2-lv .sep {
       opacity: .6;
@@ -3987,7 +3988,8 @@
                   <li>12.01 <span class="notice-badge">'미스트리스'</span> 캐릭 추가 완료</li>
                   <li>12.03 <span class="notice-badge">'넨마스터'</span> 캐릭 추가 완료</li>
                   <li>12.04 스킬트리 MAX 버튼 편의성 개선,
-                  <br>　　　TP 불가능 스킬 TP 컨트롤 삭제</li>
+                  <br>　　　TP 불가능 스킬, TP 컨트롤 삭제</li>
+                  <li>12.05 <span class="notice-badge">'스트라이커'</span> 캐릭 추가 완료</li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -6289,6 +6291,32 @@ if (!ownerKey) {
         }
       };
 
+      // ===== 스트라이커 전용: 로킥 → 본 크러셔 자동 연동 =====
+      const skillNameKey = (txt) =>
+        String(txt || '').normalize('NFC').replace(/\s+/g, '');
+
+      let lowKickSkill = null;
+      let boneCrusherSkill = null;
+      let boneCrusherSpanCur = null; // 본 크러셔 레벨 표시 span
+
+      function syncBoneCrusherAutoFromLowKick() {
+        if (!lowKickSkill || !boneCrusherSkill) return;
+
+        const curMap = state.skillLv || {};
+        const lowLv = Number(curMap[lowKickSkill.id] ?? 0) || 0;
+
+        // 로킥 11 → 본 크러셔 1, 이후 1레벨당 +1
+        let autoLv = lowLv - 10;
+        if (autoLv < 0) autoLv = 0;
+
+        autoLv = clampSkill(boneCrusherSkill, autoLv);
+        state.skillLv[boneCrusherSkill.id] = autoLv;
+
+        if (boneCrusherSpanCur) {
+          boneCrusherSpanCur.textContent = String(autoLv);
+        }
+      }
+
       // (6) 스킬 밴드 UI 구성
       wrap.innerHTML = '';
       levels.forEach(lvl => {
@@ -6306,6 +6334,21 @@ if (!ownerKey) {
           tile.className = 'st2-tile';
           tile.style.gridColumn = String(s.x);
           tile.style.gridRow = String(s.y || 1);
+          tile.dataset.skillId = s.id;   // ★ 스킬 ID를 DOM에 박아서 나중에 찾아오기
+
+                    const keyName = skillNameKey(s.name);
+          const isLowKick = (keyName === skillNameKey('로킥'));
+          const isBoneCrusher = (keyName === skillNameKey('본 크러셔'));
+          
+          if (isLowKick) lowKickSkill = s;
+          if (isBoneCrusher) boneCrusherSkill = s;
+
+          const spanCur = document.createElement('span');
+          spanCur.className = 'cur';
+
+          if (isBoneCrusher) {
+            boneCrusherSpanCur = spanCur;
+          }
 
            
   // ✅ 이 스킬이 TP를 쓸 수 있는지 여부
@@ -6348,7 +6391,7 @@ if (!ownerKey) {
 
           const lvBox = document.createElement('div'); lvBox.className = 'st2-lv';
           const nums = document.createElement('div'); nums.className = 'st2-lvnums';
-          const spanCur = document.createElement('span'); spanCur.className = 'cur';
+         // const spanCur = document.createElement('span'); spanCur.className = 'cur';
           const spanSep = document.createElement('span'); spanSep.className = 'sep'; spanSep.textContent = '│';
           const spanTp = document.createElement('span'); spanTp.className = 'tp';
           // ✅ 이 스킬이 TP를 쓸 수 있는지 여부
@@ -6415,11 +6458,19 @@ if (hasTp) {
             const tp = getTp(s);
             spanCur.textContent = String(cur);
             spanTp.textContent = String(tp);
-
-            btnSkillPlus.disabled = (cur >= s.maxLv);
-            btnSkillMax.disabled = (cur >= s.maxLv);
-            btnSkillMinus.disabled = (cur <= s.minLv);
-            btnSkillMin.disabled = (cur <= s.minLv);
+            
+            // ★ 본 크러셔: SP는 자동습득 → 버튼 완전 비활성화
+            if (isBoneCrusher) {
+              btnSkillPlus.disabled = true;
+              btnSkillMax.disabled  = true;
+              btnSkillMinus.disabled = true;
+              btnSkillMin.disabled   = true;
+            } else {
+              btnSkillPlus.disabled = (cur >= s.maxLv);
+              btnSkillMax.disabled  = (cur >= s.maxLv);
+              btnSkillMinus.disabled = (cur <= s.minLv);
+              btnSkillMin.disabled   = (cur <= s.minLv);
+            }
 
             const unit = Number(s.tpCost || 0);
             if (!(unit > 0)) {
@@ -6434,32 +6485,49 @@ if (hasTp) {
           };
           refresh();
 
-          const stepSkillUp = () => { setSkill(s, getSkill(s) + 1); refresh(); };
-          const stepSkillDn = () => { setSkill(s, getSkill(s) - 1); refresh(); };
+                    const stepSkillUp = () => {
+            setSkill(s, getSkill(s) + 1);
+            if (isLowKick) syncBoneCrusherAutoFromLowKick();
+            refresh();
+          };
+
+          const stepSkillDn = () => {
+            setSkill(s, getSkill(s) - 1);
+            if (isLowKick) syncBoneCrusherAutoFromLowKick();
+            refresh();
+          };
+
           // ✅ 가진 SP 한도 내에서 가능한 만큼 MAX
-const toSkillMax = () => {
-  const perSp = Number(s.sp || 0);
-  const cur = getSkill(s);
-  const maxTarget = clampSkill(s, s.maxLv);
+          const toSkillMax = () => {
+            const perSp = Number(s.sp || 0);
+            const cur = getSkill(s);
+            const maxTarget = clampSkill(s, s.maxLv);
 
-  // 레벨당 SP 0이면 그냥 풀로 찍어도 상관 없음
-  if (!(perSp > 0)) {
-    setSkill(s, maxTarget);
-    refresh();
-    return;
-  }
+            // 레벨당 SP 0이면 그냥 풀로 찍어도 상관 없음
+            if (!(perSp > 0)) {
+              setSkill(s, maxTarget);
+              if (isLowKick) syncBoneCrusherAutoFromLowKick();
+              refresh();
+              return;
+            }
 
-  const left = state.sp.left || 0;               // 남은 SP
-  const maxDeltaByCap = maxTarget - cur;         // 레벨 상한까지 필요한 증가량
-  const maxDeltaBySp  = Math.floor(left / perSp); // SP로 올릴 수 있는 최대 레벨 수
+            const left = state.sp.left || 0;               // 남은 SP
+            const maxDeltaByCap = maxTarget - cur;         // 레벨 상한까지 필요한 증가량
+            const maxDeltaBySp  = Math.floor(left / perSp); // SP로 올릴 수 있는 최대 레벨 수
 
-  if (maxDeltaBySp <= 0) return; // 올릴 SP가 1레벨분도 없으면 아무 것도 안 함
+            if (maxDeltaBySp <= 0) return; // 올릴 SP가 1레벨분도 없으면 아무 것도 안 함
 
-  const target = cur + Math.min(maxDeltaByCap, maxDeltaBySp);
-  setSkill(s, target);
-  refresh();
-};
-          const toSkillMin = () => { setSkill(s, s.minLv); refresh(); };
+            const target = cur + Math.min(maxDeltaByCap, maxDeltaBySp);
+            setSkill(s, target);
+            if (isLowKick) syncBoneCrusherAutoFromLowKick();
+            refresh();
+          };
+
+          const toSkillMin = () => {
+            setSkill(s, s.minLv);
+            if (isLowKick) syncBoneCrusherAutoFromLowKick();
+            refresh();
+          };
 
           const stepTpUp = () => { setTp(s, getTp(s) + 1); refresh(); };
           const stepTpDn = () => { setTp(s, getTp(s) - 1); refresh(); };
