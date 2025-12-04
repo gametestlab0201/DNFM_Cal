@@ -3483,6 +3483,12 @@
       border-radius: 999px;
     }
 
+    /* TP가 없는 스킬은 아이콘 + 스킬명만 살짝 오른쪽으로 이동 */
+.st2-tile.no-tp .st2-skill,
+.st2-tile.no-tp .st2-name {
+  transform: translateX(23px); /* 4~10px 사이로 취향껏 조절 가능 */
+}
+
     /* Controls: left stack / center level box / right stack */
     .st2-ctrl2 {
       display: grid;
@@ -3980,6 +3986,8 @@
                   <li>11.30 남스핏, 아수라, SP 총량 모자람 현상 수정 완료</li>
                   <li>12.01 <span class="notice-badge">'미스트리스'</span> 캐릭 추가 완료</li>
                   <li>12.03 <span class="notice-badge">'넨마스터'</span> 캐릭 추가 완료</li>
+                  <li>12.04 스킬트리 MAX 버튼 편의성 개선,
+                  <br>　　　TP 불가능 스킬 TP 컨트롤 삭제</li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -6299,12 +6307,21 @@ if (!ownerKey) {
           tile.style.gridColumn = String(s.x);
           tile.style.gridRow = String(s.y || 1);
 
-          const icon = document.createElement('div');
-          icon.className = 'st2-skill';
-          const img = document.createElement('img');
-          img.alt = s.name;
-          img.src = s.img || '';
-          icon.appendChild(img);
+           
+  // ✅ 이 스킬이 TP를 쓸 수 있는지 여부
+  const hasTp1 = (s.tpCost || 0) > 0;
+
+  // TP가 없는 스킬이면 타일에 표시용 클래스 추가
+  if (!hasTp1) {
+    tile.classList.add('no-tp');
+  }
+
+  const icon = document.createElement('div');
+  icon.className = 'st2-skill';
+  const img = document.createElement('img');
+  img.alt = s.name;
+  img.src = s.img || '';
+  icon.appendChild(img);
 
           const nameEl = document.createElement('div');
           nameEl.className = 'st2-name';
@@ -6334,25 +6351,46 @@ if (!ownerKey) {
           const spanCur = document.createElement('span'); spanCur.className = 'cur';
           const spanSep = document.createElement('span'); spanSep.className = 'sep'; spanSep.textContent = '│';
           const spanTp = document.createElement('span'); spanTp.className = 'tp';
-          nums.appendChild(spanCur); nums.appendChild(spanSep); nums.appendChild(spanTp);
+          // ✅ 이 스킬이 TP를 쓸 수 있는지 여부
+const hasTp = (s.tpCost || 0) > 0;
+
+// 현재 레벨은 항상 표시
+nums.appendChild(spanCur);
+
+// TP를 올릴 수 있는 스킬만 TP 구분선/숫자 표시
+if (hasTp) {
+  nums.appendChild(spanSep);
+  nums.appendChild(spanTp);
+}
           lvBox.appendChild(nums);
 
           LTop.appendChild(btnSkillMax); LTop.appendChild(btnSkillPlus);
           LBot.appendChild(btnSkillMinus); LBot.appendChild(btnSkillMin);
-          RTop.appendChild(btnTpMax); RTop.appendChild(btnTpPlus);
-          RBot.appendChild(btnTpMinus); RBot.appendChild(btnTpMin);
+          // ✅ TP 가능한 스킬만 TP 버튼 보이기
+if (hasTp) {
+  RTop.appendChild(btnTpMax); RTop.appendChild(btnTpPlus);
+  RBot.appendChild(btnTpMinus); RBot.appendChild(btnTpMin);
+} else {
+  // TP가 없는 스킬이면 오른쪽 칸 자체를 숨겨도 됨
+  RTop.style.display = 'none';
+  RBot.style.display = 'none';
+}
 
           // 🔹 SP / TP 태그 – 레벨박스 바로 위 중앙에 놓을 것
           const tags = document.createElement('div');
-          tags.className = 'st2-tags';
-          const tagSp = document.createElement('span');
-          tagSp.className = 'tag-sp';
-          tagSp.textContent = 'SP';
-          const tagTp = document.createElement('span');
-          tagTp.className = 'tag-tp';
-          tagTp.textContent = 'TP';
-          tags.appendChild(tagSp);
-          tags.appendChild(tagTp);
+tags.className = 'st2-tags';
+const tagSp = document.createElement('span');
+tagSp.className = 'tag-sp';
+tagSp.textContent = 'SP';
+const tagTp = document.createElement('span');
+tagTp.className = 'tag-tp';
+tagTp.textContent = 'TP';
+
+tags.appendChild(tagSp);
+// ✅ TP 가능한 스킬만 TP 태그 표시
+if (hasTp) {
+  tags.appendChild(tagTp);
+}
 
           tags.style.gridColumn = '2';
           tags.style.gridRow = '1';
@@ -6398,12 +6436,56 @@ if (!ownerKey) {
 
           const stepSkillUp = () => { setSkill(s, getSkill(s) + 1); refresh(); };
           const stepSkillDn = () => { setSkill(s, getSkill(s) - 1); refresh(); };
-          const toSkillMax = () => { setSkill(s, s.maxLv); refresh(); };
+          // ✅ 가진 SP 한도 내에서 가능한 만큼 MAX
+const toSkillMax = () => {
+  const perSp = Number(s.sp || 0);
+  const cur = getSkill(s);
+  const maxTarget = clampSkill(s, s.maxLv);
+
+  // 레벨당 SP 0이면 그냥 풀로 찍어도 상관 없음
+  if (!(perSp > 0)) {
+    setSkill(s, maxTarget);
+    refresh();
+    return;
+  }
+
+  const left = state.sp.left || 0;               // 남은 SP
+  const maxDeltaByCap = maxTarget - cur;         // 레벨 상한까지 필요한 증가량
+  const maxDeltaBySp  = Math.floor(left / perSp); // SP로 올릴 수 있는 최대 레벨 수
+
+  if (maxDeltaBySp <= 0) return; // 올릴 SP가 1레벨분도 없으면 아무 것도 안 함
+
+  const target = cur + Math.min(maxDeltaByCap, maxDeltaBySp);
+  setSkill(s, target);
+  refresh();
+};
           const toSkillMin = () => { setSkill(s, s.minLv); refresh(); };
 
           const stepTpUp = () => { setTp(s, getTp(s) + 1); refresh(); };
           const stepTpDn = () => { setTp(s, getTp(s) - 1); refresh(); };
-          const toTpMax = () => { setTp(s, 5); refresh(); };
+          // ✅ 가진 TP 한도 내에서 가능한 만큼 MAX
+const toTpMax = () => {
+  const unit = Number(s.tpCost || 0);
+  const cur = getTp(s);
+  const maxTarget = clampTp(TP_MAX);  // 보통 5
+
+  // TP 소모가 없다면 그냥 풀로 올려도 됨
+  if (!(unit > 0)) {
+    setTp(s, maxTarget);
+    refresh();
+    return;
+  }
+
+  const left = state.tp.left || 0;               // 남은 TP
+  const maxDeltaByCap = maxTarget - cur;         // 레벨 상한까지 필요량
+  const maxDeltaByTp  = Math.floor(left / unit); // TP로 올릴 수 있는 최대 레벨 수
+
+  if (maxDeltaByTp <= 0) return; // 올릴 TP가 없으면 아무 것도 안 함
+
+  const target = cur + Math.min(maxDeltaByCap, maxDeltaByTp);
+  setTp(s, target);
+  refresh();
+};
           const toTpMin = () => { setTp(s, 0); refresh(); };
 
           attachPressRepeat(btnSkillPlus, stepSkillUp);
@@ -14605,7 +14687,7 @@ const specialRunesPayload = state.specialRunes || null;
             box.textContent = e.message;
           } else if (msg.includes('login_expired') || msg.includes('login_timeout') || msg.includes('relogin_timeout')) {
             // 로그인 관련 에러는 별도 안내
-            box.textContent = '로그인 시간이 만료되었습니다.\n위쪽 로그인 영역에서 다시 로그인한 뒤, 계산 버튼을 다시 눌러 주세요.';
+            box.textContent = '로그인 시간 만료';
             if (typeof toast === 'function') {
               toast('로그인 시간이 만료되었습니다. 다시 로그인 후 계산을 다시 시도해 주세요.');
             }
