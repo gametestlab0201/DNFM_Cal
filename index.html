@@ -174,9 +174,44 @@
     }
 
     .badge-danger {
-      color: #ff8b8b;
-      font-weight: 700
-    }
+  color: #ff8b8b;
+  font-weight: 700
+}
+
+/* 🔹 공지 상단 행 (배포 텍스트 + 버튼 나란히) */
+.notice-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* 🔹 패치내역 버튼 작게 */
+.patch-log-btn {
+  font-size: 11px;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+
+/* 🔹 패치 모달 내용 영역 */
+.patch-log-body {
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-y: auto;
+}
+
+/* 🔹 패치 리스트 스타일 */
+.patch-log-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.patch-log-list li {
+  margin-bottom: 6px;
+}
+
 
     .upgrade {
       margin-top: 10px;
@@ -316,6 +351,16 @@
   content: "★";
   font-size: 0.8rem;
   margin-top: -1px;
+}
+
+/* 메인 공지는 그대로 두고, 패치내역 모달 안에서만 더 작게 */
+#patchLogModal .notice-list .notice-badge {
+  font-size: 0.8rem;   /* 기존보다 조금 작게 */
+  padding: 1px 8px;    /* 필요하면 패딩도 살짝 줄이기 */
+}
+
+#patchLogModal .notice-list .notice-badge::before {
+  font-size: 0.7rem;   /* 별 아이콘도 같이 줄이고 싶으면 */
 }
 
 
@@ -3979,20 +4024,19 @@
             <aside class="notice">
               <h3>* 계산기는 계속해서 업데이트될 예정입니다!</h3>
               <div class="box">
-                <div class="badge-danger">25.11.29 시즌5 신규 계산기 배포</div>
-                <ul class="notice-list">
+  <div class="notice-top-row">
+    <div class="badge-danger">25.11.29 시즌5 신규 계산기 배포</div>
+    <button type="button" id="btnPatchLog" class="btn patch-log-btn">
+      패치내역 전체보기
+    </button>
+  </div>
+  <ul class="notice-list">
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
-                  <li>11.29 아수라 캐릭 '분쇄' 옵션 오류 패치</li>
-                  <li>11.30 익시드 고유효과 복리 적용 계산 수정</li>
-                  <li>11.30 남레인저 헤드샷, 웨스턴파이어 쿨타임 개별 적용</li>
-                  <li>11.30 남스핏, 아수라, SP 총량 모자람 현상 수정 완료</li>
-                  <li>12.01 <span class="notice-badge">'미스트리스'</span> 캐릭 추가 완료</li>
-                  <li>12.03 <span class="notice-badge">'넨마스터'</span> 캐릭 추가 완료</li>
-                  <li>12.04 스킬트리 MAX 버튼 편의성 개선,
-                  <br>　　　TP 불가능 스킬, TP 컨트롤 삭제</li>
-                  <li>12.05 <span class="notice-badge">'스트라이커'</span> 캐릭 추가 완료</li>
-                  <li>12.07 <span class="notice-badge">'웨펀마스터'</span> 캐릭 추가 완료</li>
+                  <li>12.05 <span class="notice-badge">'스트라이커'</span> 캐릭 추가</li>
+                  <li>12.06 남스핏, 얼불보 속성 추가 데미지 버그 수정</li>
+                  <li>12.07 남스핏, 머스켓 평타, 평타(탄버프) 미적용 버그 수정</li>
+                  <li>12.07 <span class="notice-badge">'웨펀마스터'</span> 캐릭 추가</li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -4890,6 +4934,37 @@
     </div>
   </div>
 
+    <!-- 패치내역 전체보기 모달 -->
+  <div id="patchLogModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-close></div>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="patchLogTitle"
+         style="width:min(600px,95vw);height:min(600px,85vh);">
+      <header>
+        <div style="width:32px;"></div>
+        <h2 id="patchLogTitle">패치내역 전체보기</h2>
+        <button type="button" class="btn" data-close>
+          닫기
+        </button>
+      </header>
+
+      <div class="patch-log-body">
+        <ul class="patch-log-list notice-list">
+          <li>25.11.29 <span style="color: yellow;">아수라</span> <span style="color: #ff4444;">'분쇄'</span> 옵션 오류 패치</li>
+                  <li>25.11.30 익시드 고유효과 <span style="color: #ff4444;">복리 적용</span> 으로 계산 수정</li>
+                  <li>25.11.30 <span style="color: yellow;">남레인저</span> 헤드샷, 웨스턴파이어 <span style="color: #ff4444;">쿨타임 개별 적용</span></li>
+                  <li>25.11.30 <span style="color: yellow;">남스핏, 아수라,</span> <span style="color: #ff4444;">SP 총량 모자람 현상</span> 수정</li>
+                  <li>25.12.01 <span class="notice-badge">'미스트리스'</span> 캐릭 추가</li>
+                  <li>25.12.03 <span class="notice-badge">'넨마스터'</span> 캐릭 추가</li>
+                  <li>25.12.04 스킬트리 <span style="color: #ff4444;">MAX 버튼 편의성</span> 개선, TP 불가능 스킬, TP 컨트롤 삭제</li>
+                  <li>25.12.05 <span class="notice-badge">'스트라이커'</span> 캐릭 추가</li>
+                  <li>25.12.06 <span style="color: yellow;">남스핏</span>, <span style="color: #ff4444;">'얼음 불꽃 보우건'</span> 최고 속성 추가 데미지가 암속성 추가 데미지로 적용되던 현상 수정</li>
+                  <li>25.12.07 <span style="color: yellow;">남스핏</span>, 머스켓 착용시 <span style="color: #ff4444;">평타, 평타(탄버프) 미적용</span> 버그 수정</li>
+                  <li>25.12.07 <span class="notice-badge">'웨펀마스터'</span> 캐릭 추가</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
@@ -5724,11 +5799,31 @@
 
     // 공용 모달 show/hide 유틸(파일 내 다른 모달과 동일 방식 사용)
     function showModal(modal, on) {
-      if (!modal) return;
-      if (on) { modal.classList.add('show'); modal.setAttribute('aria-hidden', 'false'); }
-      else { modal.classList.remove('show'); modal.setAttribute('aria-hidden', 'true'); }
-    }
-    $enchantModal?.querySelector('.backdrop[data-close]')?.addEventListener('click', () => showModal($enchantModal, false));
+  if (!modal) return;
+  if (on) { modal.classList.add('show'); modal.setAttribute('aria-hidden', 'false'); }
+  else { modal.classList.remove('show'); modal.setAttribute('aria-hidden', 'true'); }
+}
+
+/* 🔹 패치내역 전체보기 모달 */
+const $patchLogModal = document.getElementById('patchLogModal');
+const $btnPatchLog = document.getElementById('btnPatchLog');
+
+if ($patchLogModal) {
+  // 닫기 (배경/버튼 모두 data-close 달아둠)
+  $patchLogModal.querySelectorAll('[data-close]').forEach(el => {
+    el.addEventListener('click', () => showModal($patchLogModal, false));
+  });
+}
+
+if ($btnPatchLog && $patchLogModal) {
+  $btnPatchLog.addEventListener('click', () => {
+    showModal($patchLogModal, true);
+  });
+}
+
+/* 기존 ENCHANT 모달 코드 */
+$enchantModal?.querySelector('.backdrop[data-close]')?.addEventListener('click', () => showModal($enchantModal, false));
+
 
     // === [ENCHANT] 4) 세 번째 세부상자 클릭 시 모달 ===
     document.addEventListener('click', (e) => {
