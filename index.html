@@ -3914,6 +3914,8 @@
       margin: 0;
       font-size: 14px;
     }
+    
+    
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -3990,6 +3992,7 @@
                   <li>12.04 스킬트리 MAX 버튼 편의성 개선,
                   <br>　　　TP 불가능 스킬, TP 컨트롤 삭제</li>
                   <li>12.05 <span class="notice-badge">'스트라이커'</span> 캐릭 추가 완료</li>
+                  <li>12.07 <span class="notice-badge">'웨펀마스터'</span> 캐릭 추가 완료</li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -10723,7 +10726,7 @@ async function waitForIdToken(timeout = 15000) {
       const elemText = `${fmtInt(S.fire ?? 0)}/${fmtInt(S.water ?? 0)}/${fmtInt(S.light ?? 0)}/${fmtInt(S.dark ?? 0)}`;
       const defBreak = S.def_break ?? S.def_break_inc ?? 0;
       const skillAtk = S.skill_dmg ?? S.skill_atk_inc ?? 0;
-      const cdr = S.cdr ?? 0;
+      const cdr = S.cdr ?? S.col_down ?? 0;
       const speedAtk = S.atk_spd ?? 0;
       const speedCast = S.cat_spd ?? 0;
 
@@ -12666,7 +12669,7 @@ const jobKey = (typeof jobGroupKeyFromState === 'function')
             fire: pct(r["화속추"]), water: pct(r["수속추"]), light: pct(r["명속추"]), dark: pct(r["암속추"])
           },
           speed: { attack: pct(r["공속(%)"]), move: pct(r["이속(%)"]), cast: pct(r["캐속(%)"]) },
-          cdr: pct(r["쿨감(%)"]),
+          cdr: (r["쿨감"]),
           dot_add: { poison: 0, bleed: pct(r["출혈추뎀"]), burn: pct(r["화상추뎀"]), shock: pct(r["감전추뎀"]) },
           dot_inc: { poison: 0, bleed: pct(r["출혈뎀증"]), burn: pct(r["화상뎀증"]), shock: pct(r["감전뎀증"]) },
           other: { def_break_inc: pct(r["방깎뎀증(%)"]), enchant_bleed: num(r["인챈출혈"]) }
