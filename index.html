@@ -4489,10 +4489,9 @@
                 <ul class="notice-list">
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
-                  <li>12.07 <span class="notice-badge">'웨펀마스터'</span> 캐릭 추가</li>
-                  <li>12.07 남스핏, 머스켓 평타, 평타(탄버프) 미적용 버그 수정</li>
                   <li>12.09 <span class="notice-badge">'여레인저'</span> 캐릭 추가</li>
                   <li>12.11 <span class="notice-badge">'블레이드'</span> 캐릭 추가</li>
+                  <li>12.12 '거대누골' 몬스터 레벨, 방어력 조절 <br> 기존 거대누골은 '(구)거대누골' 로 선택 가능합니다</li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -5621,6 +5620,7 @@
 
         <div class="patch-log-body">
           <ul class="patch-log-list notice-list">
+            <li>25.12.12 <span style="color: yellow;">'거대누골'</span> 시즌5 기준으로 <span style="color: #ff4444;">몬스터 레벨, 방어력 조절</span> <br>　　　　기존 80렙 거대누골은 <span style="color: yellow;">'(구)거대누골'</span> 로 선택 가능합니다</li>
             <li>25.12.11 <span class="notice-badge">'블레이드'</span> 캐릭 추가</li>
             <li>25.12.09 <span class="notice-badge">'여레인저'</span> 캐릭 추가</li>
             <li>25.12.07 <span class="notice-badge">'웨펀마스터'</span> 캐릭 추가</li>
@@ -12258,6 +12258,42 @@ $specSetList?.addEventListener('click', (e) => {
         }
       }
 
+// 장비 설명 프리뷰(equipDescPreview)에서 세트 이름만 추출
+function getCurrentSetSummaryFromPreview() {
+  const box = document.getElementById('equipDescPreview');
+  const result = { armorSet: '', accSet: '', specSet: '' };
+  if (!box) return result;
+
+  const armorNames = new Set();
+  const accNames   = new Set();
+  const specNames  = new Set();
+
+  const normalizeName = (text) => {
+    if (!text) return '';
+    // 예: "세트이름 (방어구 5세트)" → "세트이름"
+    return String(text).split('(')[0].trim();
+  };
+
+  box.querySelectorAll('.stat-preview-line .slot-tag').forEach(el => {
+    const t = (el.textContent || '').trim();
+    if (!t) return;
+
+    if (t.includes('악세')) {
+      accNames.add(normalizeName(t));
+    } else if (t.includes('특수')) {
+      specNames.add(normalizeName(t));
+    } else if (t.includes('세트')) {
+      // 괄호 안에 "방어구 5세트"처럼 카테고리 표시가 없는 경우 → 방어구 쪽으로 취급
+      armorNames.add(normalizeName(t));
+    }
+  });
+
+  result.armorSet = Array.from(armorNames).join(', ');
+  result.accSet   = Array.from(accNames).join(', ');
+  result.specSet  = Array.from(specNames).join(', ');
+  return result;
+}
+
 
       window.__DBG = window.__DBG || { once: new Set() };
       function dbgOnce(key, ...args) {
@@ -16847,6 +16883,147 @@ $specSetList?.addEventListener('click', (e) => {
 
           const total = Number(resCompute.total || 0);
 
+// 🔹 고유효과 토글(ON)일 때만 '계산값' 시트에 로그 적재
+try {
+  if (window.state && window.state.uniqueOnOff) {
+    // 1) 장비 프리뷰 최신화 (세트 정보 정확히 뽑기 위함)
+    if (typeof updateEquipDescPreview === 'function') {
+      try { updateEquipDescPreview(); } catch (e) {
+        console.warn('[computeViaBackend] updateEquipDescPreview 실패:', e);
+      }
+    }
+
+    const s = window.state || {};
+
+    // 2) 기본 정보: 캐릭터 / 무기 / 무기 고유효과
+    const charName = (s.currentCharacter?.name || '').trim();
+
+    // 무기 이름
+    let weaponName = '';
+    try {
+      if (typeof getCurrentWeaponName === 'function') {
+        weaponName = getCurrentWeaponName();
+      }
+    } catch (_) {}
+
+    // 무기 고유효과 (강타/광채/분쇄/선명/없음 등)
+    const weaponUnique = (s.customSkills?.type || '').trim();
+
+    // 팔찌 고유효과 (선봉/의지/이상/없음 등)
+    const braceletUnique = (
+      (s.customSkills?.braceletType) ||
+      s.customBraceletLabel ||
+      ''
+    ).trim();
+
+    // 3) 세트 이름들 (방어구 / 악세 / 특수) - 프리뷰에서 추출
+    let armorSet = '';
+    let accSet   = '';
+    let specSet  = '';
+    try {
+      const sets = getCurrentSetSummaryFromPreview();
+      armorSet = sets.armorSet || '';
+      accSet   = sets.accSet   || '';
+      specSet  = sets.specSet  || '';
+    } catch (e) {
+      console.warn('[computeViaBackend] getCurrentSetSummaryFromPreview 실패:', e);
+    }
+
+        // 4) 각성룬 정보 (H: 가장 많이 사용하는 각성룬 레벨, I: 그 개수)
+    let awakeningRuneLevel = '';
+    let awakeningRuneCount = 0;
+    try {
+      const runes = s.runes || s.skillrune || null;
+      const awak = runes?.awakening || {};
+      const levels = Object.keys(awak)
+        .map(k => Number(k))
+        .filter(n => Number.isFinite(n) && n > 0);
+
+      if (levels.length > 0) {
+        // 레벨별 개수 중 가장 많이 사용하는 레벨 찾기
+        let bestLevel = levels[0];
+        let bestCount = Number(awak[bestLevel] || 0) || 0;
+
+        for (const lvl of levels) {
+          const c = Number(awak[lvl] || 0) || 0;
+          // 더 많이 사용한 레벨이 우선, 동률이면 레벨이 더 높은 쪽 선택
+          if (c > bestCount || (c === bestCount && lvl > bestLevel)) {
+            bestLevel = lvl;
+            bestCount = c;
+          }
+        }
+
+        awakeningRuneLevel = String(bestLevel); // 예: "65"
+        awakeningRuneCount = bestCount;         // 해당 레벨의 개수
+      }
+    } catch (e) {
+      console.warn('[computeViaBackend] 각성룬 정보 추출 실패:', e);
+    }
+
+
+    // 5) 룬 각인 설정 (예: "가호 3", "지혜 2" 등)
+    let runeEngrave = '';
+    try {
+      const re = s.runeEngrave || {};
+      const nm = (re.name || '').trim();
+      const lv = (re.level || '').trim();
+      if (nm && lv) runeEngrave = `${nm} ${lv}`;
+      else runeEngrave = nm || lv || '';
+    } catch (e) {
+      console.warn('[computeViaBackend] 룬각인 정보 추출 실패:', e);
+    }
+
+    // 6) TP를 5로 넣은 스킬 이름 (최대 3개)
+    let tpSkill1 = '', tpSkill2 = '', tpSkill3 = '';
+    try {
+      const tpMap = s.skillTpLv || {};
+      const skillIds = Object.keys(tpMap).filter(id => Number(tpMap[id]) === 5);
+
+      const names = [];
+      for (const skillId of skillIds) {
+        const tile = document.querySelector(`.st2-tile[data-skill-id="${skillId}"]`);
+        if (!tile) continue;
+        const nameEl = tile.querySelector('.st2-name');
+        const nm = (nameEl?.textContent || '').trim();
+        if (!nm) continue;
+        names.push(nm);
+        if (names.length >= 3) break;
+      }
+
+      tpSkill1 = names[0] || '';
+      tpSkill2 = names[1] || '';
+      tpSkill3 = names[2] || '';
+    } catch (e) {
+      console.warn('[computeViaBackend] TP5 스킬명 추출 실패:', e);
+    }
+
+    // 7) 백엔드 log_damage 호출
+    try {
+      await apiJSON('log_damage', {
+        charName,
+        weaponName,
+        weaponUnique,
+        armorSet,
+        accSet,
+        specSet,
+        braceletUnique,
+        awakeningRuneLevel,
+        awakeningRuneCount,
+        runeEngrave,
+        tpSkill1,
+        tpSkill2,
+        tpSkill3,
+        damage: total,
+      });
+    } catch (e) {
+      console.warn('[computeViaBackend] log_damage 호출 실패:', e);
+    }
+  }
+} catch (e) {
+  console.warn('[computeViaBackend] damage log wrapper 실패:', e);
+}
+
+
           if (box) {
             const n = Math.floor(total || 0).toLocaleString();
             box.textContent = n;
@@ -16877,6 +17054,7 @@ $specSetList?.addEventListener('click', (e) => {
           btns.forEach(b => b.disabled = false);
         }
       }
+
 
       document.getElementById('btn-sum-all-final')?.setAttribute('data-compute-btn', '');
       document.getElementById('btn-sum-all-final2')?.setAttribute('data-compute-btn', '');
