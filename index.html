@@ -2125,16 +2125,6 @@
       height: min(520px, 85vh);
     }
 
-    /* 마법부여 선택 모달(텍스트 리스트) */
-    #enchantModal .dialog {
-      width: min(420px, 95vw);
-      /* 강화 모달이랑 같은 폭으로 맞춤 */
-      height: auto;
-      min-height: 220px;
-      /* 폭이 너무 좁아지지만 않게 최소 폭만 잡아둠 */
-      max-height: 92vw;
-      /* 화면보다 더 넓어지진 않게 상한 */
-    }
 
     .enh-list {
       overflow: auto;
@@ -2142,6 +2132,12 @@
       display: grid;
       gap: 8px;
     }
+
+    /* 마법부여 모달 안에서만: 리스트가 길어질 때만 스크롤 */
+#enchantModal .enh-list {
+  max-height: 60vh;   /* 화면 높이의 60%를 넘으면 그 이상은 스크롤 */
+  overflow-y: auto;
+}
 
     .enh-option {
       height: 36px;
@@ -2158,6 +2154,25 @@
       border-color: #cfa24f;
       box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
     }
+
+    
+/* 마법부여 선택 모달(텍스트 리스트) - 공통 dialog 레이아웃 완전 덮어쓰기 */
+#enchantModal .dialog {
+  width: min(420px, 95vw);
+
+  /* 공통 .dialog의 height: min(720px,92vh) 덮어쓰기 */
+  height: auto;
+  min-height: 0;
+  max-height: none;
+
+  /* 공통 .dialog의 grid 레이아웃도 끄기 */
+  display: block;
+}
+
+/* 필요하면 약간의 여백 정도만 */
+#enchantModal .items {
+  margin-top: 8px;
+}
 
     @media (max-width: 900px) {
       .layout {
@@ -7044,13 +7059,6 @@ if ($specSetToggle) {
   window._specSetCardsCache = sets;
 
   sets.forEach((set, idx) => {
-    // 첫 줄 세 번째 칸 비우기 (방어구/악세랑 동일 패턴)
-    if (idx === 2 && sets.length >= 3) {
-      const spacer = document.createElement('div');
-      spacer.className = 'armor-set-spacer';
-      $specSetList.appendChild(spacer);
-    }
-
     const card = document.createElement('div');
     card.className = 'armor-set-card';
     card.dataset.setType = set.type;
