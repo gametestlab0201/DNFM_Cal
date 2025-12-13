@@ -2058,6 +2058,26 @@
       color: #e5e7eb;
     }
 
+    /* ✅ 카테고리 라벨 색상 (고유효과(custom-tag)와 겹치지 않게 분리) */
+.stat-preview-line .slot-tag.slot-armor:not(.custom-tag) {
+  border: 1px solid rgba(168, 85, 247, 0.55);
+  background: rgba(168, 85, 247, 0.16); /* 보라 */
+  color: #f3e8ff;
+}
+
+.stat-preview-line .slot-tag.slot-acc:not(.custom-tag) {
+  border: 1px solid rgba(249, 115, 22, 0.55);
+  background: rgba(249, 115, 22, 0.16); /* 주황 */
+  color: #ffedd5;
+}
+
+.stat-preview-line .slot-tag.slot-spec:not(.custom-tag) {
+  border: 1px solid rgba(236, 72, 153, 0.55);
+  background: rgba(236, 72, 153, 0.16); /* 핑크 */
+  color: #fce7f3;
+}
+
+
     .stat-list {
       flex: 1;
       min-height: 0;
@@ -4504,10 +4524,10 @@
                 <ul class="notice-list">
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
-                  <li>12.11 <span class="notice-badge">'블레이드'</span> 캐릭 추가</li>
                   <li>12.12 개별 마법부여 창 크기 조절 </li>
                   <li>12.12 '거대누골' 몬스터 레벨, 방어력 조절 </li>
                   <li>12.13 <span class="notice-badge">'여인파이터'</span> 캐릭 추가</li>
+                  <li>12.14 '장비설명' 부위별 시인성 개선 </li>
                   <!--<br> 기존 거대누골은 '(구)거대누골' 로 선택 가능합니다-->
                 </ul>
               </div>
@@ -5637,6 +5657,7 @@
 
         <div class="patch-log-body">
           <ul class="patch-log-list notice-list">
+            <li>25.12.14 <span style="color: yellow;">'장비설명'</span> 부위별 <span style="color: #ff4444;">시인성 개선</span> </li>
             <li>25.12.13 <span class="notice-badge">'여인파이터'</span> 캐릭 추가</li>
             <li>25.12.12 <span style="color: yellow;">'거대누골'</span> 시즌5 기준으로 <span style="color: #ff4444;">몬스터 레벨, 방어력 조절</span> </li>
             <!--<br>　　　　기존 80렙 거대누골은 <span style="color: yellow;">'(구)거대누골'</span> 로 선택 가능합니다>-->
@@ -11887,12 +11908,18 @@ $specSetList?.addEventListener('click', (e) => {
               : String(rawDesc)
             ).replace(/\n/g, '<br>');
 
-          setLines.push(
-            `<div class="stat-preview-line">
-         <div class="slot-tag">${safeLabel}</div>
-         <div class="desc-text">${safeDesc}</div>
-       </div>`
-          );
+          const catClass =
+  String(labelText).includes('악세') ? 'slot-acc' :
+  String(labelText).includes('특수') ? 'slot-spec' :
+  String(labelText).includes('세트') ? 'slot-armor' : '';
+
+setLines.push(
+  `<div class="stat-preview-line">
+     <div class="slot-tag ${catClass}">${safeLabel}</div>
+     <div class="desc-text">${safeDesc}</div>
+   </div>`
+);
+
         };
 
         // 3) type별로 방어구 / 악세 / 특수 세트 활성화 여부 + 세트 설명 계산
@@ -12103,164 +12130,196 @@ $specSetList?.addEventListener('click', (e) => {
         }
 
         // 4) 개별 장비 설명 추가 (완성된 세트에 속한 슬롯은 건너뛴다)
-        for (const [slotKey, info] of Object.entries(selections)) {
-          if (!info) continue;
+//    ✅ 출력 순서 고정: 무기 → 방어구 → 악세 → 특수 → 기타
+const weaponLines = [];
+const armorLines  = [];
+const accLines    = [];
+const specLines   = [];
+const otherLines  = [];
 
-          const desc = info.desc || info.description || '';
-          if (!desc) continue;
+const pickBucket = (slotKey) => {
+  if (slotKey === 'weapon') return weaponLines;
+  if (ARMOR_SLOTS.has(slotKey)) return armorLines;
+  if (ACC_SLOTS.has(slotKey)) return accLines;
+  if (SPEC_SLOTS.has(slotKey)) return specLines;
+  return otherLines; // aura/title/creature/artifact 등
+};
 
-          const t = norm(info.type || '');
-          const base = stripSetPrefix(t);
+for (const [slotKey, info] of Object.entries(selections)) {
+  if (!info) continue;
 
-          // ★ 방어구 5세트 / 악세 3세트 / 특수 3세트면 개별 설명 숨김
-          if (t) {
-            // 방어구: base 기준으로 숨김
-            if (ARMOR_SLOTS.has(slotKey) && activeArmorSetTypes.has(base || t)) continue;
+  const desc = info.desc || info.description || '';
+  if (!desc) continue;
 
-            // 악세: 원본 type 또는 baseKey 둘 중 하나라도 세트 완성된 경우 숨김
-            if (ACC_SLOTS.has(slotKey) &&
-              (activeAccSetTypes.has(t) || activeAccSetTypes.has(base || t))) {
-              continue;
-            }
+  const t = norm(info.type || '');
+  const base = stripSetPrefix(t);
 
-            // 특수: 위와 동일
-            if (SPEC_SLOTS.has(slotKey) &&
-              (activeSpecSetTypes.has(t) || activeSpecSetTypes.has(base || t))) {
-              continue;
-            }
-          }
+  // ★ 방어구 5세트 / 악세 3세트 / 특수 3세트면 개별 설명 숨김
+  if (t) {
+    if (ARMOR_SLOTS.has(slotKey) && activeArmorSetTypes.has(base || t)) continue;
 
+    if (ACC_SLOTS.has(slotKey) &&
+      (activeAccSetTypes.has(t) || activeAccSetTypes.has(base || t))) {
+      continue;
+    }
 
+    if (SPEC_SLOTS.has(slotKey) &&
+      (activeSpecSetTypes.has(t) || activeSpecSetTypes.has(base || t))) {
+      continue;
+    }
+  }
 
-          const slotName = labelForSlot(slotKey);
-          const safeSlot = (typeof escapeHTML === 'function')
-            ? escapeHTML(slotName)
-            : String(slotName);
-          const safeDesc = desc.includes('<')
-            ? desc
-            : ((typeof escapeHTML === 'function')
-              ? escapeHTML(desc)
-              : String(desc)
-            ).replace(/\n/g, '<br>');
+  const slotName = labelForSlot(slotKey);
+  const safeSlot = (typeof escapeHTML === 'function')
+    ? escapeHTML(slotName)
+    : String(slotName);
 
-          lines.push(
-            `<div class="stat-preview-line">
-         <div class="slot-tag">${safeSlot}</div>
-         <div class="desc-text">${safeDesc}</div>
-       </div>`
-          );
-        }
+  const safeDesc = desc.includes('<')
+    ? desc
+    : ((typeof escapeHTML === 'function')
+      ? escapeHTML(desc)
+      : String(desc)
+    ).replace(/\n/g, '<br>');
 
-        // 5) 커스텀옵 설명 추가 (custom:list + state.customSkills)
-        const customLines = [];
-        try {
-          let customList =
-            (window.CORE && window.CORE.lists && window.CORE.lists['custom:list']) ||
-            [];
-          if (!Array.isArray(customList)) customList = [];
+  const catClass =
+  ARMOR_SLOTS.has(slotKey) ? 'slot-armor' :
+  ACC_SLOTS.has(slotKey)   ? 'slot-acc'   :
+  SPEC_SLOTS.has(slotKey)  ? 'slot-spec'  :
+  '';
 
-          const char = state.currentCharacter || {};
-          const jobGroup = norm(char.jobGroupLabel || char.jobGroup || '');
-          const charName = norm(char.name || '');
-
-          if (customList.length && (jobGroup || charName)) {
-            const cs = state.customSkills || {};
-            const picks = [];
-
-            const addPick = (kind, val) => {
-              const v = norm(val);
-              if (!v || v === '없음') return;
-              picks.push({ kind, label: v });
-            };
-
-            addPick('weapon', cs.type);
-            addPick('armor', cs.armorType);
-            addPick('bracelet', cs.braceletType);
-            addPick('earring', cs.earringType);
-
-            if (!picks.length) {
-              // 선택된 커스텀옵 없으면 스킵
-            } else {
-              const counts = {};
-              picks.forEach(p => {
-                counts[p.label] = (counts[p.label] || 0) + 1;
-              });
-
-              Object.entries(counts).forEach(([customName, count]) => {
-                // 1차 필터: 같은 커스텀 이름
-                let rowsBase = customList.filter(r => norm(r.type) === customName);
-                if (!rowsBase.length) return;
-
-                // 2차 필터: 직업군/캐릭명 우선 매칭, 없으면 공용/전체 행도 허용
-                let candidates = rowsBase.filter(r =>
-                  (!jobGroup || norm(r.jobGroup) === jobGroup || !norm(r.jobGroup)) &&
-                  (!charName || norm(r.name) === charName || !norm(r.name))
-                );
-
-                if (!candidates.length) {
-                  candidates = rowsBase; // 그래도 없으면 그냥 이 커스텀 이름 전체 중에서 고름
-                }
-
-                // 3차: 갯수(num) 기준 점수 매기기 (동일갯수 > 1개 기본 > 나머지)
-                candidates = candidates
-                  .map(r => {
-                    const rawNum = norm(r.num);
-                    const rowNum = rawNum ? (parseInt(rawNum, 10) || 0) : 1;
-                    return { r, rowNum };
-                  })
-                  .filter(x => x.rowNum > 0);
-
-                if (!candidates.length) return;
-
-                let best =
-                  candidates.find(x => x.rowNum === count) ||
-                  candidates.find(x => x.rowNum === 1) ||
-                  candidates[0];
-
-                const r = best.r;
-                const parts = [r.desc1, r.desc2, r.desc3, r.desc4, r.desc5]
-                  .map(v => norm(v))
-                  .filter(Boolean);
-
-                if (!parts.length) return;
-
-                const rawDesc = parts.join('\n');
-                const labelText = `고유효과 - ${customName} (${count}개)`;
-
-                // 커스텀 이름 → 색상 클래스 매핑
-                const colorClass =
-                  (customName === '분쇄' || customName === '선봉') ? 'tag-red' :
-                    (customName === '선명' || customName === '이상') ? 'tag-green' :
-                      (customName === '의지' || customName === '광채') ? 'tag-blue' :
-                        (customName === '강타') ? 'tag-yellow' :
-                          'tag-neutral';
-
-                const safeLabel = (typeof escapeHTML === 'function')
-                  ? escapeHTML(labelText)
-                  : String(labelText);
-                const safeDesc = rawDesc.includes('<')
-                  ? rawDesc
-                  : ((typeof escapeHTML === 'function')
-                    ? escapeHTML(rawDesc)
-                    : String(rawDesc)
-                  ).replace(/\n/g, '<br>');
-
-                customLines.push(
-                  `<div class="stat-preview-line">
-     <div class="slot-tag custom-tag ${colorClass}">${safeLabel}</div>
+const html =
+  `<div class="stat-preview-line">
+     <div class="slot-tag ${catClass}">${safeSlot}</div>
      <div class="desc-text">${safeDesc}</div>
-   </div>`
-                );
-              });
-            }
-          }
-        } catch (e) {
-          console.warn('[updateEquipDescPreview] custom preview failed:', e);
-        }
+   </div>`;
 
-        // 6) 세트 + 커스텀 라인들을 뒤에 붙인다
-        lines.push(...setLines);
-        lines.push(...customLines);
+  pickBucket(slotKey).push(html);
+}
+
+// 5) 커스텀옵 설명 추가 (custom:list + state.customSkills)
+const customLines = [];
+try {
+  let customList =
+    (window.CORE && window.CORE.lists && window.CORE.lists['custom:list']) || [];
+  if (!Array.isArray(customList)) customList = [];
+
+  const char = state.currentCharacter || {};
+  const jobGroup = norm(char.jobGroupLabel || char.jobGroup || '');
+  const charName = norm(char.name || '');
+
+  if (customList.length && (jobGroup || charName)) {
+    const cs = state.customSkills || {};
+    const picks = [];
+
+    const addPick = (kind, val) => {
+      const v = norm(val);
+      if (!v || v === '없음') return;
+      picks.push({ kind, label: v });
+    };
+
+    addPick('weapon', cs.type);
+    addPick('armor', cs.armorType);
+    addPick('bracelet', cs.braceletType);
+    addPick('earring', cs.earringType);
+
+    if (picks.length) {
+      const counts = {};
+      picks.forEach(p => { counts[p.label] = (counts[p.label] || 0) + 1; });
+
+      Object.entries(counts).forEach(([customName, count]) => {
+        // 1차 필터: 같은 커스텀 이름
+        let rowsBase = customList.filter(r => norm(r.type) === customName);
+        if (!rowsBase.length) return;
+
+        // 2차 필터: 직업군/캐릭명 우선 매칭, 없으면 공용/전체 행도 허용
+        let candidates = rowsBase.filter(r =>
+          (!jobGroup || norm(r.jobGroup) === jobGroup || !norm(r.jobGroup)) &&
+          (!charName || norm(r.name) === charName || !norm(r.name))
+        );
+        if (!candidates.length) candidates = rowsBase;
+
+        // 3차: 갯수(num) 기준 점수 매기기
+        candidates = candidates
+          .map(r => {
+            const rawNum = norm(r.num);
+            const rowNum = rawNum ? (parseInt(rawNum, 10) || 0) : 1;
+            return { r, rowNum };
+          })
+          .filter(x => x.rowNum > 0);
+
+        if (!candidates.length) return;
+
+        let best = candidates.find(x => x.rowNum === count);
+        if (!best) best = candidates.find(x => x.rowNum === 1) || candidates[0];
+
+        const r = best.r;
+        const parts = [r.desc1, r.desc2, r.desc3, r.desc4, r.desc5]
+          .map(v => norm(v))
+          .filter(Boolean);
+        if (!parts.length) return;
+
+        const rawDesc = parts.join('\n');
+        const labelText = `고유효과 - ${customName} (${count}개)`;
+
+        // 커스텀 이름 → 색상 클래스 매핑 (기존 로직 그대로)
+        const colorClass =
+          (customName === '분쇄' || customName === '선봉') ? 'tag-red' :
+          (customName === '선명' || customName === '이상') ? 'tag-green' :
+          (customName === '의지' || customName === '광채') ? 'tag-blue' :
+          (customName === '강타') ? 'tag-yellow' :
+          'tag-neutral';
+
+        const safeLabel = (typeof escapeHTML === 'function')
+          ? escapeHTML(labelText)
+          : String(labelText);
+
+        const safeDesc = rawDesc.includes('<')
+          ? rawDesc
+          : ((typeof escapeHTML === 'function')
+            ? escapeHTML(rawDesc)
+            : String(rawDesc)
+          ).replace(/\n/g, '<br>');
+
+        customLines.push(
+          `<div class="stat-preview-line">
+             <div class="slot-tag custom-tag ${colorClass}">${safeLabel}</div>
+             <div class="desc-text">${safeDesc}</div>
+           </div>`
+        );
+      });
+    }
+  }
+} catch (e) {
+  console.warn('[updateEquipDescPreview] custom preview failed:', e);
+}
+
+// 6) 세트 + 커스텀 라인들을 원하는 순서로 붙인다
+//    ✅ 세트도 방어구/악세/특수로 분리해서 해당 구간 뒤에 배치
+const armorSetLines = [];
+const accSetLines   = [];
+const specSetLines  = [];
+const otherSetLines = [];
+
+for (const html of setLines) {
+  if (html.includes('악세')) accSetLines.push(html);
+  else if (html.includes('특수')) specSetLines.push(html);
+  else if (html.includes('세트')) armorSetLines.push(html);
+  else otherSetLines.push(html);
+}
+
+// ✅ 최종 출력 순서: 무기 → 방어구 → (방어구세트) → 악세 → (악세세트) → 특수 → (특수세트) → 기타 → 고유효과
+lines.push(...weaponLines);
+lines.push(...armorLines);
+lines.push(...armorSetLines);
+lines.push(...accLines);
+lines.push(...accSetLines);
+lines.push(...specLines);
+lines.push(...specSetLines);
+lines.push(...otherLines);
+lines.push(...otherSetLines);
+
+// 고유효과(커스텀)는 항상 맨 아래
+lines.push(...customLines);
 
         // 7) 출력
         if (!lines.length) {
