@@ -371,6 +371,13 @@
       /* 별 아이콘도 같이 줄이고 싶으면 */
     }
 
+/* 공지 모달 항목들 사이 여백 추가 */
+#noticeModal .notice-list li {
+  line-height: 1.6;     /* 줄 자체 간격 */
+  margin-bottom: 16px;   /* 항목 사이 간격 */
+}
+
+
 
     /* 로고 아이콘 박스 */
     header .title .logo-box {
@@ -4524,10 +4531,10 @@
                 <ul class="notice-list">
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
-                  <li>12.12 개별 마법부여 창 크기 조절 </li>
                   <li>12.12 '거대누골' 몬스터 레벨, 방어력 조절 </li>
                   <li>12.13 <span class="notice-badge">'여인파이터'</span> 캐릭 추가</li>
                   <li>12.14 '장비설명' 부위별 시인성 개선 </li>
+                  <li>12.15 '콰트로 마누스 연산장치' 세트 옵션 버그 수정 </li>
                   <!--<br> 기존 거대누골은 '(구)거대누골' 로 선택 가능합니다-->
                 </ul>
               </div>
@@ -4671,6 +4678,15 @@
           style="display:none;">
     고유효과 일괄적용
   </button>
+
+  <!-- ✅ 지정 세트 자동계산 버튼 -->
+<button id="btnAutoSetSweepSelected"
+        class="btn btn-special-patch"
+        type="button"
+        style="display:none;">
+  선택 세트 자동계산
+</button>
+
 
     <!-- ✅ 고유효과 ON/OFF 토글 -->
   <div id="uniqueOnOffRow" class="unique-onoff-row" style="display:none;">
@@ -5642,6 +5658,53 @@
       </div>
     </div>
 
+        <!-- PC 계산기 로딩 후 안내 공지 모달 -->
+    <div id="noticeModal" class="modal" aria-hidden="true">
+      <div class="backdrop" data-close></div>
+      <div class="dialog"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="noticeModalTitle"
+           style="width:min(620px,95vw);max-height:min(480px,85vh);">
+        <header>
+          <div style="width:32px;"></div>
+          <h2 id="noticeModalTitle">안내사항</h2>
+          <button type="button" class="btn" data-close>닫기</button>
+        </header>
+
+        <div class="patch-log-body">
+          <ul class="patch-log-list notice-list">
+            <li>
+              <strong style="font-size:15px;">'콰트로 마누스 연산장치' 악세사리 세트 관련 안내</strong>
+            </li>
+              <li></li>
+              <li></li>
+            <li>
+              <span style="color: yellow;">'조화: 콰트로 마누스 연산장치'</span> 세트 옵션 중, <br>
+              <span style="color: #ff4444;">'던전 입장 시 악세서리 강화 수치 합이 45이상일 경우, 모든 타입 피해 3% 증가'</span> 옵션이,<br>
+              일반 <span style="color: yellow;">'콰트로 마누스 연산장치'</span> 세트와, <span style="color: yellow;">'가속: 콰트로 마누스 연산장치'</span> 세트에 <br>
+              <strong style="color: #ff4444;">동일하게 적용되는 버그</strong>를 발견하였습니다.
+            </li>
+            <li>
+              제보 받은 즉시 긴급수정 진행하였으며, 현재는 <strong>정상적으로 데미지 계산</strong>이 가능합니다.
+            </li>
+            <li>
+              패치 이전에 해당 세트로 데미지 계산을 진행하신 경우, <br>
+              위 내용을 참고하시어 다시 한번 데미지 값을 계산해 보시기 바랍니다.
+            </li>
+            <li>
+              이용에 혼란을 드려 죄송합니다. <br>
+              조그마한 이상한 점이라도 제보 해 주시면, 빠르게 확인하고 수정조치 진행하도록 하겠습니다.
+            </li>
+            <li>
+              감사합니다.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
     <!-- 패치내역 전체보기 모달 -->
     <div id="patchLogModal" class="modal" aria-hidden="true">
       <div class="backdrop" data-close></div>
@@ -5657,6 +5720,7 @@
 
         <div class="patch-log-body">
           <ul class="patch-log-list notice-list">
+            <li>25.12.15 <span style="color: yellow;">'콰트로 마누스 연산장치'</span> 세트 옵션 <span style="color: #ff4444;">버그 수정</span> </li>
             <li>25.12.14 <span style="color: yellow;">'장비설명'</span> 부위별 <span style="color: #ff4444;">시인성 개선</span> </li>
             <li>25.12.13 <span class="notice-badge">'여인파이터'</span> 캐릭 추가</li>
             <li>25.12.12 <span style="color: yellow;">'거대누골'</span> 시즌5 기준으로 <span style="color: #ff4444;">몬스터 레벨, 방어력 조절</span> </li>
@@ -6097,6 +6161,22 @@
         currentSlotKey: null
       };
 
+            // ✅ 세트 자동계산용 화이트리스트 (세트 시트의 '이름' 기준)
+      //    필요할 때 이 배열들만 수정하면 됨
+      const AUTO_SWEEP_ARMOR_SET_NAMES = [
+        '자상: 어둠을 쏘아 내리는 자 세트', '보호: 콰트로 카시테움 세트', '왜곡: 스틱키 애시드 웨펀 세트','허상: 수호자의 초합금 세트','맹독: 어둠을 쏘아 내리는 자 세트',
+        '허상: 어느 말괄량이의 탐사복 세트','수호: 빛의 헌신자 세트','연격: 빛의 헌신자 세트','왜곡: 거인의 스펙쿨룸 아이언 세트','신속: 그란데 전투기갑 파츠 세트',
+        '보호: 수호자의 초합금 세트','수호: 거인의 스펙쿨룸 아이언 세트','레거시: 자연의 수호자 세트'
+      ];
+      const AUTO_SWEEP_ACC_SET_NAMES = [
+        '레거시: 지나온 영광의 시대 세트', '레거시: 에테리얼 리벤넌트 세트', '조화: 콰트로 마누스 연산장치 세트', '가속: 콰트로 마누스 연산장치 세트', '견고: 화력 개조 탄띠 세트',
+        '가속: 부식된 메탈기어 세트', '각오: 부식된 메탈기어 세트', '초석: 신비로운 빛의 소용돌이 세트', '조화: 신비로운 빛의 소용돌이 세트'
+      ];
+      const AUTO_SWEEP_SPEC_SET_NAMES = [
+        '격변: 부정한 빛의 우상 세트', '질주: 부정한 빛의 우상 세트', '결의: 허영 속 어둠의 피조물 세트', '질주: 허영 속 어둠의 피조물 세트', '촉진: 깊은 불구덩이의 섬멸자 세트',
+        '촉진: 철갑을 두른 탑의 수호꾼 세트', '불굴: 깊은 불구덩이의 섬멸자 세트', '숙련: 개구쟁이 호문쿨루스 세트', '격변: 철갑을 두른 탑의 수호꾼 세트', '불굴: 개구쟁이 호문쿨루스 세트'
+      ];
+
       // ✅ 특정 구글 계정만 전용 버튼을 보이게 하는 허용 리스트
       //  👉 여기에 본인 구글 메일 주소를 넣으면 됨
       const SPECIAL_USER_EMAILS = [
@@ -6111,12 +6191,13 @@ function updateSpecialUserButton() {
   const btnSpec   = document.getElementById('btnSpecialSpec');
   const btnUnique = document.getElementById('btnUniqueBulk');
   const rowUnique = document.getElementById('uniqueOnOffRow');
+  const btnAutoSet = document.getElementById('btnAutoSetSweepSelected'); // ← 추가
 
   const emailRaw = (window.CORE && CORE.userEmail) ? CORE.userEmail : null;
   const email = emailRaw ? String(emailRaw).toLowerCase() : '';
   const isAllowed = SPECIAL_USER_EMAILS.includes(email);
 
-  [btnArmor, btnAcc, btnSpec, btnUnique].forEach(btn => {
+  [btnArmor, btnAcc, btnSpec, btnUnique, btnAutoSet].forEach(btn => {
     if (!btn) return;
     btn.style.display = isAllowed ? 'inline-flex' : 'none';
     btn.disabled = !isAllowed;
@@ -6998,6 +7079,33 @@ if ($specSetToggle) {
         });
       }
 
+      function getArmorSetListForSweep() {
+  let sets = window._armorSetCardsCache;
+  if (!Array.isArray(sets)) {
+    sets = buildArmorSetCardsFromSheets();
+    window._armorSetCardsCache = sets;
+  }
+  return Array.isArray(sets) ? sets : [];
+}
+
+function getAccSetListForSweep() {
+  let sets = window._accSetCardsCache;
+  if (!Array.isArray(sets)) {
+    sets = buildAccSetCardsFromSheets();
+    window._accSetCardsCache = sets;
+  }
+  return Array.isArray(sets) ? sets : [];
+}
+
+function getSpecSetListForSweep() {
+  let sets = window._specSetCardsCache;
+  if (!Array.isArray(sets)) {
+    sets = buildSpecSetCardsFromSheets();
+    window._specSetCardsCache = sets;
+  }
+  return Array.isArray(sets) ? sets : [];
+}
+
       // ✅ 악세사리 세트 모달 렌더링
       function renderAccSetModal() {
         if (!$accSetList) return;
@@ -7233,6 +7341,22 @@ if ($specSetToggle) {
         if (on) { modal.classList.add('show'); modal.setAttribute('aria-hidden', 'false'); }
         else { modal.classList.remove('show'); modal.setAttribute('aria-hidden', 'true'); }
       }
+
+            // 🔹 공지 모달 (콰트로 안내 등)
+      const $noticeModal = document.getElementById('noticeModal');
+      if ($noticeModal) {
+        $noticeModal.querySelectorAll('[data-close]').forEach(el => {
+          el.addEventListener('click', () => showModal($noticeModal, false));
+        });
+      }
+
+      // PC 계산기 로딩 후 공지 모달을 띄우는 전역 함수
+      window.showQuatroNoticeOnce = function () {
+        const modal = document.getElementById('noticeModal');
+        if (!modal) return;
+        showModal(modal, true);
+      };
+
 
       // ✅ 방어구 세트 모달 닫기 (뒤 배경 + 닫기 버튼)
 $armorSetModal?.querySelectorAll('[data-close]').forEach(el => {
@@ -17127,6 +17251,96 @@ try {
         }
       }
 
+      // 🔹 현재 장비 선택 상태를 얕은 복사
+function cloneSelections(sel) {
+  const out = {};
+  for (const [slot, info] of Object.entries(sel || {})) {
+    out[slot] = info ? { ...info } : null;
+  }
+  return out;
+}
+
+// 🔹 백업해 둔 장비 상태로 되돌리기
+async function restoreSelections(selBackup) {
+  state.selections = {};
+  if (!selBackup) return;
+
+  for (const [slotKey, info] of Object.entries(selBackup)) {
+    if (!info || !info.name) continue;
+    await applyItemToSlot(slotKey, info);
+  }
+}
+
+function filterSetsForAutoSweep(sets, nameList) {
+  if (!Array.isArray(sets) || !sets.length) return [];
+  if (!Array.isArray(nameList) || !nameList.length) return [];
+
+  const nameSet = new Set(
+    nameList.map(v => String(v ?? '').trim())
+  );
+
+  return sets.filter(set => nameSet.has(String(set.name || '').trim()));
+}
+
+let isAutoSetSweepRunning = false;
+
+// 🔁 내가 지정한 세트들만 돌려서 계산값 시트에 줄줄이 기록
+async function runAutoSetSweepSelected(targetId, p /* 'phys' | 'mag' 생략 가능 */) {
+  if (isAutoSetSweepRunning) return;
+  isAutoSetSweepRunning = true;
+
+  const originalSel = cloneSelections(state.selections || {});
+
+  try {
+    // 1) 세트 카드 목록 확보
+    let armorSets = getArmorSetListForSweep();
+    let accSets   = getAccSetListForSweep();
+    let specSets  = getSpecSetListForSweep();
+
+    // 2) 화이트리스트에 있는 세트만 남기기
+    armorSets = filterSetsForAutoSweep(armorSets, AUTO_SWEEP_ARMOR_SET_NAMES);
+    accSets   = filterSetsForAutoSweep(accSets,   AUTO_SWEEP_ACC_SET_NAMES);
+    specSets  = filterSetsForAutoSweep(specSets,  AUTO_SWEEP_SPEC_SET_NAMES);
+
+    if (!armorSets.length && !accSets.length && !specSets.length) {
+      alert('자동계산에 사용할 세트가 없습니다.\nAUTO_SWEEP_* 상수를 확인해 주세요.');
+      return;
+    }
+
+    // 3) 어떤 축이 비어 있으면 그 축은 "현재 장비 유지"로 둠
+    const armorLoop = armorSets.length ? armorSets : [null];
+    const accLoop   = accSets.length   ? accSets   : [null];
+    const specLoop  = specSets.length  ? specSets  : [null];
+
+    // 4) 3중 루프: (지정한 방어구 × 지정한 악세 × 지정한 특수)
+    for (const armor of armorLoop) {
+      if (armor) await applyArmorSetToSlots(armor);
+
+      for (const acc of accLoop) {
+        if (acc) await applyAccSetToSlots(acc);
+
+        for (const spec of specLoop) {
+          if (spec) await applySpecSetToSlots(spec);
+
+          // 👉 각 조합마다 최종 계산 + log_damage → 계산값 시트에 1줄씩 기록
+          await computeViaBackend(targetId, p);
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[runAutoSetSweepSelected] 실패:', e);
+  } finally {
+    // 5) 원래 장비 복원
+    try {
+      await restoreSelections(originalSel);
+    } catch (e2) {
+      console.warn('[runAutoSetSweepSelected] 원래 장비 복원 실패:', e2);
+    }
+    isAutoSetSweepRunning = false;
+  }
+}
+
+
 
       document.getElementById('btn-sum-all-final')?.setAttribute('data-compute-btn', '');
       document.getElementById('btn-sum-all-final2')?.setAttribute('data-compute-btn', '');
@@ -17235,6 +17449,14 @@ try {
                     // 1) 기본 init (계정/권한/CORE.lists 세팅)
                     setProgressExactMonotonic(5, '초기 설정 불러오는 중…');
                     await initCalculatorOnce();
+
+                    // 3) 화면 전환
+                    showCalcView('pc');
+
+                    // ✅ PC 계산기 로딩이 끝난 후 공지 모달 표시
+                    if (typeof window.showQuatroNoticeOnce === 'function') {
+                      window.showQuatroNoticeOnce();
+                    }
 
                     // 2) 시트/장비 미리 로딩 (여기서 게이지가 5% → 100%까지 움직인다)
                     //await preloadAllSheets({ weightCore: 35, weightSlots: 65 });
@@ -17520,6 +17742,7 @@ try {
 const $btnSpecialPatch = document.getElementById('btnSpecialPatch');
 const $btnSpecialAcc   = document.getElementById('btnSpecialAcc');
 const $btnSpecialSpec  = document.getElementById('btnSpecialSpec');
+const $btnAutoSetSweepSelected = document.getElementById('btnAutoSetSweepSelected');
 
 if ($btnSpecialPatch && $armorSetModal) {
   $btnSpecialPatch.addEventListener('click', () => {
@@ -17539,6 +17762,14 @@ if ($btnSpecialSpec && $specSetModal) {
   $btnSpecialSpec.addEventListener('click', () => {
     renderSpecSetModal();
     showModal($specSetModal, true);
+  });
+}
+
+// ✅ 선택 세트 자동계산
+if ($btnAutoSetSweepSelected) {
+  $btnAutoSetSweepSelected.addEventListener('click', async () => {
+    // 원하는 출력 박스 ID로 맞춰줘 (지금은 finalDamageValue 기준)
+    await runAutoSetSweepSelected('finalDamageValue');
   });
 }
 
