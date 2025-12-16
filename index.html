@@ -4564,6 +4564,7 @@
                   <li>12.13 <span class="notice-badge">'여인파이터'</span> 캐릭 추가</li>
                   <li>12.14 '장비설명' 부위별 시인성 개선 </li>
                   <li>12.15 '콰트로 마누스 연산장치' 세트 옵션 버그 수정 </li>
+                  <li>12.16 <span class="notice-badge">'베가본드'</span> 캐릭 추가</li>
                   <!--<br> 기존 거대누골은 '(구)거대누골' 로 선택 가능합니다-->
                 </ul>
               </div>
@@ -4714,6 +4715,10 @@
         type="button"
         style="display:none;">
   선택 세트 자동계산
+</button>
+
+<button id="btnAutoSetSweepMissing" class="ui-btnetc" style="display:none;">
+  누락만 재계산(방어구 고정)
 </button>
 
 
@@ -5749,6 +5754,7 @@
 
         <div class="patch-log-body">
           <ul class="patch-log-list notice-list">
+            <li>25.12.16 <span class="notice-badge">'베가본드'</span> 캐릭 추가</li>
             <li>25.12.15 <span style="color: yellow;">'콰트로 마누스 연산장치'</span> 세트 옵션 <span style="color: #ff4444;">버그 수정</span> </li>
             <li>25.12.14 <span style="color: yellow;">'장비설명'</span> 부위별 <span style="color: #ff4444;">시인성 개선</span> </li>
             <li>25.12.13 <span class="notice-badge">'여인파이터'</span> 캐릭 추가</li>
@@ -6211,6 +6217,12 @@
       const SPECIAL_USER_EMAILS = [
         'gametestlab0201@gmail.com',
         'gogo456654@gmail.com',
+        'gogo4566546@gmail.com',
+        'ionix4566541@gmail.com',
+        'ionix4566542@gmail.com',
+        'ssm941112@gmail.com',
+        'ionix4566543@gmail.com',
+        'ionix4566544@gmail.com',
         
         // 'another.account@example.com',
       ];
@@ -6223,12 +6235,13 @@ function updateSpecialUserButton() {
   const btnUnique = document.getElementById('btnUniqueBulk');
   const rowUnique = document.getElementById('uniqueOnOffRow');
   const btnAutoSet = document.getElementById('btnAutoSetSweepSelected'); // ← 추가
+  const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
 
   const emailRaw = (window.CORE && CORE.userEmail) ? CORE.userEmail : null;
   const email = emailRaw ? String(emailRaw).toLowerCase() : '';
   const isAllowed = SPECIAL_USER_EMAILS.includes(email);
 
-  [btnArmor, btnAcc, btnSpec, btnUnique, btnAutoSet].forEach(btn => {
+  [btnArmor, btnAcc, btnSpec, btnUnique, btnAutoSet, btnAutoSetMissing].forEach(btn => {
     if (!btn) return;
     btn.style.display = isAllowed ? 'inline-flex' : 'none';
     btn.disabled = !isAllowed;
@@ -17471,6 +17484,111 @@ if (!armorSets.length && !accSets.length && !specSets.length) {
   }
 }
 
+function _comboKey(a, b, c) {
+  return `${String(a ?? '').trim()}||${String(b ?? '').trim()}||${String(c ?? '').trim()}`;
+}
+
+// ✅ 방어구(선택한 것)는 고정으로 두고, 악세/특수에서 "계산값 시트에 없는 조합만" 재계산
+async function runAutoSetSweepMissingArmorFixed(targetId, p) {
+  if (isAutoSetSweepRunning) return;
+  isAutoSetSweepRunning = true;
+
+  // 0) 원래 장비 백업
+  const originalSel = cloneSelections(state.selections || {});
+
+  try {
+    const auto = state.autoSweep || (state.autoSweep = { armor: [], acc: [], spec: [] });
+
+    // 1) 세트 후보 리스트
+    let armorSets = filterSetsForAutoSweep(getArmorSetListForSweep(), auto.armor);
+    let accSets   = filterSetsForAutoSweep(getAccSetListForSweep(),   auto.acc);
+    let specSets  = filterSetsForAutoSweep(getSpecSetListForSweep(),  auto.spec);
+
+    if (!armorSets.length) {
+      if (typeof toast === 'function') toast('방어구 자동계산 대상이 선택되어 있지 않습니다.');
+      return;
+    }
+
+    const armorNames = armorSets.map(x => String(x?.name || '').trim()).filter(Boolean);
+
+    // 악세/특수 둘 다 비면 “누락”을 만들 조합 자체가 없음
+    if (!accSets.length && !specSets.length) {
+      if (typeof toast === 'function') toast('악세/특수 자동계산 대상이 비어있습니다.');
+      return;
+    }
+
+    // 2) 현재 캐릭/무기 (log_damage와 같은 기준으로 필터링)
+    const s = window.state || {};
+    const charName = String(s.currentCharacter?.name || '').trim();
+    const weaponName = (typeof getCurrentWeaponName === 'function')
+  ? getCurrentWeaponName()
+  : String(s?.selections?.weapon?.name || '').trim();
+
+    if (!charName) {
+      if (typeof toast === 'function') toast('캐릭터를 먼저 선택해 주세요.');
+      return;
+    }
+
+    // 3) 계산값 시트에 이미 존재하는 조합키(내계정 + char/weapon + armor filter)
+    let existing = new Set();
+    const scan = await apiJSON('log_damage_scan', { armorSets: armorNames });
+    const keys = Array.isArray(scan?.keys) ? scan.keys : [];
+    existing = new Set(keys);
+
+    console.log('[scan]', { armorNamesCount: armorNames.length, keys: keys.length });
+
+    // 4) 루프 준비
+    const accLoop = accSets.length ? accSets : [null];   // 비었으면 현재 악세 유지
+    const specLoop = specSets.length ? specSets : [null];// 비었으면 현재 특수 유지
+
+    // null일 때 쓸 “현재 세트명” 스냅샷
+    updateEquipDescPreview?.();
+    const baseSummary = (typeof getCurrentSetSummaryFromPreview === 'function')
+      ? (getCurrentSetSummaryFromPreview() || {})
+      : {};
+    const baseAccName = String(baseSummary.accSet || '').trim();
+    const baseSpecName = String(baseSummary.specSet || '').trim();
+
+    let did = 0;
+    let skipped = 0;
+
+    for (const armor of armorSets) {
+      // ✅ 방어구는 이 루프에서만 바뀜(고정축)
+      await applyArmorSetToSlots(armor);
+      const armorName = String(armor?.name || '').trim();
+
+      for (const acc of accLoop) {
+        if (acc) await applyAccSetToSlots(acc);
+        const accName = acc ? String(acc?.name || '').trim() : baseAccName;
+
+        for (const spec of specLoop) {
+          if (spec) await applySpecSetToSlots(spec);
+          const specName = spec ? String(spec?.name || '').trim() : baseSpecName;
+
+          const key = _comboKey(armorName, accName, specName);
+          if (existing.has(key)) { skipped++; continue; }
+          existing.add(key);
+
+          await computeViaBackend(targetId, p);
+          did++;
+
+          if (did % 10 === 0 && typeof toast === 'function') {
+            toast(`누락 재계산 진행중… (신규 ${did} / 건너뜀 ${skipped})`);
+          }
+        }
+      }
+    }
+
+    if (typeof toast === 'function') {
+      toast(`누락 재계산 완료 ✅ (신규 ${did} / 건너뜀 ${skipped})`);
+    }
+  } catch (e) {
+    console.warn('[runAutoSetSweepMissingArmorFixed] 실패:', e);
+  } finally {
+    try { await restoreSelections(originalSel); } catch (e2) {}
+    isAutoSetSweepRunning = false;
+  }
+}
 
 
       document.getElementById('btn-sum-all-final')?.setAttribute('data-compute-btn', '');
@@ -17485,6 +17603,15 @@ if (!armorSets.length && !accSets.length && !specSets.length) {
       document.getElementById('btn-sum-all-final2')?.addEventListener('click', () => {
         computeViaBackend('finalDamageValue2');
       });
+
+      document.getElementById('btnAutoSetSweepSelected')?.addEventListener('click', () => {
+  runAutoSetSweepSelected('finalDamageValue');
+});
+
+document.getElementById('btnAutoSetSweepMissing')?.addEventListener('click', () => {
+  runAutoSetSweepMissingArmorFixed('finalDamageValue');
+});
+
       (() => {
         window.WEBAPP_URL = 'https://dnf-backend.gogo456654.workers.dev';
 
