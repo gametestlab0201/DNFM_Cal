@@ -3073,6 +3073,35 @@
       color: #f7e3b8;
     }
 
+    /* 세트 카드 헤더를 좌우 정렬로 변경 */
+.armor-set-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 이름 부분이 왼쪽을 차지하도록 */
+.armor-set-header-title {
+  flex: 1;
+}
+
+/* 자동계산 대상 토글 버튼 */
+.set-auto-toggle {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid #facc6b;
+  background: rgba(250, 204, 21, 0.08);
+  color: #facc6b;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.set-auto-toggle.is-selected {
+  background: rgba(250, 204, 21, 0.25);
+}
+
+
     .armor-set-items {
       display: flex;
       flex-wrap: wrap;
@@ -6158,29 +6187,31 @@
         enh: {},   // 슬롯별 강화 선택
         enchants: {},   // 슬롯별 마법부여 선택
         ui: { weaponTypeTab: null, enhTargetSlot: null, enhTargetBtn: null },
-        currentSlotKey: null
+        currentSlotKey: null,
+
+          // 🔹 자동계산에 사용할 세트 선택 상태
+  autoSweep: {
+    armor: [], // 방어구 세트 이름 배열
+    acc:   [], // 악세사리 세트 이름 배열
+    spec:  []  // 특수장비 세트 이름 배열
+  }
       };
 
-            // ✅ 세트 자동계산용 화이트리스트 (세트 시트의 '이름' 기준)
-      //    필요할 때 이 배열들만 수정하면 됨
-      const AUTO_SWEEP_ARMOR_SET_NAMES = [
-        '자상: 어둠을 쏘아 내리는 자 세트', '보호: 콰트로 카시테움 세트', '왜곡: 스틱키 애시드 웨펀 세트','허상: 수호자의 초합금 세트','맹독: 어둠을 쏘아 내리는 자 세트',
-        '허상: 어느 말괄량이의 탐사복 세트','수호: 빛의 헌신자 세트','연격: 빛의 헌신자 세트','왜곡: 거인의 스펙쿨룸 아이언 세트','신속: 그란데 전투기갑 파츠 세트',
-        '보호: 수호자의 초합금 세트','수호: 거인의 스펙쿨룸 아이언 세트','레거시: 자연의 수호자 세트'
-      ];
-      const AUTO_SWEEP_ACC_SET_NAMES = [
-        '레거시: 지나온 영광의 시대 세트', '레거시: 에테리얼 리벤넌트 세트', '조화: 콰트로 마누스 연산장치 세트', '가속: 콰트로 마누스 연산장치 세트', '견고: 화력 개조 탄띠 세트',
-        '가속: 부식된 메탈기어 세트', '각오: 부식된 메탈기어 세트', '초석: 신비로운 빛의 소용돌이 세트', '조화: 신비로운 빛의 소용돌이 세트'
-      ];
-      const AUTO_SWEEP_SPEC_SET_NAMES = [
-        '격변: 부정한 빛의 우상 세트', '질주: 부정한 빛의 우상 세트', '결의: 허영 속 어둠의 피조물 세트', '질주: 허영 속 어둠의 피조물 세트', '촉진: 깊은 불구덩이의 섬멸자 세트',
-        '촉진: 철갑을 두른 탑의 수호꾼 세트', '불굴: 깊은 불구덩이의 섬멸자 세트', '숙련: 개구쟁이 호문쿨루스 세트', '격변: 철갑을 두른 탑의 수호꾼 세트', '불굴: 개구쟁이 호문쿨루스 세트'
-      ];
+
+      //방어구
+      //1차 '왜곡: 스틱키 애시드 웨펀 세트','수호: 빛의 헌신자 세트','연격: 빛의 헌신자 세트','보호: 콰트로 카시테움 세트','신속: 그란데 전투기갑 파츠 세트','레거시: 자연의 수호자 세트',
+      //2차 '허상: 수호자의 초합금 세트', '보호: 수호자의 초합금 세트', '자상: 어둠을 쏘아 내리는 자 세트',  '맹독: 어둠을 쏘아 내리는 자 세트', '수호: 거인의 스펙쿨룸 아이언 세트',
+      //3차 '허상: 어느 말괄량이의 탐사복 세트','왜곡: 거인의 스펙쿨룸 아이언 세트',
+
+      //악세
+      //
 
       // ✅ 특정 구글 계정만 전용 버튼을 보이게 하는 허용 리스트
       //  👉 여기에 본인 구글 메일 주소를 넣으면 됨
       const SPECIAL_USER_EMAILS = [
+        'gametestlab0201@gmail.com',
         'gogo456654@gmail.com',
+        
         // 'another.account@example.com',
       ];
 
@@ -7034,16 +7065,52 @@ if ($specSetToggle) {
             spacer.className = 'armor-set-spacer';
             $armorSetList.appendChild(spacer);
           }
-
           const card = document.createElement('div');
           card.className = 'armor-set-card';
           card.dataset.setType = set.type;
           card.dataset.setIndex = String(idx);
 
           const header = document.createElement('div');
-          header.className = 'armor-set-header';
-          header.textContent = set.name;
-          card.appendChild(header);
+header.className = 'armor-set-header';
+
+// 현재 자동계산 선택 상태
+const auto = state.autoSweep || (state.autoSweep = { armor: [], acc: [], spec: [] });
+const armorSelected = auto.armor || [];
+const isSelected = armorSelected.includes(set.name);
+
+// 왼쪽: 세트 이름
+const titleSpan = document.createElement('span');
+titleSpan.className = 'armor-set-header-title';
+titleSpan.textContent = set.name;
+header.appendChild(titleSpan);
+
+// 오른쪽: 자동계산 토글 버튼
+const autoBtn = document.createElement('button');
+autoBtn.type = 'button';
+autoBtn.className = 'set-auto-toggle';
+if (isSelected) autoBtn.classList.add('is-selected');
+autoBtn.textContent = isSelected ? '자동계산 대상' : '자동계산 대상';
+
+autoBtn.addEventListener('click', (e) => {
+  e.stopPropagation(); // 헤더 클릭이 세트 적용으로 번지지 않게
+  const list = state.autoSweep.armor;
+  const name = set.name;
+  const idx = list.indexOf(name);
+
+  if (idx >= 0) {
+    // 선택 해제
+    list.splice(idx, 1);
+    autoBtn.classList.remove('is-selected');
+  } else {
+    // 선택
+    list.push(name);
+    autoBtn.classList.add('is-selected');
+  }
+});
+
+header.appendChild(autoBtn);
+card.appendChild(header);
+
 
           const itemsRow = document.createElement('div');
           itemsRow.className = 'armor-set-items';
@@ -7137,9 +7204,40 @@ function getSpecSetListForSweep() {
           card.dataset.setIndex = String(idx);
 
           const header = document.createElement('div');
-          header.className = 'armor-set-header';
-          header.textContent = set.name;
-          card.appendChild(header);
+header.className = 'armor-set-header';
+
+const auto = state.autoSweep || (state.autoSweep = { armor: [], acc: [], spec: [] });
+const selected = auto.acc || [];
+const isSelected = selected.includes(set.name);
+
+const titleSpan = document.createElement('span');
+titleSpan.className = 'armor-set-header-title';
+titleSpan.textContent = set.name;
+header.appendChild(titleSpan);
+
+const autoBtn = document.createElement('button');
+autoBtn.type = 'button';
+autoBtn.className = 'set-auto-toggle';
+if (isSelected) autoBtn.classList.add('is-selected');
+autoBtn.textContent = '자동계산 대상';
+
+autoBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const list = state.autoSweep.acc;
+  const name = set.name;
+  const idx = list.indexOf(name);
+  if (idx >= 0) {
+    list.splice(idx, 1);
+    autoBtn.classList.remove('is-selected');
+  } else {
+    list.push(name);
+    autoBtn.classList.add('is-selected');
+  }
+});
+
+header.appendChild(autoBtn);
+card.appendChild(header);
+
 
           const itemsRow = document.createElement('div');
           itemsRow.className = 'armor-set-items';
@@ -7197,9 +7295,40 @@ function getSpecSetListForSweep() {
     card.dataset.setIndex = String(idx);
 
     const header = document.createElement('div');
-    header.className = 'armor-set-header';
-    header.textContent = set.name;
-    card.appendChild(header);
+header.className = 'armor-set-header';
+
+const auto = state.autoSweep || (state.autoSweep = { armor: [], acc: [], spec: [] });
+const selected = auto.spec || [];
+const isSelected = selected.includes(set.name);
+
+const titleSpan = document.createElement('span');
+titleSpan.className = 'armor-set-header-title';
+titleSpan.textContent = set.name;
+header.appendChild(titleSpan);
+
+const autoBtn = document.createElement('button');
+autoBtn.type = 'button';
+autoBtn.className = 'set-auto-toggle';
+if (isSelected) autoBtn.classList.add('is-selected');
+autoBtn.textContent = '자동계산 대상';
+
+autoBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const list = state.autoSweep.spec;
+  const name = set.name;
+  const idx = list.indexOf(name);
+  if (idx >= 0) {
+    list.splice(idx, 1);
+    autoBtn.classList.remove('is-selected');
+  } else {
+    list.push(name);
+    autoBtn.classList.add('is-selected');
+  }
+});
+
+header.appendChild(autoBtn);
+card.appendChild(header);
+
 
     const itemsRow = document.createElement('div');
     itemsRow.className = 'armor-set-items';
@@ -17294,18 +17423,20 @@ async function runAutoSetSweepSelected(targetId, p /* 'phys' | 'mag' 생략 가�
   try {
     // 1) 세트 카드 목록 확보
     let armorSets = getArmorSetListForSweep();
-    let accSets   = getAccSetListForSweep();
-    let specSets  = getSpecSetListForSweep();
+let accSets   = getAccSetListForSweep();
+let specSets  = getSpecSetListForSweep();
 
-    // 2) 화이트리스트에 있는 세트만 남기기
-    armorSets = filterSetsForAutoSweep(armorSets, AUTO_SWEEP_ARMOR_SET_NAMES);
-    accSets   = filterSetsForAutoSweep(accSets,   AUTO_SWEEP_ACC_SET_NAMES);
-    specSets  = filterSetsForAutoSweep(specSets,  AUTO_SWEEP_SPEC_SET_NAMES);
+// 🔹 state.autoSweep 에 들어있는 세트 이름 기준으로 필터링
+const auto = state.autoSweep || { armor: [], acc: [], spec: [] };
 
-    if (!armorSets.length && !accSets.length && !specSets.length) {
-      alert('자동계산에 사용할 세트가 없습니다.\nAUTO_SWEEP_* 상수를 확인해 주세요.');
-      return;
-    }
+armorSets = filterSetsForAutoSweep(armorSets, auto.armor);
+accSets   = filterSetsForAutoSweep(accSets,   auto.acc);
+specSets  = filterSetsForAutoSweep(specSets,  auto.spec);
+
+if (!armorSets.length && !accSets.length && !specSets.length) {
+  alert('자동계산에 사용할 세트가 선택되어 있지 않습니다.\n세트 선택 모달에서 자동계산 대상을 먼저 선택해 주세요.');
+  return;
+}
 
     // 3) 어떤 축이 비어 있으면 그 축은 "현재 장비 유지"로 둠
     const armorLoop = armorSets.length ? armorSets : [null];
