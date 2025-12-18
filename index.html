@@ -322,6 +322,56 @@
       color: #ffffff;
     }
 
+    /* 문의하기 오른쪽에 살짝 붙이기 */
+.site-header .title .faq-btn { margin-left: 10px; }
+
+/* FAQ 목록 */
+.faq-list { display:flex; flex-direction:column; gap:8px; margin-top: 10px; }
+.faq-q-btn{
+  width:100%;
+  text-align:left;
+  padding:10px 12px;
+  border-radius:10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.16);
+  color:#e5e7eb;
+  cursor:pointer;
+}
+.faq-q-btn:hover{ background: rgba(255,255,255,0.12); }
+
+/* ✅ FAQ 이미지: 절대 "늘리지 않기" (원본보다 커지지 않음) */
+.faq-answer-text .faq-img{
+  width: auto;                          /* 핵심: 100% 금지 */
+  max-width: min(100%, 520px);          /* 화면 밖으로만 안 나가게 + 최대폭 캡 */
+  height: auto;
+  display: block;
+  margin: 10px 0;
+  border-radius: 10px;
+}
+
+/* ✅ 자동 그리드(개수에 따라 자동 배치) */
+.faq-img-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); /* 칸 최소 260px, 되면 2~3열 */
+  gap: 10px;
+  margin: 10px 0;
+  justify-items: start; /* 이미지가 칸을 꽉 채우지 않고 왼쪽 정렬 */
+  align-items: start;
+}
+
+/* 그리드 안에서는 위/아래 마진이 겹치니까 0으로 */
+.faq-img-grid .faq-img{
+  margin: 0;
+}
+
+/* ✅ Q&A 답변 글자 크기(답변만) */
+#faqAnswerModal .faq-answer-text{
+  font-size: 13px;   /* 원하는 크기로 조절 (예: 12~14px) */
+  line-height: 1.6;
+}
+
+
+
 
     .notice-list .job-highlight {
       font-weight: 700;
@@ -735,6 +785,19 @@
       color: #6b7280;
     }
 
+    /* ✅ Q&A(FAQ) 모달: 내용이 길면 본문에서 스크롤 */
+.dialog.faq-dialog{
+  display: flex;          /* header + body를 세로로 쌓기 */
+  flex-direction: column;
+  overflow: hidden;       /* 바깥으로 삐져나가는 것 방지 */
+}
+
+.dialog.faq-dialog .contact-body{
+  flex: 1;                /* 남는 높이를 본문이 차지 */
+  min-height: 0;          /* ⭐ 이게 있어야 overflow 스크롤이 정상 작동 */
+  overflow-y: auto;       /* 내용 길면 스크롤 */
+}
+
     .reply-block {
       margin-top: 6px;
     }
@@ -802,6 +865,20 @@
       height: 30px;
       font-size: 12px;
     }
+
+    /* ✅ Q&A 답변 모달: 내용만큼만 높이 + 길면 내부 스크롤 */
+#faqAnswerModal .dialog {
+  height: auto;
+  min-height: 0;
+  max-height: min(700px, 90vh); /* 기존 의도 유지 */
+  display: flex;               /* header + body 세로 배치 */
+  flex-direction: column;
+}
+
+#faqAnswerModal .contact-body {
+  overflow-y: auto;            /* 내용이 길면 여기만 스크롤 */
+}
+
 
 
     #btnRune,
@@ -1605,6 +1682,10 @@
       border-color: #7c5b37;
       box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset
     }
+
+    .item-row.is-auto { outline: 2px solid rgba(37, 99, 235, .6); }
+    #customOptModal .opt-btn.is-auto { outline: 2px dashed rgba(22,163,74,.85); }
+
 
     .iconbox {
       position: relative;
@@ -4520,6 +4601,14 @@
           </svg>
           <span class="contact-label">문의하기</span>
         </button>
+        <button id="btnFaq" class="contact-btn faq-btn" type="button" title="문의하기 전 자주하는 Q&A">
+  <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-mail">
+    <path d="M12 18h.01"></path>
+    <path d="M9.1 9a3 3 0 1 1 5.8 1c-.6.7-1.4 1.1-1.9 1.5-.4.4-.5.6-.5 1.5"></path>
+    <path d="M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10z"></path>
+  </svg>
+  <span class="contact-label">Q&amp;A</span>
+</button>
       </div>
       <!--span 은 한줄에서 특별히 강조 할때 쓴다. div는 한줄이 강제로 나뉘기때문에 쓴다.-->
       <div class="actions">
@@ -4560,12 +4649,12 @@
                 <ul class="notice-list">
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
-                  <li>12.13 <span class="notice-badge">'여인파이터'</span> 캐릭 추가</li>
                   <li>12.14 '장비설명' 부위별 시인성 개선 </li>
                   <li>12.15 '콰트로 마누스 연산장치' 세트 옵션 버그 수정 </li>
                   <li>12.16 <span class="notice-badge">'베가본드'</span> 캐릭 추가</li>
-                  <li>12.17 '10레벨 스킬 공격력 증가/감소' 옵션 버그 수정 </li>
                   <!--<br> 기존 거대누골은 '(구)거대누골' 로 선택 가능합니다-->
+                  <li>12.17 '10레벨 스킬 공격력 증가/감소' 옵션 버그 수정</li>
+                  <li>12.18 <span class="notice-badge">'스트리트파이터'</span> 캐릭 추가</li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -4720,6 +4809,11 @@
 <button id="btnAutoSetSweepMissing" class="ui-btnetc" style="display:none;">
   누락만 재계산(방어구 고정)
 </button>
+
+<button id="btnAutoWeaponSweepSelected" class="special-btn" style="display:none;">
+  무기/무기고유효과 자동계산
+</button>
+
 
 
     <!-- ✅ 고유효과 ON/OFF 토글 -->
@@ -5654,6 +5748,45 @@
       </div>
     </div>
 
+    <!-- 문의하기 전 자주하는 Q&A (목록) -->
+<div id="faqModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-faq-close></div>
+  <div class="dialog contact-dialog faq-dialog" role="dialog" aria-modal="true" aria-labelledby="faqTitle"
+    style="width:min(720px,96vw);max-height:min(700px,90vh);">
+    <header>
+      <div style="width:32px;"></div>
+      <h2 id="faqTitle">문의하기 전 자주하는 Q&amp;A</h2>
+      <button type="button" class="close" data-faq-close>✕</button>
+    </header>
+
+    <div class="contact-body">
+      <div class="contact-notice">
+        계산기 사용 중, 혹시 이런 점들이 궁금하신가요? 가장 많이 하시는 질문들을 모아두었습니다.
+      </div>
+      <div id="faqList" class="faq-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Q&A 답변 모달 -->
+<div id="faqAnswerModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-faqans-close></div>
+  <div class="dialog contact-dialog faq-dialog" role="dialog" aria-modal="true" aria-labelledby="faqAnswerTitle"
+    style="width:min(920px,96vw);max-height:min(700px,90vh);">
+    <header>
+      <button type="button" class="btn" data-faqans-back style="font-size:12px;padding:4px 8px;">← 목록</button>
+      <h2 id="faqAnswerTitle">Q&amp;A</h2>
+      <button type="button" class="close" data-faqans-close>✕</button>
+    </header>
+
+    <div class="contact-body">
+      <div id="faqAnswerQ" style="font-weight:800;margin-bottom:10px;"></div>
+      <div id="faqAnswerA" class="faq-answer-text"></div>
+    </div>
+  </div>
+</div>
+
+
     <!-- 관리자 답장 팝업 -->
     <div id="replyModal" class="modal" aria-hidden="true">
       <div class="backdrop" data-reply-close></div>
@@ -5693,7 +5826,7 @@
     </div>
 
         <!-- PC 계산기 로딩 후 안내 공지 모달 -->
-    <div id="noticeModal" class="modal" aria-hidden="true">
+     <div id="noticeModal" class="modal" aria-hidden="true">
       <div class="backdrop" data-close></div>
       <div class="dialog"
            role="dialog"
@@ -5724,10 +5857,7 @@
               <strong style="color: #ff4444;">동일하게 적용되는 버그</strong>를 발견하였습니다.
             </li>
             <li>
-              제보 받은 즉시 긴급수정 진행하였으며, 현재는 <strong>정상적으로 데미지 계산</strong>이 가능합니다.
-            </li>
-            <li>
-              패치 이전에 해당 옵션이 포함된 아이템과, '콰트로 마누스 연산장치' 세트로 데미지 계산을 진행하신 경우, <br>
+              패치 이전에 해당 세트로 데미지 계산을 진행하신 경우, <br>
               위 내용을 참고하시어 다시 한번 데미지 값을 계산해 보시기 바랍니다.
             </li>
             <li>
@@ -5758,7 +5888,8 @@
 
         <div class="patch-log-body">
           <ul class="patch-log-list notice-list">
-            <li>25.12.17 <span style="color: yellow;">'10레벨 스킬 공격력 증가/감소'</span> 옵션이 <span style="color: #ff4444;">평타에도 적용되는 버그 수정</span> </li>
+            <li>25.12.18 <span class="notice-badge">'스트리트파이터'</span> 캐릭 추가</li>
+	          <li>25.12.17 <span style="color: yellow;">'10레벨 스킬 공격력 증가/감소'</span> 옵션이 <span style="color: #ff4444;">평타에도 적용되는 버그 수정</span> </li>
             <li>25.12.16 <span class="notice-badge">'베가본드'</span> 캐릭 추가</li>
             <li>25.12.15 <span style="color: yellow;">'콰트로 마누스 연산장치'</span> 세트 옵션 <span style="color: #ff4444;">버그 수정</span> </li>
             <li>25.12.14 <span style="color: yellow;">'장비설명'</span> 부위별 <span style="color: #ff4444;">시인성 개선</span> </li>
@@ -5963,6 +6094,8 @@
             if (contactBtn) {
               contactBtn.style.display = 'inline-flex';
             }
+            const b = document.getElementById('btnFaq');
+            if (b) b.style.display = 'inline-flex';
           }
 
           window.__loginPingResult = data;
@@ -6204,7 +6337,10 @@
   autoSweep: {
     armor: [], // 방어구 세트 이름 배열
     acc:   [], // 악세사리 세트 이름 배열
-    spec:  []  // 특수장비 세트 이름 배열
+    spec:  [],  // 특수장비 세트 이름 배열
+     // ★ 추가
+  weapon: [],        // 무기 이름 배열
+  weaponCustom: []   // 무기 고유효과(강타/광채/분쇄/선명/없음) 배열
   }
       };
 
@@ -6241,12 +6377,13 @@ function updateSpecialUserButton() {
   const rowUnique = document.getElementById('uniqueOnOffRow');
   const btnAutoSet = document.getElementById('btnAutoSetSweepSelected'); // ← 추가
   const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
+  const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
 
   const emailRaw = (window.CORE && CORE.userEmail) ? CORE.userEmail : null;
   const email = emailRaw ? String(emailRaw).toLowerCase() : '';
   const isAllowed = SPECIAL_USER_EMAILS.includes(email);
 
-  [btnArmor, btnAcc, btnSpec, btnUnique, btnAutoSet, btnAutoSetMissing].forEach(btn => {
+  [btnArmor, btnAcc, btnSpec, btnUnique, btnAutoSet, btnAutoSetMissing, btnAutoWeapon].forEach(btn => {
     if (!btn) return;
     btn.style.display = isAllowed ? 'inline-flex' : 'none';
     btn.disabled = !isAllowed;
@@ -7092,7 +7229,7 @@ if ($specSetToggle) {
 header.className = 'armor-set-header';
 
 // 현재 자동계산 선택 상태
-const auto = state.autoSweep || (state.autoSweep = { armor: [], acc: [], spec: [] });
+const auto = state.autoSweep || (state.autoSweep = { armor: [], acc: [], spec: [], weapon: [], weaponCustom: [] });
 const armorSelected = auto.armor || [];
 const isSelected = armorSelected.includes(set.name);
 
@@ -7224,7 +7361,7 @@ function getSpecSetListForSweep() {
           const header = document.createElement('div');
 header.className = 'armor-set-header';
 
-const auto = state.autoSweep || (state.autoSweep = { armor: [], acc: [], spec: [] });
+const auto = state.autoSweep || (state.autoSweep = { armor: [], acc: [], spec: [], weapon: [], weaponCustom: [] });
 const selected = auto.acc || [];
 const isSelected = selected.includes(set.name);
 
@@ -7315,7 +7452,7 @@ card.appendChild(header);
     const header = document.createElement('div');
 header.className = 'armor-set-header';
 
-const auto = state.autoSweep || (state.autoSweep = { armor: [], acc: [], spec: [] });
+const auto = state.autoSweep || (state.autoSweep = { armor: [], acc: [], spec: [], weapon: [], weaponCustom: [] });
 const selected = auto.spec || [];
 const isSelected = selected.includes(set.name);
 
@@ -10183,17 +10320,34 @@ function buildSpecSetCardsFromSheets() {
         }
       });
 
-      // 옵션 버튼 클릭 시 선택 토글
-      $armorCustomOptList?.addEventListener('click', (e) => {
-        const btn = e.target.closest('.opt-btn');
-        if (!btn) return;
+      // 옵션 버튼 클릭 시 선택 (일반 클릭) / 자동계산 대상 토글 (Shift/Ctrl/Meta 클릭)
+$customOptList?.addEventListener('click', (e) => {
+  const btn = e.target.closest('.opt-btn');
+  if (!btn) return;
 
-        const val = btn.dataset.value || btn.textContent.trim();
-        __armorCustomOptSelected = val;
+  const val = btn.dataset.value || btn.textContent.trim(); // 강타/광채/분쇄/선명/없음
+  const isToggleAuto = (e.shiftKey || e.ctrlKey || e.metaKey);
 
-        $armorCustomOptList.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      });
+  // ✅ Shift/Ctrl/Meta 클릭: 자동계산 대상 토글만 (선택/active는 건드리지 않아도 됨)
+  if (isToggleAuto) {
+    const auto = state.autoSweep || (state.autoSweep = { armor: [], acc: [], spec: [], weapon: [], weaponCustom: [] });
+    auto.weaponCustom = Array.isArray(auto.weaponCustom) ? auto.weaponCustom : [];
+
+    const idx = auto.weaponCustom.indexOf(val);
+    if (idx >= 0) auto.weaponCustom.splice(idx, 1);
+    else auto.weaponCustom.push(val);
+
+    btn.classList.toggle('is-auto', idx < 0); // 표시용
+    toast?.(`자동계산 옵션 ${idx < 0 ? '추가' : '해제'}: ${val}`);
+    return;
+  }
+
+  // ✅ 일반 클릭: 기존 동작(단일 선택 active)
+  __customOptSelected = val;
+  $customOptList.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+});
+
 
       // ─────────────────────────────────────────────
       // 귀걸이 전용 커스텀 옵션 모달 (선봉/의지/이상/없음)
@@ -10304,6 +10458,10 @@ function buildSpecSetCardsFromSheets() {
           $customOptList.querySelectorAll('.opt-btn').forEach(btn => {
             const val = btn.dataset.value || btn.textContent.trim();
             btn.classList.toggle('active', !!__customOptSelected && val === __customOptSelected);
+
+            const auto = state.autoSweep || {};
+const autoList = Array.isArray(auto.weaponCustom) ? auto.weaponCustom : [];
+btn.classList.toggle('is-auto', autoList.includes(val));
           });
         }
         showCustomOptModal(true);
@@ -11825,7 +11983,29 @@ function buildSpecSetCardsFromSheets() {
       </div>
       <div class="right"><span class="rarity-chip ${rarityClass}">${rarityLabel}</span></div>`;
 
-          row.onclick = () => { applyItemToSlot(slotKey, it); closeItemPicker(); };
+          row.onclick = (e) => {
+  const isWeapon = (slotKey === 'weapon');
+  const isToggleAuto = isWeapon && (e.shiftKey || e.ctrlKey || e.metaKey);
+
+  if (isToggleAuto) {
+    const auto = state.autoSweep || (state.autoSweep = { armor: [], acc: [], spec: [], weapon: [], weaponCustom: [] });
+    const name = String(it?.name || '').trim();
+    if (!name) return;
+
+    const idx = auto.weapon.indexOf(name);
+    if (idx >= 0) auto.weapon.splice(idx, 1);
+    else auto.weapon.push(name);
+
+    row.classList.toggle('is-auto', idx < 0); // 표시용(선택)
+    toast?.(`자동계산 무기 ${idx < 0 ? '추가' : '해제'}: ${name}`);
+    return; // ✅ 여기서 끝 (장착 안 함, 모달 닫지 않음)
+  }
+
+  // ✅ 기존 동작 그대로
+  applyItemToSlot(slotKey, it);
+  closeItemPicker();
+};
+
 
           const icon = row.querySelector('.icon');
           icon.onerror = () => { icon.src = PLACEHOLDER_IMG; };
@@ -17445,7 +17625,7 @@ let accSets   = getAccSetListForSweep();
 let specSets  = getSpecSetListForSweep();
 
 // 🔹 state.autoSweep 에 들어있는 세트 이름 기준으로 필터링
-const auto = state.autoSweep || { armor: [], acc: [], spec: [] };
+const auto = state.autoSweep || { armor: [], acc: [], spec: [], weapon: [], weaponCustom: [] };
 
 armorSets = filterSetsForAutoSweep(armorSets, auto.armor);
 accSets   = filterSetsForAutoSweep(accSets,   auto.acc);
@@ -17502,7 +17682,7 @@ async function runAutoSetSweepMissingArmorFixed(targetId, p) {
   const originalSel = cloneSelections(state.selections || {});
 
   try {
-    const auto = state.autoSweep || (state.autoSweep = { armor: [], acc: [], spec: [] });
+    const auto = state.autoSweep || (state.autoSweep = { armor: [], acc: [], spec: [], weapon: [], weaponCustom: [] });
 
     // 1) 세트 후보 리스트
     let armorSets = filterSetsForAutoSweep(getArmorSetListForSweep(), auto.armor);
@@ -17595,6 +17775,107 @@ async function runAutoSetSweepMissingArmorFixed(targetId, p) {
   }
 }
 
+async function runAutoWeaponCustomSweepSelected(targetId) {
+  const auto = state.autoSweep || (state.autoSweep = { armor:[], acc:[], spec:[], weapon:[], weaponCustom:[] });
+
+  const weaponNames = Array.isArray(auto.weapon) ? auto.weapon.slice() : [];
+  const customTypes = Array.isArray(auto.weaponCustom) ? auto.weaponCustom.slice() : [];
+
+  // 비어있으면 “현재 상태”라도 1회는 돌게 처리
+  const curWeaponName = (typeof getCurrentWeaponName === 'function') ? getCurrentWeaponName() : '';
+  if (!weaponNames.length && curWeaponName) weaponNames.push(curWeaponName);
+
+  const curType = String(state?.customSkills?.type || '').trim();
+  if (!customTypes.length) customTypes.push(curType || '없음');
+
+  if (!weaponNames.length) {
+    toast('자동계산 대상 무기가 없습니다. (무기 목록에서 Shift/Ctrl 클릭으로 추가)');
+    return;
+  }
+
+  // ★ 원복 스냅샷
+  const backupSelections = (typeof cloneSelections === 'function') ? cloneSelections() : JSON.parse(JSON.stringify(state.selections || {}));
+  const backupCustom = state.customSkills ? JSON.parse(JSON.stringify(state.customSkills)) : null;
+
+  try {
+    // 무기 리스트 로드 보장 (캐릭 jobGroup 필요)
+    const jobGroup = state?.char?.jobGroup || state?.Char?.jobGroup || state?.CharStats?.jobGroup || '';
+    if (typeof ensureEquipListLoaded === 'function') {
+      await ensureEquipListLoaded('weapon', jobGroup);
+    }
+
+    // 무기 row 찾기 helper
+    const findWeaponRowByName = (name) => {
+      if (typeof getItemsForSlot === 'function') {
+        const items = getItemsForSlot('weapon', jobGroup) || [];
+        const key = String(name || '').trim();
+        return items.find(it => String(it?.name || '').trim() === key) || null;
+      }
+      return null;
+    };
+
+    // UI 업데이트 helper (btnCustomOpt 라벨/색 맞추기)
+    const syncWeaponCustomButtonUI = (picked) => {
+      const btn = document.getElementById('btnCustomOpt');
+      if (!btn) return;
+
+      // 기존 클래스 제거
+      btn.classList.remove('customopt-강타', 'customopt-광채', 'customopt-분쇄', 'customopt-선명', 'customopt-none');
+
+      const p = (picked === '' ? '없음' : picked);
+      btn.textContent = `무기 커스텀: ${p || '없음'}`;
+      if (!p || p === '없음') btn.classList.add('customopt-none');
+      else btn.classList.add(`customopt-${p}`);
+    };
+
+    for (const wName of weaponNames) {
+      const row = findWeaponRowByName(wName);
+      if (!row) {
+        console.warn('[autoWeaponSweep] weapon not found:', wName);
+        continue;
+      }
+
+      // 1) 무기 적용
+      if (typeof applyItemToSlot === 'function') {
+        await applyItemToSlot('weapon', row);
+      } else {
+        // fallback
+        state.selections = state.selections || {};
+        state.selections.weapon = row;
+      }
+
+      for (const tRaw of customTypes) {
+        const t = (tRaw === '' ? '없음' : String(tRaw || '').trim()) || '없음';
+
+        // 2) 무기 고유효과(커스텀옵) 적용: state.customSkills에만 저장하면 됨 :contentReference[oaicite:10]{index=10}
+        if (!state.customSkills) state.customSkills = {};
+        if (t === '없음') {
+          state.customSkills.type = '';
+          state.customSkills.weaponName = '';
+        } else {
+          state.customSkills.type = t;          // 강타/광채/분쇄/선명
+          state.customSkills.weaponName = wName; // (백에서 weaponType 해석) :contentReference[oaicite:11]{index=11}
+        }
+        syncWeaponCustomButtonUI(t);
+
+        // 3) 계산 실행 (calc_all payload에 customSkills 포함됨) :contentReference[oaicite:12]{index=12}
+        await computeViaBackend(targetId);
+      }
+    }
+
+    toast('무기/무기고유효과 자동계산 완료');
+  } catch (e) {
+    console.error('[autoWeaponSweep] fail:', e);
+    toast('무기/무기고유효과 자동계산 중 오류');
+  } finally {
+    // ★ 원복
+    if (typeof restoreSelections === 'function') restoreSelections(backupSelections);
+    else state.selections = backupSelections;
+
+    state.customSkills = backupCustom;
+  }
+}
+
 
       document.getElementById('btn-sum-all-final')?.setAttribute('data-compute-btn', '');
       document.getElementById('btn-sum-all-final2')?.setAttribute('data-compute-btn', '');
@@ -17615,6 +17896,10 @@ async function runAutoSetSweepMissingArmorFixed(targetId, p) {
 
 document.getElementById('btnAutoSetSweepMissing')?.addEventListener('click', () => {
   runAutoSetSweepMissingArmorFixed('finalDamageValue');
+});
+
+document.getElementById('btnAutoWeaponSweepSelected')?.addEventListener('click', async () => {
+  await runAutoWeaponCustomSweepSelected('finalDamageValue');
 });
 
       (() => {
@@ -17968,7 +18253,7 @@ document.getElementById('btnAutoSetSweepMissing')?.addEventListener('click', () 
           $m.classList.add('show');
           $m.setAttribute('aria-hidden', 'false');
 
-          const $ta = document.getElementById('contactMessage');
+          const $ta = document.getElementById('contactTalk');
           if ($ta) {
             $ta.focus();
           }
@@ -18035,6 +18320,159 @@ if ($btnAutoSetSweepSelected) {
     await runAutoSetSweepSelected('finalDamageValue');
   });
 }
+
+// =======================
+// FAQ (문의 전 자주하는 Q&A)
+// =======================
+function getFaqItems() {
+  const lists = (window.CORE && window.CORE.lists) ? window.CORE.lists : {};
+  const raw = lists ? lists['faq:list'] : null;
+  return Array.isArray(raw) ? raw : [];
+}
+
+function openFaqModal() {
+  const modal = document.getElementById('faqModal');
+  if (!modal) return;
+
+  // 렌더
+  const box = document.getElementById('faqList');
+  const items = getFaqItems();
+
+  if (box) {
+    box.innerHTML = '';
+    if (!items.length) {
+      box.innerHTML = `<div style="opacity:.8">등록된 Q&A가 없습니다.</div>`;
+    } else {
+      for (const it of items) {
+        const q = String(it?.q ?? '').trim();
+        const a = String(it?.a ?? '').trim();
+        if (!q) continue;
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'faq-q-btn';
+        btn.textContent = q;
+        btn.addEventListener('click', () => {
+          // “모달 하나 더”는 답변 모달로 전환(겹침 문제 방지용으로 목록 모달 닫고 답변 모달 오픈)
+          closeFaqModal();
+          openFaqAnswerModal(q, a);
+        });
+        box.appendChild(btn);
+      }
+    }
+  }
+
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeFaqModal() {
+  const modal = document.getElementById('faqModal');
+  if (!modal) return;
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function openFaqAnswerModal(q, a) {
+  const modal = document.getElementById('faqAnswerModal');
+  if (!modal) return;
+
+  const qEl = document.getElementById('faqAnswerQ');
+  const aEl = document.getElementById('faqAnswerA');
+  if (qEl) qEl.textContent = q || '';
+  function renderFaqAnswer(container, answerText) {
+  if (!container) return;
+  container.innerHTML = '';
+
+  const lines = String(answerText || '').split(/\r?\n/);
+
+  const isImgToken = (s) => {
+    const t = String(s || '').trim();
+    return (
+      /^https?:\/\/\S+\.(png|jpg|jpeg|gif|webp)(\?\S*)?$/i.test(t) ||
+      /^(\/?img\/\S+|\.\.?\/img\/\S+)\.(png|jpg|jpeg|gif|webp)(\?\S*)?$/i.test(t)
+    );
+  };
+
+  const makeImg = (src) => {
+    const img = document.createElement('img');
+    img.className = 'faq-img';
+    img.src = encodeURI(String(src || '').trim());
+    img.alt = 'FAQ 이미지';
+    img.loading = 'lazy';
+    return img;
+  };
+
+  for (const lineRaw of lines) {
+    const line = lineRaw.trim();
+
+    if (!line) {
+      container.appendChild(document.createElement('br'));
+      continue;
+    }
+
+    // ✅ 한 줄에 | 로 여러 이미지면 "자동 그리드"로 렌더
+    const parts = line.split('|').map(s => s.trim()).filter(Boolean);
+    const allImgs = (parts.length >= 2) && parts.every(isImgToken);
+
+    if (allImgs) {
+      const grid = document.createElement('div');
+      grid.className = 'faq-img-grid';
+      for (const p of parts) grid.appendChild(makeImg(p));
+      container.appendChild(grid);
+      continue;
+    }
+
+    // ✅ 한 줄이 이미지 1개면 1열(기존 방식)
+    if (isImgToken(line)) {
+      container.appendChild(makeImg(line));
+      continue;
+    }
+
+    // 텍스트
+    const div = document.createElement('div');
+    div.textContent = lineRaw;
+    container.appendChild(div);
+  }
+}
+
+
+// openFaqAnswerModal 안에서:
+if (aEl) renderFaqAnswer(aEl, a || '');
+
+
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeFaqAnswerModal() {
+  const modal = document.getElementById('faqAnswerModal');
+  if (!modal) return;
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+// 버튼 연결
+const faqBtn = document.getElementById('btnFaq');
+if (faqBtn) faqBtn.addEventListener('click', openFaqModal);
+
+// 닫기(목록)
+document.querySelectorAll('[data-faq-close]').forEach(el => {
+  el.addEventListener('click', closeFaqModal);
+});
+
+// 닫기(답변)
+document.querySelectorAll('[data-faqans-close]').forEach(el => {
+  el.addEventListener('click', closeFaqAnswerModal);
+});
+
+// 답변 모달에서 “목록”
+document.querySelectorAll('[data-faqans-back]').forEach(el => {
+  el.addEventListener('click', () => {
+    closeFaqAnswerModal();
+    openFaqModal();
+  });
+});
 
 
     </script>
