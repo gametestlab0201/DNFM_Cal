@@ -6356,7 +6356,7 @@
       // ✅ 특정 구글 계정만 전용 버튼을 보이게 하는 허용 리스트
       //  👉 여기에 본인 구글 메일 주소를 넣으면 됨
       const SPECIAL_USER_EMAILS = [
-        'gametestlab0201@gmail.com',
+        //'gametestlab0201@gmail.com',
         'gogo456654@gmail.com',
         'gogo4566546@gmail.com',
         'ionix4566541@gmail.com',
@@ -10319,6 +10319,18 @@ function buildSpecSetCardsFromSheets() {
           closeArmorCustomOptModal();
         }
       });
+      // ✅ 상의 고유효과(커스텀옵) - 옵션 버튼 클릭 시 선택 토글
+$armorCustomOptList?.addEventListener('click', (e) => {
+  const btn = e.target.closest('.opt-btn');
+  if (!btn) return;
+
+  const val = btn.dataset.value || btn.textContent.trim(); // 선봉/의지/이상/없음
+  __armorCustomOptSelected = val;
+
+  $armorCustomOptList.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+});
+
 
       // 옵션 버튼 클릭 시 선택 (일반 클릭) / 자동계산 대상 토글 (Shift/Ctrl/Meta 클릭)
 $customOptList?.addEventListener('click', (e) => {
@@ -10476,18 +10488,6 @@ btn.classList.toggle('is-auto', autoList.includes(val));
         if (e.target.dataset.close != null || e.target.classList.contains('backdrop')) {
           closeCustomOptModal();
         }
-      });
-
-      // 옵션 버튼 클릭 시 선택 토글
-      $customOptList?.addEventListener('click', (e) => {
-        const btn = e.target.closest('.opt-btn');
-        if (!btn) return;
-
-        const val = btn.dataset.value || btn.textContent.trim();
-        __customOptSelected = val;
-
-        $customOptList.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
       });
 
 
@@ -17794,7 +17794,9 @@ async function runAutoWeaponCustomSweepSelected(targetId) {
   }
 
   // ★ 원복 스냅샷
-  const backupSelections = (typeof cloneSelections === 'function') ? cloneSelections() : JSON.parse(JSON.stringify(state.selections || {}));
+  const backupSelections = (typeof cloneSelections === 'function')
+  ? cloneSelections(state.selections || {})
+  : JSON.parse(JSON.stringify(state.selections || {}));
   const backupCustom = state.customSkills ? JSON.parse(JSON.stringify(state.customSkills)) : null;
 
   try {
@@ -17868,12 +17870,28 @@ async function runAutoWeaponCustomSweepSelected(targetId) {
     console.error('[autoWeaponSweep] fail:', e);
     toast('무기/무기고유효과 자동계산 중 오류');
   } finally {
-    // ★ 원복
-    if (typeof restoreSelections === 'function') restoreSelections(backupSelections);
-    else state.selections = backupSelections;
-
-    state.customSkills = backupCustom;
+  // ★ 원복 (장착 복원은 async)
+  try {
+    if (typeof restoreSelections === 'function') {
+      await restoreSelections(backupSelections);
+    } else {
+      state.selections = backupSelections;
+    }
+  } catch (e2) {
+    console.warn('[autoWeaponSweep] restoreSelections fail:', e2);
   }
+
+  // 무기고유효과도 원복
+  state.customSkills = backupCustom;
+
+  // UI도 원복 반영(프리뷰/버튼)
+  try { updateEquipDescPreview?.(); } catch (_) {}
+  try {
+    // 네 함수 안에 있던 syncWeaponCustomButtonUI 그대로 쓰면 됨
+    const t = (backupCustom?.type ? String(backupCustom.type).trim() : '') || '없음';
+    syncWeaponCustomButtonUI(t);
+  } catch (_) {}
+}
 }
 
 
