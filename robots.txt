@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://dnfm-gamelab.com/sitemap.xml
