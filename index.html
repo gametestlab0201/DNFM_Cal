@@ -4571,6 +4571,28 @@
       margin: 0;
       font-size: 14px;
     }
+  .sign-row{
+    display: flex;
+    align-items: center;   /* 수직 가운데 정렬 */
+    gap: 10px;             /* 이미지-문구 간격 */
+    justify-content: center; /* 가운데 정렬 (왼쪽 정렬 원하면 제거) */
+  }
+  .seal-stamp{
+    width: 90px;           /* 필요 시 크기만 조절 */
+    height: auto;
+    display: block;
+  }
+  .sign-text{
+    font-weight: 600;
+    font-size: 15px;
+    white-space: nowrap;   /* 줄바꿈 방지 (좁은 화면에서 줄바꿈 허용하려면 지우기) */
+  }
+
+  /* 화면이 아주 좁을 때는 세로로 쌓기 (선택) */
+  @media (max-width: 420px){
+    .sign-row{ flex-direction: column; gap: 6px; }
+    .sign-text{ white-space: normal; }
+  }
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -5844,12 +5866,21 @@
           <ul class="patch-log-list notice-list">
             <li></li>
             <li>
-              <strong style="font-size:15px;">'10레벨 스킬 공격력 증가' 옵션 및 '콰트로 마누스 연산장치' 악세사리 세트 관련 안내</strong>
+              <strong style="font-size:18px;">[2026 신년 인사드립니다]</strong>
             </li>
               <li></li>
-              <li></li>
-              <li>
-              <span style="color: yellow;">'10레벨 스킬 공격력 증가'</span> 옵션이 <strong style="color: #ff4444;">평타 데미지에도 영향을 미치는 버그</strong>를 발견하였습니다.<br>
+              <li><br>안녕하세요 게임실험연구소 입니다. 새해 복 많이 받으세요 !<br><br>
+저희 <span style="color: yellow;">게임실험연구소</span> <strong style="color: #ff4444; font-size:15px;">'던파모바일 시즌5 계산기'</strong> 발전에 함께해주신 모든 연구원 여러분께 깊은 감사드립니다.<br>
+여러분의 <strong style="color: white;">후원과 관심, 그리고 세심한 오류·버그 제보</strong> 덕분에<br> 
+출시 초기보다 계산기가 훨씬 안정적이고, 성능 또한 크게 향상 되었습니다.<br><br>   
+2026년에는 <strong><u>보다 더 정확하고 편리한 계산 환경</u></strong>을 위해 꾸준히 업데이트를 이어가겠습니다.<br>
+올 한 해도 게임실험연구소 계산기와 함께, 효율적인 템세팅 해보시길 바랍니다.<br><br>
+<li class="sign-row">
+  <span class="sign-text">- 게임실험연구소장 드림 -</span>
+  <img src="/img/sign.png" alt="게임실험연구소장 직인" class="seal-stamp">
+</li>
+              <!--<li>
+               <span style="color: yellow;">'10레벨 스킬 공격력 증가'</span> 옵션이 <strong style="color: #ff4444;">평타 데미지에도 영향을 미치는 버그</strong>를 발견하였습니다.<br> 
             </li>
             <li>
               또한 <span style="color: yellow;">'조화: 콰트로 마누스 연산장치'</span> 세트 옵션 중, <br>
@@ -5867,7 +5898,7 @@
             </li>
             <li>
               감사합니다.
-            </li>
+            </li>-->
           </ul>
         </div>
       </div>
