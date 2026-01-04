@@ -5848,6 +5848,38 @@
       </div>
     </div>
 
+    <!-- ✅ 탈퇴 안내 모달 -->
+<div id="withdrawModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-close></div>
+  <div class="dialog"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="withdrawModalTitle"
+         style="width:min(740px,95vw); height:auto; max-height:min(360px,70vh); display:flex; flex-direction:column;">
+    <header>
+      <div style="width:32px;"></div>
+      <h2 id="withdrawModalTitle">안내</h2>
+      <button type="button" class="btn" data-close>닫기</button>
+    </header>
+
+    <div class="patch-log-body" style="flex:1; min-height:0; overflow-y:auto;">
+  <div id="withdrawModalMsg"
+     style="white-space:pre-wrap; line-height:1.55; margin-top:24px; margin-bottom:46px;"></div>
+
+  <!-- ✅ 성안의 봉인 '선택 하기'와 동일 스타일(ui-btnetc) 버튼 -->
+  <a
+    href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="ui-btnetc"
+    style="text-decoration:none;"
+  >연구원 재가입 하기!</a>
+</div>
+    </div>
+  </div>
+</div>
+
+
         <!-- PC 계산기 로딩 후 안내 공지 모달 -->
      <div id="noticeModal" class="modal" aria-hidden="true">
       <div class="backdrop" data-close></div>
@@ -6106,6 +6138,11 @@
             is_mobile: detectIsMobile()
           });
 
+          // ✅ ok 여부와 무관하게, 탈퇴 안내는 있으면 무조건 1회 노출
+if (data && data.withdrawn) {
+  window.showWithdrawNoticeOnce(data.withdrawMessage || '');
+}
+
           //console.log('login_ping success:', data);
 
 
@@ -6127,6 +6164,10 @@
                 console.warn('[preset UI] update 실패:', e);
               }
             }
+            // ✅ 탈퇴 안내 모달
+if (data.withdrawn) {
+  window.showWithdrawNoticeOnce(data.withdrawMessage || '');
+}
             // ★ 여기! pendingReply 있으면 팝업 띄우기
             if (data.pendingReply && data.pendingReply.reply) {
               openReplyPopup(data.pendingReply);
@@ -7675,6 +7716,28 @@ card.appendChild(header);
           el.addEventListener('click', () => showModal($noticeModal, false));
         });
       }
+
+      // ✅ 탈퇴 안내 모달 닫기
+const $withdrawModal = document.getElementById('withdrawModal');
+if ($withdrawModal) {
+  $withdrawModal.querySelectorAll('[data-close]').forEach(el => {
+    el.addEventListener('click', () => showModal($withdrawModal, false));
+  });
+}
+
+// ✅ 탈퇴 안내를 "한 번만" 띄우는 전역 함수
+window.showWithdrawNoticeOnce = function (msg) {
+  const modal = document.getElementById('withdrawModal');
+  const box = document.getElementById('withdrawModalMsg');
+  if (!modal || !box) return;
+
+  if (window.__withdrawNoticeShown) return;
+  window.__withdrawNoticeShown = true;
+
+  box.textContent = String(msg || '해당 계정은 탈퇴 처리된 계정입니다.').trim();
+  showModal(modal, true);
+};
+
 
       // PC 계산기 로딩 후 공지 모달을 띄우는 전역 함수
       window.showQuatroNoticeOnce = function () {
