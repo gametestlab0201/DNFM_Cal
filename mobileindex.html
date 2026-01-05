@@ -386,6 +386,84 @@
             line-height: 1.6;
         }
 
+        /* ====== Page 2: 장비 슬롯 ====== */
+#pageEquip .m-card{
+  flex: 1 1 auto;
+  display:flex;
+  flex-direction:column;
+}
+
+#pageEquip .equip-body{
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  display:flex;
+  flex-direction:column;
+  gap: 14px;
+}
+
+/* 분류별 구분선 */
+#pageEquip .equip-group{
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+}
+#pageEquip .equip-group:first-child{
+  padding-top: 0;
+  border-top: 0;
+}
+
+#pageEquip .equip-group-head{
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: -0.2px;
+  color: rgba(233,238,247,0.92);
+  margin-bottom: 10px;
+}
+
+/* 12칸 느낌(모바일): 3열 그리드 */
+#pageEquip .equip-grid{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+/* 슬롯 버튼 */
+#pageEquip .equip-slot{
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 10px 8px;
+  cursor:pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap: 8px;
+
+  aspect-ratio: 1 / 1; /* 정사각 슬롯 */
+}
+#pageEquip .equip-slot:active{ transform: translateY(1px); }
+
+#pageEquip .equip-slot-icon{
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.20);
+}
+
+#pageEquip .equip-slot-name{
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: -0.2px;
+  color: rgba(233,238,247,0.95);
+  text-align:center;
+}
+
+
         /* ====== Bottom Fixed ====== */
         .m-footer {
             position: fixed;
@@ -652,26 +730,99 @@
                 </div>
 
 
-                <!-- Page 2: 장비 (placeholder) -->
-                <section class="m-page">
-                    <div class="m-card">
-                        <div class="page-title">2 / 3</div>
-                        <div class="ghost">
-                            여기는 장비/세트/커스텀 등을 배치할 페이지.<br />
-                            (PC 로직을 그대로 호출하되 UI만 모바일용으로 새로 그릴 예정)
-                        </div>
-                    </div>
-                </section>
+                <!-- Page 2: 장비 -->
+<section class="m-page" id="pageEquip">
+  <div class="m-card">
+    <div class="page-title">2 / 3</div>
 
-                <!-- Page 3: 스킬 (placeholder) -->
-                <section class="m-page">
-                    <div class="m-card">
-                        <div class="page-title">3 / 3</div>
-                        <div class="ghost">
-                            여기는 스킬/룬/각인/시뮬 설정 페이지.
-                        </div>
-                    </div>
-                </section>
+    <div class="equip-body">
+      <!-- 무기 -->
+      <div class="equip-group">
+        <div class="equip-group-head">무기</div>
+        <div class="equip-grid">
+          <button type="button" class="equip-slot" data-slot="weapon" aria-label="무기 선택">
+            <div class="equip-slot-icon" aria-hidden="true"></div>
+            <div class="equip-slot-name">무기</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- 방어구 -->
+      <div class="equip-group">
+        <div class="equip-group-head">방어구</div>
+        <div class="equip-grid">
+          <button type="button" class="equip-slot" data-slot="shoulder" aria-label="머리어깨 선택">
+            <div class="equip-slot-icon" aria-hidden="true"></div>
+            <div class="equip-slot-name">머리어깨</div>
+          </button>
+
+          <button type="button" class="equip-slot" data-slot="top" aria-label="상의 선택">
+            <div class="equip-slot-icon" aria-hidden="true"></div>
+            <div class="equip-slot-name">상의</div>
+          </button>
+
+          <button type="button" class="equip-slot" data-slot="bottom" aria-label="하의 선택">
+            <div class="equip-slot-icon" aria-hidden="true"></div>
+            <div class="equip-slot-name">하의</div>
+          </button>
+
+          <button type="button" class="equip-slot" data-slot="belt" aria-label="허리 선택">
+            <div class="equip-slot-icon" aria-hidden="true"></div>
+            <div class="equip-slot-name">허리</div>
+          </button>
+
+          <button type="button" class="equip-slot" data-slot="shoes" aria-label="신발 선택">
+            <div class="equip-slot-icon" aria-hidden="true"></div>
+            <div class="equip-slot-name">신발</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- 악세사리 -->
+      <div class="equip-group">
+        <div class="equip-group-head">악세사리</div>
+        <div class="equip-grid">
+          <button type="button" class="equip-slot" data-slot="bracelet" aria-label="팔찌 선택">
+            <div class="equip-slot-icon" aria-hidden="true"></div>
+            <div class="equip-slot-name">팔찌</div>
+          </button>
+
+          <button type="button" class="equip-slot" data-slot="necklace" aria-label="목걸이 선택">
+            <div class="equip-slot-icon" aria-hidden="true"></div>
+            <div class="equip-slot-name">목걸이</div>
+          </button>
+
+          <button type="button" class="equip-slot" data-slot="ring" aria-label="반지 선택">
+            <div class="equip-slot-icon" aria-hidden="true"></div>
+            <div class="equip-slot-name">반지</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- 특수장비 -->
+      <div class="equip-group">
+        <div class="equip-group-head">특수장비</div>
+        <div class="equip-grid">
+          <button type="button" class="equip-slot" data-slot="support" aria-label="보조장비 선택">
+            <div class="equip-slot-icon" aria-hidden="true"></div>
+            <div class="equip-slot-name">보조장비</div>
+          </button>
+
+          <button type="button" class="equip-slot" data-slot="magicstone" aria-label="마법석 선택">
+            <div class="equip-slot-icon" aria-hidden="true"></div>
+            <div class="equip-slot-name">마법석</div>
+          </button>
+
+          <button type="button" class="equip-slot" data-slot="earring" aria-label="귀걸이 선택">
+            <div class="equip-slot-icon" aria-hidden="true"></div>
+            <div class="equip-slot-name">귀걸이</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
             </div>
         </main>
