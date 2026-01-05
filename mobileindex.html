@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>게임실험연구소 계산기 (시즌5) - Mobile</title>
+
+  <style>
+    :root{
+      --bg:#070a12;
+      --card: rgba(255,255,255,0.06);
+      --card2: rgba(255,255,255,0.10);
+      --line: rgba(255,255,255,0.10);
+      --text:#e9eef7;
+      --muted: rgba(233,238,247,0.70);
+      --btn:#2563eb;
+      --btn2:#111827;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --footer-h: 92px;
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      background: radial-gradient(1200px 700px at 50% -20%, rgba(37,99,235,0.28), transparent 55%) , var(--bg);
+      color:var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+      overflow:hidden; /* 스와이프 컨텐츠 내부 스크롤만 */
+    }
+
+    /* ====== Layout ====== */
+    .m-shell{
+      height: 100dvh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .m-header{
+      position: sticky;
+      top:0;
+      z-index: 50;
+      padding: calc(10px + var(--safe-top)) 12px 10px 12px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.15));
+      backdrop-filter: blur(10px);
+    }
+
+    .m-header-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .m-title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 0;
+    }
+
+    .m-title .txt{
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      font-size: 15px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    .m-actions{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex: 0 0 auto;
+    }
+
+    .m-action-btn{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-size: 12px;
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .m-action-btn:active{ transform: translateY(1px); }
+    .m-action-btn svg{
+      width: 16px; height:16px;
+    }
+    .m-action-btn svg path, .m-action-btn svg rect{
+      fill:none; stroke: var(--text); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round;
+    }
+
+    /* ====== Swipe Pages ====== */
+    .m-main{
+      flex:1 1 auto;
+      position:relative;
+      padding-bottom: calc(var(--footer-h) + var(--safe-bottom));
+      overflow:hidden;
+    }
+
+    .m-pages{
+      height:100%;
+      display:flex;
+      overflow-x:auto;
+      overflow-y:hidden;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    .m-pages::-webkit-scrollbar{ display:none; }
+
+    .m-page{
+      flex: 0 0 100%;
+      height:100%;
+      scroll-snap-align: start;
+      padding: 14px 12px 16px 12px;
+      overflow-y:auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .m-card{
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+
+    .big-pick{
+      margin-top: 14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height: 210px;
+      border-radius: 18px;
+      border: 1px dashed rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .big-pick button{
+      width: 100%;
+      max-width: 520px;
+      border: none;
+      border-radius: 16px;
+      padding: 18px 16px;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
+      color: #ffffff;
+      background: linear-gradient(135deg, rgba(37,99,235,0.95), rgba(29,78,216,0.95));
+      box-shadow: 0 10px 24px rgba(37,99,235,0.25);
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .big-pick button:active{ transform: translateY(1px); }
+
+    .hint{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .page-title{
+      font-size: 13px;
+      font-weight: 800;
+      color: rgba(233,238,247,0.9);
+      margin-bottom: 10px;
+    }
+
+    .ghost{
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.22);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* ====== Bottom Fixed ====== */
+    .m-footer{
+      position: fixed;
+      left:0; right:0; bottom:0;
+      z-index: 60;
+      padding: 10px 12px calc(10px + var(--safe-bottom)) 12px;
+      border-top: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.55));
+      backdrop-filter: blur(10px);
+    }
+
+    .m-footer-row{
+      display:flex;
+      gap:10px;
+      align-items:stretch;
+    }
+
+    .m-calc-btn{
+      flex: 0 0 140px;
+      border:none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(37,99,235,0.95), rgba(29,78,216,0.95));
+      color:#fff;
+      font-weight: 900;
+      font-size: 18px;
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .m-calc-btn:active{ transform: translateY(1px); }
+
+    .m-result{
+      flex: 1 1 auto;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      padding: 12px 12px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-width: 0;
+    }
+
+    .m-result .label{
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .m-result .value{
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ====== Toast ====== */
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: calc(var(--footer-h) + 14px + var(--safe-bottom));
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.70);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      z-index: 999;
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(-2px);
+    }
+
+    /* (선택) 모달은 나중에 PC에서 그대로 복붙할 예정이면,
+       여기선 최소한의 기본만 둠 */
+    .modal{
+      position: fixed; inset: 0;
+      display:none;
+      z-index: 1000;
+    }
+    .modal.show{ display:block; }
+    .modal .backdrop{
+      position:absolute; inset:0;
+      background: rgba(0,0,0,0.62);
+    }
+    .modal .dialog{
+      position:absolute;
+      left:50%; top:50%;
+      transform: translate(-50%, -50%);
+      width: min(720px, 92vw);
+      max-height: min(80vh, 720px);
+      overflow:auto;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(10,14,24,0.96);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+    }
+    .modal .dialog header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+    .modal .dialog header h2{
+      margin:0;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: -0.2px;
+    }
+    .modal .dialog header .close{
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color:#fff;
+      border-radius: 10px;
+      padding: 6px 10px;
+      cursor:pointer;
+    }
+    .modal .contact-body{ padding: 14px; }
+    .contact-notice{
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+      margin-bottom: 12px;
+    }
+    .contact-textarea{
+      width:100%;
+      min-height: 130px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      padding: 10px 12px;
+      resize: vertical;
+      outline: none;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .contact-actions{
+      margin-top: 10px;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+    }
+    .ui-btnetc{
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(37,99,235,0.85);
+      color:#fff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor:pointer;
+      font-weight: 800;
+    }
+
+    .faq-list{ display:flex; flex-direction:column; gap:8px; margin-top: 10px; }
+    .faq-q-btn{
+      width:100%;
+      text-align:left;
+      padding:10px 12px;
+      border-radius:12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.16);
+      color:#e5e7eb;
+      cursor:pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="m-shell">
+
+    <!-- ====== Header ====== -->
+    <header class="m-header">
+      <div class="m-header-row">
+        <div class="m-title">
+          <div class="txt">게임실험연구소 계산기 (시즌5)</div>
+        </div>
+
+        <div class="m-actions">
+          <!-- 문의하기 (PC와 동일 id 유지) -->
+          <button id="btnContactAdmin" class="m-action-btn" type="button" title="문의하기">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="6" width="18" height="13" rx="2"></rect>
+              <path d="M3 8l9 6 9-6"></path>
+            </svg>
+            <span>문의하기</span>
+          </button>
+
+          <!-- Q&A (PC와 동일 id 유지) -->
+          <button id="btnFaq" class="m-action-btn" type="button" title="문의 전 자주하는 Q&A">
+            <span>Q&amp;A</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ====== Main (Swipe) ====== -->
+    <main class="m-main">
+      <div id="mobilePages" class="m-pages">
+
+        <!-- Page 1: 캐릭터 -->
+        <section class="m-page">
+          <div class="m-card">
+            <div class="page-title">1 / 3</div>
+            <div class="big-pick">
+              <button id="btnPickChar" type="button">캐릭터 선택하기</button>
+            </div>
+            <div class="hint">
+              • 좌/우로 넘겨가며 설정합니다.<br/>
+              • 지금은 모바일 UI 뼈대만 만든 상태입니다.
+            </div>
+          </div>
+        </section>
+
+        <!-- Page 2: 장비 (placeholder) -->
+        <section class="m-page">
+          <div class="m-card">
+            <div class="page-title">2 / 3</div>
+            <div class="ghost">
+              여기는 장비/세트/커스텀 등을 배치할 페이지.<br/>
+              (PC 로직을 그대로 호출하되 UI만 모바일용으로 새로 그릴 예정)
+            </div>
+          </div>
+        </section>
+
+        <!-- Page 3: 스킬 (placeholder) -->
+        <section class="m-page">
+          <div class="m-card">
+            <div class="page-title">3 / 3</div>
+            <div class="ghost">
+              여기는 스킬/룬/각인/시뮬 설정 페이지.
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- ====== Bottom Fixed ====== -->
+    <footer class="m-footer" style="height: var(--footer-h);">
+      <div class="m-footer-row">
+        <button id="btnMobileCompute" class="m-calc-btn" type="button">계산하기</button>
+
+        <div class="m-result">
+          <div class="label">계산 결과</div>
+          <div id="mobileFinalDamage" class="value">-</div>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ====== Modals (PC 것을 그대로 가져오기 쉬운 형태) ====== -->
+  <!-- 관리자 문의 모달 -->
+  <div id="contactModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-contact-close></div>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+      <header>
+        <h2 id="contactTitle">게임실험연구소에 문의하기</h2>
+        <button type="button" class="close" data-contact-close>닫기</button>
+      </header>
+
+      <div class="contact-body">
+        <div class="contact-notice">
+          계산기 이용 중 정상적이지 않은 동작/오류/버그를 제보해주세요.<br/>
+          실시간 문의: 게임실험연구소 오픈채팅
+        </div>
+
+        <textarea id="contactTalk" class="contact-textarea" placeholder="문의 내용을 적어주세요."></textarea>
+        <div class="contact-actions">
+          <button id="btnContactSend" class="ui-btnetc" type="button">문의 보내기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ 목록 모달 -->
+  <div id="faqModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-faq-close></div>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="faqTitle">
+      <header>
+        <h2 id="faqTitle">문의하기 전 자주하는 Q&amp;A</h2>
+        <button type="button" class="close" data-faq-close>닫기</button>
+      </header>
+
+      <div class="contact-body">
+        <div class="contact-notice">
+          가장 많이 하시는 질문들을 모아두었습니다.
+        </div>
+        <div id="faqList" class="faq-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ 답변 모달 (일단 placeholder) -->
+  <div id="faqAnswerModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-faqans-close></div>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="faqAnswerTitle">
+      <header>
+        <h2 id="faqAnswerTitle">Q&amp;A</h2>
+        <button type="button" class="close" data-faqans-close>닫기</button>
+      </header>
+      <div class="contact-body">
+        <div id="faqAnswerText" class="contact-notice"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // ===== Toast =====
+    function toast(msg){
+      const el = document.getElementById('toast');
+      if(!el) return alert(msg);
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(el._t);
+      el._t = setTimeout(()=> el.classList.remove('show'), 1400);
+    }
+
+    // ===== Swipe hint (optional) =====
+    (function(){
+      const pages = document.getElementById('mobilePages');
+      if(!pages) return;
+      // iOS 스크롤 시 가끔 튐 방지용: 터치 방향은 그대로 두고 기본만
+    })();
+
+    // ===== Header actions =====
+    function openModal(id){
+      const m = document.getElementById(id);
+      if(!m) return;
+      m.classList.add('show');
+      m.setAttribute('aria-hidden','false');
+    }
+    function closeModal(id){
+      const m = document.getElementById(id);
+      if(!m) return;
+      m.classList.remove('show');
+      m.setAttribute('aria-hidden','true');
+    }
+
+    document.getElementById('btnContactAdmin')?.addEventListener('click', ()=> openModal('contactModal'));
+    document.getElementById('btnFaq')?.addEventListener('click', ()=> {
+      // 나중에 PC의 getFaqItems/openFaqModal 로직을 그대로 붙이면 됨
+      const list = document.getElementById('faqList');
+      if(list){
+        list.innerHTML = '';
+        const empty = document.createElement('div');
+        empty.style.opacity = '0.8';
+        empty.textContent = '등록된 Q&A가 없습니다.';
+        list.appendChild(empty);
+      }
+      openModal('faqModal');
+    });
+
+    // backdrop/close 공통
+    document.querySelectorAll('[data-contact-close]').forEach(el=>{
+      el.addEventListener('click', ()=> closeModal('contactModal'));
+    });
+    document.getElementById('contactModal')?.addEventListener('click', (e)=>{
+      if(e.target?.classList?.contains('backdrop')) closeModal('contactModal');
+    });
+
+    document.querySelectorAll('[data-faq-close]').forEach(el=>{
+      el.addEventListener('click', ()=> closeModal('faqModal'));
+    });
+    document.getElementById('faqModal')?.addEventListener('click', (e)=>{
+      if(e.target?.classList?.contains('backdrop')) closeModal('faqModal');
+    });
+
+    document.querySelectorAll('[data-faqans-close]').forEach(el=>{
+      el.addEventListener('click', ()=> closeModal('faqAnswerModal'));
+    });
+    document.getElementById('faqAnswerModal')?.addEventListener('click', (e)=>{
+      if(e.target?.classList?.contains('backdrop')) closeModal('faqAnswerModal');
+    });
+
+    // ===== Main actions (placeholders) =====
+    document.getElementById('btnPickChar')?.addEventListener('click', ()=>{
+      toast('캐릭터 선택 UI는 다음 단계에서 붙입니다.');
+    });
+
+    document.getElementById('btnContactSend')?.addEventListener('click', ()=>{
+      toast('문의 전송(apiJSON contact_admin)은 다음 단계에서 연결합니다.');
+    });
+
+    document.getElementById('btnMobileCompute')?.addEventListener('click', ()=>{
+      // 나중에 PC의 compute 호출 결과를 mobileFinalDamage에 꽂으면 됨
+      document.getElementById('mobileFinalDamage').textContent = '계산(연결 전)';
+      toast('계산 로직 연결은 다음 단계에서 진행합니다.');
+    });
+  </script>
+</body>
+</html>

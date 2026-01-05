@@ -18086,6 +18086,14 @@ document.getElementById('btnAutoWeaponSweepSelected')?.addEventListener('click',
             const ping = await loginPingOnce();
             const allowed = !!(ping && ping.ok);
 
+// ✅ (추가) ping에서 email 확보 (백엔드가 토큰 검증 후 내려줌)
+const loginEmail = String(ping?.email || '').trim().toLowerCase();
+const isSpecial = !!loginEmail && SPECIAL_USER_EMAILS.includes(loginEmail);
+
+// (선택) 기존 로직들과 같이 쓰고 싶으면 CORE.userEmail도 여기서 미리 채워둠
+window.CORE = window.CORE || {};
+if (loginEmail) CORE.userEmail = loginEmail;
+
             if (!allowed) console.warn("허용 안 됨:", ping);
 
             const card = document.querySelector(".login-card");
@@ -18127,10 +18135,16 @@ document.getElementById('btnAutoWeaponSweepSelected')?.addEventListener('click',
               btnPC?.setAttribute("disabled", "true");
               btnM?.setAttribute("disabled", "true");
 
-              // ★ 모바일 버튼은 항상 비활성 + 툴팁만 (호버 시 브라우저 기본 tooltip)
-              if (btnM) {
-                btnM.setAttribute('title', 'Comming Soon...');
-              }
+              // ✅ 모바일 버튼: allowed + SPECIAL_USER_EMAILS 일 때만 활성화
+if (btnM) {
+  if (allowed && isSpecial) {
+    btnM.removeAttribute('disabled');
+    btnM.removeAttribute('title'); // 툴팁 제거(원하면 유지해도 됨)
+  } else {
+    btnM.setAttribute('disabled', 'true');
+    btnM.setAttribute('title', 'Comming Soon.');
+  }
+}
 
               if (allowed) {
                 btnPC.removeAttribute("disabled");
@@ -18174,21 +18188,14 @@ document.getElementById('btnAutoWeaponSweepSelected')?.addEventListener('click',
                 });
 
 
-                btnM.addEventListener('click', async () => {
-                  showOverlay('준비 중…');
-                  try {
-                    await preloadAllSheetsOnce();
-                    refreshExceptionSkillIdMap();
-                    refreshActiveExceptions();
-                    await initCalculatorOnce();
-                    showCalcView('mobile');
-                  } catch (e) {
-                    console.error('[INIT] preload 실패:', e);
-                    alert('초기 로딩에 실패했습니다. 잠시 후 다시 시도해 주세요.');
-                  } finally {
-                    hideOverlay();
-                  }
-                });
+                btnM.addEventListener('click', () => {
+  // ✅ 로그인 토큰을 모바일 페이지로 전달(같은 도메인에서만 유효)
+  const token = window.idToken || '';
+  if (token) sessionStorage.setItem('id_token', token);
+
+  // ✅ 모바일 전용 HTML로 이동
+  location.href = 'mobileindex.html';
+});
               }
             }
           } catch (err) {
