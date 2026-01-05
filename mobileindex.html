@@ -1,1161 +1,1248 @@
 <!doctype html>
 <html lang="ko">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>게임실험연구소 계산기 (시즌5) - Mobile</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>게임실험연구소 계산기 (시즌5) - Mobile</title>
 
-  <style>
-    :root{
-      --bg:#070a12;
-      --card: rgba(255,255,255,0.06);
-      --card2: rgba(255,255,255,0.10);
-      --line: rgba(255,255,255,0.10);
-      --text:#e9eef7;
-      --muted: rgba(233,238,247,0.70);
-      --btn:#2563eb;
-      --btn2:#111827;
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --safe-top: env(safe-area-inset-top, 0px);
-      --footer-h: 92px;
-    }
+    <style>
+        :root {
+            --bg: #070a12;
+            --card: rgba(255, 255, 255, 0.06);
+            --card2: rgba(255, 255, 255, 0.10);
+            --line: rgba(255, 255, 255, 0.10);
+            --text: #e9eef7;
+            --muted: rgba(233, 238, 247, 0.70);
+            --btn: #2563eb;
+            --btn2: #111827;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-top: env(safe-area-inset-top, 0px);
+            --footer-h: 92px;
+        }
 
-    *{ box-sizing:border-box; }
-    html, body{ height:100%; }
-    body{
-      margin:0;
-      background: radial-gradient(1200px 700px at 50% -20%, rgba(37,99,235,0.28), transparent 55%) , var(--bg);
-      color:var(--text);
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
-      overflow:hidden; /* 스와이프 컨텐츠 내부 스크롤만 */
-    }
+        * {
+            box-sizing: border-box;
+        }
 
-    /* ====== Layout ====== */
-    .m-shell{
-      height: 100dvh;
-      display:flex;
-      flex-direction:column;
-    }
+        html,
+        body {
+            height: 100%;
+        }
 
-    .m-header{
-      position: sticky;
-      top:0;
-      z-index: 50;
-      padding: calc(10px + var(--safe-top)) 12px 10px 12px;
-      border-bottom: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.15));
-      backdrop-filter: blur(10px);
-    }
+        body {
+            margin: 0;
+            background: radial-gradient(1200px 700px at 50% -20%, rgba(37, 99, 235, 0.28), transparent 55%), var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+            overflow: hidden;
+            /* 스와이프 컨텐츠 내부 스크롤만 */
+        }
 
-    .m-header-row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
+        /* ====== Layout ====== */
+        .m-shell {
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .m-title{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width: 0;
-    }
+        .m-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: calc(10px + var(--safe-top)) 12px 10px 12px;
+            border-bottom: 1px solid var(--line);
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.15));
+            backdrop-filter: blur(10px);
+        }
 
-    .m-title .txt{
-      font-weight: 800;
-      letter-spacing: -0.2px;
-      font-size: 15px;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
+        .m-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
 
-    .m-actions{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      flex: 0 0 auto;
-    }
+        .m-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
 
-    .m-action-btn{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.04);
-      color: var(--text);
-      font-size: 12px;
-      cursor:pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .m-action-btn:active{ transform: translateY(1px); }
-    .m-action-btn svg{
-      width: 16px; height:16px;
-    }
-    .m-action-btn svg path, .m-action-btn svg rect{
-      fill:none; stroke: var(--text); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round;
-    }
+        .m-title .txt {
+            font-weight: 800;
+            letter-spacing: -0.2px;
+            font-size: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-    /* ====== Swipe Pages ====== */
-    .m-main{
-      flex:1 1 auto;
-      position:relative;
-      padding-bottom: calc(var(--footer-h) + var(--safe-bottom));
-      overflow:hidden;
-    }
+        .m-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 0 0 auto;
+        }
 
-    .m-pages{
-      height:100%;
-      display:flex;
-      overflow-x:auto;
-      overflow-y:hidden;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-      scroll-behavior: smooth;
-    }
-    .m-pages::-webkit-scrollbar{ display:none; }
+        .m-action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            font-size: 12px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    .m-page{
-  flex: 0 0 100%;
-  height:100%;
-  scroll-snap-align: start;
-  padding: 14px 12px 16px 12px;
-  overflow-y:auto;
-  -webkit-overflow-scrolling: touch;
+        .m-action-btn:active {
+            transform: translateY(1px);
+        }
 
-  /* ✅ 추가: 페이지 안에서 카드가 남은 높이를 채우도록 */
-  display:flex;
-  flex-direction:column;
-  scroll-snap-stop: always; /* ✅ 추가: 스냅이 더 안정적으로 걸리게 */
-}
+        .m-action-btn svg {
+            width: 16px;
+            height: 16px;
+        }
 
-    .m-card{
-      border: 1px solid var(--line);
-      background: var(--card);
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-    }
+        .m-action-btn svg path,
+        .m-action-btn svg rect {
+            fill: none;
+            stroke: var(--text);
+            stroke-width: 1.6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
-    /* ✅ 1페이지(캐릭터 선택) 카드가 남은 높이를 꽉 채우게 */
-#pageChar .m-card{
-  flex: 1 1 auto;
-  display:flex;
-  flex-direction:column;
-}
+        /* ====== Swipe Pages ====== */
+        .m-main {
+            flex: 1 1 auto;
+            position: relative;
+            padding-bottom: calc(var(--footer-h) + var(--safe-bottom));
+            overflow: hidden;
+        }
 
-/* ✅ big-pick 영역도 같이 늘어나서 버튼이 아래 고정 푸터 위까지 길어짐 */
-#pageChar .big-pick{
-  flex: 1 1 auto;
-  min-height: 0; /* flex에서 과도한 min-height 방지 */
-}
-#pageChar .hint{
-  margin-top: 10px;
-}
+        .m-pages {
+            height: 100%;
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
 
-/* ===== 모바일 캐릭터 목록: 좌 썸네일 / 우 이름 ===== */
-/* ✅ 모달 내용: 손가락 드래그로 스크롤, 스크롤바는 숨김 */
-#charModal .dialog{
-  overflow: hidden; /* dialog 자체는 숨기고 */
-}
+            touch-action: pan-y;
+            /* ✅ 추가: 가로는 우리가 제어, 세로 스크롤은 허용 */
+            overscroll-behavior-x: contain;
+            /* ✅ 추가: 가로 스와이프 튐 방지 */
+        }
 
-/* 실제 스크롤은 catalog에서 */
-#charModal #catalog{
-  max-height: min(78vh, 720px);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* iOS 관성 */
-  scrollbar-width: none;             /* Firefox */
-}
-#charModal #catalog::-webkit-scrollbar{
-  width: 0;
-  height: 0;
-}
-#charModal #catalog{
-  touch-action: pan-y; /* 세로 스크롤 제스처 우선 */
-}
+        .m-pages::-webkit-scrollbar {
+            display: none;
+        }
 
-#charModal .mchar-list{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
+        .m-page {
+            flex: 0 0 100%;
+            height: 100%;
+            scroll-snap-align: start;
+            padding: 14px 12px 16px 12px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
 
-#charModal .mchar-row{
-  width:100%;
-  display:grid;
-  grid-template-columns: 72px 1fr;
-  gap:12px;
-  align-items:center;
-  padding: 10px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.06);
-  color:#fff;
-  text-align:left;
-  cursor:pointer;
-}
+            /* ✅ 추가: 페이지 안에서 카드가 남은 높이를 채우도록 */
+            display: flex;
+            flex-direction: column;
+            scroll-snap-stop: always;
+            /* ✅ 추가: 스냅이 더 안정적으로 걸리게 */
+        }
 
-#charModal .mchar-row:active{ transform: translateY(1px); }
+        .m-card {
+            border: 1px solid var(--line);
+            background: var(--card);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        }
 
-#charModal .mchar-thumb{
-  width:72px;
-  height:44px;
-  border-radius: 10px;
-  object-fit: cover;
-  background: rgba(0,0,0,0.25);
-  border: 1px solid rgba(255,255,255,0.10);
-}
+        /* ✅ 1페이지(캐릭터 선택) 카드가 남은 높이를 꽉 채우게 */
+        #pageChar .m-card {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+        }
 
-#charModal .mchar-name{
-  font-weight: 900;
-  font-size: 15px;
-  letter-spacing: -0.2px;
-}
+        /* ✅ big-pick 영역도 같이 늘어나서 버튼이 아래 고정 푸터 위까지 길어짐 */
+        #pageChar .big-pick {
+            flex: 1 1 auto;
+            min-height: 0;
+            /* flex에서 과도한 min-height 방지 */
+        }
 
-/* ===== 직업군 그룹 구분(배지 + 직업군명) ===== */
-#charModal .mchar-group{
-  padding: 10px 0 14px 0;
-  border-top: 1px solid rgba(255,255,255,0.10);
-}
-#charModal .mchar-group:first-child{
-  border-top: 0;
-  padding-top: 0;
-}
+        #pageChar .hint {
+            margin-top: 10px;
+        }
 
-#charModal .mchar-group-head{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding: 2px 2px 10px 2px;
-}
+        /* ===== 모바일 캐릭터 목록: 좌 썸네일 / 우 이름 ===== */
+        /* ✅ 모달 내용: 손가락 드래그로 스크롤, 스크롤바는 숨김 */
+        #charModal .dialog {
+            overflow: hidden;
+            /* dialog 자체는 숨기고 */
+        }
 
-#charModal .mchar-badge{
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid rgba(255,255,255,0.16);
-  background: rgba(255,255,255,0.06);
-  flex: 0 0 auto;
-}
+        /* 실제 스크롤은 catalog에서 */
+        #charModal #catalog {
+            max-height: min(78vh, 720px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            /* iOS 관성 */
+            scrollbar-width: none;
+            /* Firefox */
+        }
 
-#charModal .mchar-group-title{
-  font-weight: 900;
-  font-size: 14px;
-  letter-spacing: -0.2px;
-  color: rgba(233,238,247,0.95);
-}
+        #charModal #catalog::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
 
-#charModal .mchar-group-sub{
-  margin-left: 6px;
-  font-size: 11px;
-  color: rgba(233,238,247,0.60);
-  font-weight: 800;
-}
+        #charModal #catalog {
+            touch-action: pan-y;
+            /* 세로 스크롤 제스처 우선 */
+        }
 
-#charModal .mchar-group-body{
-  display:flex;
-  flex-direction:column;
-  gap:10px; /* 기존 row 간격 유지 */
-}
+        #charModal .mchar-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #charModal .mchar-row {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 72px 1fr;
+            gap: 12px;
+            align-items: center;
+            padding: 10px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        #charModal .mchar-row:active {
+            transform: translateY(1px);
+        }
+
+        #charModal .mchar-thumb {
+            width: 72px;
+            height: 44px;
+            border-radius: 10px;
+            object-fit: cover;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+        }
+
+        #charModal .mchar-name {
+            font-weight: 900;
+            font-size: 15px;
+            letter-spacing: -0.2px;
+        }
+
+        /* ===== 직업군 그룹 구분(배지 + 직업군명) ===== */
+        #charModal .mchar-group {
+            padding: 10px 0 14px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.10);
+        }
+
+        #charModal .mchar-group:first-child {
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        #charModal .mchar-group-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 2px 2px 10px 2px;
+        }
+
+        #charModal .mchar-badge {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.06);
+            flex: 0 0 auto;
+        }
+
+        #charModal .mchar-group-title {
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: -0.2px;
+            color: rgba(233, 238, 247, 0.95);
+        }
+
+        #charModal .mchar-group-sub {
+            margin-left: 6px;
+            font-size: 11px;
+            color: rgba(233, 238, 247, 0.60);
+            font-weight: 800;
+        }
+
+        #charModal .mchar-group-body {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            /* 기존 row 간격 유지 */
+        }
 
 
 
-    .big-pick{
-      margin-top: 14px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height: 210px;
-      border-radius: 18px;
-      border: 1px dashed rgba(255,255,255,0.22);
-      background: rgba(255,255,255,0.03);
+        .big-pick {
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 210px;
+            border-radius: 18px;
+            border: 1px dashed rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.03);
 
-        position: relative; /* ✅ 추가 */
-  overflow: hidden;   /* ✅ 추가 (넘치는 부분 잘라서 꽉 찬 느낌) */
-    }
+            position: relative;
+            /* ✅ 추가 */
+            overflow: hidden;
+            /* ✅ 추가 (넘치는 부분 잘라서 꽉 찬 느낌) */
+        }
 
-    .big-pick button{
-      width: 100%;
-      max-width: 520px;
-      border: none;
-      border-radius: 16px;
-      padding: 18px 16px;
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: -0.4px;
-      color: #ffffff;
-      background: linear-gradient(135deg, rgba(37,99,235,0.95), rgba(29,78,216,0.95));
-      box-shadow: 0 10px 24px rgba(37,99,235,0.25);
-      cursor:pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .big-pick button:active{ transform: translateY(1px); }
+        .big-pick button {
+            width: 100%;
+            max-width: 520px;
+            border: none;
+            border-radius: 16px;
+            padding: 18px 16px;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: -0.4px;
+            color: #ffffff;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(29, 78, 216, 0.95));
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.25);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    /* ✅ 선택된 캐릭 이미지 표시 */
-#pickedCharImg.picked-char-img{
-  display: none;         /* 기본 숨김 (선택 후 block) */
-  position: absolute;
-  inset: 0;              /* ✅ big-pick을 꽉 덮음 */
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
+        .big-pick button:active {
+            transform: translateY(1px);
+        }
 
-  object-fit: cover;     /* ✅ 핵심: 잘려도 되니 꽉 채움 */
-  object-position: center;
+        /* ✅ 선택된 캐릭 이미지 표시 */
+        #pickedCharImg.picked-char-img {
+            display: none;
+            /* 기본 숨김 (선택 후 block) */
+            position: absolute;
+            inset: 0;
+            /* ✅ big-pick을 꽉 덮음 */
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            max-height: none;
 
-  border-radius: inherit;  /* big-pick 라운드 그대로 */
-  border: 0;
-  background: rgba(0,0,0,0.18);
-}
+            object-fit: cover;
+            /* ✅ 핵심: 잘려도 되니 꽉 채움 */
+            object-position: center;
 
-    .hint{
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
+            border-radius: inherit;
+            /* big-pick 라운드 그대로 */
+            border: 0;
+            background: rgba(0, 0, 0, 0.18);
+        }
 
-    .page-title{
-      font-size: 13px;
-      font-weight: 800;
-      color: rgba(233,238,247,0.9);
-      margin-bottom: 10px;
-    }
+        .hint {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
 
-    .ghost{
-      padding: 14px;
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      background: rgba(0,0,0,0.22);
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.6;
-    }
+        .page-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: rgba(233, 238, 247, 0.9);
+            margin-bottom: 10px;
+        }
 
-    /* ====== Bottom Fixed ====== */
-    .m-footer{
-      position: fixed;
-      left:0; right:0; bottom:0;
-      z-index: 60;
-      padding: 10px 12px calc(10px + var(--safe-bottom)) 12px;
-      border-top: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.55));
-      backdrop-filter: blur(10px);
-    }
+        .ghost {
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(0, 0, 0, 0.22);
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
 
-    .m-footer-row{
-      display:flex;
-      gap:10px;
-      align-items:stretch;
-    }
+        /* ====== Bottom Fixed ====== */
+        .m-footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 60;
+            padding: 10px 12px calc(10px + var(--safe-bottom)) 12px;
+            border-top: 1px solid var(--line);
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.10), rgba(0, 0, 0, 0.55));
+            backdrop-filter: blur(10px);
+        }
 
-    .m-calc-btn{
-      flex: 0 0 140px;
-      border:none;
-      border-radius: 16px;
-      background: linear-gradient(135deg, rgba(37,99,235,0.95), rgba(29,78,216,0.95));
-      color:#fff;
-      font-weight: 900;
-      font-size: 18px;
-      cursor:pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .m-calc-btn:active{ transform: translateY(1px); }
+        .m-footer-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
 
-    .m-result{
-      flex: 1 1 auto;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.06);
-      padding: 12px 12px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      min-width: 0;
-    }
+        .m-calc-btn {
+            flex: 0 0 140px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(29, 78, 216, 0.95));
+            color: #fff;
+            font-weight: 900;
+            font-size: 18px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    .m-result .label{
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .m-result .value{
-      font-size: 18px;
-      font-weight: 900;
-      letter-spacing: -0.4px;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
+        .m-calc-btn:active {
+            transform: translateY(1px);
+        }
 
-    /* ====== Toast ====== */
-    .toast{
-      position: fixed;
-      left: 50%;
-      bottom: calc(var(--footer-h) + 14px + var(--safe-bottom));
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.70);
-      border: 1px solid rgba(255,255,255,0.14);
-      color: #fff;
-      padding: 10px 12px;
-      border-radius: 999px;
-      font-size: 12px;
-      z-index: 999;
-      opacity: 0;
-      pointer-events:none;
-      transition: opacity .18s ease, transform .18s ease;
-    }
-    .toast.show{
-      opacity: 1;
-      transform: translateX(-50%) translateY(-2px);
-    }
+        .m-result {
+            flex: 1 1 auto;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.06);
+            padding: 12px 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
 
-    /* (선택) 모달은 나중에 PC에서 그대로 복붙할 예정이면,
+        .m-result .label {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .m-result .value {
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: -0.4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ====== Toast ====== */
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: calc(var(--footer-h) + 14px + var(--safe-bottom));
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.70);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .18s ease, transform .18s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-2px);
+        }
+
+        /* (선택) 모달은 나중에 PC에서 그대로 복붙할 예정이면,
        여기선 최소한의 기본만 둠 */
-    .modal{
-      position: fixed; inset: 0;
-      display:none;
-      z-index: 1000;
-    }
-    .modal.show{ display:block; }
-    .modal .backdrop{
-      position:absolute; inset:0;
-      background: rgba(0,0,0,0.62);
-    }
-    .modal .dialog{
-      position:absolute;
-      left:50%; top:50%;
-      transform: translate(-50%, -50%);
-      width: min(720px, 92vw);
-      max-height: min(80vh, 720px);
-      overflow:auto;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(10,14,24,0.96);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.45);
-    }
-    .modal .dialog header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.10);
-    }
-    .modal .dialog header h2{
-      margin:0;
-      font-size: 14px;
-      font-weight: 900;
-      letter-spacing: -0.2px;
-    }
-    .modal .dialog header .close{
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
-      color:#fff;
-      border-radius: 10px;
-      padding: 6px 10px;
-      cursor:pointer;
-    }
-    .modal .contact-body{ padding: 14px; }
-    .contact-notice{
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.55;
-      margin-bottom: 12px;
-    }
-    .contact-textarea{
-      width:100%;
-      min-height: 130px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
-      color: var(--text);
-      padding: 10px 12px;
-      resize: vertical;
-      outline: none;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-    .contact-actions{
-      margin-top: 10px;
-      display:flex;
-      justify-content:flex-end;
-      gap:10px;
-    }
-    .ui-btnetc{
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(37,99,235,0.85);
-      color:#fff;
-      border-radius: 12px;
-      padding: 10px 12px;
-      cursor:pointer;
-      font-weight: 800;
-    }
+        .modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            z-index: 1000;
+        }
 
-    .faq-list{ display:flex; flex-direction:column; gap:8px; margin-top: 10px; }
-    .faq-q-btn{
-      width:100%;
-      text-align:left;
-      padding:10px 12px;
-      border-radius:12px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.16);
-      color:#e5e7eb;
-      cursor:pointer;
-    }
-  </style>
+        .modal.show {
+            display: block;
+        }
+
+        .modal .backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.62);
+        }
+
+        .modal .dialog {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: min(720px, 92vw);
+            max-height: min(80vh, 720px);
+            overflow: auto;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(10, 14, 24, 0.96);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+        }
+
+        .modal .dialog header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+        }
+
+        .modal .dialog header h2 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: -0.2px;
+        }
+
+        .modal .dialog header .close {
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            border-radius: 10px;
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+
+        .modal .contact-body {
+            padding: 14px;
+        }
+
+        .contact-notice {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.55;
+            margin-bottom: 12px;
+        }
+
+        .contact-textarea {
+            width: 100%;
+            min-height: 130px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+            padding: 10px 12px;
+            resize: vertical;
+            outline: none;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .contact-actions {
+            margin-top: 10px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .ui-btnetc {
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(37, 99, 235, 0.85);
+            color: #fff;
+            border-radius: 12px;
+            padding: 10px 12px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .faq-q-btn {
+            width: 100%;
+            text-align: left;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: #e5e7eb;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
-  <div class="m-shell">
+    <div class="m-shell">
 
-    <!-- ====== Header ====== -->
-    <header class="m-header">
-      <div class="m-header-row">
-        <div class="m-title">
-          <div class="txt">게임실험연구소 계산기 (시즌5)</div>
-        </div>
+        <!-- ====== Header ====== -->
+        <header class="m-header">
+            <div class="m-header-row">
+                <div class="m-title">
+                    <div class="txt">게임실험연구소 계산기 (시즌5)</div>
+                </div>
 
-        <div class="m-actions">
-          <!-- 문의하기 (PC와 동일 id 유지) -->
-          <button id="btnContactAdmin" class="m-action-btn" type="button" title="문의하기">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="3" y="6" width="18" height="13" rx="2"></rect>
-              <path d="M3 8l9 6 9-6"></path>
-            </svg>
-            <span>문의하기</span>
-          </button>
+                <div class="m-actions">
+                    <!-- 문의하기 (PC와 동일 id 유지) -->
+                    <button id="btnContactAdmin" class="m-action-btn" type="button" title="문의하기">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="3" y="6" width="18" height="13" rx="2"></rect>
+                            <path d="M3 8l9 6 9-6"></path>
+                        </svg>
+                        <span>문의하기</span>
+                    </button>
 
-          <!-- Q&A (PC와 동일 id 유지) -->
-          <button id="btnFaq" class="m-action-btn" type="button" title="문의 전 자주하는 Q&A">
-            <span>Q&amp;A</span>
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <!-- ====== Main (Swipe) ====== -->
-    <main class="m-main">
-      <div id="mobilePages" class="m-pages">
-
-        <!-- Page 1: 캐릭터 -->
-        <section class="m-page" id="pageChar">
-          <div class="m-card">
-            <div class="page-title">1 / 3</div>
-            <div class="big-pick">
-              <button id="btnPickChar" type="button">캐릭터 선택하기</button>
-                <!-- ✅ 선택 후 표시될 캐릭터 이미지 -->
-  <img id="pickedCharImg" class="picked-char-img" alt="" />
-</div>
+                    <!-- Q&A (PC와 동일 id 유지) -->
+                    <button id="btnFaq" class="m-action-btn" type="button" title="문의 전 자주하는 Q&A">
+                        <span>Q&amp;A</span>
+                    </button>
+                </div>
             </div>
-            <div class="hint">
-              • 좌/우로 넘겨가며 설정합니다.<br/>
-              • 지금은 모바일 UI 뼈대만 만든 상태입니다.
+        </header>
+
+        <!-- ====== Main (Swipe) ====== -->
+        <main class="m-main">
+            <div id="mobilePages" class="m-pages">
+
+                <!-- Page 1: 캐릭터 -->
+                <section class="m-page" id="pageChar">
+                    <div class="m-card">
+                        <div class="page-title">1 / 3</div>
+                        <div class="big-pick">
+                            <button id="btnPickChar" type="button">캐릭터 선택하기</button>
+                            <!-- ✅ 선택 후 표시될 캐릭터 이미지 -->
+                            <img id="pickedCharImg" class="picked-char-img" alt="" />
+                        </div>
+                        <div class="hint">
+                            • 좌/우로 넘겨가며 설정합니다.<br />
+                            • 지금은 모바일 UI 뼈대만 만든 상태입니다.
+                        </div>
+                    </div>
+                </section>
+                <!-- 캐릭터 선택 모달 (PC와 동일 id) -->
+                <div id="charModal" class="modal" aria-hidden="true">
+                    <div class="backdrop" data-char-close></div>
+                    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="charModalTitle">
+                        <header>
+                            <h2 id="charModalTitle">캐릭터 선택</h2>
+                            <button type="button" class="close" data-char-close>닫기</button>
+                        </header>
+
+                        <!-- PC 스크립트가 여기에 카드들을 렌더링함 -->
+                        <div id="catalog" class="catalog"></div>
+                    </div>
+                </div>
+
+
+                <!-- Page 2: 장비 (placeholder) -->
+                <section class="m-page">
+                    <div class="m-card">
+                        <div class="page-title">2 / 3</div>
+                        <div class="ghost">
+                            여기는 장비/세트/커스텀 등을 배치할 페이지.<br />
+                            (PC 로직을 그대로 호출하되 UI만 모바일용으로 새로 그릴 예정)
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Page 3: 스킬 (placeholder) -->
+                <section class="m-page">
+                    <div class="m-card">
+                        <div class="page-title">3 / 3</div>
+                        <div class="ghost">
+                            여기는 스킬/룬/각인/시뮬 설정 페이지.
+                        </div>
+                    </div>
+                </section>
+
             </div>
-          </div>
-        </section>
-        <!-- 캐릭터 선택 모달 (PC와 동일 id) -->
-<div id="charModal" class="modal" aria-hidden="true">
-  <div class="backdrop" data-char-close></div>
-  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="charModalTitle">
-    <header>
-      <h2 id="charModalTitle">캐릭터 선택</h2>
-      <button type="button" class="close" data-char-close>닫기</button>
-    </header>
+        </main>
 
-    <!-- PC 스크립트가 여기에 카드들을 렌더링함 -->
-    <div id="catalog" class="catalog"></div>
-  </div>
-</div>
+        <!-- ====== Bottom Fixed ====== -->
+        <footer class="m-footer" style="height: var(--footer-h);">
+            <div class="m-footer-row">
+                <button id="btnMobileCompute" class="m-calc-btn" type="button">계산하기</button>
 
-
-        <!-- Page 2: 장비 (placeholder) -->
-        <section class="m-page">
-          <div class="m-card">
-            <div class="page-title">2 / 3</div>
-            <div class="ghost">
-              여기는 장비/세트/커스텀 등을 배치할 페이지.<br/>
-              (PC 로직을 그대로 호출하되 UI만 모바일용으로 새로 그릴 예정)
+                <div class="m-result">
+                    <div class="label">계산 결과</div>
+                    <div id="mobileFinalDamage" class="value">-</div>
+                </div>
             </div>
-          </div>
-        </section>
+        </footer>
 
-        <!-- Page 3: 스킬 (placeholder) -->
-        <section class="m-page">
-          <div class="m-card">
-            <div class="page-title">3 / 3</div>
-            <div class="ghost">
-              여기는 스킬/룬/각인/시뮬 설정 페이지.
-            </div>
-          </div>
-        </section>
-
-      </div>
-    </main>
-
-    <!-- ====== Bottom Fixed ====== -->
-    <footer class="m-footer" style="height: var(--footer-h);">
-      <div class="m-footer-row">
-        <button id="btnMobileCompute" class="m-calc-btn" type="button">계산하기</button>
-
-        <div class="m-result">
-          <div class="label">계산 결과</div>
-          <div id="mobileFinalDamage" class="value">-</div>
-        </div>
-      </div>
-    </footer>
-
-  </div>
-
-  <!-- ====== Modals (PC 것을 그대로 가져오기 쉬운 형태) ====== -->
-  <!-- 관리자 문의 모달 -->
-  <div id="contactModal" class="modal" aria-hidden="true">
-    <div class="backdrop" data-contact-close></div>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
-      <header>
-        <h2 id="contactTitle">게임실험연구소에 문의하기</h2>
-        <button type="button" class="close" data-contact-close>닫기</button>
-      </header>
-
-      <div class="contact-body">
-        <div class="contact-notice">
-          계산기 이용 중 정상적이지 않은 동작/오류/버그를 제보해주세요.<br/>
-          실시간 문의: 게임실험연구소 오픈채팅
-        </div>
-
-        <textarea id="contactTalk" class="contact-textarea" placeholder="문의 내용을 적어주세요."></textarea>
-        <div class="contact-actions">
-          <button id="btnContactSend" class="ui-btnetc" type="button">문의 보내기</button>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- FAQ 목록 모달 -->
-  <div id="faqModal" class="modal" aria-hidden="true">
-    <div class="backdrop" data-faq-close></div>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="faqTitle">
-      <header>
-        <h2 id="faqTitle">문의하기 전 자주하는 Q&amp;A</h2>
-        <button type="button" class="close" data-faq-close>닫기</button>
-      </header>
+    <!-- ====== Modals (PC 것을 그대로 가져오기 쉬운 형태) ====== -->
+    <!-- 관리자 문의 모달 -->
+    <div id="contactModal" class="modal" aria-hidden="true">
+        <div class="backdrop" data-contact-close></div>
+        <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+            <header>
+                <h2 id="contactTitle">게임실험연구소에 문의하기</h2>
+                <button type="button" class="close" data-contact-close>닫기</button>
+            </header>
 
-      <div class="contact-body">
-        <div class="contact-notice">
-          가장 많이 하시는 질문들을 모아두었습니다.
+            <div class="contact-body">
+                <div class="contact-notice">
+                    계산기 이용 중 정상적이지 않은 동작/오류/버그를 제보해주세요.<br />
+                    실시간 문의: 게임실험연구소 오픈채팅
+                </div>
+
+                <textarea id="contactTalk" class="contact-textarea" placeholder="문의 내용을 적어주세요."></textarea>
+                <div class="contact-actions">
+                    <button id="btnContactSend" class="ui-btnetc" type="button">문의 보내기</button>
+                </div>
+            </div>
         </div>
-        <div id="faqList" class="faq-list"></div>
-      </div>
     </div>
-  </div>
 
-  <!-- FAQ 답변 모달 (일단 placeholder) -->
-  <div id="faqAnswerModal" class="modal" aria-hidden="true">
-    <div class="backdrop" data-faqans-close></div>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="faqAnswerTitle">
-      <header>
-        <h2 id="faqAnswerTitle">Q&amp;A</h2>
-        <button type="button" class="close" data-faqans-close>닫기</button>
-      </header>
-      <div class="contact-body">
-        <div id="faqAnswerText" class="contact-notice"></div>
-      </div>
+    <!-- FAQ 목록 모달 -->
+    <div id="faqModal" class="modal" aria-hidden="true">
+        <div class="backdrop" data-faq-close></div>
+        <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="faqTitle">
+            <header>
+                <h2 id="faqTitle">문의하기 전 자주하는 Q&amp;A</h2>
+                <button type="button" class="close" data-faq-close>닫기</button>
+            </header>
+
+            <div class="contact-body">
+                <div class="contact-notice">
+                    가장 많이 하시는 질문들을 모아두었습니다.
+                </div>
+                <div id="faqList" class="faq-list"></div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div id="toast" class="toast"></div>
+    <!-- FAQ 답변 모달 (일단 placeholder) -->
+    <div id="faqAnswerModal" class="modal" aria-hidden="true">
+        <div class="backdrop" data-faqans-close></div>
+        <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="faqAnswerTitle">
+            <header>
+                <h2 id="faqAnswerTitle">Q&amp;A</h2>
+                <button type="button" class="close" data-faqans-close>닫기</button>
+            </header>
+            <div class="contact-body">
+                <div id="faqAnswerText" class="contact-notice"></div>
+            </div>
+        </div>
+    </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script>
-    window.idToken = sessionStorage.getItem('id_token') || null;
-     window.WEBAPP_URL = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
-      const WEBAPP_URL = window.WEBAPP_URL;   // 기존 코드들이 쓰는 식별자 보존
-      // DB
-      const DB = { itemsBySlot: {}, loaded: {}, chars: { loaded: false, groups: [] } };
-      // ✅ 전역이 없으면 만들고
-      window.DBEnh = window.DBEnh || { loaded: false, list: [], byType: {} };
-      // ✅ 지역 별칭은 전역을 가리키게
-      const DBEnh = window.DBEnh;
-      // 1) 토큰만 보내는 API (시트/목록 로딩 계열)
-      function getStoredToken() {
-  return (
-    window.idToken ||
-    sessionStorage.getItem('id_token') ||
-    localStorage.getItem('id_token') ||
-    null
-  );
-}
+    <div id="toast" class="toast"></div>
 
-async function waitForIdToken(timeoutMs = 1500) {
-  // 1) 즉시 꺼내기
-  const now = getStoredToken();
-  if (now) {
-    window.idToken = now;
-    return now;
-  }
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script>
+        window.idToken = sessionStorage.getItem('id_token') || null;
+        window.WEBAPP_URL = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
+        const WEBAPP_URL = window.WEBAPP_URL;   // 기존 코드들이 쓰는 식별자 보존
+        // DB
+        const DB = { itemsBySlot: {}, loaded: {}, chars: { loaded: false, groups: [] } };
+        // ✅ 전역이 없으면 만들고
+        window.DBEnh = window.DBEnh || { loaded: false, list: [], byType: {} };
+        // ✅ 지역 별칭은 전역을 가리키게
+        const DBEnh = window.DBEnh;
+        // 1) 토큰만 보내는 API (시트/목록 로딩 계열)
+        function getStoredToken() {
+            return (
+                window.idToken ||
+                sessionStorage.getItem('id_token') ||
+                localStorage.getItem('id_token') ||
+                null
+            );
+        }
 
-  // 2) 짧게 폴링(PC에서 넘어오는 타이밍이 애매할 때 대비)
-  const t0 = Date.now();
-  while (Date.now() - t0 < timeoutMs) {
-    const tok = getStoredToken();
-    if (tok) {
-      window.idToken = tok;
-      return tok;
-    }
-    await new Promise(r => setTimeout(r, 60));
-  }
+        async function waitForIdToken(timeoutMs = 1500) {
+            // 1) 즉시 꺼내기
+            const now = getStoredToken();
+            if (now) {
+                window.idToken = now;
+                return now;
+            }
 
-  throw new Error('no_id_token');
-}
+            // 2) 짧게 폴링(PC에서 넘어오는 타이밍이 애매할 때 대비)
+            const t0 = Date.now();
+            while (Date.now() - t0 < timeoutMs) {
+                const tok = getStoredToken();
+                if (tok) {
+                    window.idToken = tok;
+                    return tok;
+                }
+                await new Promise(r => setTimeout(r, 60));
+            }
 
-      async function apiText(type) {
-  const token = await waitForIdToken();
-  const res = await fetch(`${WEBAPP_URL}?type=${encodeURIComponent(type)}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'text/plain',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: token, // ✅ 하위호환 유지
-  });
+            throw new Error('no_id_token');
+        }
 
-  if (!res.ok) {
-    if (res.status === 401 || res.status === 403) {
-      // 토큰이 만료/거부일 때 대비(선택)
-      // sessionStorage.removeItem('id_token'); localStorage.removeItem('id_token');
-    }
-    throw new Error(`${type}_http_${res.status}`);
-  }
+        async function apiText(type) {
+            const token = await waitForIdToken();
+            const res = await fetch(`${WEBAPP_URL}?type=${encodeURIComponent(type)}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: token, // ✅ 하위호환 유지
+            });
 
-  // 응답이 JSON이라고 가정하지만, 안전하게 처리
-  const text = await res.text();
-  try { return JSON.parse(text); }
-  catch { throw new Error(`${type}_bad_json`); }
-}
+            if (!res.ok) {
+                if (res.status === 401 || res.status === 403) {
+                    // 토큰이 만료/거부일 때 대비(선택)
+                    // sessionStorage.removeItem('id_token'); localStorage.removeItem('id_token');
+                }
+                throw new Error(`${type}_http_${res.status}`);
+            }
 
-async function apiJSON(type, payload = {}) {
-  const token = await waitForIdToken();
+            // 응답이 JSON이라고 가정하지만, 안전하게 처리
+            const text = await res.text();
+            try { return JSON.parse(text); }
+            catch { throw new Error(`${type}_bad_json`); }
+        }
 
-  // ✅ 네 기존 형식 유지: Authorization + body.id_token
-  const body = { id_token: token, ...payload };
+        async function apiJSON(type, payload = {}) {
+            const token = await waitForIdToken();
 
-  const res = await fetch(`${WEBAPP_URL}?type=${encodeURIComponent(type)}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify(body),
-  });
+            // ✅ 네 기존 형식 유지: Authorization + body.id_token
+            const body = { id_token: token, ...payload };
 
-  if (!res.ok) {
-    if (res.status === 401 || res.status === 403) {
-      // sessionStorage.removeItem('id_token'); localStorage.removeItem('id_token');
-    }
-    throw new Error(`${type}_http_${res.status}`);
-  }
+            const res = await fetch(`${WEBAPP_URL}?type=${encodeURIComponent(type)}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify(body),
+            });
 
-  const text = await res.text();
-  try { return JSON.parse(text); }
-  catch { throw new Error(`${type}_bad_json`); }
-}
+            if (!res.ok) {
+                if (res.status === 401 || res.status === 403) {
+                    // sessionStorage.removeItem('id_token'); localStorage.removeItem('id_token');
+                }
+                throw new Error(`${type}_http_${res.status}`);
+            }
 
-// ✅ 모바일: 최초 1회 init 호출로 경량리스트(=CORE.lists) 전부 확보
-let __mobileInitPromise = null;
+            const text = await res.text();
+            try { return JSON.parse(text); }
+            catch { throw new Error(`${type}_bad_json`); }
+        }
 
-async function initMobileAllLightListsOnce() {
-  if (__mobileInitPromise) return __mobileInitPromise;
+        // ✅ 모바일: 최초 1회 init 호출로 경량리스트(=CORE.lists) 전부 확보
+        let __mobileInitPromise = null;
 
-  __mobileInitPromise = (async () => {
-    const res = await apiJSON('init', {});
-    if (!res?.ok) {
-      __mobileInitPromise = null;
-      throw new Error(res?.error || 'init_failed');
-    }
+        async function initMobileAllLightListsOnce() {
+            if (__mobileInitPromise) return __mobileInitPromise;
 
-    window.CORE = window.CORE || {};
-    CORE.lists = res.lists || {};
-    CORE.userEmail = res.email || null;
+            __mobileInitPromise = (async () => {
+                const res = await apiJSON('init', {});
+                if (!res?.ok) {
+                    __mobileInitPromise = null;
+                    throw new Error(res?.error || 'init_failed');
+                }
 
-    return CORE.lists;
-  })();
+                window.CORE = window.CORE || {};
+                CORE.lists = res.lists || {};
+                CORE.userEmail = res.email || null;
 
-  return __mobileInitPromise;
-}
+                return CORE.lists;
+            })();
 
-// ===== 캐릭터 선택 (모바일 전용: 좌 썸네일 / 우 이름) =====
-window.state = window.state || {};
+            return __mobileInitPromise;
+        }
 
-function _normImg(src){
-  const s = String(src || '').trim();
-  if (!s) return '';
-  if (/^https?:\/\//i.test(s)) return s;
-  // img/xxx 형태면 현재 경로 기준으로 로딩되게
-  if (s.startsWith('img/')) return './' + s.replace(/^\.?\//, '');
-  return s;
-}
+        // ===== 캐릭터 선택 (모바일 전용: 좌 썸네일 / 우 이름) =====
+        window.state = window.state || {};
 
-function _pick(obj, keys){
-  for (const k of keys){
-    if (obj && obj[k] != null && String(obj[k]).trim() !== '') return obj[k];
-  }
-  return '';
-}
+        function _normImg(src) {
+            const s = String(src || '').trim();
+            if (!s) return '';
+            if (/^https?:\/\//i.test(s)) return s;
+            // img/xxx 형태면 현재 경로 기준으로 로딩되게
+            if (s.startsWith('img/')) return './' + s.replace(/^\.?\//, '');
+            return s;
+        }
 
-function _getCharName(c){
-  return String(_pick(c, ['name','이름','charName','캐릭터명']) || '').trim();
-}
-function _getCharThumb(c){
-  return _normImg(_pick(c, ['thumbnail','썸네일','thumb','thumbSrc']));
-}
-// ✅ 메인 표시용: 반드시 '이미지' 컬럼만 사용(썸네일 fallback 금지)
-function _getCharMainImage(c){
-  // 혹시 컬럼명이 공백 포함(예: "이미지 " )으로 들어오는 경우까지 커버
-  const direct = _pick(c, ['fullSrc','이미지','image','img','imgSrc']);
-  if (direct) return _normImg(direct);
+        function _pick(obj, keys) {
+            for (const k of keys) {
+                if (obj && obj[k] != null && String(obj[k]).trim() !== '') return obj[k];
+            }
+            return '';
+        }
 
-  // 느슨한 매칭(키의 공백 제거 후 비교)
-  const target = new Set(['이미지','image','img','imgsrc'].map(s => s.toLowerCase()));
-  for (const k in (c || {})){
-    const nk = String(k).replace(/\s+/g,'').toLowerCase();
-    if (target.has(nk) && String(c[k] || '').trim() !== '') return _normImg(c[k]);
-  }
-  return '';
-}
-function applyPickedCharacterUI(c){
-  const pickBtn = document.getElementById('btnPickChar');
-  const imgEl   = document.getElementById('pickedCharImg');
+        function _getCharName(c) {
+            return String(_pick(c, ['name', '이름', 'charName', '캐릭터명']) || '').trim();
+        }
+        function _getCharThumb(c) {
+            return _normImg(_pick(c, ['thumbnail', '썸네일', 'thumb', 'thumbSrc']));
+        }
+        // ✅ 메인 표시용: 반드시 '이미지' 컬럼만 사용(썸네일 fallback 금지)
+        function _getCharMainImage(c) {
+            // 혹시 컬럼명이 공백 포함(예: "이미지 " )으로 들어오는 경우까지 커버
+            const direct = _pick(c, ['fullSrc', '이미지', 'image', 'img', 'imgSrc']);
+            if (direct) return _normImg(direct);
 
-  if (!pickBtn || !imgEl) return;
+            // 느슨한 매칭(키의 공백 제거 후 비교)
+            const target = new Set(['이미지', 'image', 'img', 'imgsrc'].map(s => s.toLowerCase()));
+            for (const k in (c || {})) {
+                const nk = String(k).replace(/\s+/g, '').toLowerCase();
+                if (target.has(nk) && String(c[k] || '').trim() !== '') return _normImg(c[k]);
+            }
+            return '';
+        }
+        function applyPickedCharacterUI(c) {
+            const pickBtn = document.getElementById('btnPickChar');
+            const imgEl = document.getElementById('pickedCharImg');
 
-  const name = _getCharName(c) || '';
-  const imgSrc = _getCharMainImage(c);  // ✅ 메인은 '이미지'만
+            if (!pickBtn || !imgEl) return;
 
-  // 이미지가 없으면(예외) 기존 버튼 유지
-  if (!imgSrc){
-    pickBtn.style.display = '';
-    pickBtn.textContent = name || '캐릭터 선택하기';
-    imgEl.style.display = 'none';
-    imgEl.removeAttribute('src');
-    imgEl.alt = '';
-    return;
-  }
+            const name = _getCharName(c) || '';
+            const imgSrc = _getCharMainImage(c);  // ✅ 메인은 '이미지'만
 
-  // ✅ 요구사항: 선택버튼은 사라지고 이미지가 들어감
-  pickBtn.style.display = 'none';
-  imgEl.src = imgSrc;
-  imgEl.alt = name ? `${name} 이미지` : '';
-  imgEl.style.display = 'block';
-  
-    if (!imgEl.dataset.boundPick){
-    imgEl.dataset.boundPick = '1';
-    imgEl.addEventListener('click', () => openMobileCharacterPicker());
-  }
-}
+            // 이미지가 없으면(예외) 기존 버튼 유지
+            if (!imgSrc) {
+                pickBtn.style.display = '';
+                pickBtn.textContent = name || '캐릭터 선택하기';
+                imgEl.style.display = 'none';
+                imgEl.removeAttribute('src');
+                imgEl.alt = '';
+                return;
+            }
 
-function _getCharJobGroup(c){
-  return String(_pick(c, ['jobGroup','직업군','group','job_group']) || '').trim();
-}
-function _getCharBadge(c){
-  // ‘종류’ 컬럼(배지 이미지)
-  return _normImg(_pick(c, ['type','종류','badge','badgeSrc','kind']) || '');
-}
+            // ✅ 요구사항: 선택버튼은 사라지고 이미지가 들어감
+            pickBtn.style.display = 'none';
+            imgEl.src = imgSrc;
+            imgEl.alt = name ? `${name} 이미지` : '';
+            imgEl.style.display = 'block';
 
-function renderMobileCharList(items){
-  const catalog = document.getElementById('catalog');
-  if (!catalog) return;
+            if (!imgEl.dataset.boundPick) {
+                imgEl.dataset.boundPick = '1';
+                imgEl.addEventListener('click', () => openMobileCharacterPicker());
+            }
+        }
 
-  catalog.innerHTML = '';
+        function _getCharJobGroup(c) {
+            return String(_pick(c, ['jobGroup', '직업군', 'group', 'job_group']) || '').trim();
+        }
+        function _getCharBadge(c) {
+            // ‘종류’ 컬럼(배지 이미지)
+            return _normImg(_pick(c, ['type', '종류', 'badge', 'badgeSrc', 'kind']) || '');
+        }
 
-  if (!Array.isArray(items) || items.length === 0){
-    catalog.innerHTML = `<div style="opacity:.8;padding:12px;">캐릭터 목록이 비어있습니다.</div>`;
-    return;
-  }
+        function renderMobileCharList(items) {
+            const catalog = document.getElementById('catalog');
+            if (!catalog) return;
 
-  // 1) 직업군별로 그룹 만들기(등장 순서 유지)
-  const order = [];
-  const groups = new Map(); // jobGroup -> { title, badge, list: [] }
+            catalog.innerHTML = '';
 
-  for (const c of items){
-    const name = _getCharName(c);
-    if (!name) continue;
+            if (!Array.isArray(items) || items.length === 0) {
+                catalog.innerHTML = `<div style="opacity:.8;padding:12px;">캐릭터 목록이 비어있습니다.</div>`;
+                return;
+            }
 
-    const job = _getCharJobGroup(c) || '기타';
-    const badge = _getCharBadge(c);
+            // 1) 직업군별로 그룹 만들기(등장 순서 유지)
+            const order = [];
+            const groups = new Map(); // jobGroup -> { title, badge, list: [] }
 
-    if (!groups.has(job)){
-      groups.set(job, { title: job, badge: badge || '', list: [] });
-      order.push(job);
-    }
-    const g = groups.get(job);
-    if (!g.badge && badge) g.badge = badge; // 비어있으면 채워두기
+            for (const c of items) {
+                const name = _getCharName(c);
+                if (!name) continue;
 
-    g.list.push(c);
-  }
+                const job = _getCharJobGroup(c) || '기타';
+                const badge = _getCharBadge(c);
 
-  // 2) 렌더
-  const frag = document.createDocumentFragment();
+                if (!groups.has(job)) {
+                    groups.set(job, { title: job, badge: badge || '', list: [] });
+                    order.push(job);
+                }
+                const g = groups.get(job);
+                if (!g.badge && badge) g.badge = badge; // 비어있으면 채워두기
 
-  for (const job of order){
-    const g = groups.get(job);
+                g.list.push(c);
+            }
 
-    const groupEl = document.createElement('div');
-    groupEl.className = 'mchar-group';
+            // 2) 렌더
+            const frag = document.createDocumentFragment();
 
-    // 헤더(배지 + 직업군명)
-    const head = document.createElement('div');
-    head.className = 'mchar-group-head';
+            for (const job of order) {
+                const g = groups.get(job);
 
-    const img = document.createElement('img');
-    img.className = 'mchar-badge';
-    img.loading = 'lazy';
-    img.alt = job;
-    // 배지 없을 때 깨짐 방지(투명 1x1)
-    img.src = g.badge || 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
+                const groupEl = document.createElement('div');
+                groupEl.className = 'mchar-group';
 
-    const titleWrap = document.createElement('div');
-    titleWrap.innerHTML = `
+                // 헤더(배지 + 직업군명)
+                const head = document.createElement('div');
+                head.className = 'mchar-group-head';
+
+                const img = document.createElement('img');
+                img.className = 'mchar-badge';
+                img.loading = 'lazy';
+                img.alt = job;
+                // 배지 없을 때 깨짐 방지(투명 1x1)
+                img.src = g.badge || 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
+
+                const titleWrap = document.createElement('div');
+                titleWrap.innerHTML = `
       <span class="mchar-group-title">${job}</span>
       <span class="mchar-group-sub">(${g.list.length})</span>
     `;
 
-    head.appendChild(img);
-    head.appendChild(titleWrap);
+                head.appendChild(img);
+                head.appendChild(titleWrap);
 
-    // 바디(기존 row를 그대로 사용)
-    const body = document.createElement('div');
-    body.className = 'mchar-group-body';
+                // 바디(기존 row를 그대로 사용)
+                const body = document.createElement('div');
+                body.className = 'mchar-group-body';
 
-    for (const c of g.list){
-      const name = _getCharName(c);
-      const thumb = _getCharThumb(c);
+                for (const c of g.list) {
+                    const name = _getCharName(c);
+                    const thumb = _getCharThumb(c);
 
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'mchar-row';
-      btn.innerHTML = `
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'mchar-row';
+                    btn.innerHTML = `
         <img class="mchar-thumb" src="${thumb}" alt="">
         <div class="mchar-name">${name}</div>
       `;
 
-      btn.addEventListener('click', () => {
-        // 선택 저장
-        window.state.currentCharacter = { ...c, name };
+                    btn.addEventListener('click', () => {
+                        // 선택 저장
+                        window.state.currentCharacter = { ...c, name };
 
-        // ✅ 버튼 숨기고, 캐릭 이미지 표시
-        applyPickedCharacterUI(window.state.currentCharacter);
+                        // ✅ 버튼 숨기고, 캐릭 이미지 표시
+                        applyPickedCharacterUI(window.state.currentCharacter);
 
-        // 모달 닫기
-        const m = document.getElementById('charModal');
-        if (m){
-          m.classList.remove('show');
-          m.setAttribute('aria-hidden','true');
+                        // 모달 닫기
+                        const m = document.getElementById('charModal');
+                        if (m) {
+                            m.classList.remove('show');
+                            m.setAttribute('aria-hidden', 'true');
+                        }
+                    });
+
+                    body.appendChild(btn);
+                }
+
+                groupEl.appendChild(head);
+                groupEl.appendChild(body);
+                frag.appendChild(groupEl);
+            }
+
+            catalog.appendChild(frag);
         }
-      });
 
-      body.appendChild(btn);
-    }
+        async function openMobileCharacterPicker() {
+            // init에서 경량리스트들 받아온다
+            await initMobileAllLightListsOnce();
 
-    groupEl.appendChild(head);
-    groupEl.appendChild(body);
-    frag.appendChild(groupEl);
-  }
+            // 핵심: char:list 배열
+            const items = window.CORE?.lists?.['char:list'];
 
-  catalog.appendChild(frag);
-}
+            renderMobileCharList(items);
 
-async function openMobileCharacterPicker(){
-  // init에서 경량리스트들 받아온다
-  await initMobileAllLightListsOnce();
+            const m = document.getElementById('charModal');
+            if (m) {
+                m.classList.add('show');
+                m.setAttribute('aria-hidden', 'false');
+            }
+        }
 
-  // 핵심: char:list 배열
-  const items = window.CORE?.lists?.['char:list'];
-
-  renderMobileCharList(items);
-
-  const m = document.getElementById('charModal');
-  if (m){
-    m.classList.add('show');
-    m.setAttribute('aria-hidden','false');
-  }
-}
-
-// 닫기(backdrop + 닫기 버튼)
-document.querySelectorAll('[data-char-close]').forEach(el => {
-  el.addEventListener('click', () => {
-    const m = document.getElementById('charModal');
-    m?.classList.remove('show');
-    m?.setAttribute('aria-hidden','true');
-  });
-});
+        // 닫기(backdrop + 닫기 버튼)
+        document.querySelectorAll('[data-char-close]').forEach(el => {
+            el.addEventListener('click', () => {
+                const m = document.getElementById('charModal');
+                m?.classList.remove('show');
+                m?.setAttribute('aria-hidden', 'true');
+            });
+        });
 
 
-    // ===== Toast =====
-    function toast(msg){
-      const el = document.getElementById('toast');
-      if(!el) return alert(msg);
-      el.textContent = msg;
-      el.classList.add('show');
-      clearTimeout(el._t);
-      el._t = setTimeout(()=> el.classList.remove('show'), 1400);
-    }
+        // ===== Toast =====
+        function toast(msg) {
+            const el = document.getElementById('toast');
+            if (!el) return alert(msg);
+            el.textContent = msg;
+            el.classList.add('show');
+            clearTimeout(el._t);
+            el._t = setTimeout(() => el.classList.remove('show'), 1400);
+        }
 
-    // ✅ 페이지 열리면 즉시 경량리스트 전부 로드
-initMobileAllLightListsOnce().catch((e) => {
-  console.error(e);
-  toast('초기 데이터 로딩 실패');
-});
+        // ✅ 페이지 열리면 즉시 경량리스트 전부 로드
+        initMobileAllLightListsOnce().catch((e) => {
+            console.error(e);
+            toast('초기 데이터 로딩 실패');
+        });
 
-// ===== Swipe Pages (필수: 가로 스와이프 강제 스냅) =====
-(function initSwipePages(){
-  const pages = document.getElementById('mobilePages');
-  if(!pages) return;
+        // ===== Swipe Pages (PointerEvent: 터치/마우스 모두 지원) =====
+        (function initSwipePages() {
+            const pages = document.getElementById('mobilePages');
+            if (!pages) return;
 
-  // ⚠️ modal(div.modal)은 flex child로 섞여있을 수 있으니, 실제 페이지(.m-page)만 카운트
-  const getPageEls = () => Array.from(pages.children).filter(el => el.classList?.contains('m-page'));
-  const getPageCount = () => getPageEls().length;
+            // 실제 페이지(.m-page)만 카운트
+            const getPageEls = () => Array.from(pages.children).filter(el => el.classList?.contains('m-page'));
+            const getPageCount = () => getPageEls().length;
 
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const pageWidth = () => pages.clientWidth || 1;
-  const getIndex = () => Math.round(pages.scrollLeft / pageWidth());
+            const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+            const pageWidth = () => pages.clientWidth || 1;
+            const getIndex = () => Math.round(pages.scrollLeft / pageWidth());
 
-  // 외부에서도 쓰게(원하면 버튼/도트로 이동 가능)
-  window.goToMobilePage = (i) => {
-    const cnt = getPageCount();
-    const idx = clamp(i|0, 0, Math.max(0, cnt-1));
-    pages.scrollTo({ left: idx * pageWidth(), behavior: 'smooth' });
-  };
+            window.goToMobilePage = (i) => {
+                const cnt = getPageCount();
+                const idx = clamp(i | 0, 0, Math.max(0, cnt - 1));
+                pages.scrollTo({ left: idx * pageWidth(), behavior: 'smooth' });
+            };
 
-  let sx=0, sy=0, startLeft=0, lastDx=0, dragging=false, horiz=null;
-  const LOCK = 8;        // 방향 판별 최소 이동
-  const TH = 40;         // 페이지 넘김 임계치(px)
+            let pid = null;
+            let sx = 0, sy = 0, startLeft = 0, lastDx = 0, dragging = false, horiz = null;
 
-  pages.addEventListener('touchstart', (e) => {
-    if(e.touches.length !== 1) return;
-    const t = e.touches[0];
-    sx = t.clientX; sy = t.clientY;
-    startLeft = pages.scrollLeft;
-    lastDx = 0;
-    dragging = true;
-    horiz = null;
-  }, { passive: true });
+            const LOCK = 8;   // 방향 판별 최소 이동
+            const TH = 40;  // 페이지 넘김 임계치(px)
 
-  pages.addEventListener('touchmove', (e) => {
-    if(!dragging || e.touches.length !== 1) return;
-    const t = e.touches[0];
-    const dx = t.clientX - sx;
-    const dy = t.clientY - sy;
-    lastDx = dx;
+            function onEnd() {
+                if (!dragging) return;
+                dragging = false;
 
-    // 처음엔 방향 잠금
-    if(horiz === null){
-      if(Math.abs(dx) < LOCK && Math.abs(dy) < LOCK) return;
-      horiz = Math.abs(dx) > Math.abs(dy);
-    }
+                if (horiz !== true) { pid = null; return; }
 
-    // 세로 제스처면 그냥 페이지 내부 스크롤에 맡김
-    if(!horiz) return;
+                const w = pageWidth();
+                const cnt = getPageCount();
+                let idx = Math.round(startLeft / w);
 
-    // 가로 제스처면 브라우저 기본 스크롤(튐) 막고 우리가 제어
-    e.preventDefault();
-    pages.scrollLeft = startLeft - dx;
-  }, { passive: false });
+                if (lastDx < -TH) idx += 1;
+                else if (lastDx > TH) idx -= 1;
+                else idx = getIndex();
 
-  const onEnd = () => {
-    if(!dragging) return;
-    dragging = false;
+                idx = clamp(idx, 0, Math.max(0, cnt - 1));
+                pages.scrollTo({ left: idx * w, behavior: 'smooth' });
 
-    // 세로였으면 스냅 안 건드림
-    if(horiz !== true) return;
+                pid = null;
+            }
 
-    const w = pageWidth();
-    const cnt = getPageCount();
-    let idx = Math.round(startLeft / w);
+            pages.addEventListener('pointerdown', (e) => {
+                // 마우스 좌클릭/터치만
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
 
-    if(lastDx < -TH) idx += 1;        // 왼쪽으로 스와이프 => 다음 페이지
-    else if(lastDx > TH) idx -= 1;    // 오른쪽으로 스와이프 => 이전 페이지
-    else idx = getIndex();           // 애매하면 현재 위치 기준
+                pid = e.pointerId;
+                pages.setPointerCapture?.(pid);
 
-    idx = clamp(idx, 0, Math.max(0, cnt-1));
-    pages.scrollTo({ left: idx * w, behavior: 'smooth' });
-  };
+                sx = e.clientX; sy = e.clientY;
+                startLeft = pages.scrollLeft;
+                lastDx = 0;
+                dragging = true;
+                horiz = null;
+            }, { passive: true });
 
-  pages.addEventListener('touchend', onEnd, { passive: true });
-  pages.addEventListener('touchcancel', onEnd, { passive: true });
-})();
+            pages.addEventListener('pointermove', (e) => {
+                if (!dragging || pid == null || e.pointerId !== pid) return;
 
-    // ===== Header actions =====
-     function openModal(id){
-      const m = document.getElementById(id);
-      if(!m) return;
-      m.classList.add('show');
-      m.setAttribute('aria-hidden','false');
-    }
-    function closeModal(id){
-      const m = document.getElementById(id);
-      if(!m) return;
-      m.classList.remove('show');
-      m.setAttribute('aria-hidden','true');
-    }
+                const dx = e.clientX - sx;
+                const dy = e.clientY - sy;
+                lastDx = dx;
 
-    document.getElementById('btnContactAdmin')?.addEventListener('click', ()=> openModal('contactModal'));
-    document.getElementById('btnFaq')?.addEventListener('click', ()=> {
-      // 나중에 PC의 getFaqItems/openFaqModal 로직을 그대로 붙이면 됨
-      const list = document.getElementById('faqList');
-      if(list){
-        list.innerHTML = '';
-        const empty = document.createElement('div');
-        empty.style.opacity = '0.8';
-        empty.textContent = '등록된 Q&A가 없습니다.';
-        list.appendChild(empty);
-      }
-      openModal('faqModal');
-    });
+                if (horiz === null) {
+                    if (Math.abs(dx) < LOCK && Math.abs(dy) < LOCK) return;
+                    horiz = Math.abs(dx) > Math.abs(dy);
+                }
 
-    // backdrop/close 공통
-    document.querySelectorAll('[data-contact-close]').forEach(el=>{
-      el.addEventListener('click', ()=> closeModal('contactModal'));
-    });
-    document.getElementById('contactModal')?.addEventListener('click', (e)=>{
-      if(e.target?.classList?.contains('backdrop')) closeModal('contactModal');
-    });
+                // 세로 제스처면 놔둠(페이지 내부 스크롤)
+                if (!horiz) return;
 
-    document.querySelectorAll('[data-faq-close]').forEach(el=>{
-      el.addEventListener('click', ()=> closeModal('faqModal'));
-    });
-    document.getElementById('faqModal')?.addEventListener('click', (e)=>{
-      if(e.target?.classList?.contains('backdrop')) closeModal('faqModal');
-    });
+                // 가로 제스처면 우리가 scrollLeft를 직접 제어
+                e.preventDefault?.();
+                pages.scrollLeft = startLeft - dx;
+            }, { passive: false });
 
-    document.querySelectorAll('[data-faqans-close]').forEach(el=>{
-      el.addEventListener('click', ()=> closeModal('faqAnswerModal'));
-    });
-    document.getElementById('faqAnswerModal')?.addEventListener('click', (e)=>{
-      if(e.target?.classList?.contains('backdrop')) closeModal('faqAnswerModal');
-    });
+            pages.addEventListener('pointerup', onEnd, { passive: true });
+            pages.addEventListener('pointercancel', onEnd, { passive: true });
+        })();
 
-    // ===== Main actions (placeholders) =====
-    document.getElementById('btnPickChar')?.addEventListener('click', async ()=>{
-  try{
-    await openMobileCharacterPicker();
-  }catch(e){
-    console.error(e);
-    toast('캐릭터 목록을 불러오지 못했습니다.');
-  }
-});
 
-    document.getElementById('btnContactSend')?.addEventListener('click', ()=>{
-      toast('문의 전송(apiJSON contact_admin)은 다음 단계에서 연결합니다.');
-    });
+        // ===== Header actions =====
+        function openModal(id) {
+            const m = document.getElementById(id);
+            if (!m) return;
+            m.classList.add('show');
+            m.setAttribute('aria-hidden', 'false');
+        }
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            if (!m) return;
+            m.classList.remove('show');
+            m.setAttribute('aria-hidden', 'true');
+        }
 
-    document.getElementById('btnMobileCompute')?.addEventListener('click', ()=>{
-      // 나중에 PC의 compute 호출 결과를 mobileFinalDamage에 꽂으면 됨
-      document.getElementById('mobileFinalDamage').textContent = '계산(연결 전)';
-      toast('계산 로직 연결은 다음 단계에서 진행합니다.');
-    });
-  </script>
+        document.getElementById('btnContactAdmin')?.addEventListener('click', () => openModal('contactModal'));
+        document.getElementById('btnFaq')?.addEventListener('click', () => {
+            // 나중에 PC의 getFaqItems/openFaqModal 로직을 그대로 붙이면 됨
+            const list = document.getElementById('faqList');
+            if (list) {
+                list.innerHTML = '';
+                const empty = document.createElement('div');
+                empty.style.opacity = '0.8';
+                empty.textContent = '등록된 Q&A가 없습니다.';
+                list.appendChild(empty);
+            }
+            openModal('faqModal');
+        });
+
+        // backdrop/close 공통
+        document.querySelectorAll('[data-contact-close]').forEach(el => {
+            el.addEventListener('click', () => closeModal('contactModal'));
+        });
+        document.getElementById('contactModal')?.addEventListener('click', (e) => {
+            if (e.target?.classList?.contains('backdrop')) closeModal('contactModal');
+        });
+
+        document.querySelectorAll('[data-faq-close]').forEach(el => {
+            el.addEventListener('click', () => closeModal('faqModal'));
+        });
+        document.getElementById('faqModal')?.addEventListener('click', (e) => {
+            if (e.target?.classList?.contains('backdrop')) closeModal('faqModal');
+        });
+
+        document.querySelectorAll('[data-faqans-close]').forEach(el => {
+            el.addEventListener('click', () => closeModal('faqAnswerModal'));
+        });
+        document.getElementById('faqAnswerModal')?.addEventListener('click', (e) => {
+            if (e.target?.classList?.contains('backdrop')) closeModal('faqAnswerModal');
+        });
+
+        // ===== Main actions (placeholders) =====
+        document.getElementById('btnPickChar')?.addEventListener('click', async () => {
+            try {
+                await openMobileCharacterPicker();
+            } catch (e) {
+                console.error(e);
+                toast('캐릭터 목록을 불러오지 못했습니다.');
+            }
+        });
+
+        document.getElementById('btnContactSend')?.addEventListener('click', () => {
+            toast('문의 전송(apiJSON contact_admin)은 다음 단계에서 연결합니다.');
+        });
+
+        document.getElementById('btnMobileCompute')?.addEventListener('click', () => {
+            // 나중에 PC의 compute 호출 결과를 mobileFinalDamage에 꽂으면 됨
+            document.getElementById('mobileFinalDamage').textContent = '계산(연결 전)';
+            toast('계산 로직 연결은 다음 단계에서 진행합니다.');
+        });
+    </script>
 </body>
+
 </html>
