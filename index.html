@@ -8320,11 +8320,25 @@ $uniqueEffectModal?.querySelectorAll('[data-close]').forEach(el => {
           const delta = target - cur;
           const perSp = Number(s.sp || 0);
           if (delta > 0) {
-            const need = perSp * delta;
-            if (!canSpendSp(need)) return;
-            state.skillLv[s.id] = target;
-            spendSp(need);
-          } else if (delta < 0) {
+  // ★ 팔콘 4종 상호배제: 이미 다른 팔콘이 찍혀 있으면 증가 차단
+  if (isFalconGroupedSkill(s)) {
+    const other = pickedOtherFalconExcept(s);
+    if (other) {
+      alert(`
+      팔콘 계열은 동시에 둘 이상 찍을 수 없습니다.\n
+      [인서트 : 팔콘], [G-SP 팔콘(코로나 폼)], \n
+      [G-SP 팔콘(롤링 썬더 폼)], [G-SP 팔콘(랩터 폼)] \n
+      중에 사용하실 하나의 스킬만 선택해서 올려주세요.\n\n
+      현재 [${other.name}]이(가) 선택되어 있습니다.`);
+      return;
+    }
+  }
+
+  const need = perSp * delta;
+  if (!canSpendSp(need)) return;
+  state.skillLv[s.id] = target;
+  spendSp(need);
+} else if (delta < 0) {
             state.skillLv[s.id] = target;
             refundSp(perSp * (-delta));
           } else {
@@ -8342,17 +8356,47 @@ $uniqueEffectModal?.querySelectorAll('[data-close]').forEach(el => {
           const target = clampTp(v);
           const cur = getTp(s);
           if (target > cur) {
-            const need = (target - cur) * unit;
-            if (!canSpendTp(need)) return;
-            state.skillTpLv[s.id] = target;
-            spendTp(need);
-          } else if (target < cur) {
+  // ★ 팔콘 4종 상호배제: SP 미습득 상태에서 다른 팔콘이 이미 찍혀 있으면 TP 증가 차단
+  if (isFalconGroupedSkill(s)) {
+    const baseLv = Number(state.skillLv?.[s.id] ?? 0) || 0;
+    const other  = pickedOtherFalconExcept(s);
+    if (baseLv <= 0 && other) {
+      alert(`팔콘 계열은 동시에 둘 이상 사용할 수 없습니다.\n현재 [${other.name}]이(가) 선택되어 있습니다.`);
+      return;
+    }
+  }
+
+  const need = (target - cur) * unit;
+  if (!canSpendTp(need)) return;
+  state.skillTpLv[s.id] = target;
+  spendTp(need);
+} else if (target < cur) {
             state.skillTpLv[s.id] = target;
             refundTp((cur - target) * unit);
           } else {
             state.skillTpLv[s.id] = target;
           }
         };
+
+// ===== 메카닉(여) 전용: G-4 호넷 → G 풀 블룸 자동 연동 =====
+let hornetSkill = null;
+let fullBloomSkill = null;
+let fullBloomSpanCur = null; // 풀 블룸 레벨 표기 span
+
+function syncFullBloomAutoFromHornet() {
+  if (!hornetSkill || !fullBloomSkill) return;
+
+  const curMap = state.skillLv || {};
+  let autoLv = Number(curMap[hornetSkill.id] ?? 0) || 0;
+
+  autoLv = clampSkill(fullBloomSkill, autoLv);
+  state.skillLv[fullBloomSkill.id] = autoLv;
+
+  if (fullBloomSpanCur) {
+    fullBloomSpanCur.textContent = String(autoLv);
+  }
+}
+
 
         // ===== 스트라이커 전용: 로킥 → 본 크러셔 자동 연동 =====
         const skillNameKey = (txt) =>
@@ -8379,6 +8423,35 @@ $uniqueEffectModal?.querySelectorAll('[data-close]').forEach(el => {
             boneCrusherSpanCur.textContent = String(autoLv);
           }
         }
+
+        // ===== 메카닉(여) 전용: 팔콘 4종 상호배제 =====
+let falconInsertSkill = null;      // '인서트 : 팔콘'
+let gspFalconCorona   = null;      // 'G-SP 팔콘(코로나 폼)'
+let gspFalconRolling  = null;      // 'G-SP 팔콘(롤링 썬더 폼)'
+let gspFalconRaptor   = null;      // 'G-SP 팔콘(랩터 폼)'
+
+// 현재 팔콘 4종 중 '나(sTry)'를 제외하고 이미 찍힌(레벨>0) 스킬이 있는지 검사
+function pickedOtherFalconExcept(sTry) {
+  const curMap = state.skillLv || {};
+  const group = [falconInsertSkill, gspFalconCorona, gspFalconRolling, gspFalconRaptor].filter(Boolean);
+  for (const sk of group) {
+    if (!sk) continue;
+    if (sTry && sk.id === sTry.id) continue;
+    const lv = Number(curMap[sk.id] ?? 0) || 0;
+    if (lv > 0) return sk;            // 이미 하나 찍혀 있음 → 위반 대상 반환
+  }
+  return null;                         // 없음
+}
+
+// 이 스킬이 팔콘 4종에 속하는가
+function isFalconGroupedSkill(s) {
+  if (!s) return false;
+  const id = s.id;
+  return !![falconInsertSkill, gspFalconCorona, gspFalconRolling, gspFalconRaptor]
+          .filter(Boolean)
+          .find(sk => sk.id === id);
+}
+
 
         let hurricaneSkill = null;
 let deathHurricaneSkill = null;
@@ -8418,6 +8491,18 @@ const isLowKick = (keyName === skillNameKey('로킥'));
 const isBoneCrusher = (keyName === skillNameKey('본 크러셔'));
 const isHurricane = (keyName === skillNameKey('허리케인'));
 const isDeathHurricane = (keyName === skillNameKey('데스 허리케인'));
+const isHornet    = (keyName === skillNameKey('G-4 호넷'));
+const isFullBloom = (keyName === skillNameKey('G 풀 블룸'));
+const isFalconInsert = (keyName === skillNameKey('인서트 : 팔콘') || keyName === skillNameKey('인서트: 팔콘'));
+const isGspCorona    = (keyName === skillNameKey('G-SP 팔콘(코로나 폼)'));
+const isGspRolling   = (keyName === skillNameKey('G-SP 팔콘(롤링 썬더 폼)'));
+const isGspRaptor    = (keyName === skillNameKey('G-SP 팔콘(랩터 폼)'));
+
+if (isFalconInsert) falconInsertSkill = s;
+if (isGspCorona)    gspFalconCorona   = s;
+if (isGspRolling)   gspFalconRolling  = s;
+if (isGspRaptor)    gspFalconRaptor   = s;
+
 
 if (isLowKick) lowKickSkill = s;
 if (isBoneCrusher) boneCrusherSkill = s;
@@ -8425,11 +8510,18 @@ if (isBoneCrusher) boneCrusherSkill = s;
 if (isHurricane) hurricaneSkill = s;
 if (isDeathHurricane) deathHurricaneSkill = s;
 
+if (isHornet)    hornetSkill = s;
+if (isFullBloom) fullBloomSkill = s;
+
             const spanCur = document.createElement('span');
             spanCur.className = 'cur';
 
             if (isBoneCrusher) {
               boneCrusherSpanCur = spanCur;
+            }
+
+            if (isFullBloom) {
+              fullBloomSpanCur = spanCur;
             }
 
 
@@ -8541,8 +8633,8 @@ if (isDeathHurricane) deathHurricaneSkill = s;
               spanCur.textContent = String(cur);
               spanTp.textContent = String(tp);
 
-              // ★ 본 크러셔: SP는 자동습득 → 버튼 완전 비활성화
-              if (isBoneCrusher) {
+              // ★ 본 크러셔/풀 블룸: SP는 자동습득 → 버튼 완전 비활성화
+              if (isBoneCrusher || isFullBloom) {
                 btnSkillPlus.disabled = true;
                 btnSkillMax.disabled = true;
                 btnSkillMinus.disabled = true;
@@ -8574,6 +8666,7 @@ if (isDeathHurricane) deathHurricaneSkill = s;
   }
   setSkill(s, getSkill(s) + 1);
   if (isLowKick) syncBoneCrusherAutoFromLowKick();
+  if (isHornet)  syncFullBloomAutoFromHornet();   // ← 이 줄 추가
   enforceDeathHurricanePrereq();
   refresh();
 };
@@ -8581,6 +8674,7 @@ if (isDeathHurricane) deathHurricaneSkill = s;
             const stepSkillDn = () => {
   setSkill(s, getSkill(s) - 1);
   if (isLowKick) syncBoneCrusherAutoFromLowKick();
+  if (isHornet)  syncFullBloomAutoFromHornet();   // ← 이 줄 추가
   enforceDeathHurricanePrereq();
   refresh();
 };
@@ -8599,6 +8693,7 @@ if (isDeathHurricane) deathHurricaneSkill = s;
               if (!(perSp > 0)) {
                 setSkill(s, maxTarget);
                 if (isLowKick) syncBoneCrusherAutoFromLowKick();
+                if (isHornet)  syncFullBloomAutoFromHornet();   // ← 추가
                 enforceDeathHurricanePrereq();
                 refresh();
                 return;
@@ -8613,6 +8708,7 @@ if (isDeathHurricane) deathHurricaneSkill = s;
               const target = cur + Math.min(maxDeltaByCap, maxDeltaBySp);
               setSkill(s, target);
               if (isLowKick) syncBoneCrusherAutoFromLowKick();
+              if (isHornet)  syncFullBloomAutoFromHornet();   // ← 추가
               enforceDeathHurricanePrereq();
               refresh();
             };
@@ -8620,6 +8716,7 @@ if (isDeathHurricane) deathHurricaneSkill = s;
             const toSkillMin = () => {
   setSkill(s, s.minLv);
   if (isLowKick) syncBoneCrusherAutoFromLowKick();
+  if (isHornet)  syncFullBloomAutoFromHornet();   // ← 추가
   enforceDeathHurricanePrereq();
   refresh();
 };
