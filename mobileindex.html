@@ -629,19 +629,27 @@
 #equipEnhModal { z-index: 1100; }
 #equipSealUModal { z-index: 1110; }
 #equipSealNModal { z-index: 1110; }
+#equipEnchantModal { z-index: 1120; }
+#equipEmblemModal { z-index: 1130; }
 
-/* ✅ (PC와 유사한 리스트 스타일) 강화 + 마법봉인(고유/일반) 공통 */
+
+/* ✅ (PC와 유사한 리스트 스타일) 강화 + 마법봉인(고유/일반) + 마법부여 공통 */
 #equipEnhModal .dialog,
 #equipSealUModal .dialog,
-#equipSealNModal .dialog{
+#equipSealNModal .dialog,
+#equipEnchantModal .dialog,
+/* ✅ 추가 */
+#equipEmblemModal .dialog{
   width: min(320px, 95vw);
   height: min(520px, 85vh);
 }
 
+
 /* 리스트(1열) */
 #equipEnhModal .enh-list,
 #equipSealUModal .enh-list,
-#equipSealNModal .enh-list{
+#equipSealNModal .enh-list,
+#equipEnchantModal .enh-list{
   overflow: auto;
   padding: 10px;
   display: grid;
@@ -649,10 +657,11 @@
   gap: 8px;
 }
 
-/* 버튼 */
+/* 버튼 (마법부여는 .enh-btn 이라 같이 포함) */
 #equipEnhModal .enh-option,
 #equipSealUModal .enh-option,
-#equipSealNModal .enh-option{
+#equipSealNModal .enh-option,
+#equipEnchantModal .enh-btn{
   height: 36px;
   padding: 0 12px;
   text-align: left;
@@ -663,13 +672,15 @@
   cursor: pointer;
 }
 
-/* active */
+/* active (마법부여는 .enh-btn.active) */
 #equipEnhModal .enh-option.active,
 #equipSealUModal .enh-option.active,
-#equipSealNModal .enh-option.active{
+#equipSealNModal .enh-option.active,
+#equipEnchantModal .enh-btn.active{
   border-color: rgba(207,162,79,0.9);
-  box-shadow: 0 0 0 2px rgba(207,162,79,.18) inset;
+  box-shadow: 0 0 0 2px rgba(207,162,79,0.18) inset;
 }
+
 
 
 
@@ -875,6 +886,278 @@
       color: #e5e7eb;
       cursor: pointer;
     }
+    /* ===== Emblem Modal UI ===== */
+#equipEmblemModal .items{
+  overflow: auto;
+  padding: 10px;
+}
+
+/* 상단: 현재 슬롯/소켓 선택 영역 */
+#equipEmblemTarget{
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 8px;
+  margin: 0 0 10px 0;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.22);
+  backdrop-filter: blur(6px);
+}
+
+.em-target-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+}
+.em-slot-title{
+  font-size: 13px;
+  font-weight: 800;
+  color: rgba(240,230,210,0.95);
+}
+.em-sockets{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+/* ✅ 상단 소켓 왼쪽에 플래티넘 속성 배지 */
+.em-sock-wrap{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.em-line-badge{
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 999px;
+
+  color: rgba(240,230,210,0.92);
+  background: rgba(0,0,0,0.40);
+  border: 1px solid rgba(255,255,255,0.16);
+
+  /* 클릭 방해 방지 */
+  pointer-events: none;
+}
+
+.em-sock{
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(0,0,0,0.25);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.em-sock.active{
+  outline: 2px solid rgba(255,220,140,0.55);
+}
+.em-sock.has-img{
+  background-size: cover;
+  background-position: center;
+}
+.em-sock{
+  position: relative; /* 혹시 빠져있으면 보장 */
+}
+
+.em-sock .num{
+  position:absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1;
+
+  padding: 3px 7px;
+  border-radius: 999px;
+
+  color: rgba(255,255,255,0.95);
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.20);
+
+  text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+  pointer-events: none; /* 클릭 방해 방지 */
+}
+
+/* ===== Emblem Modal (세로 리스트 버전) ===== */
+#equipEmblemList{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.em-group{
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.18);
+  overflow: hidden;
+}
+
+.em-group-title{
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(240,230,210,0.92);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.18);
+}
+
+/* ✅ 특수장비 플래티넘: 속성 선택 UI */
+.em-group-title.plat{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.em-line-btn{
+  border:1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: rgba(240,230,210,0.92);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  cursor:pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.em-line-btn:active{ transform: translateY(1px); }
+
+.em-line-choices{
+  display:none;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.03);
+}
+.em-line-choices.show{ display:flex; }
+
+.em-line-opt{
+  border:1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.25);
+  color: rgba(240,230,210,0.92);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor:pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.em-line-opt.active{
+  border-color: rgba(207,162,79,0.9);
+  box-shadow: 0 0 0 2px rgba(207,162,79,0.18) inset;
+}
+
+.em-plat-hint{
+  padding: 10px 12px;
+  font-size: 12px;
+  color: rgba(240,230,210,0.65);
+}
+
+.em-vlist{
+  display:flex;
+  flex-direction:column;
+}
+
+.em-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: transparent;
+  cursor:pointer;
+  text-align:left;
+}
+.em-item:last-child{ border-bottom:none; }
+
+.em-item:hover{
+  background: rgba(255,255,255,0.04);
+}
+
+.em-item .thumb{
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.25);
+  background-size: cover;
+  background-position: center;
+  flex: 0 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.em-item.none .thumb{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(240,230,210,0.75);
+  background: rgba(0,0,0,0.18);
+}
+
+.em-item .meta{
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.em-item .name{
+  font-size: 13px;
+  font-weight: 900;
+  color: rgba(240,230,210,0.95);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.em-item .sub{
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(240,230,210,0.65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.em-item .badge{
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(250,240,220,0.95);
+  background: rgba(0,0,0,0.25);
+}
+
+
+/* 장비 리스트의 엠블렘 표시(오른쪽 작은 원) */
+.equip-emblem-icons{
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+.equip-emblem-icons .emb{
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.18);
+  background-size: cover;
+  background-position: center;
+}
+.equip-emblem-icons .emb.has-img{
+  box-shadow: 0 0 0 1px rgba(255,220,140,0.25) inset;
+}
+
 
     /* ✅ 장비 선택 모달만: 상단(헤더+버튼바) 고정, 목록만 스크롤 */
     #equipModal .dialog {
@@ -886,17 +1169,17 @@
 
     /* 상단 버튼바 */
     #equipModal .equip-topbar {
-      flex: 0 0 auto;
-      display: flex;
-      gap: 8px;
-      padding: 10px 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
-      background: rgba(10, 14, 24, 0.96);
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;               /* ✅ 버튼들이 다음 줄로 내려감 */
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(10, 14, 24, 0.96);
 
-      overflow-x: auto;
-      /* 혹시 좁으면 가로 스크롤 */
-      -webkit-overflow-scrolling: touch;
-    }
+  overflow-x: hidden;            /* ✅ 가로 스크롤 제거 */
+  overflow-y: hidden;
+}
 
     /* 버튼 스타일(작고 촘촘하게) */
     #equipModal .equip-topbtn {
@@ -910,6 +1193,7 @@
       font-size: 12px;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
     }
 
     #equipModal .equip-topbtn.active {
@@ -1014,28 +1298,66 @@
 #equipCatalog,
 #equipEnhList,
 #equipSealUList,
-#equipSealNList{
+#equipSealNList,
+#equipEnchantList{
   overflow: auto;                 /* 스크롤은 가능해야 손으로 밀림 */
   -webkit-overflow-scrolling: touch; /* iOS 관성 스크롤 */
   scrollbar-width: none;          /* Firefox: 스크롤바 숨김 */
+}
+
+
+/* ✅ (선택모달) dialog 자체는 스크롤 금지: 스크롤은 리스트에서만 */
+dialog,
+#equipEnhModal .dialog,
+#equipSealUModal .dialog,
+#equipSealNModal .dialog,
+#equipEnchantModal .dialog,
+#equipEmblemModal .dialog{
+  overflow: hidden;
+  display: flex;            /* ✅ 추가 */
+  flex-direction: column;   /* ✅ 추가 */
+}
+
+/* ✅ 헤더 아래 남은 공간을 items가 먹고, 그 안의 리스트만 스크롤되게 */
+#equipEnhModal .items,
+#equipSealUModal .items,
+#equipSealNModal .items,
+#equipEnchantModal .items,
+#equipEmblemModal .items{
+  flex: 1 1 auto;     /* ✅ 추가 */
+  min-height: 0;      /* ✅ 핵심: flex 환경에서 내부 overflow가 작동하려면 필요 */
+  overflow: hidden;   /* ✅ dialog은 숨기고, 실제 스크롤은 리스트에서만 */
+}
+
+/* ✅ 리스트: “스크롤바는 숨기되” 터치 스크롤은 허용 */
+#equipCatalog,
+#equipEnhList,
+#equipSealUList,
+#equipSealNList,
+#equipEnchantList,
+#equipEmblemList{
+  height: 100%;                 /* ✅ 추가: items 높이를 꽉 채움 */
+  overflow: auto;
+  overflow-x: hidden;           /* ✅ 가로 스크롤 방지 */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  touch-action: pan-y;          /* ✅ 모바일에서 위/아래 드래그를 스크롤로 확실히 */
+  overscroll-behavior: contain; /* ✅ 바운스/배경 스크롤 간섭 줄이기 */
 }
 
 /* Chrome/Safari/Edge: 스크롤바 숨김 */
 #equipCatalog::-webkit-scrollbar,
 #equipEnhList::-webkit-scrollbar,
 #equipSealUList::-webkit-scrollbar,
-#equipSealNList::-webkit-scrollbar{
+#equipSealNList::-webkit-scrollbar,
+#equipEnchantList::-webkit-scrollbar,
+#equipEmblemList::-webkit-scrollbar{
   width: 0;
   height: 0;
   display: none;
 }
 
-#equipModal .dialog,
-#equipEnhModal .dialog,
-#equipSealUModal .dialog,
-#equipSealNModal .dialog{
-  overflow: hidden; /* 스크롤은 리스트 영역에서만 */
-}
+
 
 
   </style>
@@ -1187,6 +1509,40 @@
     </div>
   </div>
 </div>
+
+<!-- ✅ (방법B) 마법부여 선택 2중 모달 -->
+<div id="equipEnchantModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-equip-enchant-close></div>
+
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="equipEnchantModalTitle">
+    <header>
+      <h2 id="equipEnchantModalTitle">마법부여 선택</h2>
+      <button type="button" class="close" data-equip-enchant-close>✕</button>
+    </header>
+
+    <div class="items">
+      <div id="equipEnchantList" class="enh-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ (추가) 엠블렘 선택 2중 모달 -->
+<div id="equipEmblemModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-equip-emblem-close></div>
+
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="equipEmblemModalTitle">
+    <header>
+      <h2 id="equipEmblemModalTitle">엠블렘 선택</h2>
+      <button type="button" class="close" data-equip-emblem-close>✕</button>
+    </header>
+
+    <div class="items">
+      <div id="equipEmblemTarget"></div>
+      <div id="equipEmblemList"></div>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -2135,6 +2491,8 @@
   closeEquipEnhModal();
   closeEquipSealUModal();
   closeEquipSealNModal();
+  closeEquipEnchantModal();
+  closeEquipEmblemModal();
 
   const m = document.getElementById('equipModal');
   if (!m) return;
@@ -2289,6 +2647,29 @@ function closeEquipEnhModal(){
   m.classList.remove('show');
   m.setAttribute('aria-hidden', 'true');
 }
+function openEquipEmblemModal(){
+  const m = document.getElementById('equipEmblemModal');
+  if(!m) return;
+  m.classList.add('show');
+  m.setAttribute('aria-hidden','false');
+}
+function closeEquipEmblemModal(){
+  const m = document.getElementById('equipEmblemModal');
+  if(!m) return;
+  m.classList.remove('show');
+  m.setAttribute('aria-hidden','true');
+}
+
+(function bindEquipEmblemModalCloseOnce(){
+  const m = document.getElementById('equipEmblemModal');
+  if(!m || m.__bound) return;
+  m.__bound = 1;
+
+  m.addEventListener('click', (e)=>{
+    if (e.target?.classList?.contains('backdrop')) return closeEquipEmblemModal();
+    if (e.target?.closest?.('[data-equip-emblem-close]')) return closeEquipEmblemModal();
+  });
+})();
 
 // 닫기(backdrop + X)
 (function bindEquipEnhModalCloseOnce(){
@@ -2340,6 +2721,19 @@ function closeEquipSealNModal(){
   m.classList.remove('show');
   m.setAttribute('aria-hidden', 'true');
 }
+function openEquipEnchantModal(){
+  const m = document.getElementById('equipEnchantModal');
+  if(!m) return;
+  m.classList.add('show');
+  m.setAttribute('aria-hidden', 'false');
+}
+function closeEquipEnchantModal(){
+  const m = document.getElementById('equipEnchantModal');
+  if(!m) return;
+  m.classList.remove('show');
+  m.setAttribute('aria-hidden', 'true');
+}
+
 (function bindEquipSealNModalCloseOnce(){
   const m = document.getElementById('equipSealNModal');
   if(!m || m.__bound) return;
@@ -2349,7 +2743,16 @@ function closeEquipSealNModal(){
     if (e.target?.closest?.('[data-equip-seal-n-close]')) return closeEquipSealNModal();
   });
 })();
+(function bindEquipEnchantModalCloseOnce(){
+  const m = document.getElementById('equipEnchantModal');
+  if(!m || m.__bound) return;
+  m.__bound = 1;
 
+  m.addEventListener('click', (e) => {
+    if (e.target?.classList?.contains('backdrop')) return closeEquipEnchantModal();
+    if (e.target?.closest?.('[data-equip-enchant-close]')) return closeEquipEnchantModal();
+  });
+})();
 function _sealTypeKeysForSlot_mobile(slot){
   if(slot === 'weapon') return { u:'무기고유', g:'무기일반' };
 
@@ -2403,6 +2806,21 @@ function _syncSealLabelFromState_mobile(slot){
   if(nEl) nEl.textContent = `일반옵션 ${nName || '-'}`;
 }
 
+function _syncEnchantLabelFromState_mobile(slot){
+  const row = document.querySelector(`.equip-row[data-slot="${slot}"]`);
+  if(!row) return;
+
+  const body = row.querySelector('.equip-enchant .equip-col-body');
+  if(!body) return;
+
+  const name = window.state?.enchants?.[slot]?.name
+    ? String(window.state.enchants[slot].name).trim()
+    : '';
+
+  body.textContent = name ? name : '-';
+}
+
+
 function renderMobileSealUniqueList(slot){
   const keys = _sealTypeKeysForSlot_mobile(slot);
   const type = keys?.u;
@@ -2440,6 +2858,7 @@ function renderMobileSealUniqueList(slot){
       window.state.seals[slot].unique = { name: it.name, type: it.type };
 
       _syncSealLabelFromState_mobile(slot);
+      syncSealTopbarLabel_mobile(slot);
       closeEquipSealUModal(); // ✅ 장비 모달은 유지
     };
 
@@ -2488,6 +2907,7 @@ function renderMobileSealNormalList(slot){
       window.state.seals[slot].general1 = { name: it.name, type: it.type };
 
       _syncSealLabelFromState_mobile(slot);
+      syncSealTopbarLabel_mobile(slot);
       closeEquipSealNModal(); // ✅ 장비 모달은 유지
     };
 
@@ -2559,6 +2979,137 @@ syncEnhTopbarLabel_mobile(slot);
   openEquipEnhModal();
 }
 
+function _enchantTypeForSlot_mobile(slot){
+  switch(slot){
+    case 'weapon':        return '무기마부';
+    case 'headshoulder':  return '머리어깨마부';
+    case 'top':           return '상의마부';
+    case 'bottom':        return '하의마부';
+    case 'belt':          return '허리마부';
+    case 'shoes':         return '신발마부';
+
+    case 'bracelet':      return '팔찌마부';
+    case 'necklace':      return '목걸이마부';
+    case 'ring':          return '반지마부';
+
+    case 'sub':           return '보장마부';
+    case 'magestone':     return '마법석마부';
+    case 'earring':       return '귀걸이마부';
+    default: return '';
+  }
+}
+
+function normalizeEnchantType_mobile(t){
+  const s = String(t || '').replace(/\s+/g,'').trim();
+  if(!s) return '';
+  // 이미 "무기마부" 같이 들어오는 경우 그대로 사용
+  if(s.endsWith('마부')) return s;
+
+  // 혹시 "무기마법부여" 같은 형태면 마부 키로 변환
+  if(/무기/.test(s)) return '무기마부';
+  if(/머리어깨|어깨/.test(s)) return '머리어깨마부';
+  if(/상의/.test(s)) return '상의마부';
+  if(/하의/.test(s)) return '하의마부';
+  if(/허리|벨트/.test(s)) return '허리마부';
+  if(/신발/.test(s)) return '신발마부';
+  if(/팔찌/.test(s)) return '팔찌마부';
+  if(/목걸이/.test(s)) return '목걸이마부';
+  if(/반지/.test(s)) return '반지마부';
+  if(/보장|보조/.test(s)) return '보장마부';
+  if(/마법석/.test(s)) return '마법석마부';
+  if(/귀걸이/.test(s)) return '귀걸이마부';
+
+  return s;
+}
+
+function renderMobileEnchantList(slot){
+  const typeKey = _enchantTypeForSlot_mobile(slot);
+  if(!typeKey){
+    toast('이 슬롯은 마법부여를 지원하지 않습니다.');
+    return;
+  }
+
+  const listEl = document.getElementById('equipEnchantList');
+  if(!listEl) return;
+
+  const map = window.EQUIP_SLOT_LABELS || {};
+const slotLabel =
+  map[slot]
+  || (slot === 'headshoulder' ? (map.headshoulder || map.shoulder || '머리어깨') : '')
+  || slot;
+
+const titleEl = document.getElementById('equipEnchantModalTitle');
+if(titleEl) titleEl.textContent = `${slotLabel} 마법부여 선택`;
+
+  // ✅ 목록은 "강화마봉마부 시트"에서 가져오는 라이트 리스트를 재사용
+  const raw = _getLightEnhList_mobile().map(_normEnhItem_mobile);
+
+  const items = raw.filter(x=>{
+    if(!x || !x.name) return false;
+    return normalizeEnchantType_mobile(x.type) === typeKey;
+  });
+
+  // ✅ 렌더
+  const picked = window.state?.enchants?.[slot]?.name ? String(window.state.enchants[slot].name) : '';
+
+  let html = '';
+  // 없음
+  html += `
+    <button type="button" class="enh-btn ${picked ? '' : 'active'}" data-none="1">
+      없음
+    </button>
+  `;
+
+  // 실제 옵션들 (정렬 X: 시트 순서 유지)
+  for(const it of items){
+    const name = String(it.name || '').trim();
+    const active = (picked && picked === name) ? 'active' : '';
+    html += `
+      <button type="button" class="enh-btn ${active}"
+        data-name="${name.replace(/"/g,'&quot;')}"
+        data-typekey="${typeKey.replace(/"/g,'&quot;')}">
+        ${name}
+      </button>
+    `;
+  }
+
+  listEl.innerHTML = html;
+
+  // 클릭 핸들러(중복 바인딩 방지)
+  if(!listEl.dataset.bound){
+    listEl.dataset.bound = '1';
+    listEl.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.enh-btn');
+      if(!btn) return;
+
+      const slot = window.state?.ui?.equipPickerSlot;
+      if(!slot) return;
+
+      (window.state = window.state || {}).enchants = (window.state.enchants || {});
+
+      // 없음
+      if(btn.dataset.none === '1'){
+        delete window.state.enchants[slot];
+        _syncEnchantLabelFromState_mobile(slot);
+        syncEnchantTopbarLabel_mobile(slot);
+        closeEquipEnchantModal();
+        return;
+      }
+
+      // 선택
+      const name = (btn.dataset.name || '').trim();
+      const typeKey = (btn.dataset.typekey || '').trim();
+
+      window.state.enchants[slot] = { name, typeKey };
+      _syncEnchantLabelFromState_mobile(slot);
+      syncEnchantTopbarLabel_mobile(slot);
+      closeEquipEnchantModal();
+    });
+  }
+
+  openEquipEnchantModal();
+}
+
 
     function _isSpecialSlot(slot) {
       return slot === 'sub' || slot === 'magestone' || slot === 'earring';
@@ -2596,6 +3147,537 @@ function syncEnhTopbarLabel_mobile(slot){
   // 만약 "강화 +12"로 표기하고 싶으면 위 줄 대신:
   // enhBtn.textContent = (lv > 0) ? `강화 +${lv}` : enhBtn.dataset.baseLabel;
 }
+/* =========================
+ * ✅ 모바일 엠블렘 시스템
+ * ========================= */
+
+// (PC와 동일) 플래티넘 7라인
+const PLAT_LINES = [
+  { label:'화', key:'화' },
+  { label:'수', key:'수' },
+  { label:'명', key:'명' },
+  { label:'암', key:'암' },
+  { label:'모속', key:'모속' },
+  { label:'힘', key:'힘' },
+  { label:'지능', key:'지능' },
+];
+
+// (PC와 동일) 슬롯별 허용 엠블렘 타입
+const SOCKET_RULES = {
+  headshoulder: ['노란빛엠블렘'],
+  belt: ['노란빛엠블렘'],
+  top: ['붉은빛엠블렘'],
+  bottom: ['붉은빛엠블렘'],
+  shoes: ['푸른빛엠블렘'],
+  bracelet: ['푸른빛엠블렘'],
+  necklace: ['녹색빛엠블렘'],
+  ring: ['녹색빛엠블렘'],
+  weapon: ['붉은빛엠블렘','노란빛엠블렘','녹색빛엠블렘','푸른빛엠블렘'],
+  sub: ['플래티넘엠블렘'],
+  // title: ['플래티넘엠블렘'], // 모바일에 칭호 슬롯 붙일 때 사용
+  earring: ['플래티넘엠블렘'],
+  magestone: ['플래티넘엠블렘'],
+};
+const SOCKET_COUNT = (slotKey) => _isSpecialSlot(slotKey) ? 1 : 2;
+
+// DBEnh.byType 준비(모바일은 init에서 CORE.lists만 있으니 여기서 그룹핑)
+const PLACEHOLDER_IMG = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+function _ensureDBEnhByType_mobile(){
+  window.DBEnh = window.DBEnh || {};
+  if (DBEnh.byType && DBEnh.__byTypeReady) return;
+
+  DBEnh.byType = {};
+  const list = (window.CORE?.lists && (CORE.lists['enh:list'] || CORE.lists.enh || CORE.lists.enhList)) || [];
+  for(const row of list){
+    const it = _normEnhItem_mobile(row);
+    const raw = it._raw || {};
+    const type = String(it.type || '').trim();
+    const name = String(it.name || '').trim();
+    if(!type || !name) continue;
+
+    // 이미지
+    const img = _normImg(row?.image ?? raw['이미지'] ?? raw.image ?? '');
+    // 플래티넘 라인 분류용(PC는 levelVal/tag를 쓰므로 여기서 하나 만들어 둠)
+    const levelVal = String(
+  row?.levelVal ??
+  row?.level ??          // ✅ CORE 경량리스트에서 '렙제'가 level로 들어오는 케이스 대응
+  raw['렙제'] ??
+  raw['태그'] ??
+  raw['tag'] ??
+  raw.level ??
+  ''
+).trim();
+
+
+    // 숫자 뱃지(이름에서 1~2자리 숫자)
+    let level_num = '';
+    const m = name.match(/(\d{1,2})/);
+    if(m) level_num = m[1];
+
+    const out = { name, type, img: img || PLACEHOLDER_IMG, levelVal, level_num, _raw: raw };
+    (DBEnh.byType[type] = DBEnh.byType[type] || []).push(out);
+  }
+  DBEnh.__byTypeReady = true;
+}
+
+// state.emblems[slot] 배열 보장
+function _ensureEmblemArray_mobile(slotKey){
+  window.state = window.state || {};
+  state.emblems = state.emblems || {};
+  const cnt = SOCKET_COUNT(slotKey);
+  if(!Array.isArray(state.emblems[slotKey])) state.emblems[slotKey] = new Array(cnt).fill(null);
+
+  // 길이 보정
+  if(state.emblems[slotKey].length !== cnt){
+    const arr = state.emblems[slotKey].slice(0, cnt);
+    while(arr.length < cnt) arr.push(null);
+    state.emblems[slotKey] = arr;
+  }
+  return state.emblems[slotKey];
+}
+
+// 상단바(엠블렘 구멍) 이미지 동기화
+function syncEmblemTopbarDots_mobile(slotKey){
+  const bar = document.getElementById('equipTopbar');
+  if(!bar) return;
+  const emblemBtn = bar.querySelector('.equip-topbtn[data-eqtab="emblem"]');
+  if(!emblemBtn) return;
+
+  const dots = emblemBtn.querySelectorAll('.top-embs .emb');
+  const arr = _ensureEmblemArray_mobile(slotKey);
+  dots.forEach((d,i)=>{
+    const picked = arr[i] || null;
+    d.classList.toggle('has-img', !!picked);
+    if(picked?.img) d.style.backgroundImage = `url("${String(picked.img).replace(/"/g,'\\"')}")`;
+    else d.style.backgroundImage = '';
+  });
+}
+
+// 장비 리스트(메인 페이지) 엠블렘 아이콘 동기화
+function syncEquipRowEmblemIcons_mobile(slotKey){
+  const row = document.querySelector(`#pageEquip .equip-row[data-slot="${slotKey}"]`);
+  if(!row) return;
+  const box = row.querySelector('.equip-emblem-icons');
+  if(!box) return;
+
+  const arr = _ensureEmblemArray_mobile(slotKey);
+  const dots = box.querySelectorAll('.emb');
+  dots.forEach((d,i)=>{
+    const picked = arr[i] || null;
+    d.classList.toggle('has-img', !!picked);
+    if(picked?.img) d.style.backgroundImage = `url("${String(picked.img).replace(/"/g,'\\"')}")`;
+    else d.style.backgroundImage = '';
+  });
+}
+
+// 모달 상단 타겟(소켓 선택 UI) 렌더
+function renderEmblemTarget_mobile(slotKey){
+  const wrap = document.getElementById('equipEmblemTarget');
+  if(!wrap) return;
+
+  const cnt = SOCKET_COUNT(slotKey);
+  const slotKo =
+    (window.EQUIP_SLOT_LABELS && EQUIP_SLOT_LABELS[slotKey]) ||
+    (document.querySelector(`#pageEquip .equip-row[data-slot="${slotKey}"] .equip-name`)?.textContent || slotKey);
+
+  state.ui = state.ui || {};
+  state.ui.emblemTarget = state.ui.emblemTarget || { slotKey, sockIndex: 0 };
+  state.ui.emblemTarget.slotKey = slotKey;
+
+  const arr = _ensureEmblemArray_mobile(slotKey);
+  const cur = Math.max(0, Math.min(cnt-1, Number(state.ui.emblemTarget.sockIndex)||0));
+  state.ui.emblemTarget.sockIndex = cur;
+
+  wrap.innerHTML = `
+    <div class="em-target-top">
+      <div class="em-slot-title">${String(slotKo).trim()} · 엠블렘</div>
+      <div class="em-sockets">
+        ${Array.from({length:cnt}).map((_,i)=>{
+          const p = arr[i];
+          const bg = p?.img ? `style="background-image:url('${String(p.img).replace(/'/g,"\\'")}')"` : '';
+          const active = (i===cur) ? 'active' : '';
+          const has = p?.img ? 'has-img' : '';
+          const num = p?.level_num ? `<span class="num">${p.level_num}</span>` : '';
+          const line = (p?.type === '플래티넘엠블렘' && p?.tag)
+  ? `<span class="em-line-badge">${String(p.tag).trim()}</span>`
+  : '';
+
+return `
+  <span class="em-sock-wrap" data-sock="${i}">
+    ${line}
+    <button type="button" class="em-sock ${active} ${has}" data-sock="${i}" ${bg}>${num}</button>
+  </span>
+`;
+
+        }).join('')}
+      </div>
+    </div>
+    <div style="font-size:12px;color:rgba(240,230,210,0.75);">
+      소켓을 눌러 대상을 바꾸고, 아래에서 엠블렘을 선택하세요.
+    </div>
+  `;
+
+  // 소켓 클릭 바인딩(한 번만)
+  if(!wrap.dataset.bound){
+    wrap.dataset.bound = '1';
+    wrap.addEventListener('click', (e)=>{
+      const b = e.target.closest('.em-sock, .em-sock-wrap');
+if(!b) return;
+const i = Number(b.dataset.sock);
+      if(!Number.isFinite(i)) return;
+      state.ui.emblemTarget.sockIndex = i;
+      renderEmblemTarget_mobile(slotKey);
+    });
+  }
+}
+
+// 모달 리스트(가로 행) 렌더
+function renderEmblemList_mobile(slotKey){
+  function _emNum(x){
+  const n = parseInt(String(x?.level_num ?? '').replace(/[^\d]/g,''), 10);
+  return Number.isFinite(n) ? n : -1;
+}
+// ✅ 내림차순: level_num 큰 것 먼저 → 이름(내림차순)
+function _sortEmblemsDesc(a, b){
+  const na = _emNum(a), nb = _emNum(b);
+  if (nb !== na) return nb - na;
+  const an = String(a?.name || '');
+  const bn = String(b?.name || '');
+  return bn.localeCompare(an, 'ko'); // name desc
+}
+
+  const listEl = document.getElementById('equipEmblemList');
+  if(!listEl) return;
+
+  const allow = SOCKET_RULES[slotKey] || [];
+  listEl.innerHTML = '';
+
+  if(!allow.length){
+    listEl.innerHTML = `<div style="color:rgba(240,230,210,0.75);padding:8px;">선택 가능한 엠블렘이 없습니다.</div>`;
+    return;
+  }
+
+  const isPlatinumOnly = (allow.length===1 && allow[0]==='플래티넘엠블렘');
+
+  const makeItemBtn = (item, isNone=false) => {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'em-item' + (isNone ? ' none' : '');
+  const img = isNone ? '' : (item?.img || PLACEHOLDER_IMG);
+  const name = isNone ? '없음' : (item?.name || '');
+  const sub  = isNone ? '선택한 소켓을 비웁니다' : (item?.type || '');
+  const badge = (!isNone && item?.level_num) ? String(item.level_num) : '';
+
+  btn.innerHTML = `
+    <div class="thumb" style="${isNone ? '' : `background-image:url('${String(img).replace(/'/g,"\\'")}')`}">
+      ${isNone ? '없음' : ''}
+    </div>
+    <div class="meta">
+      <div class="name">${name}</div>
+      <div class="sub">${sub}</div>
+    </div>
+    <div class="badge">${badge}</div>
+  `;
+  return btn;
+};
+
+  const pick = (pickedItemOrNull) => {
+    const t = state.ui?.emblemTarget || { slotKey, sockIndex:0 };
+    const sKey = t.slotKey;
+    const idx = Number(t.sockIndex)||0;
+
+    _ensureEmblemArray_mobile(sKey);
+    state.emblems[sKey][idx] = pickedItemOrNull ? {
+      name: pickedItemOrNull.name,
+      type: pickedItemOrNull.type,
+      img: pickedItemOrNull.img,
+      level_num: pickedItemOrNull.level_num,
+      tag: pickedItemOrNull.levelVal,
+    } : null;
+
+    // UI 동기화
+    syncEquipRowEmblemIcons_mobile(sKey);
+    syncEmblemTopbarDots_mobile(sKey);
+    renderEmblemTarget_mobile(sKey);
+
+    // ✅ 자동 다음 소켓으로 이동(마지막이면 닫기)
+    const cnt = SOCKET_COUNT(sKey);
+    if(idx < cnt-1){
+      state.ui.emblemTarget.sockIndex = idx + 1;
+      renderEmblemTarget_mobile(sKey);
+    }else{
+      closeEquipEmblemModal();
+    }
+  };
+
+  if(isPlatinumOnly){
+  let base = (DBEnh.byType['플래티넘엠블렘'] || []);
+  const isSpecial = _isSpecialSlot(slotKey); // sub / magestone / earring
+
+  // ✅ 특수장비: "속성 선택" → 선택한 속성의 단계(이름)만 아래에 표시
+  if(isSpecial){
+    const ui = (state.ui || (state.ui = {}));
+    const mem = (ui.emblemPlatLine || (ui.emblemPlatLine = {})); // 슬롯별 선택 기억
+    const cur = (mem[slotKey] || '').trim();
+
+    const group = document.createElement('div');
+    group.className = 'em-group';
+
+    const title = document.createElement('div');
+    title.className = 'em-group-title plat';
+    title.innerHTML = `
+      <span>플래티넘 · <b class="em-plat-cur">${cur || '선택'}</b></span>
+      <button type="button" class="em-line-btn">속성 선택</button>
+    `;
+    group.appendChild(title);
+
+    const vlist = document.createElement('div');
+    vlist.className = 'em-vlist';
+    group.appendChild(vlist);
+
+    // 속성 선택 패널(기본 숨김, 버튼 누르면 펼침)
+    const chooser = document.createElement('div');
+    chooser.className = 'em-line-choices';
+    chooser.innerHTML = (PLAT_LINES || []).map(line => {
+      const k = String(line.key || '').trim();
+      const lb = String(line.label || k);
+      return `<button type="button" class="em-line-opt" data-key="${k}">${lb}</button>`;
+    }).join('');
+    vlist.appendChild(chooser);
+
+    const setActiveChooser = () => {
+      const now = (mem[slotKey] || '').trim();
+      chooser.querySelectorAll('.em-line-opt').forEach(b=>{
+        b.classList.toggle('active', (b.dataset.key||'') === now);
+      });
+      const curEl = title.querySelector('.em-plat-cur');
+      if(curEl) curEl.textContent = now || '선택';
+    };
+
+    const renderStageList = () => {
+      // 기존 단계 버튼/힌트 제거(chooser는 유지)
+      vlist.querySelectorAll('.em-item, .em-plat-hint').forEach(el => el.remove());
+
+      setActiveChooser();
+
+      const now = (mem[slotKey] || '').trim();
+      if(!now){
+        const hint = document.createElement('div');
+        hint.className = 'em-plat-hint';
+        hint.textContent = '속성(화/수/명/암/모속/힘/지능)을 먼저 선택해주세요.';
+        vlist.appendChild(hint);
+        return;
+      }
+
+      // 해제(없음)
+      const noneBtn = document.createElement('button');
+      noneBtn.type = 'button';
+      noneBtn.className = 'em-item none';
+      noneBtn.innerHTML = `
+        <span class="thumb">없음</span>
+        <span class="meta">
+          <div class="name">없음</div>
+          <div class="sub">플래티넘엠블렘</div>
+        </span>
+        <span class="badge">해제</span>
+      `;
+      noneBtn.addEventListener('click', ()=>{
+        applyEmblem_mobile(slotKey, sockIdx, null);
+        closeEquipEmblemModal();
+      });
+      vlist.appendChild(noneBtn);
+
+      // ✅ 선택 속성과 일치하는 것만 "이름" 목록으로
+      const items = base
+        .filter(it => String((it.levelVal || '')).trim() === now)
+        .sort(_sortEmblemsDesc);
+
+      items.forEach(it=>{
+  const btn = makeItemBtn(it, false);
+  btn.addEventListener('click', ()=>pick(it)); // ✅ 선택 적용
+  vlist.appendChild(btn);
+});
+    };
+
+    // 버튼 눌러 chooser 토글
+    const btnToggle = title.querySelector('.em-line-btn');
+    if(btnToggle){
+      btnToggle.addEventListener('click', ()=>{
+        chooser.classList.toggle('show');
+      });
+    }
+
+    // chooser에서 속성 선택
+    chooser.addEventListener('click', (e)=>{
+      const b = e.target.closest('.em-line-opt');
+      if(!b) return;
+      mem[slotKey] = (b.dataset.key || '').trim();
+      chooser.classList.remove('show');
+      renderStageList();
+    });
+
+    renderStageList();
+    listEl.appendChild(group);
+    return;
+  }
+
+  // (기존) 방어구/악세 등: 화/수/명/암 그룹 표시 유지
+  const lines = PLAT_LINES.slice(0, 4);
+  const SYNS = {
+    '화': ['화','화속','화속성','불'],
+    '수': ['수','수속','수속성','물'],
+    '명': ['명','명속','명속성','빛'],
+    '암': ['암','암속','암속성','어둠'],
+    '모속': ['모속','모든속성','전속성'],
+    '힘': ['힘'],
+    '지능': ['지능'],
+  };
+
+  lines.forEach(line=>{
+    const keys = SYNS[line.key] || [line.key];
+    const group = document.createElement('div');
+    group.className = 'em-group';
+    group.innerHTML = `<div class="em-group-title">플래티넘 · ${line.label}</div>`;
+    const vlist = document.createElement('div');
+    vlist.className = 'em-vlist';
+
+    const noneBtn = document.createElement('button');
+    noneBtn.type = 'button';
+    noneBtn.className = 'em-item none';
+    noneBtn.innerHTML = `
+      <span class="thumb">없음</span>
+      <span class="meta">
+        <div class="name">없음</div>
+        <div class="sub">플래티넘엠블렘</div>
+      </span>
+      <span class="badge">해제</span>
+    `;
+    noneBtn.addEventListener('click', ()=>pick(null));
+    vlist.appendChild(noneBtn);
+
+    const filtered = base
+      .filter(x=>{
+        const lv = String(x.levelVal || '').trim();
+        return keys.some(k => lv === k);
+      })
+      .sort(_sortEmblemsDesc);
+
+    filtered.forEach(item=>{
+      vlist.appendChild(makeItemBtn(item));
+    });
+
+    group.appendChild(vlist);
+    listEl.appendChild(group);
+  });
+
+  }else{
+    const orderMap = { '붉은빛엠블렘':0, '노란빛엠블렘':1, '녹색빛엠블렘':2, '푸른빛엠블렘':3 };
+
+allow.slice().sort((a,b)=>(orderMap[a]??9)-(orderMap[b]??9)).forEach(type=>{
+  const group = document.createElement('div');
+  group.className = 'em-group';
+
+  const title = document.createElement('div');
+  title.className = 'em-group-title';
+  title.textContent = type.replace('엠블렘',''); // 보기 좋게: 붉은빛/노란빛...
+  group.appendChild(title);
+
+  const vlist = document.createElement('div');
+  vlist.className = 'em-vlist';
+
+  // ✅ 없음은 항상 맨 위
+  const noneBtn = makeItemBtn(null, true);
+  noneBtn.addEventListener('click', ()=>pick(null));
+  vlist.appendChild(noneBtn);
+
+  // ✅ 내림차순 정렬
+  const items = (DBEnh.byType[type] || []).slice().sort(_sortEmblemsDesc);
+  items.forEach(item=>{
+    const b = makeItemBtn(item, false);
+    b.addEventListener('click', ()=>pick(item));
+    vlist.appendChild(b);
+  });
+
+  group.appendChild(vlist);
+  listEl.appendChild(group);
+});
+  }
+}
+
+// 외부 진입점: 슬롯/소켓으로 엠블렘 모달 열기
+function openMobileEmblemPicker(slotKey, sockIndex=0){
+  _ensureDBEnhByType_mobile();
+
+  window.state = window.state || {};
+  state.ui = state.ui || {};
+  state.ui.emblemTarget = { slotKey, sockIndex };
+
+  // 제목
+  const titleEl = document.getElementById('equipEmblemModalTitle');
+  if(titleEl){
+    const slotKo =
+      (window.EQUIP_SLOT_LABELS && EQUIP_SLOT_LABELS[slotKey]) ||
+      (document.querySelector(`#pageEquip .equip-row[data-slot="${slotKey}"] .equip-name`)?.textContent || slotKey);
+    titleEl.textContent = `${String(slotKo).trim()} 엠블렘 선택`;
+  }
+
+  _ensureEmblemArray_mobile(slotKey);
+  renderEmblemTarget_mobile(slotKey);
+  renderEmblemList_mobile(slotKey);
+
+  openEquipEmblemModal();
+}
+
+function _shortTopbarText_mobile(s, maxLen = 7){
+  s = String(s || '').trim();
+  if(!s) return '';
+  return (s.length > maxLen) ? (s.slice(0, maxLen - 1) + '…') : s;
+}
+
+function syncSealTopbarLabel_mobile(slot){
+  const bar = document.getElementById('equipTopbar');
+  if(!bar) return;
+
+  const uBtn = bar.querySelector('.equip-topbtn[data-eqtab="seal_u"]');
+  const nBtn = bar.querySelector('.equip-topbtn[data-eqtab="seal_n"]');
+
+  if(uBtn && !uBtn.dataset.baseLabel){
+    uBtn.dataset.baseLabel = (uBtn.textContent || '고유옵션').trim();
+  }
+  if(nBtn && !nBtn.dataset.baseLabel){
+    nBtn.dataset.baseLabel = (nBtn.textContent || '일반옵션').trim();
+  }
+
+  const uName = window.state?.seals?.[slot]?.unique?.name
+    ? String(window.state.seals[slot].unique.name).trim()
+    : '';
+  const nName = window.state?.seals?.[slot]?.general1?.name
+    ? String(window.state.seals[slot].general1.name).trim()
+    : '';
+
+  if(uBtn) uBtn.textContent = uName ? _shortTopbarText_mobile(uName) : uBtn.dataset.baseLabel;
+  if(nBtn) nBtn.textContent = nName ? _shortTopbarText_mobile(nName) : nBtn.dataset.baseLabel;
+}
+
+function syncEnchantTopbarLabel_mobile(slot){
+  const bar = document.getElementById('equipTopbar');
+  if(!bar) return;
+
+  const btn = bar.querySelector('.equip-topbtn[data-eqtab="enchant"]');
+  if(!btn) return;
+
+  if(!btn.dataset.baseLabel){
+    btn.dataset.baseLabel = (btn.textContent || '마법부여').trim();
+  }
+
+  const name = window.state?.enchants?.[slot]?.name
+    ? String(window.state.enchants[slot].name).trim()
+    : '';
+
+  btn.textContent = name ? _shortTopbarText_mobile(name) : btn.dataset.baseLabel;
+}
+
+
 
 
     function setEquipTopbarSlot(slot) {
@@ -2616,6 +3698,10 @@ function syncEnhTopbarLabel_mobile(slot){
       // ✅ 추가: 현재 슬롯의 강화 수치로 '강화 버튼 텍스트' 갱신
 syncEnhTopbarLabel_mobile(slot);
 
+// ✅ 추가: 현재 슬롯의 고유/일반 선택값으로 상단 버튼 텍스트 갱신
+syncSealTopbarLabel_mobile(slot);
+syncEnchantTopbarLabel_mobile(slot);
+
       // ✅ 엠블렘 구멍 개수: 특수장비(보조/마법석/귀걸이)=1개, 그 외=2개
       const emblemBtn = bar.querySelector('.equip-topbtn[data-eqtab="emblem"]');
       if (emblemBtn) {
@@ -2625,6 +3711,8 @@ syncEnhTopbarLabel_mobile(slot);
         ${Array.from({ length: cnt }).map(() => `<span class="emb"></span>`).join('')}
       </span>
     `;
+    // 구멍 만든 직후, 현재 선택된 엠블렘 이미지 반영
+    syncEmblemTopbarDots_mobile(slot);
       }
 
       // (선택) 현재 슬롯 저장해두면 나중에 탭 클릭 시 분기하기 편함
@@ -2676,10 +3764,22 @@ syncEnhTopbarLabel_mobile(slot);
   await initMobileAllLightListsOnce(); // ✅ 경량리스트 보장
   renderMobileSealNormalList(slot);    // ✅ 일반옵션 모달 오픈 + 목록 렌더
   return;
-}
+} else if (tab === 'enchant') {
+  const slot = window.state?.ui?.equipPickerSlot;
+  if(!slot) { toast('슬롯 정보가 없습니다.'); return; }
 
-        else if (tab === 'enchant') toast('마법부여 선택은 다음 단계에서 연결합니다.');
-        else if (tab === 'emblem') toast('엠블렘 선택은 다음 단계에서 연결합니다.');
+  initMobileAllLightListsOnce().then(()=>{
+    renderMobileEnchantList(slot);
+  });
+  return;
+} else if (tab === 'emblem') {
+  const slot = window.state?.ui?.equipPickerSlot;
+  if (!slot) { toast('슬롯 정보가 없습니다.'); return; }
+
+  await initMobileAllLightListsOnce(); // 경량리스트 보장
+  openMobileEmblemPicker(slot, 0);     // ✅ 엠블렘 모달 오픈
+  return;
+}
       });
     })();
 
