@@ -631,6 +631,7 @@
 #equipSealNModal { z-index: 1110; }
 #equipEnchantModal { z-index: 1120; }
 #equipEmblemModal { z-index: 1130; }
+#equipGrindModal { z-index: 1108; }
 
 
 /* ✅ (PC와 유사한 리스트 스타일) 강화 + 마법봉인(고유/일반) + 마법부여 공통 */
@@ -639,7 +640,8 @@
 #equipSealNModal .dialog,
 #equipEnchantModal .dialog,
 /* ✅ 추가 */
-#equipEmblemModal .dialog{
+#equipEmblemModal .dialog,
+#equipGrindModal .dialog{
   width: min(320px, 95vw);
   height: min(520px, 85vh);
 }
@@ -649,7 +651,8 @@
 #equipEnhModal .enh-list,
 #equipSealUModal .enh-list,
 #equipSealNModal .enh-list,
-#equipEnchantModal .enh-list{
+#equipEnchantModal .enh-list,
+#equipGrindModal .enh-list{
   overflow: auto;
   padding: 10px;
   display: grid;
@@ -661,7 +664,8 @@
 #equipEnhModal .enh-option,
 #equipSealUModal .enh-option,
 #equipSealNModal .enh-option,
-#equipEnchantModal .enh-btn{
+#equipEnchantModal .enh-btn,
+#equipGrindModal .enh-option{
   height: 36px;
   padding: 0 12px;
   text-align: left;
@@ -676,7 +680,8 @@
 #equipEnhModal .enh-option.active,
 #equipSealUModal .enh-option.active,
 #equipSealNModal .enh-option.active,
-#equipEnchantModal .enh-btn.active{
+#equipEnchantModal .enh-btn.active,
+#equipGrindModal .enh-option.active{
   border-color: rgba(207,162,79,0.9);
   box-shadow: 0 0 0 2px rgba(207,162,79,0.18) inset;
 }
@@ -1158,6 +1163,49 @@
   box-shadow: 0 0 0 1px rgba(255,220,140,0.25) inset;
 }
 
+/* 무기 종류 필터 바 (equipModal 안) */
+.weapon-typebar{
+  display:none;                 /* 기본 숨김, 무기에서만 show */
+  gap: 8px;
+
+  /* ✅ 높이(세로) 키우기 */
+  padding: 12px 12px 12px 12px;
+  min-height: 56px;
+  align-items: center;
+
+  /* ✅ 종류가 많으면 2줄로 내려가게 (영역이 더 넓어 보임) */
+  display: flex;
+  flex-wrap: wrap;
+
+  /* ✅ 너무 많아져도 모달을 침범하지 않게 제한 */
+  max-height: 92px;
+  overflow-y: auto;
+
+  /* 스크롤바 숨김(스크롤은 유지) */
+  scrollbar-width: none;        /* firefox */
+  -ms-overflow-style: none;     /* ie/edge */
+}
+.weapon-typebar::-webkit-scrollbar{ width:0; height:0; }
+
+.weapon-typebtn{
+  flex: 0 0 auto;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color: rgba(233,238,247,.92);
+  border-radius: 999px;
+  padding: 9px 12px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.weapon-typebtn.active{
+  background: rgba(37,99,235,.35);
+  border-color: rgba(37,99,235,.55);
+}
+
 
     /* ✅ 장비 선택 모달만: 상단(헤더+버튼바) 고정, 목록만 스크롤 */
     #equipModal .dialog {
@@ -1299,7 +1347,8 @@
 #equipEnhList,
 #equipSealUList,
 #equipSealNList,
-#equipEnchantList{
+#equipEnchantList,
+#equipGrindList{
   overflow: auto;                 /* 스크롤은 가능해야 손으로 밀림 */
   -webkit-overflow-scrolling: touch; /* iOS 관성 스크롤 */
   scrollbar-width: none;          /* Firefox: 스크롤바 숨김 */
@@ -1312,7 +1361,8 @@ dialog,
 #equipSealUModal .dialog,
 #equipSealNModal .dialog,
 #equipEnchantModal .dialog,
-#equipEmblemModal .dialog{
+#equipEmblemModal .dialog,
+#equipGrindModal .dialog{
   overflow: hidden;
   display: flex;            /* ✅ 추가 */
   flex-direction: column;   /* ✅ 추가 */
@@ -1323,7 +1373,8 @@ dialog,
 #equipSealUModal .items,
 #equipSealNModal .items,
 #equipEnchantModal .items,
-#equipEmblemModal .items{
+#equipEmblemModal .items,
+#equipGrindModal .items{
   flex: 1 1 auto;     /* ✅ 추가 */
   min-height: 0;      /* ✅ 핵심: flex 환경에서 내부 overflow가 작동하려면 필요 */
   overflow: hidden;   /* ✅ dialog은 숨기고, 실제 스크롤은 리스트에서만 */
@@ -1335,7 +1386,8 @@ dialog,
 #equipSealUList,
 #equipSealNList,
 #equipEnchantList,
-#equipEmblemList{
+#equipEmblemList,
+#equipGrindList{
   height: 100%;                 /* ✅ 추가: items 높이를 꽉 채움 */
   overflow: auto;
   overflow-x: hidden;           /* ✅ 가로 스크롤 방지 */
@@ -1351,7 +1403,8 @@ dialog,
 #equipSealUList::-webkit-scrollbar,
 #equipSealNList::-webkit-scrollbar,
 #equipEnchantList::-webkit-scrollbar,
-#equipEmblemList::-webkit-scrollbar{
+#equipEmblemList::-webkit-scrollbar,
+#equipGrindList::-webkit-scrollbar{
   width: 0;
   height: 0;
   display: none;
@@ -1542,6 +1595,23 @@ dialog,
     </div>
   </div>
 </div>
+
+<!-- ✅ (방법B) 연마 선택 2중 모달 -->
+<div id="equipGrindModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-equip-grind-close></div>
+
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="equipGrindModalTitle">
+    <header>
+      <h2 id="equipGrindModalTitle">연마 선택</h2>
+      <button type="button" class="close" data-equip-grind-close>✕</button>
+    </header>
+
+    <div class="items">
+      <div id="equipGrindList" class="enh-list"></div>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -1814,7 +1884,7 @@ dialog,
                         <div class="equip-col-title">엠블렘</div>
                         <div class="equip-emblem-icons">
                           <span class="emb"></span><span class="emb"></span>
-                          < </div>
+                           </div>
                         </div>
                       </div>
                   </button>
@@ -2486,8 +2556,89 @@ dialog,
     function _equipListKey(slot) {
       return `${slot}:list`;
     }
+function _baseJG_mobile(s){
+  s = String(s || '').trim();
+  // 괄호 안 옵션 제거(예: 거너(남) -> 거너)
+  return s.replace(/\(.*?\)/g, '').trim();
+}
+
+function _jgMatches_mobile(a, b){
+  a = String(a || '').trim();
+  b = String(b || '').trim();
+  if(!a || !b) return true;
+
+  const aa = _baseJG_mobile(a);
+  const bb = _baseJG_mobile(b);
+
+  return (
+    a === b ||
+    aa === bb ||
+    a.includes(b) || b.includes(a) ||
+    aa.includes(bb) || bb.includes(aa)
+  );
+}
+
+function _getEquipJobGroup_mobile(it){
+  // 데이터 키가 뭐든 최대한 잡아내기
+  return String(_pick(it, ['jobGroup','직업군','group','job_group','직업군(필터)']) || '').trim();
+}
+
+function _getWeaponType_mobile(it){
+  // 무기 "종류" 컬럼(예: 소검/대검/권총 등) 최대한 잡아내기
+  return String(_pick(it, ['type','종류','weaponType','무기종류','kind']) || '').trim();
+}
+
+function _ensureWeaponTypeBar_mobile(){
+  let bar = document.getElementById('weaponTypeBar');
+  if(bar) return bar;
+
+  const dialog = document.querySelector('#equipModal .dialog');
+  const catalog = document.getElementById('equipCatalog');
+  if(!dialog || !catalog) return null;
+
+  bar = document.createElement('div');
+  bar.id = 'weaponTypeBar';
+  bar.className = 'weapon-typebar';
+
+  // equipCatalog 바로 위(=모달 안, 목록 위)에 끼워넣기
+  dialog.insertBefore(bar, catalog);
+  return bar;
+}
+
+function _hideWeaponTypeBar_mobile(){
+  const bar = document.getElementById('weaponTypeBar');
+  if(!bar) return;
+  bar.style.display = 'none';
+  bar.innerHTML = '';
+}
+
+function renderWeaponTypeBar_mobile(types, activeType, onPick){
+  const bar = _ensureWeaponTypeBar_mobile();
+  if(!bar) return;
+
+  if(!Array.isArray(types) || types.length === 0){
+    _hideWeaponTypeBar_mobile();
+    return;
+  }
+
+  bar.style.display = 'flex';
+  bar.innerHTML = '';
+
+  // ✅ '전체' 없음: types만 렌더
+  types.forEach(t=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'weapon-typebtn';
+    b.textContent = t;
+    if(t === activeType) b.classList.add('active');
+    b.addEventListener('click', ()=>onPick(t));
+    bar.appendChild(b);
+  });
+}
 
     function closeEquipModal() {
+        _hideWeaponTypeBar_mobile();
+
   closeEquipEnhModal();
   closeEquipSealUModal();
   closeEquipSealNModal();
@@ -2586,6 +2737,7 @@ dialog,
       }
       _syncEnhLabelFromState_mobile(slot);
       _syncSealLabelFromState_mobile(slot);
+      _syncGrindLabelFromState_mobile(slot);
     }
 
     // ===== Enhancement Picker (Mobile) =====
@@ -2627,7 +2779,7 @@ dialog,
     function _syncEnhLabelFromState_mobile(slot) {
       const row = document.querySelector(`#pageEquip .equip-row[data-slot="${slot}"]`);
       if (!row) return;
-      const el = row.querySelector('.equip-enh-val'); // 모바일 UI에 존재 :contentReference[oaicite:5]{index=5}
+      const el = row.querySelector('.equip-enh-val'); // 모바일 UI에 존재 
       if (!el) return;
 
       const info = window.state?.enh?.[slot];
@@ -2682,6 +2834,127 @@ function closeEquipEmblemModal(){
     if (e.target?.closest?.('[data-equip-enh-close]')) return closeEquipEnhModal();
   });
 })();
+function _grindTypeForSlot_mobile(slot){
+  return (slot === 'weapon') ? '무기연마' : '보조장비연마';
+}
+
+function _getGrindLevelFromName(name){
+  const m = String(name || '').match(/^(\d+)연마$/);
+  return m ? Number(m[1]) : 0;
+}
+
+function _syncGrindLabelFromState_mobile(slot){
+  const row = document.querySelector(`#pageEquip .equip-row[data-slot="${slot}"]`);
+  if(!row) return;
+
+  const el = row.querySelector('.equip-grind');
+  if(!el) return;
+
+  const slotKey = (slot === 'weapon') ? 'weapon' : (slot === 'sub') ? 'sub' : '';
+  const name = slotKey && window.state?.refines?.[slotKey]?.name ? String(window.state.refines[slotKey].name) : '';
+  const lv = _getGrindLevelFromName(name);
+
+  el.textContent = (lv > 0) ? `연마 ${lv}` : '연마 -';
+}
+
+function syncGrindTopbarLabel_mobile(slot){
+  const bar = document.getElementById('equipTopbar');
+  if(!bar) return;
+
+  const btn = bar.querySelector('.equip-topbtn[data-eqtab="grind"]');
+  if(!btn) return;
+
+  const slotKey = (slot === 'weapon') ? 'weapon' : (slot === 'sub') ? 'sub' : '';
+  const name = slotKey && window.state?.refines?.[slotKey]?.name ? String(window.state.refines[slotKey].name) : '';
+  const lv = _getGrindLevelFromName(name);
+
+  btn.textContent = (lv > 0) ? `연마 ${lv}` : '연마';
+}
+
+function renderMobileGrindList(slot){
+  bindEquipGrindModalCloseOnce();
+
+  const title = document.getElementById('equipGrindModalTitle');
+  if(title){
+    const slotName = (slot === 'weapon') ? '무기' : '보조장비';
+title.textContent = `${slotName} 연마 선택`;
+  }
+
+  const listEl = document.getElementById('equipGrindList');
+  if(!listEl) return;
+
+  const labels = ['연마없음','1연마','2연마','3연마','4연마','5연마','6연마','7연마','8연마','9연마'];
+  const slotKey = (slot === 'weapon') ? 'weapon' : 'sub';
+
+  const curName = window.state?.refines?.[slotKey]?.name ? String(window.state.refines[slotKey].name) : '연마없음';
+
+  listEl.innerHTML = '';
+  labels.forEach(name=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'enh-option';
+    b.textContent = (name === '연마없음') ? '없음' : name;
+
+    if(String(name) === curName) b.classList.add('active');
+
+    b.addEventListener('click', ()=>{
+      window.state = window.state || {};
+      window.state.refines = window.state.refines || {};
+
+      const refineType = _grindTypeForSlot_mobile(slot);
+      const level = _getGrindLevelFromName(name);
+
+      window.state.refines[slotKey] = { name, refineType, level };
+
+      _syncGrindLabelFromState_mobile(slot);
+      syncGrindTopbarLabel_mobile(slot);
+
+      showEquipGrindModal(false);
+      toast(level > 0 ? `연마 ${level} 적용` : '연마 해제');
+    });
+
+    listEl.appendChild(b);
+  });
+
+  showEquipGrindModal(true);
+}
+
+function openMobileGrindPicker(){
+  const slot = window.state?.ui?.equipPickerSlot;
+  if(!slot){ toast('슬롯 정보가 없습니다.'); return; }
+
+  if(!(slot === 'weapon' || slot === 'sub')){
+    toast('이 슬롯은 연마를 지원하지 않습니다.');
+    return;
+  }
+
+  renderMobileGrindList(slot);
+}
+
+
+function showEquipGrindModal(on){
+  const m = document.getElementById('equipGrindModal');
+  if(!m) return;
+  if(on){
+    m.classList.add('show');
+    m.setAttribute('aria-hidden','false');
+  }else{
+    m.classList.remove('show');
+    m.setAttribute('aria-hidden','true');
+  }
+}
+
+function bindEquipGrindModalCloseOnce(){
+  const m = document.getElementById('equipGrindModal');
+  if(!m || m.dataset.bound) return;
+  m.dataset.bound = '1';
+
+  m.addEventListener('click', (e)=>{
+    if(e.target?.dataset?.equipGrindClose != null){
+      showEquipGrindModal(false);
+    }
+  });
+}
 
 // =========================
 // ✅ 마법봉인(고유/일반) 2중모달
@@ -3684,11 +3957,14 @@ function syncEnchantTopbarLabel_mobile(slot){
       const bar = document.getElementById('equipTopbar');
       if (!bar) return;
 
-      // ✅ 보조장비(sub)에서만 연마 버튼 노출
-      const grindBtn = bar.querySelector('.equip-topbtn[data-eqtab="grind"]');
-      if (grindBtn) {
-        grindBtn.style.display = (slot === 'sub') ? '' : 'none';
-      }
+      // ✅ 연마 탭: data-grind="1" 인 슬롯에서만 노출 (무기/보조장비)
+const grindBtn = bar.querySelector('.equip-topbtn[data-eqtab="grind"]');
+if(grindBtn){
+  const row = document.querySelector(`#pageEquip .equip-row[data-slot="${slot}"]`);
+  const canGrind = !!(row && row.dataset.grind === '1');
+  grindBtn.style.display = canGrind ? '' : 'none';
+  if(canGrind) syncGrindTopbarLabel_mobile(slot);
+}
 
       // active 기본은 강화
       bar.querySelectorAll('.equip-topbtn').forEach(b => {
@@ -3737,7 +4013,7 @@ syncEnchantTopbarLabel_mobile(slot);
 
         // ✅ 강화 탭: enhList 버튼 목록 보여주기
         if (tab === 'enh') {
-          const slot = window.state?.ui?.equipPickerSlot; // setEquipTopbarSlot에서 저장 :contentReference[oaicite:2]{index=2}
+          const slot = window.state?.ui?.equipPickerSlot; // setEquipTopbarSlot에서 저장
           if (!slot) {
             toast('슬롯 정보가 없습니다.');
             return;
@@ -3748,7 +4024,10 @@ syncEnchantTopbarLabel_mobile(slot);
         }
 
         // 나머지는 일단 기존대로 토스트
-        if (tab === 'grind') toast('연마 선택은 다음 단계에서 연결합니다.');
+        if (tab === 'grind') { 
+  openMobileGrindPicker(); 
+  return; 
+}
         else if (tab === 'seal_u') {
   const slot = window.state?.ui?.equipPickerSlot; // ✅ setEquipTopbarSlot에서 저장한 슬롯
   if (!slot) { toast('슬롯 정보가 없습니다.'); return; }
@@ -3786,11 +4065,95 @@ syncEnchantTopbarLabel_mobile(slot);
 
 
     async function openEquipPicker(slot) {
-      // 무기는 다음 단계
-      if (slot === 'weapon') {
-        toast('무기 선택은 다음 단계에서 연결합니다.');
-        return;
-      }
+      // ✅ 무기 선택(캐릭터 직업군 + 무기종류 필터 반영)
+if (slot === 'weapon') {
+  _hideWeaponTypeBar_mobile();
+  await initMobileAllLightListsOnce(); // 경량리스트 보장
+
+  // 1) 현재 선택 캐릭터 직업군 확보 (프로젝트 내 상태키가 다를 수 있어 방어적으로)
+  const ch = window.state?.currentCharacter || window.state?.char || window.state?.pickedChar || null;
+const jobGroup = _getCharJobGroup(ch) || '';
+  if (!jobGroup) {
+    toast('캐릭터를 먼저 선택해주세요.');
+    return;
+  }
+
+  // 2) 무기 리스트 가져오기
+  //    - 직업군별로 따로 내려주는 키가 있으면 그걸 우선
+  //    - 없으면 weapon:list 전체에서 jobGroup으로 필터
+  const keyByJob = `weapon:${jobGroup}:list`;
+  const byJob = window.CORE?.lists?.[keyByJob];
+  let items = Array.isArray(byJob) ? byJob.slice() : (window.CORE?.lists?.['weapon:list'] || []).slice();
+
+  // 직업군별 키가 없어서 전체 weapon:list를 쓰는 경우만 jobGroup 필터
+  if (!Array.isArray(byJob)) {
+    const base = _baseJG_mobile(jobGroup);
+items = items.filter(it => _jgMatches_mobile(_getEquipJobGroup_mobile(it), jobGroup));
+  }
+
+  // 3) 무기종류 탭(버튼) 구성 + 선택 시 목록 갱신
+const baseItems = items.slice();
+
+// 직업군에 해당하는 무기들에서 "종류" 목록 뽑기
+let types = Array.from(new Set(
+  baseItems.map(it => _getWeaponType_mobile(it)).filter(Boolean)
+));
+
+// 보기 좋게 정렬(원하면 제거 가능)
+types.sort((a,b)=> String(a).localeCompare(String(b), 'ko-KR'));
+
+// state.ui 준비
+window.state = window.state || {};
+window.state.ui = window.state.ui || {};
+
+let activeType = String(window.state.ui.weaponType || '전체').trim() || '전체';
+if (activeType !== '전체' && !types.includes(activeType)) activeType = '전체';
+window.state.ui.weaponType = activeType;
+
+// ✅ 탭 클릭 시: active 갱신 + 목록 재렌더
+const onPickType = (t) => {
+  t = String(t || '전체').trim() || '전체';
+  window.state.ui.weaponType = t;
+
+  // 탭 active 다시 그리기
+  renderWeaponTypeBar_mobile(types, t, onPickType);
+
+  // 목록 필터링 후 다시 렌더
+  let filtered = baseItems;
+  if (t !== '전체') filtered = baseItems.filter(it => _getWeaponType_mobile(it) === t);
+
+  const catalog = document.getElementById('equipCatalog');
+  if (!filtered.length) {
+    toast('표시할 무기 목록이 없습니다.');
+    if (catalog) {
+      catalog.innerHTML = `<div style="padding:14px 16px; color:#c7b589;">표시할 무기 목록이 없습니다.</div>`;
+    }
+    return;
+  }
+  renderMobileEquipList('weapon', filtered);
+};
+
+// 최초 1회 탭 렌더
+renderWeaponTypeBar_mobile(types, activeType, onPickType);
+
+// 최초 진입 시 현재 선택 타입으로 필터 적용
+items = baseItems;
+if (activeType !== '전체') {
+  items = baseItems.filter(it => _getWeaponType_mobile(it) === activeType);
+}
+
+
+  if (!items.length) {
+    toast('표시할 무기 목록이 없습니다.');
+    return;
+  }
+
+  setEquipTopbarSlot(slot);
+  renderMobileEquipList(slot, items);
+  openEquipModal();
+  return;
+}
+
 
       // init에서 경량리스트 전부 받기
       await initMobileAllLightListsOnce();
