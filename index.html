@@ -8336,6 +8336,15 @@ $uniqueEffectModal?.querySelectorAll('[data-close]').forEach(el => {
     }
   }
 
+  // ★ G-2 롤링썬더 ↔ G-3 랩터 상호배제: 이미 다른 쪽에 SP/TP가 투자되어 있으면 증가 차단
+if (isRollingRaptorGroupedSkill(s)) {
+  const other = pickedOtherRollingRaptorExcept(s);
+  if (other) {
+    alert(`G-2 롤링썬더와 G-3 랩터는 동시에 사용할 수 없습니다.\n\n현재 [${other.name}]에 SP 또는 TP가 투자되어 있습니다.`);
+    return;
+  }
+}
+
   const need = perSp * delta;
   if (!canSpendSp(need)) return;
   state.skillLv[s.id] = target;
@@ -8347,6 +8356,10 @@ $uniqueEffectModal?.querySelectorAll('[data-close]').forEach(el => {
             state.skillLv[s.id] = target;
             //onSkillTreeChanged();
           }
+          // ★ 메카닉(여) 전용: G 마그네틱 ↔ 싱크로 : 코로나 SP 연동
+if (isMagneticCoronaLinkedSkill(s)) {
+  syncMagneticCoronaSpFrom(s);
+}
         };
         const getTp = s => {
           if (state.skillTpLv[s.id] === undefined) state.skillTpLv[s.id] = TP_MIN;
@@ -8368,6 +8381,15 @@ $uniqueEffectModal?.querySelectorAll('[data-close]').forEach(el => {
     }
   }
 
+  // ★ G-2 롤링썬더 ↔ G-3 랩터 상호배제: 다른 쪽에 SP/TP가 투자되어 있으면 TP 증가 차단
+if (isRollingRaptorGroupedSkill(s)) {
+  const other = pickedOtherRollingRaptorExcept(s);
+  if (other) {
+    alert(`G-2 롤링썬더와 G-3 랩터는 동시에 사용할 수 없습니다.\n현재 [${other.name}]에 SP 또는 TP가 투자되어 있습니다.`);
+    return;
+  }
+}
+
   const need = (target - cur) * unit;
   if (!canSpendTp(need)) return;
   state.skillTpLv[s.id] = target;
@@ -8378,6 +8400,10 @@ $uniqueEffectModal?.querySelectorAll('[data-close]').forEach(el => {
           } else {
             state.skillTpLv[s.id] = target;
           }
+          // ★ 메카닉(여) 전용: G 마그네틱 ↔ 싱크로 : 코로나 TP 연동
+if (isMagneticCoronaLinkedSkill(s)) {
+  syncMagneticCoronaTpFrom(s);
+}
         };
 
 // ===== 메카닉(여) 전용: G-4 호넷 → G 풀 블룸 자동 연동 =====
@@ -8454,6 +8480,86 @@ function isFalconGroupedSkill(s) {
           .find(sk => sk.id === id);
 }
 
+// ===== 메카닉(여) 전용: G 마그네틱 ↔ 싱크로 : 코로나 SP/TP 연동 =====
+let gMagneticSkill = null;        // 'G 마그네틱'
+let syncroCoronaSkill = null;     // '싱크로 : 코로나'
+let gMagneticSpanCur = null;
+let gMagneticSpanTp  = null;
+let syncroCoronaSpanCur = null;
+let syncroCoronaSpanTp  = null;
+
+function isMagneticCoronaLinkedSkill(s) {
+  if (!s) return false;
+  const id = s.id;
+  return !![gMagneticSkill, syncroCoronaSkill]
+    .filter(Boolean)
+    .find(sk => sk.id === id);
+}
+
+// SP 연동: 한 쪽을 올리거나 내리면 다른 쪽 SP 레벨도 동일하게 맞춤 (SP 소모/환급은 1회만 발생)
+function syncMagneticCoronaSpFrom(srcSkill) {
+  if (!gMagneticSkill || !syncroCoronaSkill) return;
+  if (!srcSkill) return;
+
+  const srcId = srcSkill.id;
+  const other = (gMagneticSkill && srcId === gMagneticSkill.id) ? syncroCoronaSkill : gMagneticSkill;
+  if (!other) return;
+
+  const lv = Number(state.skillLv?.[srcId] ?? 0) || 0;
+  const newLv = clampSkill(other, lv);
+  state.skillLv[other.id] = newLv;
+
+  if (other.id === gMagneticSkill.id && gMagneticSpanCur) gMagneticSpanCur.textContent = String(newLv);
+  if (other.id === syncroCoronaSkill.id && syncroCoronaSpanCur) syncroCoronaSpanCur.textContent = String(newLv);
+}
+
+// TP 연동: 한 쪽을 올리거나 내리면 다른 쪽 TP 레벨도 동일하게 맞춤 (TP 소모/환급은 1회만 발생)
+function syncMagneticCoronaTpFrom(srcSkill) {
+  if (!gMagneticSkill || !syncroCoronaSkill) return;
+  if (!srcSkill) return;
+
+  const srcId = srcSkill.id;
+  const other = (gMagneticSkill && srcId === gMagneticSkill.id) ? syncroCoronaSkill : gMagneticSkill;
+  if (!other) return;
+
+  const tp = Number(state.skillTpLv?.[srcId] ?? 0) || 0;
+  const newTp = clampTp(tp);
+  state.skillTpLv[other.id] = newTp;
+
+  if (other.id === gMagneticSkill.id && gMagneticSpanTp) gMagneticSpanTp.textContent = String(newTp);
+  if (other.id === syncroCoronaSkill.id && syncroCoronaSpanTp) syncroCoronaSpanTp.textContent = String(newTp);
+}
+
+// ===== 메카닉(여) 전용: G-2 롤링썬더 ↔ G-3 랩터 상호배제 =====
+let mechRollingSkill = null;  // 'G-2 롤링썬더'
+let mechRaptorSkill  = null;  // 'G-3 랩터'
+
+// 현재 (롤링/랩터) 2종 중 '나(sTry)'를 제외하고 이미 투자된(SP>0 또는 TP>0) 스킬이 있는지 검사
+function pickedOtherRollingRaptorExcept(sTry) {
+  const curMap = state.skillLv || {};
+  const tpMap  = state.skillTpLv || {};
+  const group  = [mechRollingSkill, mechRaptorSkill].filter(Boolean);
+
+  for (const sk of group) {
+    if (!sk) continue;
+    if (sTry && sk.id === sTry.id) continue;
+
+    const lv = Number(curMap[sk.id] ?? 0) || 0;
+    const tp = Number(tpMap[sk.id] ?? 0) || 0;
+
+    if (lv > 0 || tp > 0) return sk;   // 이미 다른 쪽에 투자됨
+  }
+  return null;
+}
+
+function isRollingRaptorGroupedSkill(s) {
+  if (!s) return false;
+  const id = s.id;
+  return !![mechRollingSkill, mechRaptorSkill]
+    .filter(Boolean)
+    .find(sk => sk.id === id);
+}
+
 
         let hurricaneSkill = null;
 let deathHurricaneSkill = null;
@@ -8499,12 +8605,22 @@ const isFalconInsert = (keyName === skillNameKey('인서트 : 팔콘') || keyNam
 const isGspCorona    = (keyName === skillNameKey('G-SP 팔콘(코로나 폼)'));
 const isGspRolling   = (keyName === skillNameKey('G-SP 팔콘(롤링 썬더 폼)'));
 const isGspRaptor    = (keyName === skillNameKey('G-SP 팔콘(랩터 폼)'));
+const isMechRolling = (keyName === skillNameKey('G-2 롤링썬더'));
+const isMechRaptor  = (keyName === skillNameKey('G-3 랩터'));
+const isGMagnetic = (keyName === skillNameKey('G 마그네틱') || keyName === skillNameKey('G-마그네틱') || keyName === skillNameKey('G - 마그네틱') || keyName === skillNameKey('G- 마그네틱'));
+const isSyncroCorona = (keyName === skillNameKey('싱크로 : 코로나') || keyName === skillNameKey('싱크로: 코로나') || keyName === skillNameKey('싱크로:코로나') || keyName === skillNameKey('싱크로 :코로나'));
+
+
 
 if (isFalconInsert) falconInsertSkill = s;
 if (isGspCorona)    gspFalconCorona   = s;
 if (isGspRolling)   gspFalconRolling  = s;
 if (isGspRaptor)    gspFalconRaptor   = s;
+if (isMechRolling)  mechRollingSkill = s;
+if (isMechRaptor)   mechRaptorSkill  = s;
 
+if (isGMagnetic)    gMagneticSkill = s;
+if (isSyncroCorona) syncroCoronaSkill = s;
 
 if (isLowKick) lowKickSkill = s;
 if (isBoneCrusher) boneCrusherSkill = s;
@@ -8524,6 +8640,14 @@ if (isFullBloom) fullBloomSkill = s;
 
             if (isFullBloom) {
               fullBloomSpanCur = spanCur;
+            }
+
+            if (isGMagnetic) {
+              gMagneticSpanCur = spanCur;
+            }
+
+            if (isSyncroCorona) {
+              syncroCoronaSpanCur = spanCur;
             }
 
 
@@ -8570,6 +8694,8 @@ if (isFullBloom) fullBloomSkill = s;
             // const spanCur = document.createElement('span'); spanCur.className = 'cur';
             const spanSep = document.createElement('span'); spanSep.className = 'sep'; spanSep.textContent = '│';
             const spanTp = document.createElement('span'); spanTp.className = 'tp';
+            if (isGMagnetic) gMagneticSpanTp = spanTp;
+            if (isSyncroCorona) syncroCoronaSpanTp = spanTp;
             // ✅ 이 스킬이 TP를 쓸 수 있는지 여부
             const hasTp = (s.tpCost || 0) > 0;
 
