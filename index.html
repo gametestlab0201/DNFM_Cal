@@ -4588,6 +4588,28 @@
     white-space: nowrap;   /* 줄바꿈 방지 (좁은 화면에서 줄바꿈 허용하려면 지우기) */
   }
 
+  /* 워리어 와일드베인: 스킬트리(2안) 선택 모달 */
+.wb-tree-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+.wb-tree-btn{
+  height:44px;
+  border-radius:12px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  font-weight:800;
+  cursor:pointer;
+}
+.wb-tree-btn.wb-active{
+  background:#111827;
+  color:#fff;
+  border-color:#111827;
+}
+
+
   /* 화면이 아주 좁을 때는 세로로 쌓기 (선택) */
   @media (max-width: 420px){
     .sign-row{ flex-direction: column; gap: 6px; }
@@ -5560,6 +5582,34 @@
         </div>
       </div>
     </div>
+
+    <!-- ▼ 워리어 와일드베인: 스킬트리 2안 선택 모달 -->
+<div id="wildbaneTreeModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-close></div>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="wbTreeTitle"
+    style="width:min(520px,92vw);">
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <h2 id="wbTreeTitle" style="margin:0;">스킬트리 선택</h2>
+      <button class="close" data-close style="font-size:18px;">✕</button>
+    </header>
+
+    <div class="items" style="padding:14px 14px 6px;">
+      <div style="font-size:13px;color:#6b7280;line-height:1.45;">
+        워리어 와일드베인은 <b>스킬을 직접 찍을 수 없고</b>, 정형화된 2가지 스킬트리 중 하나를 선택합니다.
+      </div>
+
+      <div class="wb-tree-grid">
+        <button type="button" class="wb-tree-btn" data-wb-tree="파파초">파파초</button>
+        <button type="button" class="wb-tree-btn" data-wb-tree="파빨초">파빨초</button>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button id="btnWildbaneTreeApply" class="st-apply-btn" type="button" style="padding:12px 26px;">선택하기</button>
+    </div>
+  </div>
+</div>
+
 
     <!-- ▼ 성안의 봉인 모달 -->
     <div id="castleSealModal" class="modal simple-modal" aria-hidden="true">
@@ -8911,6 +8961,55 @@ if (isFullBloom) fullBloomSkill = s;
         }
       }
 
+      // 워리어 와일드베인: 스킬트리 2안(파파초/빨파초) 선택 모달
+const openWildbaneTreeModal = () => {
+  const wbModal = document.getElementById('wildbaneTreeModal');
+  if (!wbModal) return false;
+
+  state.wildbaneTreePreset = state.wildbaneTreePreset || '파파초';
+  state._wbTreeTemp = state.wildbaneTreePreset;
+
+  wbModal.querySelectorAll('[data-wb-tree]').forEach(btn => {
+    btn.classList.toggle('wb-active', btn.dataset.wbTree === state._wbTreeTemp);
+  });
+
+  wbModal.classList.add('show');
+  wbModal.setAttribute('aria-hidden', 'false');
+  return true;
+};
+
+(() => {
+  const wbModal = document.getElementById('wildbaneTreeModal');
+  if (!wbModal) return;
+
+  const close = () => {
+    wbModal.classList.remove('show');
+    wbModal.setAttribute('aria-hidden', 'true');
+  };
+
+  // 닫기(배경/✕)
+  wbModal.querySelectorAll('[data-close]').forEach(el => {
+    el.addEventListener('click', close);
+  });
+
+  // 옵션 선택(버튼 클릭)
+  wbModal.querySelectorAll('[data-wb-tree]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state._wbTreeTemp = btn.dataset.wbTree || '파파초';
+      wbModal.querySelectorAll('[data-wb-tree]').forEach(b2 => {
+        b2.classList.toggle('wb-active', b2.dataset.wbTree === state._wbTreeTemp);
+      });
+    });
+  });
+
+  // 선택 확정
+  document.getElementById('btnWildbaneTreeApply')?.addEventListener('click', () => {
+    state.wildbaneTreePreset = state._wbTreeTemp || state.wildbaneTreePreset || '파파초';
+    close();
+  });
+})();
+
+
 
       /* ESC로 닫기(선택 사항) */
       document.addEventListener('keydown', (e) => {
@@ -8955,6 +9054,13 @@ if (isFullBloom) fullBloomSkill = s;
           alert('스킬트리를 보려면 먼저 캐릭터를 선택해 주세요.');
           return;
         }
+        // ✅ 워리어 와일드베인: 스킬을 직접 찍는 스킬트리가 아니라,
+//    정형화된 2개 스킬트리(파파초 / 빨파초) 중 하나를 고르는 모달을 띄운다.
+if (ownerKey === '워리어와일드베인') {
+  openWildbaneTreeModal();
+  return;
+}
+
 
 
         // 🔁 캐릭터가 바뀐 경우: 스킬트리 상태만 초기화 (SP/TP는 캐릭터 선택 시 값 유지)
@@ -9364,9 +9470,12 @@ if (isFullBloom) fullBloomSkill = s;
             //try { await recalcAndRenderPanel(); } catch (_) { }
             ownerKey = String(state?.CurrentSumStats?.ownerKey || '').trim();
           }
-          const j = await apiJSON('skill_uses', {
-            ownerKey, window: getTimeKey()
-          });
+          const payload = { ownerKey, window: getTimeKey() };
+if (ownerKey === '워리어와일드베인') {
+  payload.wildbaneTreePreset = state.wildbaneTreePreset || '파파초';
+}
+const j = await apiJSON('skill_uses', payload);
+
 
           if (j?.ok) {
             // ① 원본 uses를 보관 (평타/연결평타 포함)
