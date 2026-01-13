@@ -4594,6 +4594,7 @@
   grid-template-columns:1fr 1fr;
   gap:10px;
   margin-top:10px;
+  margin-bottom:4px;  /* ✅ 사이클 입력이 바로 아래 붙도록 */
 }
 .wb-tree-btn{
   height:44px;
@@ -4604,10 +4605,68 @@
   cursor:pointer;
 }
 .wb-tree-btn.wb-active{
-  background:#111827;
+  /* ✅ 선택 강조: 노란색 테두리 */
+  border-color:#facc15;                 /* 노란색 */
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.35) inset;
+
+  /* 배경/글자색은 취향대로: '테두리만 노랗게'를 원하면 아래 2줄은 지워도 됨 */
+  background: rgba(250, 204, 21, 0.10);
   color:#fff;
-  border-color:#111827;
 }
+
+/* 워리어 와일드베인: 사이클 횟수 입력 UI (pretty ver.) */
+.wb-cycle-wrap{
+  /* ✅ 큰 상자 제거 + 버튼 바로 아래 붙이기 */
+  margin-top: 2px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+
+.wb-cycle-label{
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: -0.2px;
+  color: #fff;                  /* ✅ 텍스트 색 변경 */
+  text-shadow: 0 1px 0 rgba(0,0,0,0.25);
+  text-align: center;           /* ✅ 가운데 정렬 */
+}
+
+.wb-cycle-row{
+  display: flex;
+  align-items: center;
+  justify-content: center;      /* ✅ 가운데 정렬 */
+  gap: 10px;
+}
+
+.wb-cycle-input{
+  width: 120px;                 /* ✅ 가로 길이 줄이기 (원하면 100~160 조절) */
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(250, 204, 21, 0.45);
+  background: rgba(17,24,39,0.75);
+  color: #fff;
+  text-align: center;           /* ✅ 숫자 가운데 정렬 */
+  font-size: 15px;
+  font-weight: 900;
+  outline: none;
+}
+
+.wb-cycle-input::placeholder{
+  color: rgba(255,255,255,0.55);
+}
+
+.wb-cycle-input:focus{
+  border-color: rgba(250, 204, 21, 0.95);
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.28);
+}
+
 
 
   /* 화면이 아주 좁을 때는 세로로 쌓기 (선택) */
@@ -5593,16 +5652,33 @@
       <button class="close" data-close style="font-size:18px;">✕</button>
     </header>
 
-    <div class="items" style="padding:14px 14px 6px;">
+    <div class="items" style="padding:14px;">
       <div style="font-size:13px;color:#6b7280;line-height:1.45;">
-        워리어 와일드베인은 <b>스킬을 직접 찍을 수 없고</b>, 정형화된 2가지 스킬트리 중 하나를 선택합니다.
+        워리어 와일드베인은 <b>스킬을 직접 찍을 수 없고</b>,<br>
+        정형화된 2가지 스킬트리 중 하나를 선택합니다.<br><br><br>
+        현재 와일드베인 캐릭터는 다른 캐릭터와 버프 적용 방식이 상이하고,<br>
+        독립적인 딜 구조를 가지고 있습니다.<br>
+        또한 일부 버그로 인해 캐릭터 간, 스킬트리 간 계산 정확도에 차이가 발생할 수 있으므로,<br>
+        타 캐릭터와의 데미지 직접 비교는 <b>지양</b>해 주시고,<br>
+        동일한 스킬트리내에서 아이템 세팅용으로 사용하시기 바랍니다.<br><br>
+        추후 리뉴얼이 진행되면 <b>보다 정확한 와일드베인 계산기</b>로 찾아뵙겠습니다.
       </div>
 
-      <div class="wb-tree-grid">
-        <button type="button" class="wb-tree-btn" data-wb-tree="파파초">파파초</button>
-        <button type="button" class="wb-tree-btn" data-wb-tree="파빨초">파빨초</button>
-      </div>
+  <div class="wb-tree-grid">
+    <button type="button" class="wb-tree-btn" data-wb-tree="파파초">파파초</button>
+    <button type="button" class="wb-tree-btn" data-wb-tree="파빨초">파빨초</button>
+  </div>
+
+  <!-- ✅ 사이클 횟수 입력 (추후 백엔드 uses 계산에 활용) -->
+  <div class="wb-cycle-wrap">
+    <div class="wb-cycle-label">사이클 횟수 직접 입력</div>
+    <div class="wb-cycle-row">
+      <input id="wbCycleCount" class="wb-cycle-input"
+             type="number" inputmode="numeric"
+             min="0" step="1" value="0" placeholder="0">
     </div>
+  </div>
+</div>
 
     <div class="modal-foot">
       <button id="btnWildbaneTreeApply" class="st-apply-btn" type="button" style="padding:12px 26px;">선택하기</button>
@@ -8966,6 +9042,7 @@ const openWildbaneTreeModal = () => {
   const wbModal = document.getElementById('wildbaneTreeModal');
   if (!wbModal) return false;
 
+  // ✅ 스킬트리
   state.wildbaneTreePreset = state.wildbaneTreePreset || '파파초';
   state._wbTreeTemp = state.wildbaneTreePreset;
 
@@ -8973,10 +9050,25 @@ const openWildbaneTreeModal = () => {
     btn.classList.toggle('wb-active', btn.dataset.wbTree === state._wbTreeTemp);
   });
 
+// ✅ 사이클 입력(임시값) - 체크박스 제거 버전
+state.wildbaneCycleCount = Number.isFinite(+state.wildbaneCycleCount)
+  ? Math.max(0, Math.floor(+state.wildbaneCycleCount))
+  : 0;
+
+// enabled는 UI 없이 "값이 있으면 true"로만 유지(백엔드에서 필요하면 사용)
+state.wildbaneCycleEnabled = state.wildbaneCycleCount > 0;
+
+state._wbCycleCountTemp = state.wildbaneCycleCount;
+state._wbCycleEnabledTemp = state.wildbaneCycleEnabled;
+
+const inp = wbModal.querySelector('#wbCycleCount');
+if (inp) inp.value = String(state._wbCycleCountTemp ?? 0);
+
   wbModal.classList.add('show');
   wbModal.setAttribute('aria-hidden', 'false');
   return true;
 };
+
 
 (() => {
   const wbModal = document.getElementById('wildbaneTreeModal');
@@ -9002,11 +9094,28 @@ const openWildbaneTreeModal = () => {
     });
   });
 
-  // 선택 확정
-  document.getElementById('btnWildbaneTreeApply')?.addEventListener('click', () => {
-    state.wildbaneTreePreset = state._wbTreeTemp || state.wildbaneTreePreset || '파파초';
-    close();
+// ✅ 사이클 입력(숫자) 변경 시 임시값 갱신 (체크박스 제거 버전)
+const inp = wbModal.querySelector('#wbCycleCount');
+
+if (inp) {
+  inp.addEventListener('input', () => {
+    const v = Math.floor(Number(inp.value || 0));
+    state._wbCycleCountTemp = Math.max(0, isFinite(v) ? v : 0);
+    state._wbCycleEnabledTemp = state._wbCycleCountTemp > 0; // count 기반
   });
+}
+
+// 선택 확정
+document.getElementById('btnWildbaneTreeApply')?.addEventListener('click', () => {
+  state.wildbaneTreePreset = state._wbTreeTemp || state.wildbaneTreePreset || '파파초';
+
+// ✅ 사이클 입력 확정 (체크박스 제거 버전)
+state.wildbaneCycleCount = Math.max(0, Math.floor(Number(state._wbCycleCountTemp || 0)));
+state.wildbaneCycleEnabled = state.wildbaneCycleCount > 0;
+
+  close();
+});
+
 })();
 
 
@@ -9471,10 +9580,18 @@ if (ownerKey === '워리어와일드베인') {
             ownerKey = String(state?.CurrentSumStats?.ownerKey || '').trim();
           }
           const payload = { ownerKey, window: getTimeKey() };
+
 if (ownerKey === '워리어와일드베인') {
   payload.wildbaneTreePreset = state.wildbaneTreePreset || '파파초';
+
+  // ✅ 사이클 횟수(프론트 입력값)도 같이 보냄
+  const cc = Math.max(0, Math.floor(Number(state.wildbaneCycleCount || 0)));
+  payload.wildbaneCycleCount = cc;
+  payload.wildbaneCycleEnabled = (cc > 0); // 체크박스 없으니 0이면 false
 }
+
 const j = await apiJSON('skill_uses', payload);
+
 
 
           if (j?.ok) {
