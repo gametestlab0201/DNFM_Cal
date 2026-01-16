@@ -4754,11 +4754,11 @@
                 <ul class="notice-list">
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li> 
-                  <li>01.05 <span class="notice-badge">'다크랜서'</span> 캐릭 추가</li>
                   <li>01.09 <span class="notice-badge">'여메카닉'</span> 캐릭 추가</li>
                   <li>01.11 <span class="notice-badge">'다크템플러'</span> 캐릭 추가</li>
                   <li>01.13 <span class="notice-badge">'와일드베인'</span> 캐릭 추가</li>
                   <li>01.15 <span class="notice-badge">'여크루세이더'</span> 캐릭 추가</li>
+                  <li>01.16 <span class="notice-badge">'남크루세이더'</span> 캐릭 추가</li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -5686,6 +5686,54 @@
   </div>
 </div>
 
+<!-- ▼ 워리어 윈드시어: 스킬트리 3안 선택 모달 -->
+<div id="windshearTreeModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-close></div>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="wsTreeTitle"
+    style="width:min(520px,92vw);">
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <h2 id="wsTreeTitle" style="margin:0;">스킬트리 선택</h2>
+      <button class="close" data-close style="font-size:18px;">✕</button>
+    </header>
+
+    <div class="items" style="padding:14px;">
+      <div style="font-size:13px;color:#fff;line-height:1.45;">
+        워리어 윈드시어는 <b>스킬을 직접 찍을 수 없고</b>,<br>
+        정형화된 3가지 스킬트리 중 하나를 선택 한 뒤 <b>사이클 횟수</b>를 넣어주세요.<br><br>
+        현재 윈드시어 캐릭터는 다른 캐릭터와 버프 적용 방식이 상이하고,<br>
+        독립적인 딜 구조를 가지고 있습니다.<br>
+        또한 일부 버그로 인해 캐릭터 간, 스킬트리 간 계산 정확도에 차이가 발생할 수 있으므로,<br>
+        타 캐릭터와의 데미지 직접 비교는 <b>지양</b>해 주시고,<br>
+        동일한 스킬트리내에서 아이템 세팅용으로 사용하시기 바랍니다.<br><br>
+        추후 리뉴얼이 진행되면 <b>보다 정확한 윈드시어 계산기</b>로 찾아뵙겠습니다.
+      </div>
+
+      <div style="height:10px;"></div>
+
+      <!-- ✅ 버튼 3개 (라벨/값은 원하는대로 교체) -->
+      <div class="wb-tree-grid">
+        <button type="button" class="wb-tree-btn" data-ws-tree="A">파파파파빨</button>
+        <button type="button" class="wb-tree-btn" data-ws-tree="B">초초초초파파빨</button>
+        <button type="button" class="wb-tree-btn" data-ws-tree="C">파파파초빨</button>
+      </div>
+
+      <!-- ✅ 사이클 횟수 입력: 와일드베인과 동일 -->
+      <div class="wb-cycle-wrap">
+        <div class="wb-cycle-label">사이클 횟수 직접 입력</div>
+        <div class="wb-cycle-row">
+          <input id="wsCycleCount" class="wb-cycle-input"
+                 type="number" inputmode="numeric"
+                 min="0" step="1" value="0">
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button id="btnWindshearTreeApply" class="st-apply-btn" style="width:100%;">설정 하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
     <!-- ▼ 성안의 봉인 모달 -->
     <div id="castleSealModal" class="modal simple-modal" aria-hidden="true">
@@ -6078,6 +6126,7 @@
 
         <div class="patch-log-body">
           <ul class="patch-log-list notice-list">
+            <li>26.01.16 <span class="notice-badge">'남크루세이더'</span> 캐릭 추가</li>
             <li>26.01.15 <span class="notice-badge">'여크루세이더'</span> 캐릭 추가</li>
             <li>26.01.13 <span class="notice-badge">'와일드베인'</span> 캐릭 추가</li>
             <li>26.01.11 <span class="notice-badge">'다크템플러'</span> 캐릭 추가</li>
@@ -9071,6 +9120,37 @@ if (inp) inp.value = String(state._wbCycleCountTemp ?? 0);
   return true;
 };
 
+// 워리어 윈드시어: 스킬트리 3안 선택 모달
+const openWindshearTreeModal = () => {
+  const wsModal = document.getElementById('windshearTreeModal');
+  if (!wsModal) return false;
+
+  // ✅ 기본값
+  state.windshearTreePreset = state.windshearTreePreset || 'A';
+
+  // 버튼 활성화 표시
+  wsModal.querySelectorAll('[data-ws-tree]').forEach(b2 => {
+    b2.classList.toggle('wb-active', b2.dataset.wsTree === state.windshearTreePreset);
+  });
+
+  // ✅ 사이클 값 보정(와일드베인과 동일한 정책)
+  state.windshearCycleCount = Number.isFinite(+state.windshearCycleCount)
+    ? Math.max(0, Math.floor(+state.windshearCycleCount))
+    : 0;
+
+  state.windshearCycleEnabled = state.windshearCycleCount > 0;
+
+  state._wsCycleCountTemp = state.windshearCycleCount;
+  state._wsCycleEnabledTemp = state.windshearCycleEnabled;
+
+  const inp = wsModal.querySelector('#wsCycleCount');
+  if (inp) inp.value = String(state._wsCycleCountTemp ?? 0);
+
+  wsModal.classList.add('show');
+  wsModal.setAttribute('aria-hidden', 'false');
+  return true;
+};
+
 
 (() => {
   const wbModal = document.getElementById('wildbaneTreeModal');
@@ -9120,6 +9200,50 @@ state.wildbaneCycleEnabled = state.wildbaneCycleCount > 0;
 
 })();
 
+(() => {
+  const wsModal = document.getElementById('windshearTreeModal');
+  if (!wsModal) return;
+
+  const close = () => {
+    wsModal.classList.remove('show');
+    wsModal.setAttribute('aria-hidden', 'true');
+  };
+
+  // 닫기(배경/✕)
+  wsModal.querySelectorAll('[data-close]').forEach(el => {
+    el.addEventListener('click', close);
+  });
+
+  // 옵션 선택(버튼 클릭)
+  wsModal.querySelectorAll('[data-ws-tree]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state._wsTreeTemp = btn.dataset.wsTree || 'A';
+      wsModal.querySelectorAll('[data-ws-tree]').forEach(b2 => {
+        b2.classList.toggle('wb-active', b2.dataset.wsTree === state._wsTreeTemp);
+      });
+    });
+  });
+
+  // ✅ 사이클 입력(숫자) 변경 시 임시값 갱신
+  const inp = wsModal.querySelector('#wsCycleCount');
+  if (inp) {
+    inp.addEventListener('input', () => {
+      const v = Math.floor(Number(inp.value || 0));
+      state._wsCycleCountTemp = Math.max(0, isFinite(v) ? v : 0);
+      state._wsCycleEnabledTemp = state._wsCycleCountTemp > 0;
+    });
+  }
+
+  // 선택 확정
+  document.getElementById('btnWindshearTreeApply')?.addEventListener('click', () => {
+    state.windshearTreePreset = state._wsTreeTemp || state.windshearTreePreset || 'A';
+
+    state.windshearCycleCount = Math.max(0, Math.floor(Number(state._wsCycleCountTemp || 0)));
+    state.windshearCycleEnabled = state.windshearCycleCount > 0;
+
+    close();
+  });
+})();
 
 
       /* ESC로 닫기(선택 사항) */
@@ -9171,7 +9295,11 @@ if (ownerKey === '워리어와일드베인') {
   openWildbaneTreeModal();
   return;
 }
-
+// ✅ 워리어 윈드시어: 와일드베인과 동일한 형태의 전용 선택 모달을 띄운다.
+if (ownerKey === '워리어윈드시어') {
+  openWindshearTreeModal();
+  return;
+}
 
 
         // 🔁 캐릭터가 바뀐 경우: 스킬트리 상태만 초기화 (SP/TP는 캐릭터 선택 시 값 유지)
