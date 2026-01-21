@@ -519,7 +519,7 @@
       background: rgba(110, 168, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 18px;
-      padding: 12px 16px;
+      padding: 12px 44px;
       display: flex;
       justify-content: flex-start;
       /* ← 왼쪽 정렬 */
@@ -529,6 +529,7 @@
       /* -6 ~ -20px 등으로 조절 */
       z-index: 2;
       /* 겹칠 때 위에 보이게 */
+      overflow: hidden;        /* ✅ 박스 밖으로 삐져나오면 숨김 */
     }
 
     /* 가운데 캐릭터 아래에 오는 프리셋 버튼들 정렬 */
@@ -639,6 +640,80 @@
       opacity: 1;
       pointer-events: auto;
     }
+
+/* ✅ 프리셋 슬롯 페이지 화살표(박스 안쪽 좌/우) */
+.save-box .preset-page-btn{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+
+  /* 보기 좋은 반투명 글래스 느낌 */
+  background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+
+  color: rgba(255,255,255,0.92);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 5;              /* ✅ 슬롯 위로 */
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  transition: transform .15s ease, filter .15s ease, opacity .15s ease, background .15s ease;
+}
+
+/* ✅ 박스 안쪽 끝에 “붙여넣기” */
+.save-box .preset-page-btn.prev{ left: 8px; }
+.save-box .preset-page-btn.next{ right: 8px; }
+
+/* hover / active */
+.save-box .preset-page-btn:hover{
+  filter: brightness(1.08);
+  transform: translateY(-50%) scale(1.04);
+}
+.save-box .preset-page-btn:active{
+  transform: translateY(-50%) scale(0.96);
+  filter: brightness(0.98);
+}
+
+/* disabled */
+.save-box .preset-page-btn:disabled{
+  opacity: 0.28;
+  cursor: default;
+  filter: none;
+  transform: translateY(-50%);
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* 페이지 표시(1/2) - 가운데 아래, 예쁘게 */
+.save-box .preset-page-ind{
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.80);
+  pointer-events: none;
+  display: none; /* JS에서 필요할 때 켬 */
+}
+
 
 
     .save-box button:disabled {
@@ -4993,6 +5068,9 @@
             <button type="button" class="preset-btn" data-slot="10">+</button>
             <button type="button" class="preset-trash" data-slot="10" aria-label="슬롯 10 초기화">🗑</button>
           </div>
+          <button type="button" class="preset-page-btn prev" id="presetPagePrev" aria-label="이전 저장슬롯 페이지">‹</button>
+<button type="button" class="preset-page-btn next" id="presetPageNext" aria-label="다음 저장슬롯 페이지">›</button>
+<div class="preset-page-ind" id="presetPageInd" aria-hidden="true"></div>
         </div>
 
       </div>
@@ -6299,7 +6377,7 @@
 
         // 1순위: 계산기목록 시트의 '슬롯' 컬럼 값
         if (typeof info.presetSlots === 'number' && info.presetSlots >= 0) {
-          return Math.max(0, Math.min(10, info.presetSlots));
+          return Math.max(0, Math.min(20, info.presetSlots));
         }
 
         // 2순위: 기존 직책별 기본값 (백워드 호환용)
@@ -6338,7 +6416,7 @@ if (data && data.withdrawn) {
 
             // ★ 백엔드에서 내려준 사용자별 프리셋 슬롯 수
             const slots = (typeof data.presetSlots === 'number' && data.presetSlots >= 0)
-              ? Math.min(10, data.presetSlots)        // 0~10 사이로 클램프
+              ? Math.min(20, data.presetSlots)        // 0~10 사이로 클램프
               : 0;
 
             // 🔹 전역 직책/슬롯 상태 저장
@@ -16862,6 +16940,60 @@ function getCurrentSetSummaryFromPreview() {
         // slot 번호별 메타: { slot, label, meta, savedAt }
         data: {}
       };
+      // ✅ 프리셋 슬롯 페이징(10개씩, 최대 20슬롯)
+const PRESET_UI_TOTAL = 20;
+const PRESET_UI_PER_PAGE = 10;
+let presetPage = 0; // 0=1페이지(1~10), 1=2페이지(11~20)
+
+function getPresetMaxPage(maxSlot){
+  const total = Math.max(0, Math.min(PRESET_UI_TOTAL, Number(maxSlot||0)));
+  return Math.max(0, Math.ceil(total / PRESET_UI_PER_PAGE) - 1);
+}
+
+function applyPresetPageToDom(){
+  const base = presetPage * PRESET_UI_PER_PAGE;
+  const wraps = document.querySelectorAll('.save-box .preset-slot');
+  wraps.forEach((wrap, i) => {
+    const n = base + i + 1;
+    const btn = wrap.querySelector('.preset-btn');
+    const trash = wrap.querySelector('.preset-trash');
+    if (btn) btn.dataset.slot = String(n);
+    if (trash){
+      trash.dataset.slot = String(n);
+      trash.setAttribute('aria-label', `슬롯 ${n} 초기화`);
+    }
+  });
+}
+
+function updatePresetPagerUI(maxSlot){
+  const prev = document.getElementById('presetPagePrev');
+  const next = document.getElementById('presetPageNext');
+  const ind  = document.getElementById('presetPageInd');
+
+  const maxPage = getPresetMaxPage(maxSlot);
+
+  if (prev) prev.disabled = (presetPage <= 0);
+  if (next) next.disabled = (presetPage >= maxPage);
+
+  if (ind){
+    if (maxPage <= 0){
+      ind.style.display = 'none';
+      ind.textContent = '';
+    } else {
+      ind.style.display = 'block';
+      ind.textContent = `${presetPage + 1}/${maxPage + 1}`;
+    }
+  }
+}
+
+function setPresetPage(p){
+  const maxSlot = getUserPresetLimit();
+  const maxPage = getPresetMaxPage(maxSlot);
+  presetPage = Math.max(0, Math.min(maxPage, (p|0)));
+  applyPresetPageToDom();
+  updatePresetButtonsUI();
+}
+
 
       // ★ 슬롯 기본 라벨 백업 (나중에 리셋용)
       const SLOT_BASE_LABELS = {};
@@ -16875,45 +17007,56 @@ function getCurrentSetSummaryFromPreview() {
 
       // 슬롯 버튼 UI(테두리/툴팁) 갱신
       function updatePresetButtonsUI() {
-        const btns = document.querySelectorAll('.save-box .preset-btn[data-slot]');
-        const maxSlot = getUserPresetLimit();   // 🔹 직책별 사용 가능 최대 슬롯 수
+  const maxSlot = getUserPresetLimit();   // 🔹 직책별 사용 가능 최대 슬롯 수
 
-        btns.forEach((btn) => {
-          const slotStr = btn.dataset.slot;
-          const slotNum = Number(slotStr || '0');
-          const info = presetSlots.data[slotStr];
+  // ✅ 페이지가 허용 범위를 벗어나면 보정
+  const maxPage = getPresetMaxPage(maxSlot);
+  if (presetPage > maxPage) presetPage = maxPage;
 
-          const meta = info && info.meta ? info.meta : null;
-          const isAllowed = slotNum > 0 && slotNum <= maxSlot;
+  // ✅ 현재 페이지에 맞춰 data-slot을 1~10 또는 11~20으로 갱신
+  applyPresetPageToDom();
 
-          // 🔹 직책에 따라 enable/disable
-          btn.disabled = !isAllowed;
+  // 이제 버튼 조회(갱신된 data-slot 기준)
+  const btns = document.querySelectorAll('.save-box .preset-btn[data-slot]');
 
-          if (info) {
-            btn.classList.add('has-data');
-            const label = info.label || '';
-            const charName = info.meta?.charName || '';
-            btn.title = label || charName || `슬롯 ${slotNum}`;
-            // 🔹 저장된 캐릭터 썸네일을 버튼 배경으로 사용
-            const thumb = meta && meta.thumb ? meta.thumb : '';
-            if (thumb) {
-              btn.style.backgroundImage = `url("${thumb}")`;
-              btn.textContent = '';      // 이미지만 보이게 ➜ 플러스 문자 제거
-            } else {
-              // 메타는 있지만 썸네일이 없으면 그냥 기본 버튼처럼
-              btn.style.backgroundImage = '';
-              btn.textContent = '+';     // 플러스 표시 유지
-            }
-          } else {
-            btn.classList.remove('has-data');
-            btn.style.backgroundImage = '';
-            btn.textContent = '+';       // 항상 플러스 표시
-            btn.title = isAllowed
-              ? `슬롯 ${slotNum}`
-              : `게임실험연구소 멤버십 업그레이드가 필요합니다!`;
-          }
-        });
+  btns.forEach((btn) => {
+    const slotStr = btn.dataset.slot;
+    const slotNum = Number(slotStr || '0');
+    const info = presetSlots.data[slotStr];
+
+    const meta = info && info.meta ? info.meta : null;
+    const isAllowed = slotNum > 0 && slotNum <= maxSlot;
+
+    btn.disabled = !isAllowed;
+
+    if (info) {
+      btn.classList.add('has-data');
+      const label = info.label || '';
+      const charName = info.meta?.charName || '';
+      btn.title = label || charName || `슬롯 ${slotNum}`;
+
+      const thumb = meta && meta.thumb ? meta.thumb : '';
+      if (thumb) {
+        btn.style.backgroundImage = `url("${thumb}")`;
+        btn.textContent = '';
+      } else {
+        btn.style.backgroundImage = '';
+        btn.textContent = '+';
       }
+    } else {
+      btn.classList.remove('has-data');
+      btn.style.backgroundImage = '';
+      btn.textContent = '+';
+      btn.title = isAllowed
+        ? `슬롯 ${slotNum}`
+        : `게임실험연구소 멤버십 업그레이드가 필요합니다!`;
+    }
+  });
+
+  // ✅ 화살표/페이지 표시 업데이트
+  updatePresetPagerUI(maxSlot);
+}
+
 
       // 현재 프론트 state 전체를 스냅샷으로 만들어서 서버에 보낼 객체로 반환
       function buildFrontPresetState() {
@@ -17752,15 +17895,15 @@ function getCurrentSetSummaryFromPreview() {
       (function initPresetUI() {
         // 슬롯 버튼 클릭 → 모달 오픈
         document
-          .querySelectorAll('.save-box button[data-slot]')
-          .forEach((btn) => {
-            btn.addEventListener('click', () => {
-              if (btn.disabled) return;            // 🔹 직책 제한: 비활성 슬롯은 무시
-              const slot = Number(btn.dataset.slot || '0');
-              if (!slot) return;
-              openPresetModal(slot);
-            });
-          });
+  .querySelectorAll('.save-box .preset-btn[data-slot]')
+  .forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      const slot = Number(btn.dataset.slot || '0');
+      if (!slot) return;
+      openPresetModal(slot);
+    });
+  });
 
         // 휴지통 버튼 클릭 → 슬롯 초기화
         document
@@ -17795,7 +17938,11 @@ function getCurrentSetSummaryFromPreview() {
         document.getElementById('btnPresetLoad')?.addEventListener('click', () => {
           handlePresetLoad();   // ✅ 파라미터 없이
         });
+        // ✅ 페이지 버튼
+document.getElementById('presetPagePrev')?.addEventListener('click', () => setPresetPage(presetPage - 1));
+document.getElementById('presetPageNext')?.addEventListener('click', () => setPresetPage(presetPage + 1));
 
+applyPresetPageToDom();
         // 페이지 로딩 시 서버에 있는 프리셋 메타 동기화
         refreshPresetSlotsFromServer();
       })();
@@ -18863,18 +19010,21 @@ if (btnM) {
 
             let messages = (data.items || [])
               .filter(x => {
-                const pos = (x.position || '').trim();
-                const msg = (x.message || '').trim();
-                return !!msg && /^(수석|책임)/.test(pos);
-              })
-              .map(x => {
-                const pos = (x.position || '').trim();
-                const nick = (x.ingame || '').trim() || (x.youtube || '').trim();
-                const msg = (x.message || '').trim();
-                const isSenior = /^수석/.test(pos);
-                const roleBadge = isSenior
-                  ? '<span class="tag tag-senior" aria-label="수석" title="수석"><span class="badge-emoji">👑</span></span>'
-                  : '<span class="tag-lead" aria-hidden="true"></span>';
+  const pos = (x.position || '').trim();
+  const pos0 = pos.replace(/^\[이벤트\]\s*/, '');
+  const msg = (x.message || '').trim();
+  return !!msg && /^(수석|책임)/.test(pos0);
+})
+.map(x => {
+  const pos = (x.position || '').trim();
+  const pos0 = pos.replace(/^\[이벤트\]\s*/, '');
+  const nick = (x.ingame || '').trim() || (x.youtube || '').trim();
+  const msg = (x.message || '').trim();
+
+  const isSenior = /^수석/.test(pos0); // ✅ 이벤트 수석도 수석 처리
+  const roleBadge = isSenior
+    ? '<span class="tag tag-senior" aria-label="수석" title="수석"><span class="badge-emoji">👑</span></span>'
+    : '<span class="tag-lead" aria-hidden="true"></span>';
 
                 return `
       <span class="hdrmsg ${isSenior ? 'senior' : 'lead'}">
