@@ -578,7 +578,35 @@
       border-radius: 50%;
       border: 1px solid rgba(255, 255, 255, 0.16);
       background: rgba(0, 0, 0, 0.20);
+        background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;     /* ✅ 이상한 타일/크롭 방지 */
     }
+
+    #pageEquip .equip-emblem-icons .emb,
+#equipModal .equip-topbtn .top-embs .emb{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: 10px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.95);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.75);
+}
+
+/* ✅ 특수장비(플래티넘) 엠블렘 속성 텍스트(미리보기) */
+#pageEquip .equip-emblem-desc{
+  margin-top: 4px;
+  font-size: 10.5px;
+  font-weight: 850;
+  color: rgba(233, 238, 247, 0.70);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#pageEquip .equip-emblem-desc:empty{ display:none; }
+
 
     /* ===== Equip list (Modal) ===== */
     .meq-wrap {
@@ -1002,7 +1030,11 @@
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: 14px;
   background: rgba(0,0,0,0.18);
-  overflow: hidden;
+
+  /* ✅ 잘림 방지 */
+  overflow: visible;
+  height: auto;
+  max-height: none;
 }
 
 .em-group-title{
@@ -1272,6 +1304,9 @@
       border: 1px solid rgba(255, 255, 255, 0.18);
       background: rgba(0, 0, 0, 0.22);
       display: block;
+        background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;     /* ✅ */
     }
 
 
@@ -2696,7 +2731,14 @@ function renderWeaponTypeBar_mobile(types, activeType, onPick){
           window.state.equips = window.state.equips || {};
           window.state.equips[slot] = it;
 
-          applyPickedEquipUI(slot, it);
+          
+          // ✅ PC판과 동일한 스냅샷 구조(state.selections)도 함께 유지
+          window.state.selections = window.state.selections || {};
+          window.state.selections[slot] = {
+            name: String((it && (it.name || it['이름'])) || '').trim(),
+            code: (it && (it.code || it['코드'])) || '',
+          };
+applyPickedEquipUI(slot, it);
           closeEquipModal();
         });
 
@@ -2764,17 +2806,25 @@ function renderWeaponTypeBar_mobile(types, activeType, onPick){
     }
 
     function _normEnhItem_mobile(row) {
-      const raw = row?._raw || row || {};
-      const name = String(row?.name ?? raw['이름'] ?? raw.name ?? '').trim();
-      const type = String(row?.type ?? raw['종류'] ?? raw.type ?? '').trim();
+  const raw = row?._raw || row || {};
 
-      const lv =
-        Number.isFinite(Number(row?.level)) ? Number(row.level) :
-          Number.isFinite(Number(raw['강화'])) ? Number(raw['강화']) :
-            _parseEnhLevel_mobile(name);
+  // ✅ 빈 문자열('')도 fallback 되도록 || 체인 사용
+  const name =
+    String(row?.name || '').trim() ||
+    String(raw['이름'] || raw.name || raw.title || '').trim();
 
-      return { name, type, level: lv, _raw: raw };
-    }
+  const type =
+    String(row?.type || '').trim() ||
+    String(raw['종류'] || raw.type || raw.category || '').trim();
+
+  const lv =
+    Number.isFinite(Number(row?.level)) ? Number(row.level) :
+    Number.isFinite(Number(raw['강화'])) ? Number(raw['강화']) :
+    _parseEnhLevel_mobile(name);
+
+  return { name, type, level: lv, _raw: raw };
+}
+
 
     function _syncEnhLabelFromState_mobile(slot) {
       const row = document.querySelector(`#pageEquip .equip-row[data-slot="${slot}"]`);
@@ -3072,11 +3122,16 @@ function _syncSealLabelFromState_mobile(slot){
   const uEl = row.querySelector('.equip-unique');
   const nEl = row.querySelector('.equip-normal');
 
-  const uName = window.state?.seals?.[slot]?.unique?.name ? String(window.state.seals[slot].unique.name).trim() : '';
-  const nName = window.state?.seals?.[slot]?.general1?.name ? String(window.state.seals[slot].general1.name).trim() : '';
+  const uName = window.state?.seals?.[slot]?.unique?.name
+    ? String(window.state.seals[slot].unique.name).trim()
+    : '';
+  const nName = window.state?.seals?.[slot]?.general1?.name
+    ? String(window.state.seals[slot].general1.name).trim()
+    : '';
 
-  if(uEl) uEl.textContent = `고유옵션 ${uName || '-'}`;
-  if(nEl) nEl.textContent = `일반옵션 ${nName || '-'}`;
+  // ✅ 라벨 대신 "선택값" 자체를 표시
+  if(uEl) uEl.textContent = uName ? uName : '고유옵션';
+  if(nEl) nEl.textContent = nName ? nName : '일반옵션';
 }
 
 function _syncEnchantLabelFromState_mobile(slot){
@@ -3273,14 +3328,27 @@ function _enchantTypeForSlot_mobile(slot){
 }
 
 function normalizeEnchantType_mobile(t){
-  const s = String(t || '').replace(/\s+/g,'').trim();
+  const raw = String(t ?? '');
+  // 공백/하이픈/괄호 제거로 최대한 표준화
+  const s = raw.replace(/\s+|-/g, '').replace(/[()]/g, '').trim();
   if(!s) return '';
-  // 이미 "무기마부" 같이 들어오는 경우 그대로 사용
-  if(s.endsWith('마부')) return s;
 
-  // 혹시 "무기마법부여" 같은 형태면 마부 키로 변환
+  // ✅ 핵심: "마부/마법부여" 계열만 마부로 인정 (무기강화/무기마봉/연마 등은 여기서 컷)
+  if(!/(마부|마법부여)/.test(s)) return '';
+
+  // 이미 표준키(…마부)면 그대로 + 일부 동의어만 정리
+  if(s.endsWith('마부')){
+    const alias = {
+      '머리/어깨마부': '머리어깨마부',
+      '보조장비마부': '보장마부',
+    };
+    return alias[s] || s;
+  }
+
+  // "무기마법부여" 같은 형태면 표준키로 변환
+  if(/칭호/.test(s)) return '칭호마부';
   if(/무기/.test(s)) return '무기마부';
-  if(/머리어깨|어깨/.test(s)) return '머리어깨마부';
+  if(/머리어깨|머리\/어깨|어깨/.test(s)) return '머리어깨마부';
   if(/상의/.test(s)) return '상의마부';
   if(/하의/.test(s)) return '하의마부';
   if(/허리|벨트/.test(s)) return '허리마부';
@@ -3292,7 +3360,8 @@ function normalizeEnchantType_mobile(t){
   if(/마법석/.test(s)) return '마법석마부';
   if(/귀걸이/.test(s)) return '귀걸이마부';
 
-  return s;
+  // 변환 실패면 마부로 취급하지 않음(섞여 들어오는 것 방지)
+  return '';
 }
 
 function renderMobileEnchantList(slot){
@@ -3519,11 +3588,18 @@ function syncEmblemTopbarDots_mobile(slotKey){
   const dots = emblemBtn.querySelectorAll('.top-embs .emb');
   const arr = _ensureEmblemArray_mobile(slotKey);
   dots.forEach((d,i)=>{
-    const picked = arr[i] || null;
-    d.classList.toggle('has-img', !!picked);
-    if(picked?.img) d.style.backgroundImage = `url("${String(picked.img).replace(/"/g,'\\"')}")`;
-    else d.style.backgroundImage = '';
-  });
+  const picked = arr[i] || null;
+
+  const badge = picked?.level_num
+    ? String(picked.level_num).replace(/[^\d]/g,'')
+    : (picked?.name ? String(picked.name).replace(/[^\d]/g,'') : '');
+
+  d.classList.toggle('has-img', !!picked);
+  d.textContent = picked ? (badge || '') : '';
+
+  if(picked?.img) d.style.backgroundImage = `url("${String(picked.img).replace(/"/g,'\\"')}")`;
+  else d.style.backgroundImage = '';
+});
 }
 
 // 장비 리스트(메인 페이지) 엠블렘 아이콘 동기화
@@ -3536,11 +3612,19 @@ function syncEquipRowEmblemIcons_mobile(slotKey){
   const arr = _ensureEmblemArray_mobile(slotKey);
   const dots = box.querySelectorAll('.emb');
   dots.forEach((d,i)=>{
-    const picked = arr[i] || null;
-    d.classList.toggle('has-img', !!picked);
-    if(picked?.img) d.style.backgroundImage = `url("${String(picked.img).replace(/"/g,'\\"')}")`;
-    else d.style.backgroundImage = '';
-  });
+  const picked = arr[i] || null;
+
+  // ✅ 숫자(레벨) 표시: level_num 우선, 없으면 name에서 숫자 추출
+  const badge = picked?.level_num
+    ? String(picked.level_num).replace(/[^\d]/g,'')
+    : (picked?.name ? String(picked.name).replace(/[^\d]/g,'') : '');
+
+  d.classList.toggle('has-img', !!picked);
+  d.textContent = picked ? (badge || '') : '';   // ✅ 숫자 표시
+
+  if(picked?.img) d.style.backgroundImage = `url("${String(picked.img).replace(/"/g,'\\"')}")`;
+  else d.style.backgroundImage = '';
+});
 }
 
 // 모달 상단 타겟(소켓 선택 UI) 렌더
@@ -3622,7 +3706,23 @@ function _sortEmblemsDesc(a, b){
   const listEl = document.getElementById('equipEmblemList');
   if(!listEl) return;
 
-  const allow = SOCKET_RULES[slotKey] || [];
+// ✅ 추가: enh:list → DBEnh.byType 준비(엠블렘 포함)
+_ensureDBEnhByType_mobile();
+
+const allowRaw = SOCKET_RULES[slotKey] || [];
+const allow = allowRaw
+  .map(s => String(s || '').trim().replace(/^"+|"+$/g, ''))  // 앞/뒤 따옴표 제거
+  .filter(Boolean);
+
+  // ✅ DEBUG: 렌더 시점(진짜로 목록 채우기 직전)
+if(slotKey === 'weapon'){
+  const by = window.DBEnh?.byType || {};
+  console.log('[DBG weapon render] allow=', allow);
+allow.forEach(t=>{
+  console.log('  - type', t, 'len=', (by[t]||[]).length);
+});
+}
+
   listEl.innerHTML = '';
 
   if(!allow.length){
@@ -3852,7 +3952,8 @@ allow.slice().sort((a,b)=>(orderMap[a]??9)-(orderMap[b]??9)).forEach(type=>{
 
   const title = document.createElement('div');
   title.className = 'em-group-title';
-  title.textContent = type.replace('엠블렘',''); // 보기 좋게: 붉은빛/노란빛...
+  const key = String(type || '').trim().replace(/^"+|"+$/g, '');
+title.textContent = key.replace('엠블렘','');
   group.appendChild(title);
 
   const vlist = document.createElement('div');
@@ -3864,7 +3965,7 @@ allow.slice().sort((a,b)=>(orderMap[a]??9)-(orderMap[b]??9)).forEach(type=>{
   vlist.appendChild(noneBtn);
 
   // ✅ 내림차순 정렬
-  const items = (DBEnh.byType[type] || []).slice().sort(_sortEmblemsDesc);
+  const items = (DBEnh.byType[key] || []).slice().sort(_sortEmblemsDesc);
   items.forEach(item=>{
     const b = makeItemBtn(item, false);
     b.addEventListener('click', ()=>pick(item));
@@ -3880,6 +3981,33 @@ allow.slice().sort((a,b)=>(orderMap[a]??9)-(orderMap[b]??9)).forEach(type=>{
 // 외부 진입점: 슬롯/소켓으로 엠블렘 모달 열기
 function openMobileEmblemPicker(slotKey, sockIndex=0){
   _ensureDBEnhByType_mobile();
+
+// ✅ DEBUG: 무기 엠블렘 모달 진입 시점 점검
+try{
+  const allow = SOCKET_RULES[slotKey] || [];
+  const allowRaw = SOCKET_RULES[slotKey] || [];
+const allowNorm = allowRaw.map(s => String(s||'').trim().replace(/^"+|"+$/g,'')).filter(Boolean);
+
+console.log('[DBG emblem open]', { slotKey, allowRaw, allowNorm });
+
+  const by = window.DBEnh?.byType || {};
+  console.log('[DBG byType counts]', {
+    red:  (by['붉은빛엠블렘']||[]).length,
+    yel:  (by['노란빛엠블렘']||[]).length,
+    grn:  (by['녹색빛엠블렘']||[]).length,
+    blu:  (by['푸른빛엠블렘']||[]).length,
+    keysEmblem: Object.keys(by).filter(k=>k.includes('엠블렘')).slice(0,30)
+  });
+
+  // 무기일 때만 샘플도 몇 개 찍기
+  if(slotKey === 'weapon'){
+    console.log('[DBG weapon sample red]', (by['붉은빛엠블렘']||[]).slice(0,5).map(x=>x.name));
+    console.log('[DBG weapon sample yel]', (by['노란빛엠블렘']||[]).slice(0,5).map(x=>x.name));
+    console.log('[DBG weapon sample grn]', (by['녹색빛엠블렘']||[]).slice(0,5).map(x=>x.name));
+    console.log('[DBG weapon sample blu]', (by['푸른빛엠블렘']||[]).slice(0,5).map(x=>x.name));
+  }
+}catch(e){ console.warn('[DBG emblem open] err', e); }
+
 
   window.state = window.state || {};
   state.ui = state.ui || {};
@@ -4203,12 +4331,165 @@ if (activeType !== '전체') {
       toast('문의 전송(apiJSON contact_admin)은 다음 단계에서 연결합니다.');
     });
 
-    document.getElementById('btnMobileCompute')?.addEventListener('click', () => {
-      // 나중에 PC의 compute 호출 결과를 mobileFinalDamage에 꽂으면 됨
-      document.getElementById('mobileFinalDamage').textContent = '계산(연결 전)';
-      toast('계산 로직 연결은 다음 단계에서 진행합니다.');
+    // ============================================================
+    // ✅ PC판과 동일한 calc_all payload 구성 (모바일 스냅샷 → 백코드 세션 반영)
+    // - 장비: state.selections
+    // - 강화: state.enh
+    // - 고유옵션/일반옵션: state.seals.unique / state.seals.general1  (PC의 seals 구조 유지)
+    // - 마법부여: state.enchants
+    // - 엠블렘: state.emblems
+    // ============================================================
+    function buildCalcAllPayloadMobile() {
+      const s = window.state || {};
+      const c = s.currentCharacter || {};
+
+      const charPayload = {
+        name: String(c.name || c.charName || '').trim(),
+        jobGroup: String(c.jobGroup || c.jobGroupLabel || '').trim(),
+        sp: Number(c.sp ?? 0) || 0,
+        tp: Number(c.tp ?? 0) || 0,
+        power: String(c.power ?? '').trim(),
+      };
+
+      // 최소 유효성(백엔드 calc_all 에서 missing_char 체크)
+      if (!charPayload.name || !charPayload.jobGroup) {
+        throw new Error('missing_char');
+      }
+
+      // 1) equip
+      const equipPayload = {};
+      const sel = s.selections || {};
+      for (const [slotKey, info] of Object.entries(sel)) {
+        const name = String(info?.name || '').trim();
+        if (!name) continue;
+        equipPayload[slotKey] = {
+          name,
+          code: info?.code || '',
+        };
+      }
+
+      // 2) enh
+      const enhPayload = {};
+      const enh = s.enh || {};
+      for (const [slotKey, up] of Object.entries(enh)) {
+        const name = String(up?.name || '').trim();
+        if (!name) continue;
+        enhPayload[slotKey] = {
+          name,
+          type: up?.type || '',
+          level: up?.level ?? null,
+        };
+      }
+
+      // 3) seals (모바일: 고유옵션/일반옵션 → PC: unique/general1)
+      const sealPayload = {};
+      const seals = s.seals || {};
+      for (const [slotKey, sv] of Object.entries(seals)) {
+        if (!sv) continue;
+        const uniqueName = String(sv.unique?.name || sv.unique || '').trim();
+        const general1Name = String(sv.general1?.name || sv.general1 || '').trim();
+        if (!uniqueName && !general1Name) continue;
+        sealPayload[slotKey] = {
+          unique: uniqueName || null,
+          general1: general1Name || null,
+        };
+      }
+
+      // 4) enchants
+      const enchantPayload = {};
+      const enchants = s.enchants || {};
+      for (const [slotKey, eInfo] of Object.entries(enchants)) {
+        const name = String(eInfo?.name || '').trim();
+        if (!name) continue;
+        enchantPayload[slotKey] = {
+          name,
+          enchType: eInfo?.typeKey || eInfo?.enchType || '',
+        };
+      }
+
+      // 5) emblems
+      const emblemPayload = {};
+      const emState = s.emblems || {};
+      for (const [slotKey, arr] of Object.entries(emState)) {
+        if (!Array.isArray(arr)) continue;
+        const mapped = arr.map(e => {
+          const name = String(e?.name || '').trim();
+          if (!name) return null;
+          return {
+            name,
+            levelVal: e?.levelVal,
+            type: e?.type,
+          };
+        });
+        if (mapped.some(x => x)) emblemPayload[slotKey] = mapped;
+      }
+
+      // 6) refines(연마) - 모바일이 이미 쓰고 있으면 그대로 전송
+      const refinePayload = {};
+      const refState = s.refines || {};
+      for (const [slotKey, info] of Object.entries(refState)) {
+        const name = String(info?.name || '').trim();
+        if (!name) continue;
+        refinePayload[slotKey] = {
+          name,
+          refineType: info?.refineType || '',
+        };
+      }
+
+      // 최종 payload (PC 방식 그대로)
+      const payload = { char: charPayload };
+      if (Object.keys(equipPayload).length) payload.equip = equipPayload;
+      if (Object.keys(enhPayload).length) payload.enh = enhPayload;
+      if (Object.keys(sealPayload).length) payload.seals = sealPayload;
+      if (Object.keys(enchantPayload).length) payload.enchants = enchantPayload;
+      if (Object.keys(emblemPayload).length) payload.emblems = emblemPayload;
+      if (Object.keys(refinePayload).length) payload.refines = refinePayload;
+
+      return payload;
+    }
+
+    // (디버그) 현재 스냅샷을 콘솔에서 바로 확인하고 싶을 때
+    window.__buildCalcAllPayloadMobile = buildCalcAllPayloadMobile;
+
+    document.getElementById('btnMobileCompute')?.addEventListener('click', async () => {
+      try {
+        // 1) payload 구성
+        const payload = buildCalcAllPayloadMobile();
+        window.state = window.state || {};
+        window.state.lastCalcAllPayload = payload;
+
+        // 2) 백엔드 세션에 반영(calc_all)
+        const res = await apiJSON('calc_all', { payload, p: null });
+        if (!res?.ok) {
+          throw new Error(res?.message || res?.error || 'calc_all_failed');
+        }
+
+        // 3) (선택) sum_stats 한번 호출해서 세션이 정상 반영됐는지 확인
+        //    - UI 갱신은 다음 단계에서 "PC 패널과 동일"하게 연결하면 됨
+        const sum = await apiJSON('sum_stats', { wantDbg: false });
+        if (sum?.ok) {
+          document.getElementById('mobileFinalDamage').textContent = '세션 반영 완료';
+        } else {
+          document.getElementById('mobileFinalDamage').textContent = '세션 반영(확인 실패)';
+        }
+
+        toast('세션에 장비/옵션 스냅샷 반영 완료!');
+        console.log('[MOBILE calc_all payload]', payload);
+        console.log('[MOBILE calc_all res]', res);
+        console.log('[MOBILE sum_stats res]', sum);
+
+      } catch (e) {
+        console.error(e);
+        const msg = String(e?.message || e || '');
+        if (msg === 'missing_char') {
+          toast('캐릭터를 먼저 선택해 주세요.');
+        } else {
+          toast('계산(세션 반영) 실패: ' + msg);
+        }
+        document.getElementById('mobileFinalDamage').textContent = '-';
+      }
     });
-  </script>
+</script>
 </body>
 
 </html>
