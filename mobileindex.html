@@ -891,6 +891,31 @@
     }
     .simple-auto .opt-btn:disabled{ opacity:.6; }
 
+    /* ✅ Auto Input Modal footer */
+.simple-auto .footer{
+  padding: 10px 12px 14px;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: center;
+}
+
+.simple-auto .confirm-btn{
+  width: min(240px, 70%);
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(37,99,235,0.35);
+  background: rgba(37,99,235,0.92);
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+}
+
+.simple-auto .confirm-btn:disabled{
+  opacity: .45;
+  cursor: not-allowed;
+}
+
 
     .modal .backdrop {
       position: absolute;
@@ -1521,7 +1546,333 @@ dialog,
   display: none;
 }
 
+/* ===== Page 3: Options ===== */
+#pageEtc .opt-box{
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
 
+#pageEtc .opt-title{
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: -0.2px;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#pageEtc .field{
+  display:flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+#pageEtc .label{
+  font-size: 12px;
+  opacity: .85;
+}
+
+#pageEtc{
+  --dd-bg: #0D0E15;
+  --dd-text: #ffffff;
+  --dd-gold: #cfa24f;
+}
+
+#pageEtc .select{
+  width: 100%;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: var(--dd-bg);
+  color: var(--dd-text);
+  padding: 0 12px;
+  outline: none;
+}
+/* ✅ 드롭다운 목록(option)도 셀렉트와 동일 톤으로 */
+#pageEtc .select option,
+#pageEtc .select optgroup{
+  background: var(--dd-bg);
+  color: var(--dd-text);
+}
+/* ✅ 드롭다운 펼쳐져 있는 동안(=focus 유지) 금색 테두리 */
+#pageEtc .select:focus{
+  border-color: #cfa24f; /* gold */
+  box-shadow: 0 0 0 2px rgba(207,162,79,0.22) inset;
+}
+
+/* 클릭 중에도 유지되는 느낌(브라우저별 보강) */
+#pageEtc .select:active{
+  border-color: #cfa24f;
+}
+
+#pageEtc .row{
+  display:flex;
+  gap: 8px;
+}
+
+#pageEtc .row .field{ margin: 0; flex: 1 1 0; }
+
+#pageEtc .btn{
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.28);
+  color:#fff;
+  padding: 0 12px;
+  font-weight: 800;
+}
+#pageEtc .btn:focus{
+  outline: none;
+  border-color: #cfa24f;
+  box-shadow: 0 0 0 2px rgba(207,162,79,0.22) inset;
+}
+
+#pageEtc .btn.primary{
+  background: rgba(37,99,235,0.92);
+  border-color: rgba(37,99,235,0.55);
+}
+
+
+
+
+  
+/* =========================
+   Skill Rune Modal (Mobile) - PC 톤 통일
+   ========================= */
+
+/* 모달 자체 톤(갈색/금색) */
+#runeModalM .dialog{
+  width: min(980px, 95vw);
+  height: min(820px, 88vh);
+  background: #0f0b08;
+  color: #f0e6d2;
+  border: 1px solid #3a2c21;
+  box-shadow: 0 18px 60px rgba(0,0,0,0.55);
+}
+
+#runeModalM header{
+  border-bottom: 1px solid rgba(58,44,33,0.9);
+}
+
+#runeModalM header h2{
+  color: #f0e6d2;
+}
+
+/* 공통: select(드롭다운) PC톤 */
+#runeModalM .rune-select{
+  width: 100%;
+  height: 38px;
+  border-radius: 10px;
+  padding: 0 10px;
+  background: #1a130f;
+  color: #f0e6d2;
+  border: 1px solid #3a2c21;
+  outline: none;
+}
+
+#runeModalM .rune-select:focus{
+  border-color: #cfa24f;
+  box-shadow: 0 0 0 2px rgba(207,162,79,0.25) inset;
+}
+
+/* ✅ 간편 스킬룬 선택(3 드롭다운) */
+#runeModalM .rune-picker-row{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+#runeModalM .rune-picker-row .rune-select{
+  flex: 1 1 0;
+  height: 40px;       /* 간편 UI는 살짝 키움 */
+  border-radius: 12px;
+}
+
+/* 그리드 */
+#runeModalM .rune-grid{
+  display: grid;
+  grid-auto-rows: minmax(46px, auto);
+  gap: 8px;
+  overflow: auto;
+}
+
+#runeModalM .rune-grid .row{
+  display: grid;
+  grid-template-columns: 96px repeat(8, minmax(54px, 1fr));
+  gap: 6px;
+  align-items: center;
+}
+
+#runeModalM .rune-grid .head{
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  padding: 6px 8px;
+  border: 1px solid #3a2c21;
+  border-radius: 10px;
+  background: rgba(207,162,79,0.10);
+  font-weight: 800;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+#runeModalM .rune-grid .cell{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 카테고리 헤더(아이콘+라벨) */
+#runeModalM .rune-cat-head{
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+#runeModalM .rune-cat-icon{
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+#runeModalM .rune-cat-label{
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* 특수 스킬룬 */
+#runeModalM .special-runes{
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(58,44,33,0.9);
+}
+
+#runeModalM .special-runes-title{
+  font-weight: 800;
+  font-size: 13px;
+  margin-bottom: 10px;
+  color: #c7b589;
+}
+
+#runeModalM .special-rune-row{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid #3a2c21;
+  border-radius: 12px;
+  background: rgba(207,162,79,0.06);
+  margin-bottom: 8px;
+}
+
+#runeModalM .special-rune-icon{
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+#runeModalM .special-rune-row label{
+  width: 42px;
+  font-size: 12px;
+  font-weight: 800;
+  opacity: .95;
+  color: #f0e6d2;
+}
+
+/* 버튼(모달 내부 전용) - PC opt-btnetc 느낌 */
+#runeModalM .btn{
+  height: 38px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  background: #1a130f;
+  color: #f0e6d2;
+  border: 1px solid #3a2c21;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+#runeModalM .btn:hover{
+  border-color: #cfa24f;
+  box-shadow: 0 0 0 2px rgba(207,162,79,0.25) inset;
+}
+
+/* 적용 버튼 - PC ui-btnetc 느낌 */
+#runeModalM .btn.primary{
+  background: #ecc947;
+  color: #111;
+  border: none;
+  font-size: 15px;
+  font-weight: 800;
+  padding: 12px 16px;
+  height: auto;      /* 버튼 텍스트에 맞춰 */
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+}
+
+#runeModalM .btn.primary:hover{
+  background: #ffe263;
+}
+
+/* (있다면) 행 삭제 버튼을 눈에 띄게 */
+#runeModalM .rune-row-del{
+  border-color: rgba(255,107,107,0.55);
+  color: #ff6b6b;
+}
+
+#runeModalM .rune-row-del:hover{
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 2px rgba(255,107,107,0.18) inset;
+}
+/* × 아이콘 버튼을 컴팩트하게 */
+#runeModalM .rune-icon-btn{
+  width: 30px;
+  min-width: 30px;
+  height: 30px;         /* 기본 .btn 높이(38px) 덮어씀 */
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+#runeModalM .rune-icon-btn:active{
+  transform: translateY(1px);
+}
+/* ✅ 3드롭다운 상단 라벨(헤더) */
+#runeModalM .rune-picker-head{
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  margin: 2px 0 6px;
+  padding: 0 2px;
+}
+
+#runeModalM .rune-picker-head .col{
+  flex: 1 1 0;
+  font-size: 11px;
+  font-weight: 800;
+  color: #c7b589;
+  opacity: .95;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+/* 우측 삭제(×) 버튼 자리와 폭 맞추기 */
+#runeModalM .rune-picker-head .spacer{
+  flex: 0 0 38px; /* 삭제 버튼이 38px 느낌이면 딱 맞음 */
+}
 
 
   </style>
@@ -1723,11 +2074,7 @@ dialog,
   </div>
 </div>
 
-
-
-
-
-        <section class="m-page" id="pageEquip">
+    <section class="m-page" id="pageEquip">
           <div class="m-card">
             <div class="page-title">2 / 3</div>
 
@@ -2103,6 +2450,102 @@ dialog,
           </div>
         </section>
 
+        <section class="m-page" id="pageEtc">
+  <div class="m-card">
+    <div class="page-title">3 / 3</div>
+
+    <!-- 1) 아바타 / 무기압 -->
+    <div class="opt-box">
+      <h4 class="opt-title">아바타 세부 선택</h4>
+
+      <label class="field">
+        <span class="label">아바타</span>
+        <select id="selAvatarM" class="select">
+          <option value="" selected>아바타 선택</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="label">무기압</span>
+        <select id="selImprintM" class="select">
+          <option value="" selected>무기압 선택</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- 2) 계산 세부 옵션 -->
+    <div class="opt-box">
+      <h4 class="opt-title">계산 세부 옵션 조절</h4>
+
+      <label class="field">
+        <span class="label">시간 기준</span>
+        <select id="selTimeM" class="select">
+          <option value="30s">30초딜</option>
+          <option value="1m" selected>1분딜</option>
+          <option value="3m">3분딜</option>
+          <option value="5m">5분딜</option>
+          <option value="10m">10분딜</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="label">몬스터 설정</span>
+        <select id="selMonsterM" class="select">
+          <option value="" selected>몬스터 선택</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="label">던전 난이도(미구현)</span>
+        <select id="selDungeonM" class="select" disabled>
+          <option value="" selected>누골방 고정(미구현)</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- 3) 스킬룬 / 룬각인 -->
+    <div class="opt-box">
+      <div class="opt-title">
+        <span>스킬룬 / 룬 각인</span>
+        <span style="font-size:12px;opacity:.8;">
+          선택 룬: <b id="runeCountM">0</b>
+        </span>
+      </div>
+
+      <button id="btnRuneM" class="btn" type="button">스킬룬 설정</button>
+
+      <div style="height:8px;"></div>
+
+      <div class="row">
+        <label class="field">
+          <span class="label">룬 각인 설정</span>
+          <select id="selRuneEngraveM" class="select">
+            <option value="" selected>룬 각인 선택</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="label">세부 설정</span>
+          <select id="selRuneDetailM" class="select" disabled>
+            <option value="" selected>세부 설정</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <!-- 4) 성안의 봉인 -->
+    <div class="opt-box">
+      <div class="opt-title">
+        <span>성안의 봉인</span>
+        <button id="btnCastleSealM" class="btn primary" type="button">옵션 선택</button>
+      </div>
+      <div id="castleSealSummaryM" style="font-size:12px;opacity:.85;">
+        선택: -
+      </div>
+    </div>
+
+  </div>
+</section>
 
 
       </div>
@@ -2174,6 +2617,72 @@ dialog,
       </header>
       <div class="contact-body">
         <div id="faqAnswerText" class="contact-notice"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ✅ 스킬룬 설정 모달 (모바일) -->
+  <div id="runeModalM" class="modal" aria-hidden="true">
+    <div class="backdrop" data-rune-close></div>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="runeDlgTitleM">
+      <header style="display:flex;align-items:center;gap:10px;">
+        <h2 id="runeDlgTitleM" style="flex:1;">
+          스킬룬 설정
+          <span style="font-size:12px;opacity:.75;font-weight:600;display:block;margin-top:2px;">
+            선택한 스킬룬 개수: <b id="runeCountLabelM" style="color:#ef4444;">0</b> / 20
+          </span>
+        </h2>
+        <button type="button" class="close" data-rune-close>닫기</button>
+      </header>
+
+      <div class="items" style="padding:10px;">
+          <!-- ✅ 3드롭다운 헤더 라벨 -->
+  <div class="rune-picker-head" aria-hidden="true">
+    <div class="col">스킬룬 종류</div>
+    <div class="col">스킬 레벨</div>
+    <div class="col">스킬룬 갯수</div>
+    <div class="spacer"></div> <!-- (우측 × 삭제 버튼 자리 정렬용) -->
+  </div>
+        <div id="runePickRowsM" class="rune-picker-rows" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;"></div>
+        <button id="btnRuneRowAddM" class="btn" type="button" style="width:100%;margin:0 0 10px;">+ 스킬룬 행 추가</button>
+
+        <div class="special-runes">
+          <div class="special-runes-title">특수 스킬룬</div>
+
+          <div class="special-rune-row">
+            <img src="./img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
+            <label for="specialRune_gahoM">가호</label>
+            <select id="specialRune_gahoM" class="select rune-select" aria-label="가호 개수">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+            </select>
+          </div>
+
+          <div class="special-rune-row">
+            <img src="./img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
+            <label for="specialRune_jiheM">지혜</label>
+            <select id="specialRune_jiheM" class="select rune-select" aria-label="지혜 개수">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+            </select>
+          </div>
+
+          <div class="special-rune-row">
+            <img src="./img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
+            <label for="specialRune_waegokM">왜곡</label>
+            <select id="specialRune_waegokM" class="select rune-select" aria-label="왜곡 개수">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+        <button id="runeCommitM" class="btn primary" type="button" style="width:100%;">설정 하기</button>
       </div>
     </div>
   </div>
@@ -2515,95 +3024,827 @@ dialog,
       el._t = setTimeout(() => el.classList.remove('show'), 1400);
     }
 
-    // ✅ 페이지 열리면 즉시 경량리스트 전부 로드
-    initMobileAllLightListsOnce().catch((e) => {
-      console.error(e);
-      toast('초기 데이터 로딩 실패');
+    // ✅ 페이지 열리면 즉시 경량리스트 전부 로드 + (원하면) 3페이지 init도 즉시 실행
+initMobileAllLightListsOnce()
+  .then(() => ensurePage3Init())   // ✅ 추가: 스와이프 없이도 3페이지 초기화
+  .catch((e) => {
+    console.error(e);
+    toast('초기 데이터 로딩 실패');
+  });
+
+function fillSelectOptions_(sel, items, placeholder){
+  if(!sel) return;
+
+  // 초기화
+  sel.innerHTML = '';
+
+  // placeholder
+  const opt0 = document.createElement('option');
+  opt0.value = '';
+  opt0.textContent = placeholder;
+  opt0.selected = true;
+  sel.appendChild(opt0);
+
+  // items
+  for(const n of (items || [])){
+    const name = String(n ?? '').trim();
+    if(!name) continue;
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name;
+    sel.appendChild(opt);
+  }
+}
+
+// 3페이지: 아바타/무기압 드롭다운 채우기 (ENH list 기반)
+async function populateAvatarImprintMobile(){
+  console.log('[AVATAR] start');
+  await initMobileAllLightListsOnce();
+  console.log('[AVATAR] after init', {
+    hasCore: !!window.CORE,
+    hasLists: !!window.CORE?.lists,
+    keys: Object.keys(window.CORE?.lists || {}).slice(0, 20),
+    enhListLen: Array.isArray(window.CORE?.lists?.['enh:list']) ? window.CORE.lists['enh:list'].length : null
+  });
+
+  const aSel = document.getElementById('selAvatarM');
+  const iSel = document.getElementById('selImprintM');
+  console.log('[AVATAR] selects', { aSel: !!aSel, iSel: !!iSel, aId: aSel?.id, iId: iSel?.id });
+
+  const rows = Array.isArray(CORE?.lists?.['enh:list']) ? CORE.lists['enh:list'] : [];
+  // 샘플 3개만 구조 확인
+  console.log('[AVATAR] enh:list sample', rows.slice(0, 3));
+
+  // 타입/이름이 실제로 어떤 키로 들어오는지 “자동 탐색”용
+  const probe = rows.slice(0, 50).map(r => ({
+    type: r?.type, 종류: r?.['종류'],
+    name: r?.name, 이름: r?.['이름'],
+    keys: Object.keys(r || {}).slice(0, 10)
+  }));
+  console.log('[AVATAR] probe(50)', probe);
+
+  const pickNames = (wantType) => {
+    const out = [];
+    const seen = new Set();
+    for (const r of rows) {
+      const type = String(r?.type ?? r?.['종류'] ?? '').trim();
+      if (type !== wantType) continue;
+      const name = String(r?.name ?? r?.['이름'] ?? '').trim();
+      if (!name || seen.has(name)) continue;
+      seen.add(name);
+      out.push(name);
+    }
+    return out;
+  };
+
+  const avatars  = pickNames('아바타');
+  const imprints = pickNames('무기압');
+  console.log('[AVATAR] picked', { avatarsLen: avatars.length, imprintsLen: imprints.length, avatars0: avatars[0], imprints0: imprints[0] });
+
+  try{
+    console.log('[AVATAR] before fill', { aOptions: aSel?.options?.length, iOptions: iSel?.options?.length });
+    fillSelectOptions_(aSel, avatars, '아바타 선택');
+    fillSelectOptions_(iSel, imprints, '무기압 선택');
+    console.log('[AVATAR] after fill', { aOptions: aSel?.options?.length, iOptions: iSel?.options?.length });
+  }catch(e){
+    console.error('[AVATAR] fillSelectOptions_ crashed', e);
+  }
+
+  console.log('[AVATAR] done');
+}
+
+// 3페이지: 몬스터 목록 (CORE.lists['monster:list'])
+async function populateMonsterMobile(){
+  await initMobileAllLightListsOnce();
+
+  const sel = document.getElementById('selMonsterM');
+  if(!sel) return;
+
+  const list = CORE?.lists?.['monster:list'] || [];
+  console.log('[M3][MON] raw list len =', Array.isArray(list) ? list.length : -1, 'sample =', list?.[0]);
+
+  // ✅ monster 시트는 '몬스터명' 컬럼이 핵심
+  const names = (Array.isArray(list) ? list : [])
+    .map(x => {
+      if (typeof x === 'string') return x.trim();
+      return String(
+        x?.['몬스터명'] ?? x?.monName ?? x?.monsterName ?? x?.name ?? ''
+      ).trim();
+    })
+    .filter(Boolean);
+
+  console.log('[M3][MON] parsed names len =', names.length, 'head =', names.slice(0, 5));
+
+  fillSelectOptions_(sel, names.length ? names : ['(데이터 없음)'], '몬스터 선택');
+
+  window.state = window.state || {};
+  const s = window.state;
+
+  
+
+  // ✅ 기존 선택 복원
+  if(s.monsterName && names.includes(s.monsterName)) {
+    sel.value = s.monsterName;
+  }
+
+  // ✅ init이 여러 번 호출돼도 리스너 중복 등록 방지
+  if (!sel.dataset.bound) {
+    sel.addEventListener('change', ()=>{ s.monsterName = (sel.value||'').trim(); });
+    sel.dataset.bound = '1';
+  }
+}
+
+
+// 3페이지: 룬각인 목록/세부설정 (ENH list의 '룬각인')
+async function populateRuneEngraveMobile(){
+  await initMobileAllLightListsOnce();
+  if(typeof _ensureDBEnhByType_mobile === 'function') _ensureDBEnhByType_mobile();
+
+  const sel1 = document.getElementById('selRuneEngraveM');
+  const sel2 = document.getElementById('selRuneDetailM');
+  if(!sel1 || !sel2) return;
+
+  const rows = DBEnh?.byType?.['룬각인'] || [];
+
+  // ✅ 이름 목록(중복 제거)
+  const seen = new Set();
+  const names = [];
+  rows.forEach(r=>{
+    const n = String(r?.name ?? r?.['이름'] ?? '').trim();
+    if(n && !seen.has(n)){ seen.add(n); names.push(n); }
+  });
+
+  // 룬각인 이름 드롭다운 채우기
+  fillSelectOptions_(sel1, names, '룬 각인 선택');
+
+  // ✅ 세부 설정 채우기 (escapeHtml 없이 DOM으로)
+  const fillDetail = (name)=>{
+    // 초기화
+    sel2.innerHTML = '';
+    const opt0 = document.createElement('option');
+    opt0.value = '';
+    opt0.textContent = '세부 설정';
+    opt0.selected = true;
+    sel2.appendChild(opt0);
+
+    const keyName = String(name || '').trim();
+    if(!keyName){
+      sel2.disabled = true;
+      return;
+    }
+
+    const hit = rows.filter(r => String(r?.name ?? r?.['이름'] ?? '').trim() === keyName);
+
+    // ✅ PC와 동일한 우선순위: levelVal > tag > 렙제(등)
+    const ds = [];
+    const dseen = new Set();
+    hit.forEach(r=>{
+      const v = String(
+        r?.levelVal ??
+        r?.['levelVal'] ??
+        r?.tag ??
+        r?.['렙제'] ??
+        r?.level ??
+        r?.['레벨'] ??
+        ''
+      ).trim();
+
+      if(v && !dseen.has(v)){
+        dseen.add(v);
+        ds.push(v);
+      }
     });
 
-    // ===== Swipe Pages (PointerEvent: 터치/마우스 모두 지원) =====
-    (function initSwipePages() {
-      const pages = document.getElementById('mobilePages');
-      if (!pages) return;
+    for(const v of ds){
+      const op = document.createElement('option');
+      op.value = v;
+      op.textContent = v;
+      sel2.appendChild(op);
+    }
 
-      // 실제 페이지(.m-page)만 카운트
-      const getPageEls = () => Array.from(pages.children).filter(el => el.classList?.contains('m-page'));
-      const getPageCount = () => getPageEls().length;
+    sel2.disabled = (ds.length === 0);
+  };
 
-      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-      const pageWidth = () => pages.clientWidth || 1;
-      const getIndex = () => Math.round(pages.scrollLeft / pageWidth());
+  // state 준비
+  window.state = window.state || {};
+  const s = window.state;
+  s.runeEngrave = s.runeEngrave || { type:'룬각인', name:'', level:'' };
 
-      window.goToMobilePage = (i) => {
-        const cnt = getPageCount();
-        const idx = clamp(i | 0, 0, Math.max(0, cnt - 1));
-        pages.scrollTo({ left: idx * pageWidth(), behavior: 'smooth' });
+  // 복원
+  if(s.runeEngrave.name && names.includes(s.runeEngrave.name)) sel1.value = s.runeEngrave.name;
+  if(sel1.value) fillDetail(sel1.value);
+  if(s.runeEngrave.level && !sel2.disabled) sel2.value = s.runeEngrave.level;
+
+  // ✅ 리스너 중복 방지
+  if(!sel1.dataset.bound){
+    sel1.addEventListener('change', ()=>{
+      s.runeEngrave.name = (sel1.value||'').trim();
+      s.runeEngrave.level = '';
+      fillDetail(s.runeEngrave.name);
+    });
+    sel1.dataset.bound = '1';
+  }
+
+  if(!sel2.dataset.bound){
+    sel2.addEventListener('change', ()=>{
+      s.runeEngrave.level = (sel2.value||'').trim();
+    });
+    sel2.dataset.bound = '1';
+  }
+}
+
+
+// 3페이지: 시간 기준 저장
+function bindTimeMobile(){
+  const sel = document.getElementById('selTimeM');
+  if(!sel) return;
+  window.state = window.state || {};
+  const s = window.state;
+  if(s.timeKey) sel.value = s.timeKey;
+  sel.addEventListener('change', ()=>{ s.timeKey = sel.value; });
+  if(!s.timeKey) s.timeKey = sel.value;
+}
+
+// 3페이지: 스킬룬(모달)
+const RUNE_LEVELS = [15, 20, 25, 30, 35, 40, 45, 65];
+const RUNE_CATS = [
+  { key: 'awakening', label: '각성', icon: './img/etc/skillrune/각성.png' },
+  { key: 'magic',     label: '마력', icon: './img/etc/skillrune/마력.png' },
+  { key: 'illusion',  label: '허상', icon: './img/etc/skillrune/허상.png' },
+  { key: 'training',  label: '숙련', icon: './img/etc/skillrune/숙련.png' },
+  { key: 'technique', label: '기교', icon: './img/etc/skillrune/기교.png' },
+];
+
+function _emptyRunes_(){
+  const o = {};
+  RUNE_CATS.forEach(c=>{
+    o[c.key] = {};
+    RUNE_LEVELS.forEach(lv=>{ o[c.key][lv] = 0; });
+  });
+  return o;
+}
+function ensureRunesInitialized(){
+  window.state = window.state || {};
+  const s = window.state;
+  if(!s.runes || typeof s.runes !== 'object') s.runes = _emptyRunes_();
+
+  // 누락된 키/레벨 채우기(구버전/프리셋 호환)
+  RUNE_CATS.forEach(c=>{
+    if(!s.runes[c.key] || typeof s.runes[c.key] !== 'object') s.runes[c.key] = {};
+    RUNE_LEVELS.forEach(lv=>{
+      const v = Number(s.runes[c.key][lv] ?? 0);
+      s.runes[c.key][lv] = Number.isFinite(v) ? v : 0;
+    });
+  });
+}
+function ensureSpecialRunesInitialized(){
+  window.state = window.state || {};
+  const s = window.state;
+  if(!s.specialRunes || typeof s.specialRunes !== 'object') s.specialRunes = { gaho:0, jihe:0, waegok:0 };
+  s.specialRunes.gaho  = Number(s.specialRunes.gaho  ?? 0) || 0;
+  s.specialRunes.jihe  = Number(s.specialRunes.jihe  ?? 0) || 0;
+  s.specialRunes.waegok= Number(s.specialRunes.waegok?? 0) || 0;
+}
+
+function countSelectedRunes(){
+  const s = window.state || {};
+  let n = 0;
+  const runes = s.runes || {};
+  RUNE_CATS.forEach(c=>{
+    const row = runes[c.key] || {};
+    RUNE_LEVELS.forEach(lv=>{ n += Number(row[lv] || 0); });
+  });
+  const sp = s.specialRunes || {};
+  n += Number(sp.gaho || 0) + Number(sp.jihe || 0) + Number(sp.waegok || 0);
+  return n;
+}
+
+function updateRuneCountSummary(){
+  const n = countSelectedRunes();
+  const main = document.getElementById('runeCountM');
+  const lbl  = document.getElementById('runeCountLabelM');
+  if(main) main.textContent = String(n);
+  if(lbl)  lbl.textContent  = String(n);
+}
+
+function _capTo20OrRevert_(applyFn, revertFn){
+  const n = countSelectedRunes();
+  if(n <= 20){
+    updateRuneCountSummary();
+    return true;
+  }
+  // 초과면 revert
+  revertFn?.();
+  updateRuneCountSummary();
+  toast('스킬룬은 최대 20개까지 선택할 수 있어요.');
+  return false;
+}
+
+
+
+// ✅ 스킬룬(모바일 행 UI) 전역 유틸: 행 정규화(중복 합치기/유효성 보정/최소 1행/최대 5행)
+const MAX_RUNE_ROWS_M = 5;
+
+function _getRuneDefaultsM_(){
+  const cats = (typeof RUNE_CATS !== 'undefined' && Array.isArray(RUNE_CATS)) ? RUNE_CATS : [];
+  const levels = (typeof RUNE_LEVELS !== 'undefined' && Array.isArray(RUNE_LEVELS)) ? RUNE_LEVELS : [];
+  const defCat = (cats[0] != null) ? (cats[0].key ?? cats[0]) : 'awakening';
+  const defTier = (levels[0] != null ? Number(levels[0]) : 15) || 15;
+  return { cats, levels, defCat, defTier };
+}
+
+function _isValidRuneCatM_(cat){
+  const { cats } = _getRuneDefaultsM_();
+  return (cats || []).some(c => (c.key ?? c) === cat);
+}
+function _isValidRuneTierM_(tier){
+  const { levels } = _getRuneDefaultsM_();
+  return (levels || []).map(Number).includes(Number(tier));
+}
+
+function normalizeRuneRowsM(){
+  window.state = window.state || {};
+  const s = window.state;
+
+  // 없으면 생성
+  const src = Array.isArray(s.runeRowsM) ? s.runeRowsM : [];
+  const { levels, defCat, defTier } = _getRuneDefaultsM_();
+
+  const out = [];
+  const idxMap = new Map();
+  let merged = false, trimmed = false;
+
+  for(const r of src){
+    const catRaw = String(r?.cat ?? '').trim();
+    const cat = _isValidRuneCatM_(catRaw) ? catRaw : defCat;
+
+    const tierN = Number(r?.tier ?? defTier) || defTier;
+    const tier = _isValidRuneTierM_(tierN) ? Number(tierN) : Number(defTier);
+
+    const cnt = Math.max(0, Math.min(20, Math.floor(Number(r?.cnt ?? 0) || 0)));
+
+    const key = cat + '|' + String(tier);
+    if(idxMap.has(key)){
+      const i = idxMap.get(key);
+      out[i].cnt = Math.min(20, Number(out[i].cnt || 0) + cnt);
+      merged = true;
+    }else{
+      idxMap.set(key, out.length);
+      out.push({ cat, tier, cnt });
+    }
+  }
+
+  if(out.length === 0){
+    out.push({ cat: defCat, tier: Number(defTier), cnt: 0 });
+  }
+
+  if(out.length > MAX_RUNE_ROWS_M){
+    out.length = MAX_RUNE_ROWS_M;
+    trimmed = true;
+  }
+
+  s.runeRowsM = out;
+  return { merged, trimmed };
+}
+function bindRunePickerMobile(){
+  const wrap  = document.getElementById('runePickRowsM');
+  const addBtn= document.getElementById('btnRuneRowAddM');
+  if(!wrap || !addBtn) return;
+
+  ensureRunesInitialized();
+  ensureSpecialRunesInitialized();
+
+  window.state = window.state || {};
+  const s = window.state;
+
+  // ✅ 행 모델: [{cat, tier, cnt}] (모달 UI 전용)
+  if(!Array.isArray(s.runeRowsM)){
+    s.runeRowsM = [];
+
+    // 기존 state.runes(그리드 방식) → 행으로 변환
+    try{
+      (RUNE_CATS||[]).forEach(c=>{
+        (RUNE_LEVELS||[]).forEach(lv=>{
+          const n = Number(((s.runes||{})[c.key]||{})[lv] ?? 0) || 0;
+          if(n>0) s.runeRowsM.push({cat:c.key, tier:Number(lv), cnt:n});
+        });
+      });
+    }catch(_){}
+
+    // 아무것도 없으면 기본 1행
+    if(s.runeRowsM.length===0){
+      s.runeRowsM.push({
+        cat: (RUNE_CATS && RUNE_CATS[0] ? RUNE_CATS[0].key : 'awakening'),
+        tier: (RUNE_LEVELS && RUNE_LEVELS[0] ? Number(RUNE_LEVELS[0]) : 15),
+        cnt: 0
+      });
+    }
+  }
+
+  // 초기 정규화(최대 5행 제한)
+  const _initNorm_ = normalizeRuneRowsM();
+  if(_initNorm_.trimmed){
+    toast('저장된 스킬룬 조합이 5개를 초과하여 일부가 표시/저장 제한으로 제외될 수 있어요.');
+  }
+
+  // ✅ 행 → state.runes(집계) 반영
+  const buildAggregateRunes = ()=>{
+    const agg = _emptyRunes_();
+    (s.runeRowsM||[]).forEach(r=>{
+      const catKey = String(r?.cat||'').trim();
+      const tier   = Number(r?.tier||0) || 0;
+      const cnt    = Number(r?.cnt||0)  || 0;
+      if(!catKey || !Number.isFinite(tier) || !Number.isFinite(cnt)) return;
+      if(agg[catKey] && Object.prototype.hasOwnProperty.call(agg[catKey], tier)){
+        agg[catKey][tier] = Number(agg[catKey][tier] || 0) + Math.max(0, cnt);
+      }
+    });
+    return agg;
+  };
+
+  const applyRowsToStateOrRevert = (revertFn)=>{
+    const beforeRunes = s.runes;
+    const nextRunes   = buildAggregateRunes();
+    s.runes = nextRunes;
+
+    const ok = _capTo20OrRevert_(
+      ()=>{},
+      ()=>{
+        s.runes = beforeRunes;
+        revertFn?.();
+      }
+    );
+    return ok;
+  };
+
+  const makeSelect = (cls, aria)=>{
+    const el = document.createElement('select');
+    el.className = cls || 'select rune-select';
+    if(aria) el.setAttribute('aria-label', aria);
+    return el;
+  };
+
+  const fillCatOptions = (sel)=>{
+    sel.innerHTML = '';
+    (RUNE_CATS||[]).forEach(c=>{
+      const opt = document.createElement('option');
+      opt.value = c.key;
+      opt.textContent = c.label;
+      sel.appendChild(opt);
+    });
+  };
+
+  const fillTierOptions = (sel)=>{
+    sel.innerHTML = '';
+    (RUNE_LEVELS||[]).forEach(lv=>{
+      const opt = document.createElement('option');
+      opt.value = String(lv);
+      opt.textContent = String(lv);
+      sel.appendChild(opt);
+    });
+  };
+
+  const fillCntOptions = (sel)=>{
+    sel.innerHTML = '';
+    for(let i=0;i<=20;i++){
+      const opt = document.createElement('option');
+      opt.value = String(i);
+      opt.textContent = String(i);
+      sel.appendChild(opt);
+    }
+  };
+
+  const pickNextUnusedRunePairM = ()=>{
+  const used = new Set((s.runeRowsM||[]).map(r => `${r.cat}|${r.tier}`));
+
+  const cats = (RUNE_CATS||[]).map(c=>c.key);
+  const tiers = (RUNE_LEVELS||[]).map(Number);
+
+  const defCat  = (cats[0] || 'awakening');
+  const defTier = (tiers[0] || 15);
+
+  // 1) 같은 cat에서 tier만 다음으로 돌리기(체감상 가장 자연스러움)
+  const sameCatTiers = tiers.slice();
+  // 기본 tier 다음부터 우선 시도
+  const startIdx = Math.max(0, sameCatTiers.indexOf(defTier));
+  const rotated = sameCatTiers.slice(startIdx).concat(sameCatTiers.slice(0, startIdx));
+
+  for (const t of rotated){
+    const key = `${defCat}|${t}`;
+    if(!used.has(key)) return { cat: defCat, tier: t };
+  }
+
+  // 2) 그래도 없으면 전체 cats×tiers에서 첫 미사용 조합 찾기
+  for (const c of cats){
+    for (const t of tiers){
+      const key = `${c}|${t}`;
+      if(!used.has(key)) return { cat: c, tier: t };
+    }
+  }
+
+  // 전부 사용중(= 더 추가해봤자 중복합치기로 티도 안 남)
+  return null;
+};
+
+  const render = ()=>{
+    // 중복/유효성 보정
+    normalizeRuneRowsM();
+
+    wrap.innerHTML = '';
+
+    (s.runeRowsM||[]).forEach((row, idx)=>{
+      const rowEl = document.createElement('div');
+      rowEl.className = 'rune-picker-row';
+      rowEl.style.cssText = 'display:flex;gap:8px;align-items:center;';
+
+      const selCat  = makeSelect('select rune-select','룬 종류');
+      const selTier = makeSelect('select rune-select','레벨');
+      const selCnt  = makeSelect('select rune-select','개수');
+
+      fillCatOptions(selCat);
+      fillTierOptions(selTier);
+      fillCntOptions(selCnt);
+
+      // 값 복원(유효성 보정)
+      const defCat  = (RUNE_CATS && RUNE_CATS[0] ? RUNE_CATS[0].key : 'awakening');
+      const defTier = (RUNE_LEVELS && RUNE_LEVELS[0] ? Number(RUNE_LEVELS[0]) : 15);
+
+      const catKey = String(row?.cat || defCat);
+      const tier   = Number(row?.tier ?? defTier) || defTier;
+      const cnt    = Math.max(0, Number(row?.cnt ?? 0) || 0);
+
+      selCat.value  = (RUNE_CATS||[]).some(c=>c.key===catKey) ? catKey : defCat;
+      selTier.value = (RUNE_LEVELS||[]).map(Number).includes(Number(tier)) ? String(tier) : String(defTier);
+      selCnt.value  = String(Math.min(20, cnt));
+
+      // state에 정규화
+      row.cat  = selCat.value;
+      row.tier = Number(selTier.value||defTier) || defTier;
+      row.cnt  = Number(selCnt.value||0) || 0;
+
+      const onChange = ()=>{
+        // 변경 전 스냅샷(행/집계 revert 용)
+        const prevRows = (s.runeRowsM||[]).map(x=>({cat:x.cat,tier:x.tier,cnt:x.cnt}));
+
+        row.cat  = String(selCat.value||defCat);
+        row.tier = Number(selTier.value||defTier) || defTier;
+        row.cnt  = Number(selCnt.value||0) || 0;
+
+        // ✅ 중복 선택은 자동 합치기 + 행 최대 5개 제한
+        const norm = normalizeRuneRowsM();
+
+        const ok = applyRowsToStateOrRevert(()=>{
+          // revert rows
+          s.runeRowsM = prevRows;
+        });
+
+        // 정규화/합치기 반영 위해 항상 재렌더
+        render();
+
+        if(ok){
+          if(norm.merged)  toast('중복 선택은 자동으로 합쳐졌어요.');
+          if(norm.trimmed) toast('스킬룬 행은 최대 5개까지 추가할 수 있어요.');
+        }else{
+          try{ selCnt.animate([{transform:'scale(1)'},{transform:'scale(1.03)'},{transform:'scale(1)'}],{duration:180}); }catch(_){}
+        }
       };
 
-      let pid = null;
-      let sx = 0, sy = 0, startLeft = 0, lastDx = 0, dragging = false, horiz = null;
+      selCat.addEventListener('change', onChange);
+      selTier.addEventListener('change', onChange);
+      selCnt.addEventListener('change', onChange);
 
-      const LOCK = 8;   // 방향 판별 최소 이동
-      const TH = 40;  // 페이지 넘김 임계치(px)
+      // 🗑 행 삭제 버튼(× 아이콘형)
+const btnDel = document.createElement('button');
+btnDel.type = 'button';
+btnDel.className = 'btn rune-row-del rune-icon-btn';
+btnDel.innerHTML = '&times;';          // ×
+btnDel.title = '행 삭제';
+btnDel.setAttribute('aria-label', '행 삭제');
 
-      function onEnd() {
-        if (!dragging) return;
-        dragging = false;
-
-        if (horiz !== true) { pid = null; return; }
-
-        const w = pageWidth();
-        const cnt = getPageCount();
-        let idx = Math.round(startLeft / w);
-
-        if (lastDx < -TH) idx += 1;
-        else if (lastDx > TH) idx -= 1;
-        else idx = getIndex();
-
-        idx = clamp(idx, 0, Math.max(0, cnt - 1));
-        pages.scrollTo({ left: idx * w, behavior: 'smooth' });
-
-        pid = null;
-      }
-
-      pages.addEventListener('pointerdown', (e) => {
-        // 마우스 좌클릭/터치만
-        if (e.pointerType === 'mouse' && e.button !== 0) return;
-
-        pid = e.pointerId;
-        pages.setPointerCapture?.(pid);
-
-        sx = e.clientX; sy = e.clientY;
-        startLeft = pages.scrollLeft;
-        lastDx = 0;
-        dragging = true;
-        horiz = null;
-      }, { passive: true });
-
-      pages.addEventListener('pointermove', (e) => {
-        if (!dragging || pid == null || e.pointerId !== pid) return;
-
-        const dx = e.clientX - sx;
-        const dy = e.clientY - sy;
-        lastDx = dx;
-
-        if (horiz === null) {
-          if (Math.abs(dx) < LOCK && Math.abs(dy) < LOCK) return;
-          horiz = Math.abs(dx) > Math.abs(dy);
+btnDel.addEventListener('click', (e)=>{
+        e.preventDefault(); e.stopPropagation();
+        if((s.runeRowsM||[]).length <= 1){
+          toast('최소 1행은 남겨야 해요.');
+          return;
         }
+        const prevRows = (s.runeRowsM||[]).map(x=>({cat:x.cat,tier:x.tier,cnt:x.cnt}));
+        s.runeRowsM.splice(idx, 1);
+        const ok = applyRowsToStateOrRevert(()=>{
+          s.runeRowsM = prevRows;
+        });
+        render();
+        if(ok) toast('스킬룬 행이 삭제되었습니다.');
+      });
 
-        // 세로 제스처면 놔둠(페이지 내부 스크롤)
-        if (!horiz) return;
+      rowEl.appendChild(selCat);
+      rowEl.appendChild(selTier);
+      rowEl.appendChild(selCnt);
+      rowEl.appendChild(btnDel);
+      wrap.appendChild(rowEl);
+    });
 
-        // 가로 제스처면 우리가 scrollLeft를 직접 제어
-        e.preventDefault?.();
-        pages.scrollLeft = startLeft - dx;
-      }, { passive: false });
+    updateRuneCountSummary();
+  };
 
-      pages.addEventListener('pointerup', onEnd, { passive: true });
-      pages.addEventListener('pointercancel', onEnd, { passive: true });
-    })();
+  // ✅ + 버튼(1회 바인딩)
+if(!addBtn.dataset.bound){
+  addBtn.addEventListener('click', ()=>{
+    if((s.runeRowsM||[]).length >= MAX_RUNE_ROWS_M){
+      toast('스킬룬 행은 최대 5개까지 추가할 수 있어요.');
+      return;
+    }
 
+    const nextPair = pickNextUnusedRunePairM();
+    if(!nextPair){
+      toast('추가할 수 있는 조합이 없어요. (중복 선택은 자동으로 합쳐집니다)');
+      return;
+    }
+
+    s.runeRowsM.push({ cat: nextPair.cat, tier: Number(nextPair.tier), cnt: 0 });
+
+    applyRowsToStateOrRevert(()=>{});
+    render();
+    toast('스킬룬 행이 추가되었습니다.');
+  });
+  addBtn.dataset.bound = '1';
+}
+
+  // 최초: rows → runes 반영 + 렌더
+  applyRowsToStateOrRevert(()=>{});
+  render();
+}
+
+
+
+function bindSpecialRuneSelectsMobile(){
+  const gaho  = document.getElementById('specialRune_gahoM');
+  const jihe  = document.getElementById('specialRune_jiheM');
+  const waegok= document.getElementById('specialRune_waegokM');
+  if(!gaho || !jihe || !waegok) return;
+
+  ensureSpecialRunesInitialized();
+
+  // 초기값 반영
+  gaho.value   = String(window.state.specialRunes.gaho  || 0);
+  jihe.value   = String(window.state.specialRunes.jihe  || 0);
+  waegok.value = String(window.state.specialRunes.waegok|| 0);
+
+  const onChange = (key, el)=>{
+    const s = window.state || {};
+    const before = Number(s.specialRunes?.[key] ?? 0) || 0;
+    const after  = Number(el.value || 0) || 0;
+
+    s.specialRunes[key] = after;
+
+    const ok = _capTo20OrRevert_(
+      ()=>{},
+      ()=>{
+        s.specialRunes[key] = before;
+        el.value = String(before);
+      }
+    );
+
+    if(!ok){
+      try{ el.animate([{transform:'scale(1)'},{transform:'scale(1.03)'},{transform:'scale(1)'}],{duration:180}); }catch(_){}
+    }
+  };
+
+  gaho.addEventListener('change',  ()=>onChange('gaho', gaho));
+  jihe.addEventListener('change',  ()=>onChange('jihe', jihe));
+  waegok.addEventListener('change',()=>onChange('waegok', waegok));
+
+  updateRuneCountSummary();
+}
+
+function openRuneModalMobile(){
+  const modal = document.getElementById('runeModalM');
+  if(!modal) return;
+
+  ensureRunesInitialized();
+  ensureSpecialRunesInitialized();
+
+  // 렌더 + 바인딩
+  bindRunePickerMobile();
+  bindSpecialRuneSelectsMobile();
+
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden', 'false');
+  updateRuneCountSummary();
+}
+
+function closeRuneModalMobile(){
+  const modal = document.getElementById('runeModalM');
+  if(!modal) return;
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden', 'true');
+  updateRuneCountSummary();
+}
+
+function bindRuneButtonMobile(){
+  const btn = document.getElementById('btnRuneM');
+  if(!btn) return;
+
+  // 버튼 클릭 → 모달 오픈
+  if(!btn.dataset.bound){
+    btn.addEventListener('click', ()=>{
+      openRuneModalMobile();
+    });
+    btn.dataset.bound = '1';
+  }
+
+  // 모달 close / commit 바인딩은 1회만
+  const modal = document.getElementById('runeModalM');
+  if(modal && !modal.dataset.bound){
+    modal.addEventListener('click', (e)=>{
+      if(e.target?.dataset?.runeClose !== undefined) closeRuneModalMobile();
+      if(e.target?.classList?.contains('backdrop')) closeRuneModalMobile();
+    });
+    modal.querySelectorAll('[data-rune-close]').forEach(el=>{
+      el.addEventListener('click', closeRuneModalMobile);
+    });
+
+    const commit = document.getElementById('runeCommitM');
+    commit?.addEventListener('click', ()=>{
+      // state에 이미 반영되어 있으므로 닫기만
+      closeRuneModalMobile();
+      toast('스킬룬 설정이 적용되었습니다.');
+    });
+
+    modal.dataset.bound = '1';
+  }
+
+  // 초기 카운트 반영
+  ensureRunesInitialized();
+  ensureSpecialRunesInitialized();
+  updateRuneCountSummary();
+}
+
+
+
+// 3페이지: 성안의 봉인(간단 셀렉트 모달 없이 “토스트+임시값”은 비추)
+// 여기선 최소로: state.castleSeal = {mainName, subName}를 가지고 있고 summary만 갱신
+async function bindCastleSealMobile(){
+  await initMobileAllLightListsOnce();
+  if(typeof _ensureDBEnhByType_mobile === 'function') _ensureDBEnhByType_mobile();
+
+  const btn = document.getElementById('btnCastleSealM');
+  const sum = document.getElementById('castleSealSummaryM');
+  if(!btn || !sum) return;
+
+  window.state = window.state || {};
+  const s = window.state;
+  s.castleSeal = s.castleSeal || { mainName:'', subName:'' };
+
+  const refresh = ()=>{
+    const a = s.castleSeal.mainName ? `주요: ${s.castleSeal.mainName}` : '주요: -';
+    const b = s.castleSeal.subName ? `추가: ${s.castleSeal.subName}` : '추가: -';
+    sum.textContent = `선택: ${a} / ${b}`;
+  };
+  refresh();
+
+  const mains = (DBEnh?.byType?.['주요 옵션'] || []).map(r=>(r.name||'').trim()).filter(Boolean);
+  const subs  = (DBEnh?.byType?.['추가 옵션'] || []).map(r=>(r.name||'').trim()).filter(Boolean);
+
+  btn.addEventListener('click', ()=>{
+    // ✅ 아주 간단한 prompt 방식(원하면 다음에 PC처럼 모달로 바꿔줄게)
+    const m = prompt('성안의 봉인 - 주요 옵션 이름을 정확히 입력하세요\n(비우면 해제)', s.castleSeal.mainName||'') ?? s.castleSeal.mainName;
+    const sub = prompt('성안의 봉인 - 추가 옵션 이름을 정확히 입력하세요\n(비우면 해제)', s.castleSeal.subName||'') ?? s.castleSeal.subName;
+
+    s.castleSeal.mainName = (m||'').trim();
+    s.castleSeal.subName  = (sub||'').trim();
+
+    // 오타 방지(목록에 없으면 경고)
+    if(s.castleSeal.mainName && !mains.includes(s.castleSeal.mainName)) toast('⚠ 주요 옵션 이름이 목록과 다를 수 있어요');
+    if(s.castleSeal.subName && !subs.includes(s.castleSeal.subName)) toast('⚠ 추가 옵션 이름이 목록과 다를 수 있어요');
+
+    refresh();
+  });
+}
+
+// ✅ Page 3 init을 '딱 1번만' 보장
+let __page3InitDone = false;
+
+async function ensurePage3Init(){
+  if (__page3InitDone) return;
+  __page3InitDone = true;
+  try{
+    await initPage3Mobile();
+    console.log('[PAGE3] init ok');
+  }catch(e){
+    __page3InitDone = false;
+    console.error('[PAGE3] init fail', e);
+  }
+}
+
+// ✅ 한 번에 묶어서 호출
+async function initPage3Mobile(){
+  bindTimeMobile();
+  await populateMonsterMobile();
+  await populateAvatarImprintMobile();
+  await populateRuneEngraveMobile();
+  bindRuneButtonMobile();
+  await bindCastleSealMobile();
+}
 
     // ===== Header actions =====
     function openModal(id) {
@@ -3609,7 +4850,7 @@ const SOCKET_COUNT = (slotKey) => _isSpecialSlot(slotKey) ? 1 : 2;
 const PLACEHOLDER_IMG = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 function _ensureDBEnhByType_mobile(){
   window.DBEnh = window.DBEnh || {};
-  if (DBEnh.byType && DBEnh.__byTypeReady) return;
+  if (DBEnh.byType && DBEnh.__byTypeReady && Object.keys(DBEnh.byType).length > 0) return;
 
   DBEnh.byType = {};
   const list = (window.CORE?.lists && (CORE.lists['enh:list'] || CORE.lists.enh || CORE.lists.enhList)) || [];
@@ -4568,6 +5809,55 @@ if (activeType !== '전체') {
       if (Object.keys(emblemPayload).length) payload.emblems = emblemPayload;
       if (Object.keys(refinePayload).length) payload.refines = refinePayload;
 
+      // ✅ 7) Page3 옵션들(아바타/무기압, 시간/몬스터, 룬각인, 성안의 봉인, 스킬룬)
+const s3 = window.state || {};
+
+// 아바타 / 무기압
+if (s3.avatarSel && (s3.avatarSel.avatarName || s3.avatarSel.imprintName)) {
+  payload.avatar = {
+    avatarName: String(s3.avatarSel.avatarName || '').trim(),
+    imprintName: String(s3.avatarSel.imprintName || '').trim(),
+  };
+}
+
+// 시간 기준 / 몬스터
+if (s3.timeKey) payload.window = String(s3.timeKey || '').trim();      // 예: '1m'
+if (s3.monsterName) payload.monsterName = String(s3.monsterName || '').trim();
+
+// 룬 각인
+if (s3.runeEngrave && typeof s3.runeEngrave === 'object') {
+  // 너 state 구조가 {type:'룬각인', name:'', level:''}라면 그대로 전달
+  if (s3.runeEngrave.name && s3.runeEngrave.level) {
+    payload.runeEngrave = {
+      type: '룬각인',
+      name: String(s3.runeEngrave.name || '').trim(),
+      level: String(s3.runeEngrave.level || '').trim(),
+    };
+  }
+}
+
+// 성안의 봉인
+if (s3.castleSeal && typeof s3.castleSeal === 'object') {
+  if (s3.castleSeal.mainName || s3.castleSeal.subName) {
+    payload.castleSeal = {
+      mainName: String(s3.castleSeal.mainName || '').trim(),
+      subName:  String(s3.castleSeal.subName  || '').trim(),
+    };
+  }
+}
+
+// 스킬룬 (나중에 모달 붙이면 state에 채워질 구조 그대로 전달)
+if (s3.runes && typeof s3.runes === 'object') {
+  payload.runes = s3.runes;
+}
+if (s3.specialRunes && typeof s3.specialRunes === 'object') {
+  payload.specialRunes = {
+    gaho: Number(s3.specialRunes.gaho || 0),
+    jihe: Number(s3.specialRunes.jihe || 0),
+    waegok: Number(s3.specialRunes.waegok || 0),
+  };
+}
+
       return payload;
     }
 
@@ -4855,6 +6145,62 @@ function _wireAutoSealClicks_mobile(){
 /* --- Auto Enchant --- */
 const autoEnchantState_mobile = { attr:null, tier:null };
 
+function _updateAutoEnchantConfirmBtn_mobile(){
+  const btn = document.getElementById('autoEnchantConfirmBtn');
+  if(!btn) return;
+  const ready = !!(autoEnchantState_mobile.attr && autoEnchantState_mobile.tier);
+  btn.disabled = !ready;
+}
+
+function _bindAutoEnchantConfirmBtn_mobile(){
+  const btn = document.getElementById('autoEnchantConfirmBtn');
+  if(!btn || btn.__bound) return;
+  btn.__bound = true;
+
+  btn.addEventListener('click', async ()=>{
+    if(!(autoEnchantState_mobile.attr && autoEnchantState_mobile.tier)) return;
+
+    btn.disabled = true;
+    try{
+      await applyAutoEnchant_mobile(autoEnchantState_mobile.attr, autoEnchantState_mobile.tier);
+      _hideModal_mobile('autoEnchantModal'); // ✅ 확인 누를 때만 닫힘
+    }catch(e){
+      console.error(e);
+      toast('추천 마법부여 자동 입력 실패');
+    }finally{
+      _updateAutoEnchantConfirmBtn_mobile();
+    }
+  });
+}
+
+function _updateAutoEmblemConfirmBtn_mobile(){
+  const btn = document.getElementById('autoEmblemConfirmBtn');
+  if(!btn) return;
+  const ready = !!(autoEmblemState_mobile.attr && autoEmblemState_mobile.stage);
+  btn.disabled = !ready;
+}
+
+function _bindAutoEmblemConfirmBtn_mobile(){
+  const btn = document.getElementById('autoEmblemConfirmBtn');
+  if(!btn || btn.__bound) return;
+  btn.__bound = true;
+
+  btn.addEventListener('click', async ()=>{
+    if(!(autoEmblemState_mobile.attr && autoEmblemState_mobile.stage)) return;
+
+    btn.disabled = true;
+    try{
+      await autoEmblemApply_mobile(autoEmblemState_mobile.attr, autoEmblemState_mobile.stage);
+      _hideModal_mobile('autoEmblemModal'); // ✅ 확인 누를 때만 닫힘
+    }catch(e){
+      console.error(e);
+      toast('엠블렘 자동 입력 실패');
+    }finally{
+      _updateAutoEmblemConfirmBtn_mobile();
+    }
+  });
+}
+
 function _normTier_mobile(t){
   const s = String(t||'').replace(/\s+/g,'').trim();
   if(!s) return '종결';
@@ -4969,9 +6315,8 @@ function renderAutoEnchantChoices_mobile(){
       else autoEnchantState_mobile.tier = internalVal;
 
       renderAutoEnchantChoices_mobile();
-      if(autoEnchantState_mobile.attr && autoEnchantState_mobile.tier){
-        applyAutoEnchant_mobile(autoEnchantState_mobile.attr, autoEnchantState_mobile.tier);
-      }
+_updateAutoEnchantConfirmBtn_mobile(); // ✅ 선택만 반영, 적용은 확인 버튼에서
+
     });
 
     // active
@@ -4982,6 +6327,8 @@ function renderAutoEnchantChoices_mobile(){
 
   ['화속성','수속성','명속성','암속성'].forEach(a=>wrapAttrs.appendChild(makeBtn(a,'attr')));
   ['종결','준종결','보통','가성비'].forEach(t=>wrapTiers.appendChild(makeBtn(t,'tier')));
+  _updateAutoEnchantConfirmBtn_mobile();
+_bindAutoEnchantConfirmBtn_mobile();
 }
 
 /* --- Auto Emblem --- */
@@ -5009,32 +6356,42 @@ function pickEmblemByTypeAndStage_mobile(typeKey, stageNum){
 }
 
 function pickPlatForAttr_mobile(attrKey, stageNum){
-  const list = (window.DBEnh?.byType?.['플래티넘엠블렘'] || []);
-  if(!list.length) return null;
-  const k = String(attrKey||'').trim();
-  const stage = Number(stageNum)||0;
+  const arr = (window.DBEnh?.byType?.['플래티넘엠블렘'] || []);
+  if(!arr.length) return null;
 
-  const keyKor = _AUTO_ELEM_KOR[k] || '';
-  const N = (v)=>String(v??'').replace(/\s+|-/g,'').replace(/[()]/g,'').trim();
+  const normMap = {
+    fire: '화',
+    water: '수',
+    light: '명',
+    dark: '암',
+    all: '모속',
+    str: '힘',
+    int: '지능',
+  };
 
-  // 속성(화/수/명/암) + 단계 매칭 우선
-  let hit = list.find(o => {
-    const nameN = N(String(o?.name||''));
-    const stageN = Number(o?.level_num) || (String(o?.name||'').match(/(\d+)\s*단/) ? Number(RegExp.$1):0);
-    return (keyKor && nameN.includes(N(keyKor))) && (stageN === stage);
-  });
-  if(hit) return hit;
+  const normAttr = normMap[String(attrKey||'').trim()] || String(attrKey||'').trim();
+  const st = Number(stageNum) || 0;
 
-  // 속성만 매칭
-  hit = list.find(o => keyKor && N(String(o?.name||'')).includes(N(keyKor)));
-  if(hit) return hit;
+  // ✅ PC와 동일: levelVal + level_num “정확히 일치” 매칭
+  const hit = arr.find(r =>
+    String(r?.levelVal ?? '').trim() === normAttr &&
+    Number(r?.level_num ?? 0) === st
+  );
 
-  // 마지막 폴백
-  return list[list.length-1] || null;
+  // ✅ fallback 제거: 매칭 실패면 null (랜덤/고정값 방지)
+  return hit || null;
 }
 
+
 async function autoEmblemApply_mobile(attrKey, stage){
-  if(typeof _ensureDBEnhByType_mobile === 'function') _ensureDBEnhByType_mobile();
+  // ✅ 1) CORE.lists(=enh:list 등) 로딩 보장 (미로딩 상태에서 byType이 빈 채로 캐시되는 버그 방지)
+  if (typeof initMobileAllLightListsOnce === 'function') {
+    await initMobileAllLightListsOnce();
+  }
+
+  // ✅ 2) byType 재구성 보장
+  if (window.DBEnh) DBEnh.__byTypeReady = false;  // (안전장치) 빈 캐시로 굳는 것 방지
+  if (typeof _ensureDBEnhByType_mobile === 'function') _ensureDBEnhByType_mobile();
 
   const stageNum = Number(stage)||0;
 
@@ -5044,7 +6401,12 @@ async function autoEmblemApply_mobile(attrKey, stage){
   state.emblems = state.emblems || {};
 
   for(const sk of slots){
-    const allow = (window.SOCKET_RULES && window.SOCKET_RULES[sk]) ? window.SOCKET_RULES[sk].slice() : [];
+    const RULES =
+  (typeof SOCKET_RULES !== 'undefined' && SOCKET_RULES) ? SOCKET_RULES :
+  (window.SOCKET_RULES || null);
+
+const allow = (RULES && RULES[sk]) ? RULES[sk].slice() : [];
+
     if(!allow.length) continue;
 
     // PC 동일: 무기는 붉은빛만 자동입력
@@ -5101,11 +6463,7 @@ function renderAutoEmblemChoices_mobile(){
       }
       renderAutoEmblemChoices_mobile();
 
-      if(autoEmblemState_mobile.attr && autoEmblemState_mobile.stage){
-        autoEmblemApply_mobile(autoEmblemState_mobile.attr, autoEmblemState_mobile.stage)
-          .then(()=>_hideModal_mobile('autoEmblemModal'))
-          .catch((e)=>{ console.error(e); toast('엠블렘 자동 입력 실패'); _hideModal_mobile('autoEmblemModal'); });
-      }
+      _updateAutoEmblemConfirmBtn_mobile();
     });
 
     // active
@@ -5137,11 +6495,8 @@ function renderAutoEmblemChoices_mobile(){
       b.addEventListener('click', ()=>{
         autoEmblemState_mobile.stage = lv;
         renderAutoEmblemChoices_mobile();
-        if(autoEmblemState_mobile.attr){
-          autoEmblemApply_mobile(autoEmblemState_mobile.attr, autoEmblemState_mobile.stage)
-            .then(()=>_hideModal_mobile('autoEmblemModal'))
-            .catch((e)=>{ console.error(e); toast('엠블렘 자동 입력 실패'); _hideModal_mobile('autoEmblemModal'); });
-        }
+        _updateAutoEmblemConfirmBtn_mobile();
+
       });
       row.appendChild(b);
     }
@@ -5151,6 +6506,8 @@ function renderAutoEmblemChoices_mobile(){
   wrapTiers.appendChild(makeRow(5,8));
   wrapTiers.appendChild(makeRow(9,12));
   wrapTiers.appendChild(makeRow(13,15));
+  _updateAutoEmblemConfirmBtn_mobile();
+_bindAutoEmblemConfirmBtn_mobile();
 
   // active attr highlight: rebuild attr buttons with active class
   // (attrs button rebuild above is a quick build; to keep minimal, we re-render by calling itself once more when state changes)
@@ -5211,6 +6568,10 @@ function renderAutoEmblemChoices_mobile(){
             <div class="lists tiers"></div>
           </div>
         </div>
+        <!-- ✅ 여기 추가 -->
+<div class="footer">
+  <button type="button" class="confirm-btn" id="autoEnchantConfirmBtn" disabled>확인</button>
+</div>
       </div>
     </div>
 
@@ -5231,6 +6592,10 @@ function renderAutoEmblemChoices_mobile(){
             <div class="lists tiers"></div>
           </div>
         </div>
+        <!-- ✅ 여기 추가 -->
+<div class="footer">
+  <button type="button" class="confirm-btn" id="autoEmblemConfirmBtn" disabled>확인</button>
+</div>
       </div>
     </div>
 </body>
