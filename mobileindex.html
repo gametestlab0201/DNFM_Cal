@@ -1728,7 +1728,38 @@
       border-color: rgba(37, 99, 235, 0.55);
     }
 
+/* ✅ 성안의 봉인 모달 드롭다운도 무기압(=pageEtc) 스타일과 동일하게 */
+#castleSealModalM{
+  --dd-bg: #0D0E15;
+  --dd-text: #ffffff;
+  --dd-gold: #cfa24f;
+}
 
+#castleSealModalM .select{
+  width: 100%;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--dd-bg);
+  color: var(--dd-text);
+  padding: 0 12px;
+  outline: none;
+}
+
+#castleSealModalM .select option,
+#castleSealModalM .select optgroup{
+  background: var(--dd-bg);
+  color: var(--dd-text);
+}
+
+#castleSealModalM .select:focus{
+  border-color: var(--dd-gold);
+  box-shadow: 0 0 0 2px rgba(207,162,79,0.22) inset;
+}
+
+#castleSealModalM .select:active{
+  border-color: var(--dd-gold);
+}
 
 
 
@@ -1972,6 +2003,147 @@
       flex: 0 0 38px;
       /* 삭제 버튼이 38px 느낌이면 딱 맞음 */
     }
+
+    /* ===== Page4 Skill ===== */
+.skill-topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.skill-topbar-title{
+  font-size:15px;
+  font-weight:700;
+  color:#e9d7a6;
+  letter-spacing:-0.2px;
+}
+
+.skill-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.skill-row{
+  display:flex;
+  align-items:stretch;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 10px;
+  border:1px solid rgba(231, 199, 125, .22);
+  border-radius:10px;
+  background: rgba(12, 16, 24, .55);
+}
+
+.skill-left{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:6px; /* 아이콘-이름 간격 */
+}
+
+/* (추가) 스킬 아이콘 */
+.skill-icon{
+  width:36px;
+  height:36px;
+  border-radius:8px;
+  overflow:hidden;
+  border:1px solid rgba(231,199,125,.28);
+  background: rgba(18, 22, 32, .60);
+}
+.skill-icon img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.skill-name{
+  font-size:14px;
+  font-weight:700;
+  color:#f3e6c1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.skill-right{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width:172px;
+}
+
+.skill-ctrl{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px;
+}
+.skill-ctrl .lbl{
+  font-size:12px;
+  color:rgba(233,215,166,.85);
+  width:22px;
+  text-align:left;
+}
+
+.skill-val{
+  min-width:26px;
+  text-align:center;
+  font-size:12px;
+  font-weight:800;
+  color:#e9d7a6;
+}
+
+.skill-mini{
+  padding:6px 8px;
+  border-radius:8px;
+  border:1px solid rgba(231,199,125,.25);
+  background: rgba(18, 22, 32, .65);
+  color:#e9d7a6;
+  font-size:12px;
+  font-weight:800;
+  line-height:1;
+}
+.skill-mini:active{ transform: translateY(1px); }
+
+.skill-mini.is-wide{ padding:6px 10px; }
+.skill-mini[disabled]{
+  opacity:.35;
+  cursor:not-allowed;
+}
+
+.skill-footnote{
+  margin-top:10px;
+  font-size:12px;
+  color:rgba(233,215,166,.65);
+}
+/* 렙제 구분 헤더(구분선) */
+.skill-divider{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding: 6px 2px 2px;
+
+  margin-top: 14px;      /* ✅ 구간 사이 간격 */
+  margin-bottom: 4px;    /* ✅ 헤더-첫 스킬 간격 */
+}
+
+.skill-divider .txt{
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(233,215,166,.9);
+  white-space: nowrap;
+}
+
+.skill-divider .line{
+  height: 1px;
+  flex: 1 1 auto;
+  background: rgba(231,199,125,.22);
+}
+
     
   </style>
 </head>
@@ -2011,7 +2183,7 @@
         <!-- Page 1: 캐릭터 -->
         <section class="m-page" id="pageChar">
           <div class="m-card">
-            <div class="page-title">1 / 3</div>
+            <div class="page-title">1 / 4</div>
             <div class="big-pick">
               <button id="btnPickChar" type="button">캐릭터 선택하기</button>
               <!-- ✅ 선택 후 표시될 캐릭터 이미지 -->
@@ -2174,7 +2346,7 @@
 
         <section class="m-page" id="pageEquip">
           <div class="m-card">
-            <div class="page-title">2 / 3</div>
+            <div class="page-title">2 / 4</div>
 
             <div class="equip-body">
 
@@ -2550,7 +2722,7 @@
 
         <section class="m-page" id="pageEtc">
           <div class="m-card">
-            <div class="page-title">3 / 3</div>
+            <div class="page-title">3 / 4</div>
 
             <!-- 1) 아바타 / 무기압 -->
             <div class="opt-box">
@@ -2644,6 +2816,24 @@
 
           </div>
         </section>
+
+<!-- ✅ Page 4: Skill -->
+<section class="m-page" id="pageSkill">
+  <div class="page-title">4 / 4</div>
+
+  <div class="m-card">
+    <div class="skill-topbar">
+      <div class="skill-topbar-title">스킬</div>
+      <button id="btnSkillResetM" type="button" class="m-btn m-btn-ghost">초기화</button>
+    </div>
+
+    <div id="skillListM" class="skill-list"></div>
+
+    <div class="skill-footnote">
+      * SP = 스킬 레벨, TP = TP 레벨 (각 행에서 MIN/MAX/±로 조절)
+    </div>
+  </div>
+</section>
 
 
       </div>
@@ -3088,12 +3278,21 @@
         <div class="mchar-name">${name}</div>
       `;
 
+
+
           btn.addEventListener('click', () => {
+                  const job = String(c.jobGroupLabel || c.jobGroup || c.job || '').trim();
+const nm  = String(name || c.name || '').trim();
+const ownerKey = (job + nm).replace(/\s+/g, '');
             // 선택 저장
-            window.state.currentCharacter = { ...c, name };
+            window.state.currentCharacter = {...c, name: nm, ownerKey };
 
             // ✅ 버튼 숨기고, 캐릭 이미지 표시
             applyPickedCharacterUI(window.state.currentCharacter);
+
+              // ✅ 스킬 페이지 갱신
+  ensurePage4Init();
+  renderSkillPageMobile(window.state.currentCharacter);
 
             // 모달 닫기
             const m = document.getElementById('charModal');
@@ -3152,11 +3351,14 @@
 
     // ✅ 페이지 열리면 즉시 경량리스트 전부 로드 + (원하면) 3페이지 init도 즉시 실행
     initMobileAllLightListsOnce()
-      .then(() => ensurePage3Init())   // ✅ 추가: 스와이프 없이도 3페이지 초기화
-      .catch((e) => {
-        console.error(e);
-        toast('초기 데이터 로딩 실패');
-      });
+  .then(() => {
+    ensurePage3Init();
+    ensurePage4Init();   // ✅ 추가
+  })
+  .catch((e) => {
+    console.error(e);
+    toast('초기 데이터 로딩 실패');
+  });
 
     function fillSelectOptions_(sel, items, placeholder) {
       if (!sel) return;
@@ -3907,126 +4109,130 @@
 
 
 
-    // 3페이지: 성안의 봉인(간단 셀렉트 모달 없이 “토스트+임시값”은 비추)
-    // 여기선 최소로: state.castleSeal = {mainName, subName}를 가지고 있고 summary만 갱신
     async function bindCastleSealMobile() {
-      await initMobileAllLightListsOnce();
-      if (typeof _ensureDBEnhByType_mobile === 'function') _ensureDBEnhByType_mobile();
+  // 0) 데이터 준비
+  await initMobileAllLightListsOnce();
+  if (typeof _ensureDBEnhByType_mobile === 'function') _ensureDBEnhByType_mobile();
 
-      const btn = document.getElementById('btnCastleSealM');
-      const sum = document.getElementById('castleSealSummaryM');
-      if (!btn || !sum) return;
+  const btn = document.getElementById('btnCastleSealM');
+  const sum = document.getElementById('castleSealSummaryM');
+  const modal = document.getElementById('castleSealModalM');
 
-      window.state = window.state || {};
-      const s = window.state;
-      s.castleSeal = s.castleSeal || { mainName: '', subName: '' };
+  if (!btn || !sum) return;
 
-      const refresh = () => {
-        const a = s.castleSeal.mainName ? `주요: ${s.castleSeal.mainName}` : '주요: -';
-        const b = s.castleSeal.subName ? `추가: ${s.castleSeal.subName}` : '추가: -';
-        sum.textContent = `선택: ${a} / ${b}`;
-      };
-      refresh();
+  window.state = window.state || {};
+  const s = window.state;
+  s.castleSeal = s.castleSeal || { mainName: '', subName: '' };
 
-      const mains = (DBEnh?.byType?.['주요 옵션'] || []).map(r => (r.name || '').trim()).filter(Boolean);
-      const subs = (DBEnh?.byType?.['추가 옵션'] || []).map(r => (r.name || '').trim()).filter(Boolean);
+  const refresh = () => {
+    const a = s.castleSeal.mainName ? `주요: ${s.castleSeal.mainName}` : '주요: -';
+    const b = s.castleSeal.subName ? `추가: ${s.castleSeal.subName}` : '추가: -';
+    sum.textContent = `선택: ${a} / ${b}`;
+  };
+  refresh();
 
-      // (새로 추가) 모달 열기/닫기
-      function openCastleSealModalMobile(mains, subs) {
-        const modal = document.getElementById('castleSealModalM');
-        if (!modal) return;
+  // 1) 옵션 목록(매번 최신 DBEnh 기준)
+  const getLists = () => {
+    const mains = (DBEnh?.byType?.['주요 옵션'] || [])
+      .map(r => String(r?.name ?? r?.['이름'] ?? '').trim())
+      .filter(Boolean);
 
-        const s = window.state || (window.state = {});
-        s.castleSeal = s.castleSeal || { mainName: '', subName: '' };
+    const subs = (DBEnh?.byType?.['추가 옵션'] || [])
+      .map(r => String(r?.name ?? r?.['이름'] ?? '').trim())
+      .filter(Boolean);
 
-        const selMain = document.getElementById('castleSealMainSelM');
-        const selSub = document.getElementById('castleSealSubSelM');
+    return { mains, subs };
+  };
 
-        // 옵션 채우기(매번 열 때 최신 목록 반영)
-        const fill = (sel, arr, current) => {
-          if (!sel) return;
-          const safeArr = (arr || []).filter(Boolean);
-          sel.innerHTML = `<option value="">- 선택 안함 -</option>` + safeArr
-            .map(name => `<option value="${String(name).replaceAll('"', '&quot;')}">${name}</option>`)
-            .join('');
-          sel.value = current || '';
-        };
-
-        fill(selMain, mains, s.castleSeal.mainName);
-        fill(selSub, subs, s.castleSeal.subName);
-
-        modal.classList.add('show');
-        modal.setAttribute('aria-hidden', 'false');
-      }
-
-      function closeCastleSealModalMobile() {
-        const modal = document.getElementById('castleSealModalM');
-        if (!modal) return;
-        modal.classList.remove('show');
-        modal.setAttribute('aria-hidden', 'true');
-      }
-
-      // (기존 함수 수정) bindCastleSealMobile 내부의 prompt 부분 교체
-      async function bindCastleSealMobile() {
-        await initMobileAllLightListsOnce();
-        if (typeof _ensureDBEnhByType_mobile === 'function') _ensureDBEnhByType_mobile();
-
-        const btn = document.getElementById('btnCastleSealM');
-        const sum = document.getElementById('castleSealSummaryM');
-        if (!btn || !sum) return;
-
-        window.state = window.state || {};
-        const s = window.state;
-        s.castleSeal = s.castleSeal || { mainName: '', subName: '' };
-
-        const refresh = () => {
-          const a = s.castleSeal.mainName ? `주요: ${s.castleSeal.mainName}` : '주요: -';
-          const b = s.castleSeal.subName ? `추가: ${s.castleSeal.subName}` : '추가: -';
-          sum.textContent = `선택: ${a} / ${b}`;
-        };
-        refresh();
-
-        const mains = (DBEnh?.byType?.['주요 옵션'] || []).map(r => (r.name || '').trim()).filter(Boolean);
-        const subs = (DBEnh?.byType?.['추가 옵션'] || []).map(r => (r.name || '').trim()).filter(Boolean);
-
-        // ✅ 모달 바인딩(1회만)
-        const modal = document.getElementById('castleSealModalM');
-        if (modal && !modal.dataset.bound) {
-          modal.addEventListener('click', (e) => {
-            if (e.target?.dataset?.sealClose !== undefined) closeCastleSealModalMobile();
-            if (e.target?.classList?.contains('backdrop')) closeCastleSealModalMobile();
-          });
-          modal.querySelectorAll('[data-seal-close]').forEach(el => {
-            el.addEventListener('click', closeCastleSealModalMobile);
-          });
-
-          const selMain = document.getElementById('castleSealMainSelM');
-          const selSub = document.getElementById('castleSealSubSelM');
-          selMain?.addEventListener('change', () => {
-            s.castleSeal.mainName = (selMain.value || '').trim();
-            refresh();
-          });
-          selSub?.addEventListener('change', () => {
-            s.castleSeal.subName = (selSub.value || '').trim();
-            refresh();
-          });
-
-          const commit = document.getElementById('castleSealCommitM');
-          commit?.addEventListener('click', () => {
-            closeCastleSealModalMobile();
-            toast('성안의 봉인이 적용되었습니다.');
-          });
-
-          modal.dataset.bound = '1';
-        }
-
-        // ✅ 버튼 클릭 시 모달 열기
-        btn.addEventListener('click', () => {
-          openCastleSealModalMobile(mains, subs);
-        });
-      }
-
+  const openModal = () => {
+    if (!modal) {
+      console.error('[CastleSeal] modal not found: #castleSealModalM');
+      toast('성안의 봉인 모달이 없습니다. HTML을 확인하세요.');
+      return;
     }
+
+    const selMain = document.getElementById('castleSealMainSelM');
+    const selSub  = document.getElementById('castleSealSubSelM');
+    if (!selMain || !selSub) {
+      console.error('[CastleSeal] selects not found', { selMain: !!selMain, selSub: !!selSub });
+      toast('성안의 봉인 셀렉트가 없습니다. HTML을 확인하세요.');
+      return;
+    }
+
+    const { mains, subs } = getLists();
+
+    const fill = (sel, arr, current) => {
+      // DOM 방식으로 안전하게 채우기
+      sel.innerHTML = '';
+      const opt0 = document.createElement('option');
+      opt0.value = '';
+      opt0.textContent = '- 선택 안함 -';
+      sel.appendChild(opt0);
+
+      for (const name of arr) {
+        const op = document.createElement('option');
+        op.value = name;
+        op.textContent = name;
+        sel.appendChild(op);
+      }
+      sel.value = current || '';
+    };
+
+    fill(selMain, mains, s.castleSeal.mainName);
+    fill(selSub,  subs,  s.castleSeal.subName);
+
+    modal.classList.add('show');        // ✅ CSS가 .modal.show로 열리는 구조
+    modal.setAttribute('aria-hidden', 'false');
+  };
+
+  const closeModal = () => {
+    if (!modal) return;
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+  };
+
+  // 2) 모달 이벤트 바인딩(1회만)
+  if (modal && !modal.dataset.bound) {
+    // backdrop/닫기 버튼
+    modal.addEventListener('click', (e) => {
+      const t = e.target;
+      if (t?.dataset?.sealClose !== undefined) closeModal();
+      if (t?.classList?.contains('backdrop')) closeModal();
+    });
+
+    // 셀렉트 change → state 반영 + summary 갱신
+    const selMain = document.getElementById('castleSealMainSelM');
+    const selSub  = document.getElementById('castleSealSubSelM');
+
+    selMain?.addEventListener('change', () => {
+      s.castleSeal.mainName = String(selMain.value || '').trim();
+      refresh();
+    });
+
+    selSub?.addEventListener('change', () => {
+      s.castleSeal.subName = String(selSub.value || '').trim();
+      refresh();
+    });
+
+    // 커밋 버튼
+    const commit = document.getElementById('castleSealCommitM');
+    commit?.addEventListener('click', () => {
+      closeModal();
+      toast('성안의 봉인이 적용되었습니다.');
+    });
+
+    modal.dataset.bound = '1';
+  }
+
+  // 3) 버튼 클릭 바인딩(1회만)
+  if (!btn.dataset.bound) {
+    btn.addEventListener('click', () => {
+      console.log('[CastleSeal] btn click'); // ✅ 디버깅용
+      openModal();
+    });
+    btn.dataset.bound = '1';
+  }
+}
 
     // ✅ Page 3 init을 '딱 1번만' 보장
     let __page3InitDone = false;
@@ -4052,6 +4258,338 @@
       bindRuneButtonMobile();
       await bindCastleSealMobile();
     }
+// ================================
+// ✅ Page4: Skill (SP/TP) UI
+// ================================
+let __page4InitDone = false;
+
+function ensurePage4Init(){
+  if (__page4InitDone) return;
+  __page4InitDone = true;
+
+  try{
+    bindSkillPageMobile();
+    renderSkillPageMobile();
+  }catch(e){
+    __page4InitDone = false;
+    console.error(e);
+  }
+}
+
+function _num(x, def=0){
+  const n = Number(x);
+  return Number.isFinite(n) ? n : def;
+}
+
+function _clamp(v, a, b){
+  v = _num(v, a);
+  if (v < a) return a;
+  if (v > b) return b;
+  return v;
+}
+
+function _pickAny(obj, keys){
+  for (const k of keys){
+    if (obj && obj[k] != null && String(obj[k]).trim() !== '') return obj[k];
+  }
+  return '';
+}
+
+function _getSkillListRaw(){
+  // 서버/버전별 키 차이를 느슨하게 커버
+  return (
+    window.CORE?.lists?.['skill:list'] ||
+    window.CORE?.lists?.['skills:list'] ||
+    window.CORE?.lists?.['skillList'] ||
+    window.CORE?.lists?.['skills'] ||
+    []
+  );
+}
+
+function _getSkillName(r){
+  return String(_pickAny(r, ['name','이름','skillName','스킬명']) || '').trim();
+}
+function _getSkillChar(r){
+  return String(_pickAny(r, ['charName','캐릭터명','캐릭터','char','job']) || '').trim();
+}
+function _getSkillReq(r){
+  return _num(_pickAny(r, ['reqLevel','요구레벨','레벨','Lv']) , 0);
+}
+function _getSkillMin(r){
+  return _num(_pickAny(r, ['minLevel','최소레벨','min','minLv']), 0);
+}
+function _getSkillMax(r){
+  // lvCap를 max로 쓰는 데이터도 있어서 느슨하게
+  const a = _pickAny(r, ['maxLevel','최대레벨','max','maxLv']);
+  const b = _pickAny(r, ['lvCap','레벨상한','cap']);
+  const n = _num(a, NaN);
+  return Number.isFinite(n) ? n : _num(b, 0);
+}
+function _getSkillTPCap(r){
+  return _num(_pickAny(r, ['tpCap','TP최대','tpMax','tpLimit']), 0);
+}
+function _getSkillShow(r){
+  // 시트가 한글키로 들어오면 '노출여부', 가공된 리스트면 'show'를 쓰는 경우가 많음
+  const v = _pickAny(r, ['노출여부','show','visible','노출','노출 여부']);
+  const s = String(v ?? '').trim();
+  return s === '1' || s.toLowerCase() === 'true';
+}
+function _getSkillImg(r){
+  return String(r?.['image'] ?? '').trim();
+}
+
+
+
+function _getCurrentCharKey(){
+  const c = window.state?.currentCharacter || {};
+  const k = String(c.ownerKey || c.charKey || '').trim();
+  if (k) return k.replace(/\s+/g, '');
+
+  // fallback: jobGroup + name 조합
+  const job = String(c.jobGroupLabel || c.jobGroup || c.job || '').trim();
+  const nm  = String(c.name || c.charName || '').trim();
+  return (job + nm).replace(/\s+/g, '');
+}
+
+
+function bindSkillPageMobile(){
+  const listEl = document.getElementById('skillListM');
+  const resetBtn = document.getElementById('btnSkillResetM');
+  if (!listEl) return;
+
+  // (1) 버튼 이벤트(위임)
+  if (!listEl.dataset.bound){
+    listEl.dataset.bound = '1';
+
+    listEl.addEventListener('click', (e) => {
+      const btn = e.target?.closest?.('button[data-act]');
+      if (!btn) return;
+
+      const row = btn.closest('.skill-row');
+      if (!row) return;
+
+      const act = btn.dataset.act;        // sp-min/sp-dec/sp-inc/sp-max/tp-...
+      const skillName = row.dataset.skill || '';
+      if (!skillName) return;
+
+      const s = (window.state || (window.state = {}));
+      const charKey = _getCurrentCharKey() || '__nochar__';
+
+      s.skillTrees = s.skillTrees || {};
+      s.skillTrees[charKey] = s.skillTrees[charKey] || {};
+      const store = s.skillTrees[charKey];
+
+      const cur = store[skillName] || { spLv: 0, tpLv: 0, spMin: 0, spMax: 0, tpMax: 0 };
+      const spMin = _num(cur.spMin, 0);
+      const spMax = _num(cur.spMax, 0);
+      const tpMax = _num(cur.tpMax, 0);
+
+      let spLv = _num(cur.spLv, spMin);
+      let tpLv = _num(cur.tpLv, 0);
+
+      switch(act){
+        case 'sp-min': spLv = spMin; break;
+        case 'sp-dec': spLv = spLv - 1; break;
+        case 'sp-inc': spLv = spLv + 1; break;
+        case 'sp-max': spLv = spMax; break;
+
+        case 'tp-min': tpLv = 0; break;
+        case 'tp-dec': tpLv = tpLv - 1; break;
+        case 'tp-inc': tpLv = tpLv + 1; break;
+        case 'tp-max': tpLv = tpMax; break;
+      }
+
+      spLv = _clamp(spLv, spMin, spMax);
+      tpLv = _clamp(tpLv, 0, tpMax);
+
+      store[skillName] = { ...cur, spLv, tpLv };
+      // 화면 숫자만 즉시 갱신
+      row.querySelector('[data-val="sp"]')?.replaceChildren(document.createTextNode(String(spLv)));
+      row.querySelector('[data-val="tp"]')?.replaceChildren(document.createTextNode(String(tpLv)));
+    });
+  }
+
+  // (2) 초기화 버튼
+  if (resetBtn && !resetBtn.dataset.bound){
+    resetBtn.dataset.bound = '1';
+    resetBtn.addEventListener('click', () => {
+      const s = (window.state || (window.state = {}));
+      const charKey = _getCurrentCharKey() || '__nochar__';
+      if (s.skillTrees && s.skillTrees[charKey]){
+        delete s.skillTrees[charKey];
+      }
+      renderSkillPageMobile();
+      toast('스킬이 초기화되었습니다.');
+    });
+  }
+}
+
+function renderSkillPageMobile(charObj){
+  const listEl = document.getElementById('skillListM');
+  if (!listEl) return;
+
+  const c = charObj || window.state?.currentCharacter || {};
+  const charKey = String(c.ownerKey || '').trim().replace(/\s+/g, '') || _getCurrentCharKey();
+  if (!charKey){
+    listEl.innerHTML = `<div style="padding:14px 10px; color:#c7b589;">캐릭터를 먼저 선택하세요.</div>`;
+    return;
+  }
+
+  const raw = _getSkillListRaw();
+  const rows = Array.isArray(raw) ? raw : [];
+
+  // 캐릭 필터
+  const mine = rows.filter(r =>
+  _getSkillChar(r).replace(/\s+/g,'') === charKey &&
+  _getSkillShow(r)
+);
+
+  if (!mine.length){
+    listEl.innerHTML = `<div style="padding:14px 10px; color:#c7b589;">표시할 스킬이 없습니다. (skill:list / 캐릭터명 매칭 확인)</div>`;
+    return;
+  }
+
+  // 저장소(캐릭별)  ✅ charKey로 통일
+const s = (window.state || (window.state = {}));
+s.skillTrees = s.skillTrees || {};
+s.skillTrees[charKey] = s.skillTrees[charKey] || {};
+const store = s.skillTrees[charKey];
+
+
+  // 정렬: 요구레벨 → 이름
+  mine.sort((a,b) => {
+    const da = _getSkillReq(a) - _getSkillReq(b);
+    if (da !== 0) return da;
+    return _getSkillName(a).localeCompare(_getSkillName(b), 'ko');
+  });
+
+  // 렌더
+  listEl.innerHTML = '';
+  const frag = document.createDocumentFragment();
+
+  let lastReq = null;
+
+  for (const r of mine){
+    const skillName = _getSkillName(r);
+    if (!skillName) continue;
+
+    const spMin = _getSkillMin(r);
+    const spMax = _getSkillMax(r);
+    const tpMax = _getSkillTPCap(r);
+    const reqLv = _getSkillReq(r);
+  // ✅ 렙제 바뀌면 구분 헤더(구분선) 삽입
+  if (lastReq !== reqLv){
+    lastReq = reqLv;
+
+    const div = document.createElement('div');
+    div.className = 'skill-divider';
+
+    const t = document.createElement('div');
+    t.className = 'txt';
+    t.textContent = `Lv ${reqLv}`;
+
+    const line = document.createElement('div');
+    line.className = 'line';
+
+    div.appendChild(t);
+    div.appendChild(line);
+    frag.appendChild(div);
+  }
+    const cur = store[skillName] || {};
+    const spLv = _clamp(cur.spLv ?? spMin, spMin, spMax);
+    const tpLv = _clamp(cur.tpLv ?? 0, 0, tpMax);
+
+    // cap 정보도 저장(클릭 로직에서 사용)
+    store[skillName] = { ...cur, spLv, tpLv, spMin, spMax, tpMax };
+
+    const row = document.createElement('div');
+    row.className = 'skill-row';
+    row.dataset.skill = skillName;
+
+    const left = document.createElement('div');
+left.className = 'skill-left';
+
+// (추가) 스킬 이미지
+const imgSrc = _getSkillImg(r);   // 아래 2)에서 새로 만드는 헬퍼
+if (imgSrc) {
+  const icon = document.createElement('div');
+  icon.className = 'skill-icon';
+
+  const img = document.createElement('img');
+  img.alt = skillName;
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  img.src = imgSrc;
+
+  icon.appendChild(img);
+  left.appendChild(icon);
+}
+
+const nm = document.createElement('div');
+nm.className = 'skill-name';
+nm.textContent = skillName;
+
+// ✅ meta(요구Lv/SP/TP) 완전 제거
+left.appendChild(nm);
+
+
+    const right = document.createElement('div');
+    right.className = 'skill-right';
+
+    const mkCtrl = (label, valKey, acts, disabledAll=false) => {
+      const line = document.createElement('div');
+      line.className = 'skill-ctrl';
+
+      const lbl = document.createElement('span');
+      lbl.className = 'lbl';
+      lbl.textContent = label;
+
+      const makeBtn = (text, act, wide=false, disabled=false) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'skill-mini' + (wide ? ' is-wide' : '');
+        b.textContent = text;
+        b.dataset.act = act;
+        if (disabledAll || disabled) b.disabled = true;
+        return b;
+      };
+
+      const v = document.createElement('span');
+      v.className = 'skill-val';
+      v.dataset.val = valKey;
+      v.textContent = String(valKey === 'sp' ? spLv : tpLv);
+
+      line.appendChild(lbl);
+
+// ✅ 좌측: MAX, +
+line.appendChild(makeBtn('MAX', acts.max, true));
+line.appendChild(makeBtn('+',   acts.inc));
+
+line.appendChild(v);
+
+// ✅ 우측: -, MIN
+line.appendChild(makeBtn('-',   acts.dec));
+line.appendChild(makeBtn('MIN', acts.min, true));
+
+return line;
+
+    };
+
+    right.appendChild(mkCtrl('SP', 'sp', {
+      min:'sp-min', dec:'sp-dec', inc:'sp-inc', max:'sp-max'
+    }));
+
+    right.appendChild(mkCtrl('TP', 'tp', {
+      min:'tp-min', dec:'tp-dec', inc:'tp-inc', max:'tp-max'
+    }, tpMax <= 0)); // tpCap=0이면 비활성
+
+    row.appendChild(left);
+    row.appendChild(right);
+    frag.appendChild(row);
+  }
+
+  listEl.appendChild(frag);
+}
 
     // ===== Header actions =====
     function openModal(id) {
