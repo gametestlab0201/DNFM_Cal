@@ -5015,6 +5015,7 @@
                   <li>01.30 '작열: 콰트로 카시테움 5세트' 쿨타임 감소치 조정</li>
                   <li>01.31 장비세트, 고유효과 일괄 입력 편의성 패치</li>
                   <li>02.06 오브젝트 데미지 조정</li>
+                  <li>02.10 쿠노이치 '강타' 고유효과 쿨타임 감소 옵션 적용</li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -6340,6 +6341,7 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
+          <li>26.02.10 쿠노이치 <span style="color: yellow;">'강타'</span> 무기 고유효과 <span style="color: #ff4444;">남은 쿨타임 감소</span> 옵션 적용</li>
           <li>26.02.06 <span style="color: yellow;">오브젝트 데미지</span> <span style="color: #ff4444;">속성부여</span> 적용 조정</li>
           <li>26.01.31 <span style="color: yellow;">장비세트, 고유효과</span> <span style="color: #ff4444;">일괄 입력</span> 편의성 패치 완료</li>
           <li>26.01.30 <span style="color: yellow;">작열: 콰트로 카시테움 5세트</span> <span style="color: #ff4444;">쿨타임 감소치</span> 조정</li>
@@ -9965,6 +9967,9 @@ function updateSpecialUserButton() {
           ownerKey = String(state?.CurrentSumStats?.ownerKey || '').trim();
         }
         const payload = { ownerKey, window: getTimeKey() };
+        if (state?.customSkills) {
+  payload.customSkills = state.customSkills;
+}
 
         if (ownerKey === '워리어와일드베인') {
           payload.wildbaneTreePreset = state.wildbaneTreePreset || '파파초';

@@ -2143,6 +2143,47 @@
   flex: 1 1 auto;
   background: rgba(231,199,125,.22);
 }
+/* ✅ 상단 고정(스크롤 내려도 보이게) */
+.skill-sticky{
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  margin: -16px -16px 10px;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+  background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.12));
+  backdrop-filter: blur(10px);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.skill-remaining{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding-top: 8px;
+  margin-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+}
+
+.skill-remaining.is-hidden{ display:none; }
+
+.skill-remaining .item{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  font-size:12px;
+  font-weight:900;
+  color: rgba(233,238,247,0.78);
+  letter-spacing:-0.2px;
+}
+
+.skill-remaining .num{
+  font-size:14px;
+  font-weight:900;
+  color: rgba(233,238,247,0.96);
+}
 
     
   </style>
@@ -2822,17 +2863,24 @@
   <div class="page-title">4 / 4</div>
 
   <div class="m-card">
+  <div class="skill-sticky">
     <div class="skill-topbar">
       <div class="skill-topbar-title">스킬</div>
       <button id="btnSkillResetM" type="button" class="m-btn m-btn-ghost">초기화</button>
     </div>
 
-    <div id="skillListM" class="skill-list"></div>
-
-    <div class="skill-footnote">
-      * SP = 스킬 레벨, TP = TP 레벨 (각 행에서 MIN/MAX/±로 조절)
+    <div id="skillRemainBarM" class="skill-remaining is-hidden">
+      <div class="item"><span class="k">남은 SP</span><span id="skillRemainSpM" class="num">-</span></div>
+      <div class="item"><span class="k">남은 TP</span><span id="skillRemainTpM" class="num">-</span></div>
     </div>
   </div>
+
+  <div id="skillListM" class="skill-list"></div>
+
+  <div class="skill-footnote">
+    * SP = 스킬 레벨, TP = TP 레벨 (각 행에서 MIN/MAX/±로 조절)
+  </div>
+</div>
 </section>
 
 
@@ -3430,15 +3478,66 @@ const ownerKey = (job + nm).replace(/\s+/g, '');
       console.log('[AVATAR] picked', { avatarsLen: avatars.length, imprintsLen: imprints.length, avatars0: avatars[0], imprints0: imprints[0] });
 
       try {
-        console.log('[AVATAR] before fill', { aOptions: aSel?.options?.length, iOptions: iSel?.options?.length });
-        fillSelectOptions_(aSel, avatars, '아바타 선택');
-        fillSelectOptions_(iSel, imprints, '무기압 선택');
-        console.log('[AVATAR] after fill', { aOptions: aSel?.options?.length, iOptions: iSel?.options?.length });
-      } catch (e) {
-        console.error('[AVATAR] fillSelectOptions_ crashed', e);
-      }
+  console.log('[AVATAR] before fill', { aOptions: aSel?.options?.length, iOptions: iSel?.options?.length });
+  fillSelectOptions_(aSel, avatars, '아바타 선택');
+  fillSelectOptions_(iSel, imprints, '무기압 선택');
+  console.log('[AVATAR] after fill', { aOptions: aSel?.options?.length, iOptions: iSel?.options?.length });
+} catch (e) {
+  console.error('[AVATAR] fillSelectOptions_ crashed', e);
+}
 
-      console.log('[AVATAR] done');
+/* ✅✅✅ [추가 시작] 선택값을 window.state.avatarSel에 저장/복원 + change 바인딩 */
+window.state = window.state || {};
+const s = window.state;
+
+// state 슬롯 준비
+s.avatarSel = s.avatarSel || { avatarName: '', imprintName: '' };
+
+// 1) 기존 state 값이 있으면 UI에 복원, 없으면 첫 옵션을 기본값으로 state에 저장
+if (aSel) {
+  const savedA = String(s.avatarSel.avatarName || '').trim();
+  if (savedA && avatars.includes(savedA)) {
+    aSel.value = savedA;
+  } else if (avatars.length) {
+    aSel.value = avatars[0];
+    s.avatarSel.avatarName = String(aSel.value || '').trim();
+  }
+}
+
+if (iSel) {
+  const savedI = String(s.avatarSel.imprintName || '').trim();
+  if (savedI && imprints.includes(savedI)) {
+    iSel.value = savedI;
+  } else if (imprints.length) {
+    iSel.value = imprints[0];
+    s.avatarSel.imprintName = String(iSel.value || '').trim();
+  }
+}
+
+// 2) change 이벤트(중복 바인딩 방지)
+if (aSel && !aSel.dataset.boundAvatar) {
+  aSel.addEventListener('change', () => {
+    s.avatarSel = s.avatarSel || {};
+    s.avatarSel.avatarName = String(aSel.value || '').trim();
+    console.log('[AVATAR] state.avatarSel updated', s.avatarSel);
+  });
+  aSel.dataset.boundAvatar = '1';
+}
+
+if (iSel && !iSel.dataset.boundImprint) {
+  iSel.addEventListener('change', () => {
+    s.avatarSel = s.avatarSel || {};
+    s.avatarSel.imprintName = String(iSel.value || '').trim();
+    console.log('[AVATAR] state.avatarSel updated', s.avatarSel);
+  });
+  iSel.dataset.boundImprint = '1';
+}
+
+console.log('[AVATAR] init mirror done', s.avatarSel);
+/* ✅✅✅ [추가 끝] */
+
+console.log('[AVATAR] done');
+
     }
 
     // 3페이지: 몬스터 목록 (CORE.lists['monster:list'])
@@ -3470,10 +3569,16 @@ const ownerKey = (job + nm).replace(/\s+/g, '');
 
 
 
-      // ✅ 기존 선택 복원
-      if (s.monsterName && names.includes(s.monsterName)) {
-        sel.value = s.monsterName;
-      }
+      // ✅ 기존 선택 복원 + 기본값(맨 윗값) 자동 적용
+if (s.monsterName && names.includes(s.monsterName)) {
+  sel.value = s.monsterName;
+} else if (names.length) {
+  // ✅ 기본값: 가장 윗값
+  sel.value = names[0];
+  s.monsterName = String(sel.value || '').trim();
+  console.log('[M3][MON] default applied:', s.monsterName);
+}
+
 
       // ✅ init이 여러 번 호출돼도 리스너 중복 등록 방지
       if (!sel.dataset.bound) {
@@ -4144,6 +4249,22 @@ const ownerKey = (job + nm).replace(/\s+/g, '');
     return { mains, subs };
   };
 
+// ✅ [추가] 기본값 자동 세팅: 비어있으면 항상 “맨 위(0번)”로
+const ensureCastleSealDefaults = () => {
+  const { mains, subs } = getLists();
+
+  if (!s.castleSeal.mainName && mains.length) {
+    s.castleSeal.mainName = mains[0];
+  }
+  if (!s.castleSeal.subName && subs.length) {
+    s.castleSeal.subName = subs[0];
+  }
+};
+
+// ✅ [추가] 바인딩 시점에 1번 기본값 확정 + 요약 갱신
+ensureCastleSealDefaults();
+refresh();
+
   const openModal = () => {
     if (!modal) {
       console.error('[CastleSeal] modal not found: #castleSealModalM');
@@ -4158,6 +4279,9 @@ const ownerKey = (job + nm).replace(/\s+/g, '');
       toast('성안의 봉인 셀렉트가 없습니다. HTML을 확인하세요.');
       return;
     }
+
+      // ✅ [추가] 모달 열 때도 안전하게 기본값 보정
+  ensureCastleSealDefaults();
 
     const { mains, subs } = getLists();
 
@@ -4326,7 +4450,9 @@ function _getSkillMax(r){
   return Number.isFinite(n) ? n : _num(b, 0);
 }
 function _getSkillTPCap(r){
-  return _num(_pickAny(r, ['tpCap','TP최대','tpMax','tpLimit']), 0);
+  // ✅ tpMax 컬럼이 없으므로: tp설정이 있으면 유저 수동 TP는 최대 5
+  const set = _num(_pickAny(r, ['tp','tp설정','tp 설정','TP설정','TP 설정','tpSetting','tp_setting']), 0);
+  return (set === 1 || set === 2) ? 5 : 0;
 }
 function _getSkillShow(r){
   // 시트가 한글키로 들어오면 '노출여부', 가공된 리스트면 'show'를 쓰는 경우가 많음
@@ -4336,6 +4462,87 @@ function _getSkillShow(r){
 }
 function _getSkillImg(r){
   return String(r?.['image'] ?? '').trim();
+}
+function _getSkillSpCost(r){
+  // 스킬 시트의 '소모 sp' 컬럼(PC에서는 skill.sp 로 들어감)
+  return _num(_pickAny(r, ['costSP','소모 sp','소모sp','SP소모','sp','spCost','sp_cost','sp소모']), 0);
+}
+function _getSkillTpCost(r){
+  // ✅ TP 1레벨당 소모량:
+  // 사용자가 말한 규칙: 시트의 'tp설정' 값이 1이면 1, 2이면 2를 소모
+  const set = _num(_pickAny(r, ['tp','tp 설정','TP설정','TP 설정','tpSetting','tp_setting']), NaN);
+  if (set === 1 || set === 2) return set;
+}
+
+// ===== Page4 Skill: 남은 SP/TP 표시 =====
+function _getCharTotalSpTp(){
+  const s = window.state || {};
+  const c = s.currentCharacter || {};
+
+  // ✅ 모바일 char:list에서 총 SP/TP가 sp / tp 로 들어오는 경우가 많아서 포함
+  const totalSP_1 = _num(_pickAny(c, [
+    'TotalSP','totalSP','spTotal','총SP','SP총합','spAll',
+    'sp','SP','sp_total','totalSp'
+  ]), NaN);
+
+  const totalTP_1 = _num(_pickAny(c, [
+    'TotalTP','totalTP','tpTotal','총TP','TP총합','tpAll',
+    'tp','TP','tp_total','totalTp'
+  ]), NaN);
+
+  // ✅ 폴백: state.sp.total / state.tp.total (PC쪽 구조를 따라온 경우)
+  const totalSP = Number.isFinite(totalSP_1) ? totalSP_1 : _num(s?.sp?.total, NaN);
+  const totalTP = Number.isFinite(totalTP_1) ? totalTP_1 : _num(s?.tp?.total, NaN);
+
+  return { totalSP, totalTP };
+}
+
+
+function _calcUsedSpTp(){
+  const charKey = _getCurrentCharKey() || '__nochar__';
+  const store = window.state?.skillTrees?.[charKey] || {};
+  let usedSP = 0;
+  let usedTP = 0;
+
+  for (const k in store){
+    const it = store[k];
+    if (!it) continue;
+
+    const spLv  = _num(it.spLv, 0);
+    const spMin = _num(it.spMin, 0);
+    const tpLv  = _num(it.tpLv, 0);
+
+    const spCost = _num(it.spCost ?? it.sp ?? 0, 0);
+    const tpCost = _num(it.tpCost ?? 1, 1);
+
+    usedSP += Math.max(0, spLv - spMin) * (spCost > 0 ? spCost : 0);
+    usedTP += Math.max(0, tpLv) * (tpCost > 0 ? tpCost : 0);
+  }
+  return { usedSP, usedTP };
+}
+
+function updateSkillRemainBar(){
+  const bar = document.getElementById('skillRemainBarM');
+  const elSp = document.getElementById('skillRemainSpM');
+  const elTp = document.getElementById('skillRemainTpM');
+  if (!bar || !elSp || !elTp) return;
+
+  const { totalSP, totalTP } = _getCharTotalSpTp();
+  const hasAny = Number.isFinite(totalSP) || Number.isFinite(totalTP);
+
+  if (!hasAny){
+    bar.classList.add('is-hidden');
+    elSp.textContent = '-';
+    elTp.textContent = '-';
+    return;
+  }
+
+  bar.classList.remove('is-hidden');
+
+  const { usedSP, usedTP } = _calcUsedSpTp();
+
+  elSp.textContent = Number.isFinite(totalSP) ? String(Math.max(0, Math.round(totalSP - usedSP))) : '-';
+  elTp.textContent = Number.isFinite(totalTP) ? String(Math.max(0, Math.round(totalTP - usedTP))) : '-';
 }
 
 
@@ -4387,16 +4594,49 @@ function bindSkillPageMobile(){
       let spLv = _num(cur.spLv, spMin);
       let tpLv = _num(cur.tpLv, 0);
 
+      // ✅ (보너스) 남은 SP/TP 기반으로 이 스킬의 최대치(cap) 계산
+const spCost = Number(cur?.spCost ?? 0);
+const tpCost = Number(cur?.tpCost ?? 0);
+
+const { totalSP, totalTP } = _getCharTotalSpTp();
+const { usedSP, usedTP } = _calcUsedSpTp();
+
+// 현재 스킬이 이미 쓰고 있는 양(되돌릴 수 있으니 가용량 계산에서 제외)
+const curSpentSP = (spCost > 0) ? Math.max(0, spLv - spMin) * spCost : 0;
+const curSpentTP = (tpCost > 0) ? Math.max(0, tpLv) * tpCost : 0;
+
+// 이 스킬에 “실제로 쓸 수 있는” 가용 SP/TP
+const availSP = Math.max(0, totalSP - (usedSP - curSpentSP));
+const availTP = Math.max(0, totalTP - (usedTP - curSpentTP));
+
+// 남은 SP/TP로부터 계산되는 최대 레벨
+const spMaxByRemain = (spCost > 0) ? (spMin + Math.floor(availSP / spCost)) : spMax;
+const tpMaxByRemain = (tpCost > 0) ? Math.floor(availTP / tpCost) : tpMax;
+
+// 최종 cap (원래의 스킬 제한도 같이 적용)
+const spCap = Math.max(spMin, Math.min(spMax, spMaxByRemain));
+const tpCap = Math.max(0,    Math.min(tpMax, tpMaxByRemain));
+
       switch(act){
         case 'sp-min': spLv = spMin; break;
         case 'sp-dec': spLv = spLv - 1; break;
-        case 'sp-inc': spLv = spLv + 1; break;
-        case 'sp-max': spLv = spMax; break;
+        case 'sp-inc':
+  spLv = Math.min(spLv + 1, spCap);
+  break;
+
+case 'sp-max':
+  spLv = spCap;
+  break;
 
         case 'tp-min': tpLv = 0; break;
         case 'tp-dec': tpLv = tpLv - 1; break;
-        case 'tp-inc': tpLv = tpLv + 1; break;
-        case 'tp-max': tpLv = tpMax; break;
+        case 'tp-inc':
+  tpLv = Math.min(tpLv + 1, tpCap);
+  break;
+
+case 'tp-max':
+  tpLv = tpCap;
+  break;
       }
 
       spLv = _clamp(spLv, spMin, spMax);
@@ -4406,6 +4646,7 @@ function bindSkillPageMobile(){
       // 화면 숫자만 즉시 갱신
       row.querySelector('[data-val="sp"]')?.replaceChildren(document.createTextNode(String(spLv)));
       row.querySelector('[data-val="tp"]')?.replaceChildren(document.createTextNode(String(tpLv)));
+      updateSkillRemainBar(); // ✅ 추가
     });
   }
 
@@ -4419,6 +4660,7 @@ function bindSkillPageMobile(){
         delete s.skillTrees[charKey];
       }
       renderSkillPageMobile();
+      updateSkillRemainBar(); // ✅ 추가
       toast('스킬이 초기화되었습니다.');
     });
   }
@@ -4432,6 +4674,7 @@ function renderSkillPageMobile(charObj){
   const charKey = String(c.ownerKey || '').trim().replace(/\s+/g, '') || _getCurrentCharKey();
   if (!charKey){
     listEl.innerHTML = `<div style="padding:14px 10px; color:#c7b589;">캐릭터를 먼저 선택하세요.</div>`;
+    updateSkillRemainBar();
     return;
   }
 
@@ -4476,6 +4719,8 @@ const store = s.skillTrees[charKey];
     const spMin = _getSkillMin(r);
     const spMax = _getSkillMax(r);
     const tpMax = _getSkillTPCap(r);
+    const spCost = _getSkillSpCost(r);
+const tpCost = _getSkillTpCost(r);
     const reqLv = _getSkillReq(r);
   // ✅ 렙제 바뀌면 구분 헤더(구분선) 삽입
   if (lastReq !== reqLv){
@@ -4500,11 +4745,14 @@ const store = s.skillTrees[charKey];
     const tpLv = _clamp(cur.tpLv ?? 0, 0, tpMax);
 
     // cap 정보도 저장(클릭 로직에서 사용)
-    store[skillName] = { ...cur, spLv, tpLv, spMin, spMax, tpMax };
+    store[skillName] = { ...cur, spLv, tpLv, spMin, spMax, tpMax, spCost, tpCost };
 
     const row = document.createElement('div');
     row.className = 'skill-row';
     row.dataset.skill = skillName;
+    row.dataset.spcost = String(spCost ?? 0);
+    row.dataset.tpcost = String(tpCost ?? 1);
+
 
     const left = document.createElement('div');
 left.className = 'skill-left';
@@ -4589,6 +4837,7 @@ return line;
   }
 
   listEl.appendChild(frag);
+  updateSkillRemainBar(); // ✅ 추가
 }
 
     // ===== Header actions =====
@@ -6448,6 +6697,68 @@ return line;
     // - 마법부여: state.enchants
     // - 엠블렘: state.emblems
     // ============================================================
+async function saveSkillSelectionsMobile() {
+  const s = window.state || {};
+
+  // 1) ownerKey 계산 (PC와 동일 로직)
+  let ownerKey = '';
+  if (s.currentCharacter) {
+    const jg = String(s.currentCharacter.jobGroupLabel || s.currentCharacter.jobGroup || '').trim();
+    const nm = String(s.currentCharacter.name || s.currentCharacter.charName || '').trim();
+    if (jg || nm) ownerKey = (jg + nm).replace(/\s+/g, '');
+  }
+  if (!ownerKey) ownerKey = String(s.CurrentSumStats?.ownerKey || s.ownerKey || '').trim();
+  if (!ownerKey) throw new Error('missing_owner');
+
+  // state에도 캐시(다음 호출들에서 재사용)
+  s.ownerKey = ownerKey;
+
+// 2) 모바일 skillTrees -> skills 배열로 변환 (PC가 보내는 형태)
+// Page4와 동일하게 "ownerKey(=charKey)"로 읽어야 한다
+const charKey = String(s.currentCharacter?.ownerKey || ownerKey || '').trim().replace(/\s+/g,'');
+const tree = (s.skillTrees && charKey && s.skillTrees[charKey]) ? s.skillTrees[charKey] : {};
+
+  const skills = [];
+  for (const [name, v] of Object.entries(tree)) {
+    const lv = Number(v?.spLv ?? 0);
+    const tp = Number(v?.tpLv ?? 0);
+    // lv/tp 둘 중 하나라도 있으면 보내기 (tp만 찍는 케이스 방어)
+    if (lv > 0 || tp > 0) skills.push({ name, lv, tp });
+  }
+
+  // ✅ 핵심: byName이 아니라 skills 배열로 보낸다 (PC 동일)
+  const res = await apiJSON('skill_state_set', { ownerKey, skills });
+  if (!res?.ok) throw new Error(res?.message || res?.error || 'skill_state_set_failed');
+  return res;
+}
+
+
+async function simulateSkillUsageMobile() {
+  const s = window.state || {};
+
+  // ownerKey 확보 (saveSkillSelectionsMobile에서 캐시된 값 우선)
+  let ownerKey = String(s.ownerKey || s.CurrentSumStats?.ownerKey || '').trim();
+  if (!ownerKey && s.currentCharacter) {
+    const jg = String(s.currentCharacter.jobGroupLabel || s.currentCharacter.jobGroup || '').trim();
+    const nm = String(s.currentCharacter.name || s.currentCharacter.charName || '').trim();
+    ownerKey = (jg + nm).replace(/\s+/g, '');
+  }
+  if (!ownerKey) throw new Error('missing_owner');
+
+  const timeKey = String(s.timeKey || '180');
+
+  const res = await apiJSON('skill_uses', {
+    ownerKey,
+    window: timeKey,
+    wantDbg: false,
+  });
+
+  if (!res?.ok) throw new Error(res?.message || res?.error || 'skill_uses_failed');
+  return res;
+}
+
+
+
     function buildCalcAllPayloadMobile() {
       const s = window.state || {};
       const c = s.currentCharacter || {};
@@ -6610,43 +6921,57 @@ return line;
     window.__buildCalcAllPayloadMobile = buildCalcAllPayloadMobile;
 
     document.getElementById('btnMobileCompute')?.addEventListener('click', async () => {
-      try {
-        // 1) payload 구성
-        const payload = buildCalcAllPayloadMobile();
-        window.state = window.state || {};
-        window.state.lastCalcAllPayload = payload;
+  try {
+    // 0) payload 구성
+    const payload = buildCalcAllPayloadMobile();
+    window.state = window.state || {};
+    window.state.lastCalcAllPayload = payload;
 
-        // 2) 백엔드 세션에 반영(calc_all)
-        const res = await apiJSON('calc_all', { payload, p: null });
-        if (!res?.ok) {
-          throw new Error(res?.message || res?.error || 'calc_all_failed');
-        }
+    // 1) 장비/옵션/아바타/룬각인/시간기준/몬스터 등 세션 반영
+    const resCalc = await apiJSON('calc_all', { payload, p: null });
+    if (!resCalc?.ok) throw new Error(resCalc?.message || resCalc?.error || 'calc_all_failed');
 
-        // 3) (선택) sum_stats 한번 호출해서 세션이 정상 반영됐는지 확인
-        //    - UI 갱신은 다음 단계에서 "PC 패널과 동일"하게 연결하면 됨
-        const sum = await apiJSON('sum_stats', { wantDbg: false });
-        if (sum?.ok) {
-          document.getElementById('mobileFinalDamage').textContent = '세션 반영 완료';
-        } else {
-          document.getElementById('mobileFinalDamage').textContent = '세션 반영(확인 실패)';
-        }
+    // 2) (선택) sum_stats로 세션 정리/확인
+    const sum = await apiJSON('sum_stats', { wantDbg: false });
+    if (!sum?.ok) console.warn('[MOBILE sum_stats fail]', sum);
 
-        toast('세션에 장비/옵션 스냅샷 반영 완료!');
-        console.log('[MOBILE calc_all payload]', payload);
-        console.log('[MOBILE calc_all res]', res);
-        console.log('[MOBILE sum_stats res]', sum);
+    if (sum?.ok) window.state.CurrentSumStats = sum.sum;   // ★ PC와 동일하게 sum만 저장
 
-      } catch (e) {
-        console.error(e);
-        const msg = String(e?.message || e || '');
-        if (msg === 'missing_char') {
-          toast('캐릭터를 먼저 선택해 주세요.');
-        } else {
-          toast('계산(세션 반영) 실패: ' + msg);
-        }
-        document.getElementById('mobileFinalDamage').textContent = '-';
-      }
+    // 3) ✅ 스킬 상태 저장 (skill_state_set)
+    await saveSkillSelectionsMobile(); 
+
+    // 4) ✅ 스킬 사용횟수 시뮬레이션 (skill_uses)
+    const uses = await simulateSkillUsageMobile();
+    window.state.lastSkillUses = uses;
+
+    // 5) ✅ 최종 compute
+    const s = window.state || {};
+    const timeKey = String(s.timeKey || '180');
+    const monster = s.monster || (s.monsterName ? { name: s.monsterName } : null);
+
+    const resCompute = await apiJSON('compute', {
+      p: null,
+      window: timeKey,
+      monster,
     });
+
+    if (!resCompute?.ok) throw new Error(resCompute?.message || resCompute?.error || 'compute_failed');
+
+    const total = Number(resCompute.total || 0);
+    document.getElementById('mobileFinalDamage').textContent = Math.floor(total).toLocaleString();
+
+    toast('계산 완료!');
+    console.log('[MOBILE calc_all payload]', payload);
+    console.log('[MOBILE skill_uses]', uses);
+    console.log('[MOBILE compute]', resCompute);
+
+  } catch (e) {
+    console.error(e);
+    document.getElementById('mobileFinalDamage').textContent = '-';
+    toast('계산 실패: ' + String(e?.message || e || ''));
+  }
+});
+
 
     /* ===== Auto Input (PC 동일 기능) ===== */
 
