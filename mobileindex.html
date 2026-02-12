@@ -546,6 +546,74 @@
       color: var(--text);
     }
 
+    /* ✅ (추가) 개별 고유효과 버튼 색상: data-ucolor로 제어 */
+    .equip-u-mini[data-ucolor="강타"] {
+      border-color: #facc15;
+      color: #facc15;
+      background: rgba(250, 204, 21, 0.08);
+    }
+
+    .equip-u-mini[data-ucolor="광채"] {
+      border-color: #38bdf8;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .equip-u-mini[data-ucolor="분쇄"] {
+      border-color: #f97373;
+      color: #f97373;
+      background: rgba(248, 113, 113, 0.08);
+    }
+
+    .equip-u-mini[data-ucolor="선명"] {
+      border-color: #4ade80;
+      color: #4ade80;
+      background: rgba(74, 222, 128, 0.08);
+    }
+
+    .equip-u-mini[data-ucolor="none"] {
+      border-color: var(--line);
+      color: var(--muted);
+      background: rgba(255, 255, 255, .04);
+    }
+
+    /* ✅ (추가) 색이 들어가면 tag도 같이 물들게 */
+    .equip-u-mini[data-ucolor="강타"] .tag,
+    .equip-u-mini[data-ucolor="광채"] .tag,
+    .equip-u-mini[data-ucolor="분쇄"] .tag,
+    .equip-u-mini[data-ucolor="선명"] .tag {
+      color: inherit;
+    }
+
+    /* (선택) 모달의 '선봉/의지/이상' 버튼도 요청 매핑대로 색 적용 */
+    .unique-options-other .unique-btn[data-value="선봉"] {
+      border-color: #f97373;
+      color: #f97373;
+      background: rgba(248, 113, 113, 0.08);
+      /* 분쇄색 */
+    }
+
+    .unique-options-other .unique-btn[data-value="의지"] {
+      border-color: #38bdf8;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.08);
+      /* 광채색 */
+    }
+
+    .unique-options-other .unique-btn[data-value="이상"] {
+      border-color: #4ade80;
+      color: #4ade80;
+      background: rgba(74, 222, 128, 0.08);
+      /* 선명색 */
+    }
+
+    .unique-options-other .unique-btn[data-value="없음"] {
+      border-color: var(--line);
+      color: var(--muted);
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+
 
     /* 우측: 강화(연마) | 마법봉인 | 마법부여 | 엠블렘 */
     #pageEquip .equip-right {
@@ -2261,199 +2329,412 @@
       color: rgba(233, 238, 247, 0.96);
     }
 
-    /* ✅ (NEW) Set list cards */
-    .mset-list {
+    /* =========================
+   ✅ (Mobile) PC풍 세트 모달 스타일
+========================= */
+
+    .armor-set-dialog {
+      width: min(980px, 96vw);
+      height: min(720px, 90vh);
+    }
+
+    /* body scroll */
+    .armor-set-body {
+      overflow: auto;
+      padding: 8px 6px 14px;
+    }
+
+    /* 카드 그리드: ✅ 모바일 전용 1열 */
+    .armor-set-list {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr;
+      /* ✅ 1열로 고정 */
       gap: 10px;
     }
 
-    .mset-card {
-      border: 1px solid rgba(255, 255, 255, .12);
-      background: rgba(255, 255, 255, .05);
+    /* ✅ 1열에서는 스페이서가 필요 없으니 항상 숨김 */
+    .armor-set-spacer {
+      display: none !important;
+    }
+
+
+    /* (PC처럼) 첫 줄 정렬 맞추기용 스페이서 */
+    .armor-set-spacer {
+      display: none;
+    }
+
+    @media (min-width: 720px) {
+      .armor-set-spacer {
+        display: block;
+      }
+    }
+
+    /* 세트 카드 */
+    .armor-set-card {
+      background: #15100c;
+      border: 1px solid #3b2b1e;
       border-radius: 14px;
       padding: 10px;
     }
 
-    .mset-title {
-      font-weight: 800;
+    /* 카드 헤더: 세트명 + 적용버튼 */
+    .armor-set-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
       font-size: 13px;
+      font-weight: 900;
+      color: #f6e7d2;
     }
 
-    .mset-sub {
-      opacity: .8;
-      font-size: 12px;
-      margin-top: 4px;
+    /* “세트 적용” 버튼(PC 토글 느낌) */
+    .set-auto-toggle {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(250, 204, 107, .9);
+      background: rgba(250, 204, 21, 0.10);
+      color: #facc6b;
+      font-weight: 900;
     }
 
-    .mset-card button {
-      margin-top: 8px;
-      width: 100%;
-      height: 34px;
+    /* 카드 안 아이템들 */
+    .armor-set-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* 아이템 버튼 */
+    .armor-set-item {
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    /* 아이콘 박스 */
+    .iconbox {
+      width: 44px;
+      height: 44px;
       border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, .14);
-      background: rgba(255, 255, 255, .06);
-      color: #fff;
-      font-weight: 800;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, .10);
+      background: rgba(255, 255, 255, .05);
     }
+
+    .icon {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* 레벨 배지 */
+    .badge-lv {
+      position: absolute;
+      left: 4px;
+      bottom: 4px;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 2px 5px;
+      border-radius: 999px;
+      color: #fff;
+      background: rgba(0, 0, 0, .55);
+      border: 1px solid rgba(255, 255, 255, .14);
+    }
+
     /* =========================
    ✅ PC 고유효과 모달 스타일 이식 (Mobile)
 ========================= */
 
-/* PC의 titlebar */
-.armor-set-titlebar{
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 0 8px;
-  border-bottom: 1px solid #2a211a;
-}
-.armor-set-titlebar h2{
-  margin: 0;
-  font-size: 15px;
-  color: #f0e6d2;
-  font-weight: 700;
-  text-align: center;
-}
-.armor-set-titlebar .close{
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 26px;
-  height: 26px;
-  display: grid;
-  place-items: center;
-  line-height: 1;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.16);
-  background: rgba(255,255,255,0.08);
-  color: #fff;
-  cursor: pointer;
-  transition: all .2s ease;
-}
-.armor-set-titlebar .close:hover{
-  background: rgba(255,255,255,0.16);
-  border-color: rgba(255,255,255,0.3);
-}
-/* ✅ PC 개별 고유효과 모달 닫기버튼 느낌(원형) */
-#mUniquePickModal .armor-set-titlebar .close{
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #f0e6d2;
-  font-size: 14px;
-  font-weight: 700;
-}
-#mUniquePickModal .armor-set-titlebar .close:hover{
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.3);
-}
+    /* PC의 titlebar */
+    .armor-set-titlebar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 0 8px;
+      border-bottom: 1px solid #2a211a;
+    }
 
-/* ✅ 고유효과 모달 레이아웃 */
-.unique-dialog{
-  width: min(600px, 95vw);
-  max-height: 80vh;
-}
-.unique-body{
-  padding: 12px 10px 14px;
-  display: grid;
-  gap: 12px;
-}
-.unique-section{
-  border-radius: 10px;
-  border: 1px solid #3a2c21;
-  background: #15100c;
-  padding: 8px 10px;
-}
-.unique-section-title{
-  font-size: 14px;
-  margin: 0 0 12px;
-  color: #facc6b;
-}
+    .armor-set-titlebar h2 {
+      margin: 0;
+      font-size: 15px;
+      color: #f0e6d2;
+      font-weight: 700;
+      text-align: center;
+    }
 
-/* 고유효과 옵션 목록 */
-.unique-options{
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+    .armor-set-titlebar .close {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      line-height: 1;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
 
-/* 한 줄: [버튼] [설명] */
-.unique-row{
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 4px 6px;
-  border-radius: 8px;
-  transition: background .12s ease, box-shadow .12s ease;
-}
-.unique-row:hover,
-.unique-row.is-selected{
-  background: rgba(148,163,184,0.12);
-  box-shadow: 0 0 0 1px rgba(148,163,184,0.25);
-}
-.unique-row:hover .unique-btn,
-.unique-row.is-selected .unique-btn{
-  transform: translateY(-1px);
-  box-shadow: 0 0 0 1px rgba(248,250,252,0.35);
-}
-.unique-row:hover .unique-desc,
-.unique-row.is-selected .unique-desc{
-  color: #e5e7eb;
-}
+    .armor-set-titlebar .close:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
 
-/* 버튼/설명 */
-.unique-btn{
-  min-width: 60px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid #3a2c21;
-  background: rgba(15,23,42,0.85);
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  align-self: flex-start;
-  transition: background .12s ease, color .12s ease, box-shadow .12s ease, border-color .12s ease;
-}
-.unique-btn:hover{ background: rgba(15,23,42,1); }
-.unique-btn.is-active{
-  box-shadow: 0 0 0 1px rgba(250,250,250,0.12);
-}
-.unique-desc{
-  flex: 1;
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.4;
-  white-space: normal;
-}
-.unique-actions{
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 4px;
-}
+    .armor-set-titlebar .close:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
 
-/* ───── 무기 고유효과 색상 ───── */
-.unique-options-weapon .unique-btn[data-value="강타"]{
-  border-color:#facc15; color:#facc15; background:rgba(250,204,21,0.08);
-}
-.unique-options-weapon .unique-btn[data-value="광채"]{
-  border-color:#38bdf8; color:#38bdf8; background:rgba(56,189,248,0.08);
-}
-.unique-options-weapon .unique-btn[data-value="분쇄"]{
-  border-color:#f97373; color:#f97373; background:rgba(248,113,113,0.08);
-}
-.unique-options-weapon .unique-btn[data-value="선명"]{
-  border-color:#4ade80; color:#4ade80; background:rgba(74,222,128,0.08);
-}
-.unique-options-weapon .unique-btn[data-value="없음"]{
-  border-color:var(--line); color:var(--muted); background:rgba(15,23,42,0.6);
-}
+    /* =========================
+   ✅ 익시드/에픽 토글 (Mobile)
+========================= */
+    .armor-set-titlebar .armor-toggle {
+      position: absolute;
+      right: 46px;
+      /* close(오른쪽 10px) 왼쪽에 붙임 */
+      top: 50%;
+      transform: translateY(-50%);
+    }
 
+    /* 토글 트랙 */
+    .armor-toggle {
+      position: relative;
+      width: 120px;
+      height: 26px;
+      border-radius: 999px;
+      padding: 2px;
+      display: flex;
+      align-items: stretch;
+      overflow: hidden;
+      user-select: none;
+      cursor: pointer;
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.30),
+        0 3px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    /* 상태별 배경 */
+    .armor-toggle.mode-exceed {
+      background: linear-gradient(135deg, #22c55e, #10b981);
+    }
+
+    .armor-toggle.mode-epic {
+      background: linear-gradient(135deg, #facc15, #f97316);
+    }
+
+    /* 라벨 */
+    .armor-toggle-label {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      z-index: 2;
+      transition: color .2s ease;
+    }
+
+    .armor-toggle.mode-exceed .armor-toggle-label-exceed {
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .armor-toggle.mode-exceed .armor-toggle-label-epic {
+      color: rgba(15, 23, 42, 0.45);
+      font-weight: 600;
+    }
+
+    .armor-toggle.mode-epic .armor-toggle-label-exceed {
+      color: rgba(15, 23, 42, 0.45);
+      font-weight: 600;
+    }
+
+    .armor-toggle.mode-epic .armor-toggle-label-epic {
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    /* 손잡이 */
+    .armor-toggle-thumb {
+      position: absolute;
+      top: 2px;
+      bottom: 2px;
+      width: 50%;
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+      transition: transform .25s ease;
+      z-index: 1;
+    }
+
+    .armor-toggle.mode-exceed .armor-toggle-thumb {
+      transform: translateX(0%);
+    }
+
+    .armor-toggle.mode-epic .armor-toggle-thumb {
+      transform: translateX(100%);
+    }
+
+    /* 키보드 포커스 */
+    .armor-toggle:focus {
+      outline: 2px solid rgba(250, 204, 21, 0.65);
+      outline-offset: 2px;
+    }
+
+    /* ✅ PC 개별 고유효과 모달 닫기버튼 느낌(원형) */
+    #mUniquePickModal .armor-set-titlebar .close {
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #f0e6d2;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    #mUniquePickModal .armor-set-titlebar .close:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* ✅ 고유효과 모달 레이아웃 */
+    .unique-dialog {
+      width: min(600px, 95vw);
+      max-height: 80vh;
+    }
+
+    .unique-body {
+      padding: 12px 10px 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .unique-section {
+      border-radius: 10px;
+      border: 1px solid #3a2c21;
+      background: #15100c;
+      padding: 8px 10px;
+    }
+
+    .unique-section-title {
+      font-size: 14px;
+      margin: 0 0 12px;
+      color: #facc6b;
+    }
+
+    /* 고유효과 옵션 목록 */
+    .unique-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* 한 줄: [버튼] [설명] */
+    .unique-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      transition: background .12s ease, box-shadow .12s ease;
+    }
+
+    .unique-row:hover,
+    .unique-row.is-selected {
+      background: rgba(148, 163, 184, 0.12);
+      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.25);
+    }
+
+    .unique-row:hover .unique-btn,
+    .unique-row.is-selected .unique-btn {
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 1px rgba(248, 250, 252, 0.35);
+    }
+
+    .unique-row:hover .unique-desc,
+    .unique-row.is-selected .unique-desc {
+      color: #e5e7eb;
+    }
+
+    /* 버튼/설명 */
+    .unique-btn {
+      min-width: 60px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #3a2c21;
+      background: rgba(15, 23, 42, 0.85);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      align-self: flex-start;
+      transition: background .12s ease, color .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+
+    .unique-btn:hover {
+      background: rgba(15, 23, 42, 1);
+    }
+
+    .unique-btn.is-active {
+      box-shadow: 0 0 0 1px rgba(250, 250, 250, 0.12);
+    }
+
+    .unique-desc {
+      flex: 1;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+      white-space: normal;
+    }
+
+    .unique-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    /* ───── 무기 고유효과 색상 ───── */
+    .unique-options-weapon .unique-btn[data-value="강타"] {
+      border-color: #facc15;
+      color: #facc15;
+      background: rgba(250, 204, 21, 0.08);
+    }
+
+    .unique-options-weapon .unique-btn[data-value="광채"] {
+      border-color: #38bdf8;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .unique-options-weapon .unique-btn[data-value="분쇄"] {
+      border-color: #f97373;
+      color: #f97373;
+      background: rgba(248, 113, 113, 0.08);
+    }
+
+    .unique-options-weapon .unique-btn[data-value="선명"] {
+      border-color: #4ade80;
+      color: #4ade80;
+      background: rgba(74, 222, 128, 0.08);
+    }
+
+    .unique-options-weapon .unique-btn[data-value="없음"] {
+      border-color: var(--line);
+      color: var(--muted);
+      background: rgba(15, 23, 42, 0.6);
+    }
   </style>
 </head>
 
@@ -2526,42 +2807,69 @@
 
         <div id="mArmorSetModal" class="modal" aria-hidden="true">
           <div class="backdrop"></div>
-          <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="mArmorSetTitle">
-            <header class="dialog-head">
+          <div class="dialog armor-set-dialog" role="dialog" aria-modal="true" aria-labelledby="mArmorSetTitle">
+            <header class="armor-set-titlebar">
               <h2 id="mArmorSetTitle">방어구 세트 선택</h2>
-              <button type="button" class="x" data-mset-close>×</button>
+
+              <!-- ✅ 익시드/에픽 토글 -->
+              <div id="mArmorSetToggle" class="armor-toggle mode-exceed" role="button" tabindex="0"
+                aria-label="익시드/에픽 토글(방어구)">
+                <span class="armor-toggle-label armor-toggle-label-exceed">익시드</span>
+                <span class="armor-toggle-label armor-toggle-label-epic">에픽</span>
+                <div class="armor-toggle-thumb"></div>
+              </div>
+
+              <button type="button" class="close" data-mset-close aria-label="닫기">✕</button>
             </header>
-            <div class="dialog-body">
-              <div id="mArmorSetList" class="mset-list"></div>
+
+            <div class="armor-set-body">
+              <div id="mArmorSetList" class="armor-set-list"></div>
             </div>
           </div>
         </div>
 
         <div id="mAccSetModal" class="modal" aria-hidden="true">
           <div class="backdrop"></div>
-          <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="mAccSetTitle">
-            <header class="dialog-head">
+          <div class="dialog armor-set-dialog" role="dialog" aria-modal="true" aria-labelledby="mAccSetTitle">
+            <header class="armor-set-titlebar">
               <h2 id="mAccSetTitle">악세사리 세트 선택</h2>
-              <button type="button" class="x" data-mset-close>×</button>
+              <!-- ✅ 익시드/에픽 토글 -->
+              <div id="mAccSetToggle" class="armor-toggle mode-exceed" role="button" tabindex="0"
+                aria-label="익시드/에픽 토글(악세)">
+                <span class="armor-toggle-label armor-toggle-label-exceed">익시드</span>
+                <span class="armor-toggle-label armor-toggle-label-epic">에픽</span>
+                <div class="armor-toggle-thumb"></div>
+              </div>
+              <button type="button" class="close" data-mset-close aria-label="닫기">✕</button>
             </header>
-            <div class="dialog-body">
-              <div id="mAccSetList" class="mset-list"></div>
+
+            <div class="armor-set-body">
+              <div id="mAccSetList" class="armor-set-list"></div>
             </div>
           </div>
         </div>
 
         <div id="mSpecSetModal" class="modal" aria-hidden="true">
           <div class="backdrop"></div>
-          <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="mSpecSetTitle">
-            <header class="dialog-head">
+          <div class="dialog armor-set-dialog" role="dialog" aria-modal="true" aria-labelledby="mSpecSetTitle">
+            <header class="armor-set-titlebar">
               <h2 id="mSpecSetTitle">특수장비 세트 선택</h2>
-              <button type="button" class="x" data-mset-close>×</button>
+              <!-- ✅ 익시드/에픽 토글 -->
+              <div id="mSpecSetToggle" class="armor-toggle mode-exceed" role="button" tabindex="0"
+                aria-label="익시드/에픽 토글(특수)">
+                <span class="armor-toggle-label armor-toggle-label-exceed">익시드</span>
+                <span class="armor-toggle-label armor-toggle-label-epic">에픽</span>
+                <div class="armor-toggle-thumb"></div>
+              </div>
+              <button type="button" class="close" data-mset-close aria-label="닫기">✕</button>
             </header>
-            <div class="dialog-body">
-              <div id="mSpecSetList" class="mset-list"></div>
+
+            <div class="armor-set-body">
+              <div id="mSpecSetList" class="armor-set-list"></div>
             </div>
           </div>
         </div>
+
 
         <div id="mUniqueBulkModal" class="modal" aria-hidden="true">
           <div class="backdrop"></div>
@@ -2630,28 +2938,28 @@
         </div>
         <!-- ✅ 개별 고유효과 선택 모달 -->
         <div id="mUniquePickModal" class="modal" aria-hidden="true">
-  <div class="backdrop" data-mset-close></div>
+          <div class="backdrop" data-mset-close></div>
 
-  <div class="dialog unique-dialog" role="dialog" aria-modal="true" aria-labelledby="mUniquePickTitle">
-    <header class="armor-set-titlebar">
-      <h2 id="mUniquePickTitle">고유효과</h2>
-      <button type="button" class="close" data-mset-close aria-label="닫기">✕</button>
-    </header>
+          <div class="dialog unique-dialog" role="dialog" aria-modal="true" aria-labelledby="mUniquePickTitle">
+            <header class="armor-set-titlebar">
+              <h2 id="mUniquePickTitle">고유효과</h2>
+              <button type="button" class="close" data-mset-close aria-label="닫기">✕</button>
+            </header>
 
-    <div class="unique-body">
-      <section class="unique-section">
-        <h3 class="unique-section-title">고유효과 선택</h3>
+            <div class="unique-body">
+              <section class="unique-section">
+                <h3 class="unique-section-title">고유효과 선택</h3>
 
-        <!-- ✅ 리스트를 unique-options로 감싸면 PC처럼 줄 간격/hover/선택 강조 전부 먹음 -->
-        <div id="mUniquePickList" class="unique-options"></div>
-      </section>
+                <!-- ✅ 리스트를 unique-options로 감싸면 PC처럼 줄 간격/hover/선택 강조 전부 먹음 -->
+                <div id="mUniquePickList" class="unique-options"></div>
+              </section>
 
-      <div class="unique-actions">
-        <button type="button" class="btn" data-mset-close>닫기</button>
-      </div>
-    </div>
-  </div>
-</div>
+              <div class="unique-actions">
+                <button type="button" class="btn" data-mset-close>닫기</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
 
 
@@ -7102,7 +7410,7 @@
 
     /* ✅ 공통 닫기 바인딩: backdrop 클릭 또는 [data-mset-close] */
     (function bindMSetCloseOnce() {
-      const ids = ['mArmorSetModal','mAccSetModal','mSpecSetModal','mUniqueBulkModal','mUniquePickModal'];
+      const ids = ['mArmorSetModal', 'mAccSetModal', 'mSpecSetModal', 'mUniqueBulkModal', 'mUniquePickModal'];
       ids.forEach(id => {
         const m = document.getElementById(id);
         if (!m || m.__bound) return;
@@ -7630,113 +7938,141 @@
 
     function syncUniqueMiniLabels() {
       ensureCustomSkillsMobile();
+
       const map = {
         weaponType: state.customSkills.weaponType,
         armorType: state.customSkills.armorType,
         braceletType: state.customSkills.braceletType,
         earringType: state.customSkills.earringType
       };
+
+      // ✅ 색상 매핑
+      // - 무기: 강타/광채/분쇄/선명 그대로
+      // - 나머지: 선봉=분쇄색, 의지=광채색, 이상=선명색
+      const mapColor = (key, rawVal) => {
+        const v = String(rawVal || '').trim();
+        if (!v || v === '-' || v === '없음') return 'none';
+
+        if (key === 'weaponType') {
+          // 강타/광채/분쇄/선명
+          return v;
+        }
+        if (v === '선봉') return '분쇄';
+        if (v === '의지') return '광채';
+        if (v === '이상') return '선명';
+        return 'none';
+      };
+
       document.querySelectorAll("[data-uval]").forEach(el => {
         const k = el.getAttribute("data-uval");
-        el.textContent = (map[k] && map[k].trim()) ? map[k] : "-";
+
+        const v = (map[k] && String(map[k]).trim()) ? String(map[k]).trim() : "";
+        el.textContent = v ? v : "-";
+
+        // ✅ [data-uval] span의 부모 미니버튼(.equip-u-mini)에 색상 주입
+        const mini = el.closest('.equip-u-mini');
+        if (mini) {
+          mini.dataset.ucolor = mapColor(k, v);
+        }
       });
     }
 
+
     // ✅ 전역 escapeHTML 보장 (없을 때만 생성)
-if (typeof window.escapeHTML !== 'function') {
-  window.escapeHTML = (s) => String(s ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+    if (typeof window.escapeHTML !== 'function') {
+      window.escapeHTML = (s) => String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
     // ✅ PC의 unique-desc 설명 매핑을 모바일에서도 재사용
-function updateUniqueEffectDescriptionsMobile(rootEl){
-  const root = rootEl || document;
+    function updateUniqueEffectDescriptionsMobile(rootEl) {
+      const root = rootEl || document;
 
-  // PC처럼 custom:list를 소스로 사용
-  const customList = window.CORE?.lists?.['custom:list'] || [];
-  if (!Array.isArray(customList) || !customList.length) {
-    // 데이터가 없으면 설명은 비워둠
-    root.querySelectorAll('.unique-desc').forEach(el => el.innerHTML = '');
-    return;
-  }
+      // PC처럼 custom:list를 소스로 사용
+      const customList = window.CORE?.lists?.['custom:list'] || [];
+      if (!Array.isArray(customList) || !customList.length) {
+        // 데이터가 없으면 설명은 비워둠
+        root.querySelectorAll('.unique-desc').forEach(el => el.innerHTML = '');
+        return;
+      }
 
-  // (모바일 state 구조) 현재 캐릭터의 직업군 라벨
-  const jobGroupLabel =
-    (window.state?.currentCharacter?.jobGroupLabel)
-    || (window.state?.currentCharacter?.jobGroup)
-    || '';
+      // (모바일 state 구조) 현재 캐릭터의 직업군 라벨
+      const jobGroupLabel =
+        (window.state?.currentCharacter?.jobGroupLabel)
+        || (window.state?.currentCharacter?.jobGroup)
+        || '';
 
-  // 간단 escape (PC도 innerHTML 넣기 전에 처리)
-  const escapeHTML = window.escapeHTML;
+      // 간단 escape (PC도 innerHTML 넣기 전에 처리)
+      const escapeHTML = window.escapeHTML;
 
-  // ✅ customName(강타/광채/...) → custom:list에서 설명 가져오기 (PC 매칭 방식)
-const pickDescByCustomName = (customName) => {
-  const name = (customName || '').trim();
-  if (!name || name === '없음') return '';
+      // ✅ customName(강타/광채/...) → custom:list에서 설명 가져오기 (PC 매칭 방식)
+      const pickDescByCustomName = (customName) => {
+        const name = (customName || '').trim();
+        if (!name || name === '없음') return '';
 
-  const norm = (v) => String(v ?? '').trim();
+        const norm = (v) => String(v ?? '').trim();
 
-  const jobGroup = norm(window.state?.currentCharacter?.jobGroupLabel
-    ?? window.state?.currentCharacter?.jobGroup
-    ?? '');
-  const charName = norm(window.state?.currentCharacter?.name ?? '');
+        const jobGroup = norm(window.state?.currentCharacter?.jobGroupLabel
+          ?? window.state?.currentCharacter?.jobGroup
+          ?? '');
+        const charName = norm(window.state?.currentCharacter?.name ?? '');
 
-  // 1차: type(종류)로 매칭 (PC와 동일)
-  let rowsBase = customList.filter(r =>
-    norm(r?.type ?? r?.['종류']) === name
-  );
-  if (!rowsBase.length) return '';
+        // 1차: type(종류)로 매칭 (PC와 동일)
+        let rowsBase = customList.filter(r =>
+          norm(r?.type ?? r?.['종류']) === name
+        );
+        if (!rowsBase.length) return '';
 
-  // 2차: 직업군 + 캐릭명(있으면)까지 맞는 row 우선
-  let candidates = rowsBase.filter(r =>
-    (!jobGroup || norm(r?.jobGroupLabel ?? r?.jobGroup ?? r?.['직업군']) === jobGroup || !norm(r?.jobGroupLabel ?? r?.jobGroup ?? r?.['직업군'])) &&
-    (!charName || norm(r?.name ?? r?.['이름']) === charName || !norm(r?.name ?? r?.['이름']))
-  );
-  if (!candidates.length) candidates = rowsBase;
+        // 2차: 직업군 + 캐릭명(있으면)까지 맞는 row 우선
+        let candidates = rowsBase.filter(r =>
+          (!jobGroup || norm(r?.jobGroupLabel ?? r?.jobGroup ?? r?.['직업군']) === jobGroup || !norm(r?.jobGroupLabel ?? r?.jobGroup ?? r?.['직업군'])) &&
+          (!charName || norm(r?.name ?? r?.['이름']) === charName || !norm(r?.name ?? r?.['이름']))
+        );
+        if (!candidates.length) candidates = rowsBase;
 
-  // 3차: num(갯수) 기준 — 모달 설명은 기본 1개 효과를 보여주기 위해 num=1 우선
-  const scored = candidates.map(r => {
-    const rawNum = norm(r?.num ?? r?.['갯수']);
-    const rowNum = rawNum ? (parseInt(rawNum, 10) || 0) : 1;
-    return { r, rowNum };
-  }).filter(x => x.rowNum > 0);
+        // 3차: num(갯수) 기준 — 모달 설명은 기본 1개 효과를 보여주기 위해 num=1 우선
+        const scored = candidates.map(r => {
+          const rawNum = norm(r?.num ?? r?.['갯수']);
+          const rowNum = rawNum ? (parseInt(rawNum, 10) || 0) : 1;
+          return { r, rowNum };
+        }).filter(x => x.rowNum > 0);
 
-  let best = scored.find(x => x.rowNum === 1) || scored[0];
-  if (!best) return '';
+        let best = scored.find(x => x.rowNum === 1) || scored[0];
+        if (!best) return '';
 
-  const r = best.r;
-  const parts = [
-    r?.desc1, r?.desc2, r?.desc3, r?.desc4, r?.desc5,
-    r?.['설명1'], r?.['설명2'], r?.['설명3'], r?.['설명4'], r?.['설명5'],
-  ].map(v => norm(v)).filter(Boolean);
+        const r = best.r;
+        const parts = [
+          r?.desc1, r?.desc2, r?.desc3, r?.desc4, r?.desc5,
+          r?.['설명1'], r?.['설명2'], r?.['설명3'], r?.['설명4'], r?.['설명5'],
+        ].map(v => norm(v)).filter(Boolean);
 
-  if (!parts.length) return '';
+        if (!parts.length) return '';
 
-  const raw = parts.join('\n');
-  // PC처럼 <br> 처리 + escape
-  return raw.includes('<')
-    ? raw.replace(/\n/g, '<br>')
-    : window.escapeHTML(raw).replace(/\n/g, '<br>');
-};
+        const raw = parts.join('\n');
+        // PC처럼 <br> 처리 + escape
+        return raw.includes('<')
+          ? raw.replace(/\n/g, '<br>')
+          : window.escapeHTML(raw).replace(/\n/g, '<br>');
+      };
 
 
-  // ✅ root 안의 unique-desc 모두 채우기
-  root.querySelectorAll('.unique-desc').forEach(descEl => {
-    const v = (descEl.dataset.value || '').trim();
-    const raw = pickDescByCustomName(v);
+      // ✅ root 안의 unique-desc 모두 채우기
+      root.querySelectorAll('.unique-desc').forEach(descEl => {
+        const v = (descEl.dataset.value || '').trim();
+        const raw = pickDescByCustomName(v);
 
-    if (!raw) { descEl.innerHTML = ''; return; }
+        if (!raw) { descEl.innerHTML = ''; return; }
 
-    // PC처럼 "<"가 들어간 경우는 HTML로 취급, 아니면 escape 후 줄바꿈 처리
-    descEl.innerHTML = raw.includes('<')
-      ? raw
-      : escapeHTML(raw).replace(/\n/g, '<br>');
-  });
-}
+        // PC처럼 "<"가 들어간 경우는 HTML로 취급, 아니면 escape 후 줄바꿈 처리
+        descEl.innerHTML = raw.includes('<')
+          ? raw
+          : escapeHTML(raw).replace(/\n/g, '<br>');
+      });
+    }
 
     function openUniquePickModalMobile(targetKey) {
       ensureCustomSkillsMobile();
@@ -7758,30 +8094,38 @@ const pickDescByCustomName = (customName) => {
       const $list = document.getElementById("mUniquePickList");
       if ($title) $title.textContent = titleMap[targetKey] || "고유효과";
 
-      if ($list){
-  const kind = isWeapon ? "weapon" : "other"; // (설명 매칭용)
-  $list.innerHTML = opts.map(v=>{
-    const on = (cur === v);
-    return `
-      <div class="unique-row ${on ? "is-selected" : ""}">
-        <button type="button" class="unique-btn" data-uvalpick="${v}">
-          ${v}
-        </button>
-        <div class="unique-desc" data-kind="${kind}" data-value="${v}"></div>
-      </div>
-    `;
-  }).join("");
-}
+      if ($list) {
+        const kind = isWeapon ? "weapon" : "other"; // (설명 매칭용)
 
-const modal = document.getElementById("mUniquePickModal");
-if (modal) {
-  modal.dataset.utarget = targetKey;
+        // ✅ (1) 컨테이너에 weapon/other 클래스를 붙여서 CSS 스코프가 매칭되게
+        $list.classList.remove("unique-options-weapon", "unique-options-other");
+        $list.classList.add(isWeapon ? "unique-options-weapon" : "unique-options-other");
 
-  // ✅ 추가: PC처럼 unique-desc 실제 텍스트 채우기
-  updateUniqueEffectDescriptionsMobile(modal);
-}
+        // ✅ (2) 버튼에 data-value도 같이 넣어서 CSS 셀렉터([data-value="..."])가 먹게
+        $list.innerHTML = opts.map(v => {
+          const on = (cur === v);
+          return `
+    <div class="unique-row ${on ? "is-selected" : ""}">
+      <button type="button"
+              class="unique-btn ${on ? "active" : ""}"
+              data-uvalpick="${v}" data-value="${v}">
+        ${v}
+      </button>
+      <div class="unique-desc" data-kind="${kind}" data-value="${v}"></div>
+    </div>
+  `;
+        }).join("");
+      }
 
-_openModalById_("mUniquePickModal");
+      const modal = document.getElementById("mUniquePickModal");
+      if (modal) {
+        modal.dataset.utarget = targetKey;
+
+        // ✅ 추가: PC처럼 unique-desc 실제 텍스트 채우기
+        updateUniqueEffectDescriptionsMobile(modal);
+      }
+
+      _openModalById_("mUniquePickModal");
     }
 
     function bindUniquePickModalOnce() {
@@ -7790,7 +8134,18 @@ _openModalById_("mUniquePickModal");
       modal.dataset.bound = "1";
 
       modal.addEventListener("click", (e) => {
-        const btn = e.target.closest("[data-uvalpick]");
+        // 1) 버튼 클릭이면 그대로
+        let btn = e.target.closest("[data-uvalpick]");
+
+        // 2) 버튼이 아니면(= 설명칸 클릭 등) 같은 row의 버튼을 찾아서 대신 선택 처리
+        if (!btn) {
+          const desc = e.target.closest(".unique-desc");
+          if (desc) {
+            const row = desc.closest(".unique-row");
+            btn = row ? row.querySelector("[data-uvalpick]") : null;
+          }
+        }
+
         if (!btn) return;
 
         ensureCustomSkillsMobile();
@@ -7800,80 +8155,147 @@ _openModalById_("mUniquePickModal");
         if (targetKey) {
           state.customSkills[targetKey] = v;
           syncUniqueMiniLabels();
+
+          // ✅ PC처럼 "선택됨"을 버튼 자체(active)에 부여
+          modal.querySelectorAll(".unique-btn.active").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          // (선택 강조가 row 기반인 CSS도 같이 쓰는 중이라면 row도 동기화)
+          modal.querySelectorAll(".unique-row.is-selected").forEach(r => r.classList.remove("is-selected"));
+          const row = btn.closest(".unique-row");
+          if (row) row.classList.add("is-selected");
         }
 
         _closeModalById_("mUniquePickModal");
       });
-
       // 닫기
-      modal.querySelectorAll("[data-mset-close]").forEach(el=>{
-  el.addEventListener("click", ()=> _closeModalById_("mUniquePickModal"));
-});
+      modal.querySelectorAll("[data-mset-close]").forEach(el => {
+        el.addEventListener("click", () => _closeModalById_("mUniquePickModal"));
+      });
     }
 
     // ✅ 고유효과 "일괄 적용" 모달: 선택(무기/기타) 바인딩 + 현재 state 반영
-function bindUniqueBulkModalOnce() {
-  const modal = document.getElementById('mUniqueBulkModal');
-  if (!modal || modal.dataset.bound === "1") return;
-  modal.dataset.bound = "1";
+    function bindUniqueBulkModalOnce() {
+      const modal = document.getElementById('mUniqueBulkModal');
+      if (!modal || modal.dataset.bound === "1") return;
+      modal.dataset.bound = "1";
 
-  // 버튼 클릭(이벤트 위임)
-  modal.addEventListener('click', (e) => {
-    const btn = e.target.closest('.unique-btn');
-    if (!btn || !modal.contains(btn)) return;
+      // 버튼/설명 어디를 눌러도 "row" 기준으로 선택되게 + hover 강조를 is-selected로 고정
+      modal.addEventListener('click', (e) => {
+        const row = e.target.closest('.unique-row');
+        if (!row || !modal.contains(row)) return;
 
-    const row = btn.closest('.unique-row');
-    const desc = row?.querySelector('.unique-desc');
-    const kind = desc?.dataset?.kind; // "weapon" | "other"
-    if (!kind) return;
+        const btn = row.querySelector('.unique-btn');
+        const desc = row.querySelector('.unique-desc');
+        const kind = desc?.dataset?.kind; // "weapon" | "other"
+        if (!btn || !kind) return;
 
-    const val = btn.getAttribute('data-value') || btn.textContent.trim();
+        const val = btn.getAttribute('data-value') || btn.textContent.trim();
 
-    // 같은 kind 내에서 active 토글
-    modal.querySelectorAll(`.unique-desc[data-kind="${kind}"]`).forEach(d => {
-      const r = d.closest('.unique-row');
-      const b = r?.querySelector('.unique-btn');
-      if (b) b.classList.toggle('active', b === btn);
-    });
+        // 같은 kind 내에서 active + is-selected를 "현재 row"로만 고정
+        modal.querySelectorAll(`.unique-desc[data-kind="${kind}"]`).forEach(d => {
+          const r = d.closest('.unique-row');
+          const b = r?.querySelector('.unique-btn');
+          const on = (r === row);
+          if (b) b.classList.toggle('active', on);
+          if (r) r.classList.toggle('is-selected', on);
+        });
 
-    // 선택값 저장
-    modal.dataset[`sel_${kind}`] = val;
-  });
+        // 선택값 저장
+        modal.dataset[`sel_${kind}`] = val;
+      });
 
-  // 닫기 버튼들
-  modal.querySelectorAll('[data-mset-close]').forEach(el => {
-    el.addEventListener('click', () => _closeModalById_('mUniqueBulkModal'));
-  });
-}
+      // 닫기 버튼들
+      modal.querySelectorAll('[data-mset-close]').forEach(el => {
+        el.addEventListener('click', () => _closeModalById_('mUniqueBulkModal'));
+      });
+    }
 
-function syncUniqueBulkModalSelectionFromState() {
-  const modal = document.getElementById('mUniqueBulkModal');
-  if (!modal) return;
+    function syncUniqueBulkModalSelectionFromState() {
+      const modal = document.getElementById('mUniqueBulkModal');
+      if (!modal) return;
 
-  ensureCustomSkillsMobile();
+      ensureCustomSkillsMobile();
 
-  // 현재 state를 모달 선택값으로 주입
-  const weaponPick = (state.customSkills.weaponType ?? '');
-  const otherPick =
-    (state.customSkills.armorType || state.customSkills.braceletType || state.customSkills.earringType || '');
+      // 현재 state를 모달 선택값으로 주입
+      const weaponPick = (state.customSkills.weaponType ?? '');
+      const otherPick =
+        (state.customSkills.armorType || state.customSkills.braceletType || state.customSkills.earringType || '');
 
-  if (weaponPick) modal.dataset.sel_weapon = weaponPick;
-  if (otherPick) modal.dataset.sel_other = otherPick;
+      if (weaponPick) modal.dataset.sel_weapon = weaponPick;
+      if (otherPick) modal.dataset.sel_other = otherPick;
 
-  // UI active 표시(weapon/other만)
-  ["weapon", "other"].forEach(kind => {
-    const v = modal.dataset[`sel_${kind}`] ?? '';
-    modal.querySelectorAll(`.unique-desc[data-kind="${kind}"]`).forEach(desc => {
-      const row = desc.closest('.unique-row');
-      const btn = row?.querySelector('.unique-btn');
-      const val = btn?.getAttribute('data-value') || btn?.textContent?.trim() || '';
-      if (btn) btn.classList.toggle('active', v !== '' && v === val);
-    });
-  });
-}
+      // UI active + is-selected 표시(weapon/other만)
+      ["weapon", "other"].forEach(kind => {
+        const v = modal.dataset[`sel_${kind}`] ?? '';
+        modal.querySelectorAll(`.unique-desc[data-kind="${kind}"]`).forEach(desc => {
+          const row = desc.closest('.unique-row');
+          const btn = row?.querySelector('.unique-btn');
+          const val = btn?.getAttribute('data-value') || btn?.textContent?.trim() || '';
+          const on = (v !== '' && v === val);
 
+          if (btn) btn.classList.toggle('active', on);
+          if (row) row.classList.toggle('is-selected', on);
+        });
+      });
+    }
+
+    /* =========================
+       ✅ 익시드/에픽 토글 상태 (Mobile)
+    ========================= */
+    let armorSetMode = 'exceed'; // 'exceed' | 'epic'
+
+    function updateArmorSetToggleUI_mobile() {
+      const ids = ['mArmorSetToggle', 'mAccSetToggle', 'mSpecSetToggle'];
+      ids.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.toggle('mode-exceed', armorSetMode === 'exceed');
+        el.classList.toggle('mode-epic', armorSetMode === 'epic');
+      });
+    }
+
+    function setArmorSetMode_mobile(nextMode) {
+      armorSetMode = (nextMode === 'epic') ? 'epic' : 'exceed';
+      updateArmorSetToggleUI_mobile();
+
+      // ✅ 열려있는 세트 모달이면 즉시 재렌더(익시드/에픽 반영)
+      const armorOpen = document.getElementById('mArmorSetModal')?.getAttribute('aria-hidden') === 'false';
+      const accOpen = document.getElementById('mAccSetModal')?.getAttribute('aria-hidden') === 'false';
+      const specOpen = document.getElementById('mSpecSetModal')?.getAttribute('aria-hidden') === 'false';
+
+      if (armorOpen) renderSetModal_mobile('armor');
+      else if (accOpen) renderSetModal_mobile('acc');
+      else if (specOpen) renderSetModal_mobile('spec');
+    }
+
+    function bindArmorSetTogglesOnce_mobile() {
+      const ids = ['mArmorSetToggle', 'mAccSetToggle', 'mSpecSetToggle'];
+
+      ids.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el || el.__bound) return;
+        el.__bound = 1;
+
+        const toggle = () => {
+          setArmorSetMode_mobile(armorSetMode === 'exceed' ? 'epic' : 'exceed');
+        };
+
+        el.addEventListener('click', toggle);
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+          }
+        });
+      });
+
+      updateArmorSetToggleUI_mobile();
+    }
 
     function renderSetModal_mobile(kind) {
+      if (typeof updateArmorSetToggleUI_mobile === 'function') updateArmorSetToggleUI_mobile();
+
       let sets = [];
       let modalId = '';
       let listId = '';
@@ -7896,46 +8318,95 @@ function syncUniqueBulkModalSelectionFromState() {
       if (!box) return;
 
       box.innerHTML = '';
+
       if (!Array.isArray(sets) || !sets.length) {
-        box.innerHTML = `<div style="grid-column:1/-1;opacity:.8;font-size:13px;padding:10px;">
-      세트 데이터를 찾을 수 없습니다. (CORE.lists['set:list'] / 슬롯 list 확인)
-    </div>`;
+        box.innerHTML =
+          '<div class="empty-hint" style="padding:16px;font-size:13px;color:#ddd;">세트 데이터를 찾을 수 없습니다.</div>';
+        _openModalById_(modalId);
         return;
       }
 
-      sets.forEach((s) => {
+      const applyAndClose = (s) => {
+        applySetPieces_mobile(s);
+        _closeModalById_(modalId);
+        if (typeof toast === 'function') toast('세트가 적용되었습니다.');
+      };
+
+      sets.forEach((s, idx) => {
+        // (PC 느낌) 첫 줄 3번째 칸 맞추기용 스페이서
+        if (idx === 2) {
+          const spacer = document.createElement('div');
+          spacer.className = 'armor-set-spacer';
+          box.appendChild(spacer);
+        }
+
         const card = document.createElement('div');
-        card.className = 'mset-card';
+        card.className = 'armor-set-card';
 
-        const title = document.createElement('div');
-        title.className = 'mset-title';
-        title.textContent = s.name || s.type || '세트';
-        card.appendChild(title);
+        // header
+        const header = document.createElement('div');
+        header.className = 'armor-set-header';
 
-        const sub = document.createElement('div');
-        sub.className = 'mset-sub';
-        sub.textContent = (s.pieces || [])
-          .map(p => p?.item?.name || p?.name)
-          .filter(Boolean)
-          .slice(0, 3)
-          .join(' / ') + ((s.pieces || []).length > 3 ? ' ...' : '');
-        card.appendChild(sub);
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = s?.name || '(세트)';
+        header.appendChild(titleSpan);
 
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.textContent = '이 세트 적용';
-        btn.addEventListener('click', () => {
-          applySetPieces_mobile(s);
-          _closeModalById_(modalId);
-          if (typeof toast === 'function') toast('세트가 적용되었습니다.');
+        const applyBtn = document.createElement('button');
+        applyBtn.type = 'button';
+        applyBtn.className = 'set-auto-toggle';
+        applyBtn.textContent = '이 세트 적용';
+        applyBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          applyAndClose(s);
         });
-        card.appendChild(btn);
+        header.appendChild(applyBtn);
 
+        card.appendChild(header);
+
+        // items
+        const items = document.createElement('div');
+        items.className = 'armor-set-items';
+
+        (s.pieces || []).forEach((p) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'armor-set-item';
+          btn.title = p?.item?.name || p?.name || '';
+
+          // ✅ 아이콘/레벨을 눌러도 "세트 적용"되도록
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            applyAndClose(s);
+          });
+
+          const box2 = document.createElement('div');
+          box2.className = 'iconbox';
+
+          const img = document.createElement('img');
+          img.className = 'icon';
+          img.src = p?.img || p?.item?.img || (typeof PLACEHOLDER_I !== 'undefined' ? PLACEHOLDER_I : '');
+          img.alt = '';
+          box2.appendChild(img);
+
+          const lv = p?.level ?? p?.item?.level ?? null;
+          if (lv) {
+            const badge = document.createElement('div');
+            badge.className = 'badge-lv';
+            badge.textContent = String(lv);
+            box2.appendChild(badge);
+          }
+
+          btn.appendChild(box2);
+          items.appendChild(btn);
+        });
+
+        card.appendChild(items);
         box.appendChild(card);
       });
 
       _openModalById_(modalId);
     }
+
 
     function wireSetButtons_mobile() {
       const a = document.getElementById('btnMSetArmor');
@@ -7948,57 +8419,58 @@ function syncUniqueBulkModalSelectionFromState() {
       if (c && !c.__bound) { c.__bound = 1; c.addEventListener('click', () => renderSetModal_mobile('spec')); }
 
       if (d && !d.__bound) {
-  d.__bound = 1;
-  d.addEventListener('click', () => {
-    const modal = document.getElementById('mUniqueBulkModal');
+        d.__bound = 1;
+        d.addEventListener('click', () => {
+          const modal = document.getElementById('mUniqueBulkModal');
 
-    // ✅ 1) 바인딩 보장
-    bindUniqueBulkModalOnce();
+          // ✅ 1) 바인딩 보장
+          bindUniqueBulkModalOnce();
 
-    // ✅ 2) PC처럼 설명 텍스트 채우기
-    if (modal) updateUniqueEffectDescriptionsMobile(modal);
+          // ✅ 2) PC처럼 설명 텍스트 채우기
+          if (modal) updateUniqueEffectDescriptionsMobile(modal);
 
-    // ✅ 3) 현재 state 선택값을 모달 active 표시로 동기화
-    syncUniqueBulkModalSelectionFromState();
+          // ✅ 3) 현재 state 선택값을 모달 active 표시로 동기화
+          syncUniqueBulkModalSelectionFromState();
 
-    _openModalById_('mUniqueBulkModal');
-  });
-}
+          _openModalById_('mUniqueBulkModal');
+        });
+      }
 
 
 
       const applyBtn = document.getElementById('mUniqueBulkApplyBtn');
-if (applyBtn && !applyBtn.__bound) {
-  applyBtn.__bound = 1;
-  applyBtn.addEventListener('click', () => {
-    const modal = document.getElementById('mUniqueBulkModal');
-    if (!modal) return;
+      if (applyBtn && !applyBtn.__bound) {
+        applyBtn.__bound = 1;
+        applyBtn.addEventListener('click', () => {
+          const modal = document.getElementById('mUniqueBulkModal');
+          if (!modal) return;
 
-    ensureCustomSkillsMobile();
+          ensureCustomSkillsMobile();
 
-    // 모달에서 고른 값(없으면 기존 state 유지)
-    const pickWeapon = (modal.dataset.sel_weapon ?? state.customSkills.weaponType ?? '');
-    const pickOther =
-      (modal.dataset.sel_other ??
-        state.customSkills.armorType ??
-        state.customSkills.braceletType ??
-        state.customSkills.earringType ??
-        '');
+          // 모달에서 고른 값(없으면 기존 state 유지)
+          const pickWeapon = (modal.dataset.sel_weapon ?? state.customSkills.weaponType ?? '');
+          const pickOther =
+            (modal.dataset.sel_other ??
+              state.customSkills.armorType ??
+              state.customSkills.braceletType ??
+              state.customSkills.earringType ??
+              '');
 
-    // ✅ 실제 적용 (모바일 state 구조)
-    state.customSkills.weaponType = pickWeapon;
-    state.customSkills.armorType = pickOther;
-    state.customSkills.braceletType = pickOther;
-    state.customSkills.earringType = pickOther;
+          // ✅ 실제 적용 (모바일 state 구조)
+          state.customSkills.weaponType = pickWeapon;
+          state.customSkills.armorType = pickOther;
+          state.customSkills.braceletType = pickOther;
+          state.customSkills.earringType = pickOther;
 
-    // 소제목 옆 mini 라벨 갱신
-    syncUniqueMiniLabels();
+          // 소제목 옆 mini 라벨 갱신
+          syncUniqueMiniLabels();
 
-    if (typeof toast === 'function') toast('고유효과가 적용되었습니다.');
-    _closeModalById_('mUniqueBulkModal');
-  });
-}
-
+          if (typeof toast === 'function') toast('고유효과가 적용되었습니다.');
+          _closeModalById_('mUniqueBulkModal');
+        });
+      }
+        // ✅ 여기 1줄 추가
+  bindArmorSetTogglesOnce_mobile();
     }
 
     /* ✅ page init / DOMContentLoaded / resetAll() 이후 한 번 호출 */
@@ -8285,41 +8757,41 @@ if (applyBtn && !applyBtn.__bound) {
       }
 
       // ✅ 고유효과(커스텀옵) - PC처럼 calc_all payload에 실어 보내야 서버 세션에 반영됨
-// (state.customSkills 구조는 너가 모달에서 이미 채우고 있는 그대로 전달)
-if (s.customSkills && typeof s.customSkills === 'object') {
-  // structuredClone이 없을 수 있으니 안전하게 처리
-  const cs = (typeof structuredClone === 'function')
-    ? structuredClone(s.customSkills)
-    : JSON.parse(JSON.stringify(s.customSkills));
+      // (state.customSkills 구조는 너가 모달에서 이미 채우고 있는 그대로 전달)
+      if (s.customSkills && typeof s.customSkills === 'object') {
+        // structuredClone이 없을 수 있으니 안전하게 처리
+        const cs = (typeof structuredClone === 'function')
+          ? structuredClone(s.customSkills)
+          : JSON.parse(JSON.stringify(s.customSkills));
 
-  // ✅ 핵심: 모바일은 weaponType에 저장하지만,
-  // 백엔드는 (customType/type/kind) 중 하나로 무기 고유효과를 읽는다.
-  const hasBackendWeaponKey =
-    (typeof cs.customType === 'string' && cs.customType.trim()) ||
-    (typeof cs.type === 'string' && cs.type.trim()) ||
-    (typeof cs.kind === 'string' && cs.kind.trim());
+        // ✅ 핵심: 모바일은 weaponType에 저장하지만,
+        // 백엔드는 (customType/type/kind) 중 하나로 무기 고유효과를 읽는다.
+        const hasBackendWeaponKey =
+          (typeof cs.customType === 'string' && cs.customType.trim()) ||
+          (typeof cs.type === 'string' && cs.type.trim()) ||
+          (typeof cs.kind === 'string' && cs.kind.trim());
 
-  if (!hasBackendWeaponKey && typeof cs.weaponType === 'string') {
-    cs.type = cs.weaponType;   // ← 이 1줄이 무기 고유효과 적용의 핵심
-  }
+        if (!hasBackendWeaponKey && typeof cs.weaponType === 'string') {
+          cs.type = cs.weaponType;   // ← 이 1줄이 무기 고유효과 적용의 핵심
+        }
 
-  payload.customSkills = cs;
-}
+        payload.customSkills = cs;
+      }
 
 
-// 스킬룬 (나중에 모달 붙이면 state에 채워질 구조 그대로 전달)
-if (s3.runes && typeof s3.runes === 'object') {
-  payload.runes = s3.runes;
-}
-if (s3.specialRunes && typeof s3.specialRunes === 'object') {
-  payload.specialRunes = {
-    gaho: Number(s3.specialRunes.gaho || 0),
-    jihe: Number(s3.specialRunes.jihe || 0),
-    waegok: Number(s3.specialRunes.waegok || 0),
-  };
-}
+      // 스킬룬 (나중에 모달 붙이면 state에 채워질 구조 그대로 전달)
+      if (s3.runes && typeof s3.runes === 'object') {
+        payload.runes = s3.runes;
+      }
+      if (s3.specialRunes && typeof s3.specialRunes === 'object') {
+        payload.specialRunes = {
+          gaho: Number(s3.specialRunes.gaho || 0),
+          jihe: Number(s3.specialRunes.jihe || 0),
+          waegok: Number(s3.specialRunes.waegok || 0),
+        };
+      }
 
-return payload;
+      return payload;
     }
 
     // (디버그) 현재 스냅샷을 콘솔에서 바로 확인하고 싶을 때
