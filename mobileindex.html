@@ -19,6 +19,9 @@
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
       --footer-h: 92px;
+
+      /* ✅ 저장슬롯(푸터 위 고정) 높이: JS가 실제 높이를 넣어줌 */
+  --presetbar-h: 0px;
     }
 
     * {
@@ -119,12 +122,134 @@
     }
 
     /* ====== Swipe Pages ====== */
-    .m-main {
-      flex: 1 1 auto;
-      position: relative;
-      padding-bottom: calc(var(--footer-h) + var(--safe-bottom));
-      overflow: hidden;
-    }
+    /* ===== PC 저장슬롯과 동일 스타일 (save-box/preset-btn/preset-trash/페이지버튼) ===== */
+.save-box{
+  background: rgba(110, 168, 255, 0.08);
+  border: 1px solid rgba(110, 168, 255, 0.35);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: repeat(5, 44px); /* ✅ 칸을 고정폭으로 */
+  justify-content: center;               /* ✅ 남는 공간은 양옆으로 */
+  gap: 8px;                              /* ✅ 슬롯 간 간격 고정 */
+  position: relative;
+  width: min(560px, calc(100vw - 20px));
+}
+
+.preset-slot{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 44px;          /* ✅ 칸 고정폭과 맞춤 */
+  position: relative;   /* ✅ 휴지통 absolute 기준도 더 안전 */
+}
+
+.preset-btn{
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  color: rgba(255,255,255,0.9);
+  font-weight: 700;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+}
+
+.preset-btn.has-data{
+  border-color: rgba(250, 204, 21, 0.7);
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.12) inset;
+}
+
+/* ✅ 휴지통 버튼: 슬롯 우측상단에 작게 겹치기 (PC 동일) */
+.save-box .preset-slot .preset-trash{
+  position: absolute;
+  right: -4px;
+  top: -4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(15, 23, 42, 0.85);
+  color: #9ca3af;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+
+  /* 기본은 숨김 */
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ✅ 해당 슬롯에 데이터가 있을 때만 휴지통 표시 */
+.save-box .preset-slot .preset-btn.has-data + .preset-trash{
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.preset-page-btn{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(17, 24, 39, 0.55);
+  color: rgba(255,255,255,0.9);
+  cursor: pointer;
+}
+
+.preset-page-btn.prev{ left: -10px; }
+.preset-page-btn.next{ right: -10px; }
+
+.preset-page-btn:disabled{
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.preset-page-ind{
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  transform: translateX(-50%);
+  font-size: 10px;      /* ✅ 조금 더 작게 */
+  padding: 1px 6px;     /* ✅ 조금 더 작게 */
+  border-radius: 999px;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.80);
+  pointer-events: none;
+  display: none; /* JS에서 필요할 때 켬 */
+}
+
+
+    /* ✅ 저장슬롯 바(푸터 바깥, 푸터 바로 위 고정) */
+.m-presetbar-bottom{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: var(--footer-h);              /* ✅ safe-bottom 추가로 띄우지 않음 */
+  z-index: 55; /* footer(대개 50 근처)보다 위 */
+  display: flex;
+  justify-content: center;
+  padding: 3px 10px;                    /* ✅ 위아래 여백도 살짝 축소 */
+  pointer-events: auto;
+}
+
+
+   .m-main{
+  flex: 1 1 auto;
+  position: relative;
+  padding-bottom: calc(var(--footer-h) + var(--presetbar-h) + var(--safe-bottom));
+  overflow: hidden;
+}
+
 
     .m-pages {
       height: 100%;
@@ -149,7 +274,7 @@
       flex: 0 0 100%;
       height: 100%;
       scroll-snap-align: start;
-      padding: 14px 12px 16px 12px;
+      padding: 14px 12px 0px 12px;  /* ✅ 16px → 10px */
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
 
@@ -617,24 +742,21 @@
 
     /* 우측: 강화(연마) | 마법봉인 | 마법부여 | 엠블렘 */
     #pageEquip .equip-right {
-      min-width: 0;
-      display: grid;
+  min-width: 0;
+  display: grid;
 
-      /* ✅ 고정폭 대신 비율로 분배 (마법봉인 과점 방지) */
-      grid-template-columns:
-        minmax(52px, 0.85fr)
-        /* 강화/연마 */
-        minmax(0, 1.45fr)
-        /* 마법봉인(옵션) */
-        minmax(52px, 0.90fr)
-        /* 마법부여 */
-        minmax(48px, 0.60fr);
-      /* 엠블렘 */
+  /* ✅ 마법봉인 폭을 줄이고, 마법부여 폭을 늘려서
+     "마법봉인 ↔ 마법부여" 간격이 과하게 벌어져 보이는 현상 완화 */
+  grid-template-columns:
+    minmax(52px, 0.85fr) /* 강화/연마 */
+    minmax(0, 1.20fr)    /* 마법봉인(옵션) ← 1.45fr → 1.20fr */
+    minmax(52px, 1.05fr) /* 마법부여       ← 0.90fr → 1.05fr */
+    minmax(48px, 0.60fr);/* 엠블렘 */
 
-      gap: 4px;
-      /* ✅ 6px → 4px */
-      align-items: start;
-    }
+  gap: 4px;
+  align-items: start;
+}
+
 
     /* 강화/연마 */
     #pageEquip .equip-enh {
@@ -662,47 +784,57 @@
       min-width: 0;
     }
 
-    #pageEquip .equip-unique {
-      font-weight: 900;
-      font-size: 11px;
-      color: rgba(233, 238, 247, 0.92);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    #pageEquip .equip-unique,
+#pageEquip .equip-normal{
+  font-weight: 900;
+  font-size: 10px;                /* ✅ 11px → 10px */
+  line-height: 1.15;
+  white-space: normal;            /* ✅ 줄바꿈 허용 */
+  overflow: hidden;
 
-    #pageEquip .equip-normal {
-      margin-top: 6px;
-      font-weight: 850;
-      font-size: 11px;
-      color: rgba(233, 238, 247, 0.65);
+  display: -webkit-box;           /* ✅ 2줄까지만 보이게 */
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;                  /* 표준 */
+  overflow-wrap: anywhere;        /* 긴 문자열 강제 줄바꿈 */
+  word-break: keep-all;           /* 한글 단어 잘림 완화(원하면 제거 가능) */
+}
 
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+#pageEquip .equip-unique{
+  color: rgba(233, 238, 247, 0.92);
+}
 
-      -webkit-line-clamp: 2;
-      /* WebKit */
-      line-clamp: 2;
-      /* ✅ 표준(린터 경고 제거용) */
-    }
+#pageEquip .equip-normal{
+  margin-top: 6px;                /* ✅ 기존 간격 유지 */
+  font-weight: 850;
+  color: rgba(233, 238, 247, 0.65);
+}
 
     /* 마법부여 / 엠블렘 공통 */
     #pageEquip .equip-col-title {
-      font-weight: 900;
-      font-size: 11px;
-      color: rgba(233, 238, 247, 0.70);
-      margin-bottom: 6px;
-    }
+  font-weight: 900;
+  font-size: 10px;                /* ✅ 11px → 10px */
+  color: rgba(233, 238, 247, 0.70);
+  margin-bottom: 6px;
+}
 
-    #pageEquip .equip-col-body {
-      font-weight: 900;
-      font-size: 12px;
-      color: rgba(233, 238, 247, 0.92);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+#pageEquip .equip-col-body {
+  font-weight: 900;
+  font-size: 10px;                /* ✅ 12px → 11px */
+  line-height: 1.15;
+  color: rgba(233, 238, 247, 0.92);
+
+  white-space: normal;            /* ✅ 줄바꿈 허용 */
+  overflow: hidden;
+
+  display: -webkit-box;           /* ✅ 2줄까지만 보이게 */
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+
+  overflow-wrap: anywhere;        /* ✅ 긴 문자열 대비 */
+  word-break: keep-all;
+}
 
     /* 엠블렘 아이콘 자리 */
     #pageEquip .equip-emblem-icons {
@@ -752,13 +884,21 @@
       display: none;
     }
 
-    /* ✅ (NEW) Set Equipment Bar (Page2) */
-    #pageEquip .equip-set-bar {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      margin: 2px 0 10px;
-    }
+   /* ✅ (NEW) Set Equipment Bar (Page2) */
+#pageEquip .equip-set-bar{
+  display:flex;
+  gap:8px;
+  margin: 2px 0 10px;
+}
+
+/* 4개가 한 줄에서 동일 비율로 나뉘게 */
+#pageEquip .equip-set-btn{
+  flex: 1 1 0;
+  min-width: 0;          /* flex 안에서 글자 줄바꿈/삐져나옴 방지 */
+  white-space: nowrap;   /* “악세사리/특수장비” 줄바꿈 방지 */
+  font-size: 12px;       /* 4개 한줄용 약간 축소 (원하면 13px로 다시) */
+}
+
 
     #pageEquip .equip-set-btn {
       height: 38px;
@@ -924,47 +1064,56 @@
     }
 
     .m-calc-btn {
-      flex: 0 0 140px;
-      border: none;
-      border-radius: 16px;
-      background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(29, 78, 216, 0.95));
-      color: #fff;
-      font-weight: 900;
-      font-size: 18px;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
+  flex: 0 0 clamp(110px, 30vw, 130px);  /* ✅ 140px → 120px (원하면 110~130 사이로 취향조절) */
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(29, 78, 216, 0.95));
+  color: #fff;
+  font-weight: 900;
+  font-size: 18px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
 
     .m-calc-btn:active {
       transform: translateY(1px);
     }
 
     .m-result {
-      flex: 1 1 auto;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.06);
-      padding: 12px 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-width: 0;
-    }
+  flex: 1 1 auto;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 12px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
 
-    .m-result .label {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
+.m-result .label {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
 
-    .m-result .value {
-      font-size: 18px;
-      font-weight: 900;
-      letter-spacing: -0.4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+.m-result .value {
+  /* ✅ PC처럼: 더 크고, 붉은색, 중앙 */
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.4px;
+  color: #ff5a6a;           /* 붉은색(원하면 다른 빨강으로도 조정 가능) */
+  text-align: right;   /* ✅ 우측정렬 */
+  width: 100%;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* (선택) 숫자 폭 고정으로 흔들림 줄이기 */
+  font-variant-numeric: tabular-nums;
+}
+
 
     /* ====== Toast ====== */
     .toast {
@@ -1888,7 +2037,12 @@
       border-color: var(--dd-gold);
     }
 
-
+    /* ✅ 성안의 봉인: 선택된 옵션값만 진하게 */
+#castleSealSummaryM #castleSealMainPickM,
+#castleSealSummaryM #castleSealSubPickM{
+  font-weight: 900;
+  color: rgba(233, 238, 247, 0.95);
+}
 
     /* =========================
    Skill Rune Modal (Mobile) - PC 톤 통일
@@ -2131,6 +2285,31 @@
       /* 삭제 버튼이 38px 느낌이면 딱 맞음 */
     }
 
+    /* ✅ 상단바용 작은 btn (고유효과 '선택 적용' 느낌 유지 + 크기만 축소) */
+.btn.btn-mini{
+  flex: 0 0 auto;      /* .btn의 flex:1 무력화 (상단바에서 늘어나지 않게) */
+  height: 28px;
+  padding: 0 12px;
+  font-size: 12px;
+  border-radius: 999px;
+}
+/* ✅ Page4: 초기화 버튼(고유효과 '선택 적용' 느낌 + 배경 투명) */
+#btnSkillResetM.btn.btn-mini{
+  background: transparent !important;
+  border: 1px solid rgba(231, 199, 125, .35);
+  color: #e9d7a6;
+  box-shadow: none;
+}
+
+#btnSkillResetM.btn.btn-mini:active{
+  transform: translateY(1px);
+}
+
+#btnSkillResetM.btn.btn-mini:hover{
+  background: rgba(231, 199, 125, .08) !important;
+}
+
+
     /* ===== Page4 Skill ===== */
     .skill-topbar {
       display: flex;
@@ -2328,21 +2507,93 @@
       font-weight: 900;
       color: rgba(233, 238, 247, 0.96);
     }
+/* ✅ 기존 is-hidden 동작 유지 */
+#skillRemainBarM.is-hidden{ display:none; }
+
+/* ✅ Page4: 남은 SP/TP (PC 느낌) */
+.st-counters{
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border: 1px solid rgba(231, 199, 125, .18);
+  border-radius: 10px;
+  background: rgba(12, 16, 24, .45);
+}
+
+.st-counters span{
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.st-counters span i{
+  font-style: normal;
+  font-weight: 900;
+  opacity: .95;
+}
+
+/* SP / TP 라벨 색 (PC 느낌 참고용) */
+.st-counters .c-sp i{ color: #6ec6ff; }  /* 파란 SP */
+.st-counters .c-tp i{ color: #ff6b6b; }  /* 빨간 TP */
+
+.st-counters span b{
+  font-size: 14px;
+  font-weight: 900;
+  color: #f3e6c1;
+  opacity: .95;
+}
+
 
     /* =========================
    ✅ (Mobile) PC풍 세트 모달 스타일
 ========================= */
 
-    .armor-set-dialog {
-      width: min(980px, 96vw);
-      height: min(720px, 90vh);
-    }
+    /* =========================
+   ✅ (Mobile) Set Modal: header 고정 + body만 스크롤
+========================= */
+.armor-set-dialog {
+  width: min(980px, 96vw);
+  height: min(720px, 90vh);
 
-    /* body scroll */
-    .armor-set-body {
-      overflow: auto;
-      padding: 8px 6px 14px;
-    }
+  /* ✅ 핵심: dialog는 스크롤 금지, 레이아웃은 column */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ✅ 상단(소제목+토글) 고정 */
+.armor-set-titlebar {
+  position: sticky;      /* 혹시 dialog가 스크롤되는 케이스까지 대비 */
+  top: 0;
+  z-index: 10;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 6px 0 8px;
+  border-bottom: 1px solid #2a211a;
+
+  /* ✅ 스크롤 중에도 배경이 비치지 않게 */
+  background: #15100c;
+}
+
+/* ✅ 리스트 영역만 스크롤 */
+.armor-set-body {
+  flex: 1;
+  min-height: 0;                /* ✅ 모바일에서 flex 자식 스크롤 필수 */
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+
+  padding: 8px 6px 14px;
+}
+
 
     /* 카드 그리드: ✅ 모바일 전용 1열 */
     .armor-set-list {
@@ -2356,6 +2607,33 @@
     .armor-set-spacer {
       display: none !important;
     }
+   
+/* ✅ 세트 그룹 구분선 + 소제목(PC처럼) */
+.armor-set-divider{
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 6px;
+
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(246, 231, 210, 0.78);
+  letter-spacing: -0.2px;
+}
+
+.armor-set-divider::before,
+.armor-set-divider::after{
+  content: "";
+  height: 1px;
+  flex: 1 1 auto;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.armor-set-divider .txt{
+  white-space: nowrap;
+  padding: 0 2px;
+}
 
 
     /* (PC처럼) 첫 줄 정렬 맞추기용 스페이서 */
@@ -2452,15 +2730,6 @@
 ========================= */
 
     /* PC의 titlebar */
-    .armor-set-titlebar {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 6px 0 8px;
-      border-bottom: 1px solid #2a211a;
-    }
-
     .armor-set-titlebar h2 {
       margin: 0;
       font-size: 15px;
@@ -2486,6 +2755,32 @@
       cursor: pointer;
       transition: all .2s ease;
     }
+    /* ✅ 고유효과 일괄 적용: 상단 '선택 적용' 버튼(닫기 버튼 좌측) */
+#mUniqueBulkModal .armor-set-titlebar .bulk-apply {
+  position: absolute;
+  right: 46px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+
+  /* ✅ 색깔 제거(중립 톤) */
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.88);
+
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+#mUniqueBulkModal .armor-set-titlebar .bulk-apply:hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.40);
+}
 
     .armor-set-titlebar .close:hover {
       background: rgba(255, 255, 255, 0.16);
@@ -2526,13 +2821,14 @@
     }
 
     /* 상태별 배경 */
-    .armor-toggle.mode-exceed {
-      background: linear-gradient(135deg, #22c55e, #10b981);
-    }
+.armor-toggle.mode-exceed {
+  /* ✅ PC와 동일한 익시드 파란 계열 */
+  background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+}
 
-    .armor-toggle.mode-epic {
-      background: linear-gradient(135deg, #facc15, #f97316);
-    }
+.armor-toggle.mode-epic {
+  background: linear-gradient(135deg, #facc15, #f97316);
+}
 
     /* 라벨 */
     .armor-toggle-label {
@@ -2586,11 +2882,21 @@
       transform: translateX(100%);
     }
 
-    /* 키보드 포커스 */
-    .armor-toggle:focus {
-      outline: 2px solid rgba(250, 204, 21, 0.65);
-      outline-offset: 2px;
-    }
+    /* 키보드 포커스 (mode별 색상) */
+.armor-toggle:focus {
+  outline-offset: 2px;
+}
+
+/* ✅ 익시드 = 파란 포커스 */
+.armor-toggle.mode-exceed:focus {
+  outline: 2px solid rgba(56, 189, 248, 0.80);
+}
+
+/* ✅ 에픽 = 노란 포커스 */
+.armor-toggle.mode-epic:focus {
+  outline: 2px solid rgba(250, 204, 21, 0.65);
+}
+
 
     /* ✅ PC 개별 고유효과 모달 닫기버튼 느낌(원형) */
     #mUniquePickModal .armor-set-titlebar .close {
@@ -2872,12 +3178,18 @@
 
 
         <div id="mUniqueBulkModal" class="modal" aria-hidden="true">
-          <div class="backdrop"></div>
-          <div class="dialog unique-dialog" role="dialog" aria-modal="true" aria-labelledby="mUniqueBulkTitle">
-            <header class="armor-set-titlebar">
-              <h2 id="mUniqueBulkTitle">고유효과 일괄 적용</h2>
-              <button type="button" class="close" data-mset-close aria-label="닫기">✕</button>
-            </header>
+  <!-- ✅ 바깥 터치 = '선택 적용'과 동일 동작 -->
+  <div class="backdrop" data-unique-bulk-apply></div>
+
+  <div class="dialog unique-dialog" role="dialog" aria-modal="true" aria-labelledby="mUniqueBulkTitle">
+    <header class="armor-set-titlebar">
+      <h2 id="mUniqueBulkTitle">고유효과 일괄 적용</h2>
+
+      <!-- ✅ '닫기' 버튼 좌측에 '선택 적용' 배치 -->
+      <button type="button" class="bulk-apply" id="mUniqueBulkApplyBtn">선택 적용</button>
+
+      <button type="button" class="close" data-mset-close aria-label="닫기">✕</button>
+    </header>
 
             <div class="unique-body">
               <!-- 무기 고유효과 -->
@@ -2929,10 +3241,6 @@
                   </div>
                 </div>
               </section>
-              <div class="unique-actions">
-                <button type="button" class="btn" data-mset-close>취소</button>
-                <button type="button" class="btn" id="mUniqueBulkApplyBtn">선택 적용</button>
-              </div>
             </div>
           </div>
         </div>
@@ -3112,8 +3420,11 @@
                   <button type="button" id="btnMUniqueBulk" class="equip-set-btn">고유효과</button>
                 </div>
 
+                <!-- ✅ (NEW) separator between "set buttons" and "auto input buttons" -->
+<div class="equip-auto-sep"></div>
+
                 <div class="equip-auto-bar" data-for="weapon">
-                  <button type="button" class="equip-auto-btn primary" id="btnWeaponAutoEnh">강화 자동 입력</button>
+                  <button type="button" class="equip-auto-btn" id="btnWeaponAutoEnh">강화 자동 입력</button>
                   <button type="button" class="equip-auto-btn" id="btnWeaponAutoSeal">추천 마법봉인 자동 입력</button>
                   <button type="button" class="equip-auto-btn" id="btnWeaponAutoEnchant">추천 마법부여 자동 입력</button>
                   <button type="button" class="equip-auto-btn" id="btnWeaponAutoEmblem">엠블렘 자동 입력</button>
@@ -3186,6 +3497,7 @@
                         <div class="equip-grind">연마 -</div>
                       </div>
                       <div class="equip-opts">
+                        <div class="equip-col-title">마법봉인</div>
                         <div class="equip-unique">고유옵션 -</div>
                         <div class="equip-normal">일반옵션 -</div>
                       </div>
@@ -3213,6 +3525,7 @@
                         <div class="equip-grind">연마 -</div>
                       </div>
                       <div class="equip-opts">
+                        <div class="equip-col-title">마법봉인</div>
                         <div class="equip-unique">고유옵션 -</div>
                         <div class="equip-normal">일반옵션 -</div>
                       </div>
@@ -3240,6 +3553,7 @@
                         <div class="equip-grind">연마 -</div>
                       </div>
                       <div class="equip-opts">
+                        <div class="equip-col-title">마법봉인</div>
                         <div class="equip-unique">고유옵션 -</div>
                         <div class="equip-normal">일반옵션 -</div>
                       </div>
@@ -3267,6 +3581,7 @@
                         <div class="equip-grind">연마 -</div>
                       </div>
                       <div class="equip-opts">
+                        <div class="equip-col-title">마법봉인</div>
                         <div class="equip-unique">고유옵션 -</div>
                         <div class="equip-normal">일반옵션 -</div>
                       </div>
@@ -3294,6 +3609,7 @@
                         <div class="equip-grind">연마 -</div>
                       </div>
                       <div class="equip-opts">
+                        <div class="equip-col-title">마법봉인</div>
                         <div class="equip-unique">고유옵션 -</div>
                         <div class="equip-normal">일반옵션 -</div>
                       </div>
@@ -3337,6 +3653,7 @@
                         <div class="equip-grind">연마 -</div>
                       </div>
                       <div class="equip-opts">
+                        <div class="equip-col-title">마법봉인</div>
                         <div class="equip-unique">고유옵션 -</div>
                         <div class="equip-normal">일반옵션 -</div>
                       </div>
@@ -3364,6 +3681,7 @@
                         <div class="equip-grind">연마 -</div>
                       </div>
                       <div class="equip-opts">
+                        <div class="equip-col-title">마법봉인</div>
                         <div class="equip-unique">고유옵션 -</div>
                         <div class="equip-normal">일반옵션 -</div>
                       </div>
@@ -3391,6 +3709,7 @@
                         <div class="equip-grind">연마 -</div>
                       </div>
                       <div class="equip-opts">
+                        <div class="equip-col-title">마법봉인</div>
                         <div class="equip-unique">고유옵션 -</div>
                         <div class="equip-normal">일반옵션 -</div>
                       </div>
@@ -3434,6 +3753,7 @@
                         <div class="equip-grind">연마 -</div>
                       </div>
                       <div class="equip-opts">
+                        <div class="equip-col-title">마법봉인</div>
                         <div class="equip-unique">고유옵션 -</div>
                         <div class="equip-normal">일반옵션 -</div>
                       </div>
@@ -3461,6 +3781,7 @@
                         <div class="equip-grind">연마 -</div>
                       </div>
                       <div class="equip-opts">
+                        <div class="equip-col-title">마법봉인</div>
                         <div class="equip-unique">고유옵션 -</div>
                         <div class="equip-normal">일반옵션 -</div>
                       </div>
@@ -3488,6 +3809,7 @@
                         <div class="equip-grind">연마 -</div>
                       </div>
                       <div class="equip-opts">
+                        <div class="equip-col-title">마법봉인</div>
                         <div class="equip-unique">고유옵션 -</div>
                         <div class="equip-normal">일반옵션 -</div>
                       </div>
@@ -3573,7 +3895,7 @@
                 </span>
               </div>
 
-              <button id="btnRuneM" class="btn" type="button">스킬룬 설정</button>
+              <button id="btnRuneM" class="btn primary" type="button">스킬룬 설정</button>
 
               <div style="height:8px;"></div>
 
@@ -3600,9 +3922,10 @@
                 <span>성안의 봉인</span>
                 <button id="btnCastleSealM" class="btn primary" type="button">옵션 선택</button>
               </div>
-              <div id="castleSealSummaryM" style="font-size:12px;opacity:.85;">
-                선택: -
-              </div>
+              <div id="castleSealSummaryM" style="font-size:12px;opacity:.85; line-height:1.35;">
+  <div>주요 옵션 : <span id="castleSealMainPickM">-</span></div>
+  <div>추가 옵션 : <span id="castleSealSubPickM">-</span></div>
+</div>
             </div>
 
           </div>
@@ -3615,14 +3938,14 @@
           <div class="m-card">
             <div class="skill-sticky">
               <div class="skill-topbar">
-                <div class="skill-topbar-title">스킬</div>
-                <button id="btnSkillResetM" type="button" class="m-btn m-btn-ghost">초기화</button>
-              </div>
+  <div class="skill-topbar-title">스킬</div>
+  <button id="btnSkillResetM" type="button" class="btn btn-mini">초기화</button>
+</div>
 
-              <div id="skillRemainBarM" class="skill-remaining is-hidden">
-                <div class="item"><span class="k">남은 SP</span><span id="skillRemainSpM" class="num">-</span></div>
-                <div class="item"><span class="k">남은 TP</span><span id="skillRemainTpM" class="num">-</span></div>
-              </div>
+              <div id="skillRemainBarM" class="st-counters is-hidden">
+  <span class="c-sp"><i>SP</i> <b id="skillRemainSpM">-</b></span>
+  <span class="c-tp"><i>TP</i> <b id="skillRemainTpM">-</b></span>
+</div>
             </div>
 
             <div id="skillListM" class="skill-list"></div>
@@ -3636,6 +3959,36 @@
 
       </div>
     </main>
+
+        <!-- ✅ 저장슬롯: 푸터 바깥 / 푸터 바로 위 (PC 저장슬롯과 동일 UI) -->
+      <div id="mobilePresetBar" class="m-presetbar-bottom" aria-label="저장슬롯">
+        <div class="save-box">
+          <div class="preset-slot">
+            <button type="button" class="preset-btn" data-slot="1">+</button>
+            <button type="button" class="preset-trash" data-slot="1" aria-label="슬롯 1 초기화">🗑</button>
+          </div>
+          <div class="preset-slot">
+            <button type="button" class="preset-btn" data-slot="2">+</button>
+            <button type="button" class="preset-trash" data-slot="2" aria-label="슬롯 2 초기화">🗑</button>
+          </div>
+          <div class="preset-slot">
+            <button type="button" class="preset-btn" data-slot="3">+</button>
+            <button type="button" class="preset-trash" data-slot="3" aria-label="슬롯 3 초기화">🗑</button>
+          </div>
+          <div class="preset-slot">
+            <button type="button" class="preset-btn" data-slot="4">+</button>
+            <button type="button" class="preset-trash" data-slot="4" aria-label="슬롯 4 초기화">🗑</button>
+          </div>
+          <div class="preset-slot">
+            <button type="button" class="preset-btn" data-slot="5">+</button>
+            <button type="button" class="preset-trash" data-slot="5" aria-label="슬롯 5 초기화">🗑</button>
+          </div>
+
+          <button type="button" class="preset-page-btn prev" id="presetPagePrev" aria-label="이전 저장슬롯 페이지">‹</button>
+          <button type="button" class="preset-page-btn next" id="presetPageNext" aria-label="다음 저장슬롯 페이지">›</button>
+          <div class="preset-page-ind" id="presetPageInd" aria-hidden="true"></div>
+        </div>
+      </div>
 
     <!-- ====== Bottom Fixed ====== -->
     <footer class="m-footer" style="height: var(--footer-h);">
@@ -4980,10 +5333,15 @@
       s.castleSeal = s.castleSeal || { mainName: '', subName: '' };
 
       const refresh = () => {
-        const a = s.castleSeal.mainName ? `주요: ${s.castleSeal.mainName}` : '주요: -';
-        const b = s.castleSeal.subName ? `추가: ${s.castleSeal.subName}` : '추가: -';
-        sum.textContent = `선택: ${a} / ${b}`;
-      };
+  const main = s.castleSeal.mainName ? s.castleSeal.mainName : '-';
+  const sub  = s.castleSeal.subName ? s.castleSeal.subName : '-';
+
+  const mainEl = document.getElementById('castleSealMainPickM');
+  const subEl  = document.getElementById('castleSealSubPickM');
+
+  if (mainEl) mainEl.textContent = main;
+  if (subEl)  subEl.textContent = sub;
+};
       refresh();
 
       // 1) 옵션 목록(매번 최신 DBEnh 기준)
@@ -7422,24 +7780,44 @@
       });
     })();
 
-    /* ✅ 세트 적용: state.equips + UI 동기화 */
-    function applySetPieces_mobile(setCard) {
-      if (!setCard?.pieces) return;
-      window.state = window.state || {};
-      state.equips = state.equips || {};
+    /* ✅ 세트 적용: selections + equips + UI 동기화 (세트 적용이 실제 계산에 반영되도록) */
+function applySetPieces_mobile(setCard) {
+  if (!setCard?.pieces) return;
 
-      for (const p of setCard.pieces) {
-        if (!p?.slot || !p?.item) continue;
-        state.equips[p.slot] = p.item;
+  window.state = window.state || {};
+  state.equips = state.equips || {};
+  state.selections = state.selections || {}; // ✅ payload에서 쓰는 핵심
 
-        // ✅ 모바일에 “장비 선택 시 UI 반영” 함수가 이미 존재하는 경우를 우선 사용
-        if (typeof applyPickedEquipUI === 'function') {
-          applyPickedEquipUI(p.slot, p.item);
-        } else if (typeof syncEquipUI_mobile === 'function') {
-          syncEquipUI_mobile(p.slot);
-        }
-      }
+  const stripParen = (name) => String(name ?? '').replace(/\s*\([^)]*\)\s*$/, '').trim();
+
+  for (const p of setCard.pieces) {
+    if (!p?.slot || !p?.item) continue;
+
+    const raw = p.item;
+
+    // ✅ applyPickedEquipUI는 it.image만 보므로 img → image로 맞춰준다
+    const it = { ...raw };
+    it.name = (raw.name || raw['이름'] || p.name || '').trim();
+    it.image = (raw.image || raw.img || raw['이미지'] || it.image || '').trim();
+
+    const cleanName = stripParen(it.name);
+    const code = String(raw.code ?? '');
+
+    // 1) UI용/모달 재오픈용
+    state.equips[p.slot] = it;
+
+    // 2) ✅ 계산 payload용 (이게 없어서 “이름만 바뀌고 계산이 안 됨”)
+    state.selections[p.slot] = { name: cleanName, code };
+
+    // 3) UI 반영
+    if (typeof applyPickedEquipUI === 'function') {
+      applyPickedEquipUI(p.slot, it);
+    } else if (typeof syncEquipUI_mobile === 'function') {
+      syncEquipUI_mobile(p.slot);
     }
+  }
+}
+
 
     /* =========================
        ✅ PC의 세트 카드 생성 로직 이식
@@ -8293,6 +8671,14 @@
       updateArmorSetToggleUI_mobile();
     }
 
+    function _getSetGroupTitle_mobile(name){
+  const raw = (name || '').trim();
+  if (!raw) return '(기타 세트)';
+  // "신속: 그란데 전투기갑 파츠 세트" -> "그란데 전투기갑 파츠 세트"
+  if (raw.includes(':')) return raw.split(':').slice(1).join(':').trim() || raw;
+  return raw;
+}
+
     function renderSetModal_mobile(kind) {
       if (typeof updateArmorSetToggleUI_mobile === 'function') updateArmorSetToggleUI_mobile();
 
@@ -8332,29 +8718,46 @@
         if (typeof toast === 'function') toast('세트가 적용되었습니다.');
       };
 
-      sets.forEach((s, idx) => {
-        // (PC 느낌) 첫 줄 3번째 칸 맞추기용 스페이서
-        if (idx === 2) {
-          const spacer = document.createElement('div');
-          spacer.className = 'armor-set-spacer';
-          box.appendChild(spacer);
-        }
+      // ✅ "신속: XXX" / "전격: XXX" 같은 접두를 제거해서 그룹키로 사용
+const _getSetGroupKey_mobile = (setName) => {
+  const n = String(setName || '').trim();
+  const m = n.match(/^[^:]{1,12}\s*:\s*(.+)$/); // "무언가: 본문" 형태면 본문을 그룹키로
+  return (m ? m[1] : n).trim();
+};
 
-        const card = document.createElement('div');
-        card.className = 'armor-set-card';
+let prevGroupKey = null;
 
-        // header
-        const header = document.createElement('div');
-        header.className = 'armor-set-header';
+sets.forEach((s) => {
+  const curKey = _getSetGroupTitle_mobile(s?.name);
 
-        const titleSpan = document.createElement('span');
-        titleSpan.textContent = s?.name || '(세트)';
-        header.appendChild(titleSpan);
+if (prevGroupKey !== curKey) {
+  const divider = document.createElement('div');
+  divider.className = 'armor-set-divider';
+
+  const txt = document.createElement('span');
+  txt.className = 'txt';
+  txt.textContent = curKey;          // ✅ 예: "그란데 전투기갑 파츠 세트"
+  divider.appendChild(txt);
+
+  box.appendChild(divider);
+}
+prevGroupKey = curKey;
+
+  const card = document.createElement('div');
+  card.className = 'armor-set-card';
+
+  // header
+  const header = document.createElement('div');
+  header.className = 'armor-set-header';
+
+  const titleSpan = document.createElement('span');
+  titleSpan.textContent = s?.name || '(세트)';
+  header.appendChild(titleSpan);
 
         const applyBtn = document.createElement('button');
         applyBtn.type = 'button';
         applyBtn.className = 'set-auto-toggle';
-        applyBtn.textContent = '이 세트 적용';
+        applyBtn.textContent = '세트 적용';
         applyBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           applyAndClose(s);
@@ -8438,37 +8841,56 @@
 
 
 
-      const applyBtn = document.getElementById('mUniqueBulkApplyBtn');
-      if (applyBtn && !applyBtn.__bound) {
-        applyBtn.__bound = 1;
-        applyBtn.addEventListener('click', () => {
-          const modal = document.getElementById('mUniqueBulkModal');
-          if (!modal) return;
+      // ✅ 고유효과 일괄 적용 실행(버튼/바깥터치 공용)
+function applyUniqueBulkSelectionFromModal(modal) {
+  if (!modal) return;
 
-          ensureCustomSkillsMobile();
+  ensureCustomSkillsMobile();
 
-          // 모달에서 고른 값(없으면 기존 state 유지)
-          const pickWeapon = (modal.dataset.sel_weapon ?? state.customSkills.weaponType ?? '');
-          const pickOther =
-            (modal.dataset.sel_other ??
-              state.customSkills.armorType ??
-              state.customSkills.braceletType ??
-              state.customSkills.earringType ??
-              '');
+  // 모달에서 고른 값(없으면 기존 state 유지)
+  const pickWeapon = (modal.dataset.sel_weapon ?? state.customSkills.weaponType ?? '');
+  const pickOther =
+    (modal.dataset.sel_other ??
+      state.customSkills.armorType ??
+      state.customSkills.braceletType ??
+      state.customSkills.earringType ??
+      '');
 
-          // ✅ 실제 적용 (모바일 state 구조)
-          state.customSkills.weaponType = pickWeapon;
-          state.customSkills.armorType = pickOther;
-          state.customSkills.braceletType = pickOther;
-          state.customSkills.earringType = pickOther;
+  // ✅ 실제 적용 (모바일 state 구조)
+  state.customSkills.weaponType = pickWeapon;
+  state.customSkills.armorType = pickOther;
+  state.customSkills.braceletType = pickOther;
+  state.customSkills.earringType = pickOther;
 
-          // 소제목 옆 mini 라벨 갱신
-          syncUniqueMiniLabels();
+  // 소제목 옆 mini 라벨 갱신
+  syncUniqueMiniLabels();
 
-          if (typeof toast === 'function') toast('고유효과가 적용되었습니다.');
-          _closeModalById_('mUniqueBulkModal');
-        });
-      }
+  toast?.('고유효과가 적용되었습니다.');
+  _closeModalById_('mUniqueBulkModal');
+}
+
+const applyBtn = document.getElementById('mUniqueBulkApplyBtn');
+if (applyBtn && !applyBtn.__bound) {
+  applyBtn.__bound = 1;
+  applyBtn.addEventListener('click', () => {
+    const modal = document.getElementById('mUniqueBulkModal');
+    applyUniqueBulkSelectionFromModal(modal);
+  });
+}
+
+// ✅ 바깥쪽(백드롭) 터치 = '선택 적용'
+const bulkModal = document.getElementById('mUniqueBulkModal');
+const bulkBackdrop = bulkModal?.querySelector('.backdrop[data-unique-bulk-apply]');
+if (bulkBackdrop && !bulkBackdrop.__boundApply) {
+  bulkBackdrop.__boundApply = 1;
+  bulkBackdrop.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const modal = document.getElementById('mUniqueBulkModal');
+    applyUniqueBulkSelectionFromModal(modal);
+  }, true);
+}
+
         // ✅ 여기 1줄 추가
   bindArmorSetTogglesOnce_mobile();
     }
@@ -8682,21 +9104,28 @@
       }
 
       // 5) emblems
-      const emblemPayload = {};
-      const emState = s.emblems || {};
-      for (const [slotKey, arr] of Object.entries(emState)) {
-        if (!Array.isArray(arr)) continue;
-        const mapped = arr.map(e => {
-          const name = String(e?.name || '').trim();
-          if (!name) return null;
-          return {
-            name,
-            levelVal: e?.levelVal,
-            type: e?.type,
-          };
-        });
-        if (mapped.some(x => x)) emblemPayload[slotKey] = mapped;
-      }
+const emblemPayload = {};
+const emState = s.emblems || {};
+for (const [slotKey, arr] of Object.entries(emState)) {
+  if (!Array.isArray(arr)) continue;
+  const mapped = arr.map(e => {
+    const name = String(e?.name || '').trim();
+    if (!name) return null;
+
+    // ✅ 모바일 state는 케이스에 따라 levelVal 대신 tag/level에 들어있을 수 있음(특히 플래티넘)
+    const type = String(e?.type || e?.typeKey || '').trim();
+    const levelVal = String(
+      (e?.levelVal ?? e?.tag ?? e?.level ?? '')
+    ).trim();
+
+    return {
+      name,
+      levelVal,   // ✅ 서버가 찾는 키는 levelVal이므로 여기로 강제
+      type,
+    };
+  });
+  if (mapped.some(x => x)) emblemPayload[slotKey] = mapped;
+}
 
       // 6) refines(연마) - 모바일이 이미 쓰고 있으면 그대로 전송
       const refinePayload = {};
@@ -8797,7 +9226,22 @@
     // (디버그) 현재 스냅샷을 콘솔에서 바로 확인하고 싶을 때
     window.__buildCalcAllPayloadMobile = buildCalcAllPayloadMobile;
 
+    let __mobileComputing = false;
+
     document.getElementById('btnMobileCompute')?.addEventListener('click', async () => {
+       if (__mobileComputing) return;
+  __mobileComputing = true;
+
+  const btn = document.getElementById('btnMobileCompute');
+  const out = document.getElementById('mobileFinalDamage');
+
+  const prevBtnText = btn?.textContent || '계산하기';
+
+  // ✅ 1) 즉시 UI 반영 (PC처럼)
+  if (btn) btn.disabled = true;
+  if (btn) btn.textContent = '계산중…';
+  if (out) out.textContent = '계산중입니다…';
+
       try {
         // 0) payload 구성
         const payload = buildCalcAllPayloadMobile();
@@ -8809,10 +9253,21 @@
         if (!resCalc?.ok) throw new Error(resCalc?.message || resCalc?.error || 'calc_all_failed');
 
         // 2) (선택) sum_stats로 세션 정리/확인
-        const sum = await apiJSON('sum_stats', { wantDbg: false });
-        if (!sum?.ok) console.warn('[MOBILE sum_stats fail]', sum);
+const sum = await apiJSON('sum_stats', { wantDbg: false });
 
-        if (sum?.ok) window.state.CurrentSumStats = sum.sum;   // ★ PC와 동일하게 sum만 저장
+if (!sum?.ok) {
+  console.warn('[MOBILE sum_stats fail]', sum);
+  // ❗sum_stats가 실패해도 다음 단계 진행은 하되, CurrentSumStats는 최소 객체로 보장
+  window.state.CurrentSumStats = window.state.CurrentSumStats || {};
+} else {
+  // ✅ 플래티넘 엠블렘 등 특정 케이스에서 sum.sum이 비어오는 경우 방어
+  if (sum.sum && typeof sum.sum === 'object') {
+    window.state.CurrentSumStats = sum.sum; // 정상
+  } else {
+    console.warn('[MOBILE sum_stats ok but missing sum.sum]', sum);
+    window.state.CurrentSumStats = window.state.CurrentSumStats || {};
+  }
+}
 
         // 3) ✅ 스킬 상태 저장 (skill_state_set)
         await saveSkillSelectionsMobile();
@@ -8847,6 +9302,14 @@
         document.getElementById('mobileFinalDamage').textContent = '-';
         toast('계산 실패: ' + String(e?.message || e || ''));
       }
+       finally {
+    // ✅ 3) 반드시 원복
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = prevBtnText;
+    }
+    __mobileComputing = false;
+  }
     });
 
 
@@ -9461,6 +9924,354 @@
     }
 
     /* ===== end auto input ===== */
+
+// ✅ 저장슬롯(푸터 위 고정) 높이를 실제 DOM 기준으로 측정해서 본문 padding-bottom에 반영
+function _syncPresetbarHeight_mobile() {
+  const el = document.getElementById('mobilePresetBar');
+  const h = el ? Math.ceil(el.getBoundingClientRect().height) : 0;
+  document.documentElement.style.setProperty('--presetbar-h', `${h}px`);
+}
+
+// 최초 1회 + 리사이즈/회전 대응
+requestAnimationFrame(_syncPresetbarHeight_mobile);
+window.addEventListener('resize', _syncPresetbarHeight_mobile);
+
+// ✅ 저장슬롯 페이징 + 서버 fpreset_list 연동 (PC 기능 그대로)
+// - 총 20슬롯(1~20), 페이지당 5개 => 4페이지
+const presetSlots = {
+  currentSlot: null,
+  // slot 번호별 메타: { slot, label, meta, savedAt }
+  data: {}
+};
+
+const PRESET_UI_TOTAL = 20;
+const PRESET_UI_PER_PAGE = 5;
+let presetPage = 0;
+
+// PC처럼 "직책별 허용 슬롯 수"가 있으면 그걸 우선 사용
+function _getMobilePresetMaxSlot() {
+  try {
+    const lim = (typeof getUserPresetLimit === 'function') ? Number(getUserPresetLimit() || 0) : 0;
+    if (lim > 0) return Math.min(PRESET_UI_TOTAL, lim);
+  } catch (e) {}
+  return PRESET_UI_TOTAL;
+}
+
+function getPresetMaxPage(maxSlot) {
+  const n = Math.max(0, Number(maxSlot || 0));
+  return Math.max(0, Math.ceil(n / PRESET_UI_PER_PAGE) - 1);
+}
+
+// ✅ 현재 페이지에 맞춰 DOM(5개 슬롯)의 data-slot을 1~20으로 재매핑
+function applyPresetPageToDom() {
+  const base = presetPage * PRESET_UI_PER_PAGE;
+
+  // 모바일은 #mobilePresetBar 안쪽만 대상으로 잡는 게 안전
+  const wraps = document.querySelectorAll('#mobilePresetBar .save-box .preset-slot');
+  wraps.forEach((wrap, i) => {
+    const slotNo = base + i + 1;
+
+    const btn = wrap.querySelector('.preset-btn');
+    const trash = wrap.querySelector('.preset-trash');
+
+    if (btn) btn.dataset.slot = String(slotNo);
+
+    if (trash) {
+      trash.dataset.slot = String(slotNo);
+      trash.setAttribute('aria-label', `슬롯 ${slotNo} 초기화`);
+    }
+  });
+}
+
+function updatePresetPagerUI(maxSlot) {
+  const prev = document.getElementById('presetPagePrev');
+  const next = document.getElementById('presetPageNext');
+  const ind  = document.getElementById('presetPageInd');
+
+  const maxPage = getPresetMaxPage(maxSlot);
+
+  if (prev) prev.disabled = (presetPage <= 0);
+  if (next) next.disabled = (presetPage >= maxPage);
+
+  if (ind) {
+    if (maxPage <= 0) {
+      ind.style.display = 'none';
+      ind.textContent = '';
+    } else {
+      ind.style.display = 'inline-flex';
+      ind.textContent = `${presetPage + 1}/${maxPage + 1}`;
+    }
+  }
+}
+
+// ✅ 버튼 UI(썸네일/has-data/disabled/휴지통 표시) 갱신
+function updatePresetButtonsUI() {
+  const maxSlot = _getMobilePresetMaxSlot();
+
+  // 페이지 보정
+  const maxPage = getPresetMaxPage(maxSlot);
+  if (presetPage > maxPage) presetPage = maxPage;
+
+  // 현재 페이지에 맞춰 data-slot 재매핑
+  applyPresetPageToDom();
+
+  // 버튼들
+  const btns = document.querySelectorAll('#mobilePresetBar .save-box .preset-btn[data-slot]');
+  btns.forEach((btn) => {
+    const slotStr = btn.dataset.slot;
+    const slotNum = Number(slotStr || '0');
+    const info = presetSlots.data[slotStr];
+    const meta = info && info.meta ? info.meta : null;
+
+    const isAllowed = slotNum > 0 && slotNum <= maxSlot;
+    btn.disabled = !isAllowed;
+
+    // 같은 슬롯의 휴지통도 함께 제어
+    const wrap = btn.closest('.preset-slot');
+    const trash = wrap ? wrap.querySelector('.preset-trash') : null;
+
+    if (info) {
+      btn.classList.add('has-data');
+
+      const label = info.label || '';
+      const charName = meta?.charName || '';
+      btn.title = label || charName || `슬롯 ${slotNum}`;
+
+      const thumb = meta && meta.thumb ? String(meta.thumb) : '';
+      if (thumb) {
+        btn.style.backgroundImage = `url("${thumb}")`;
+        btn.textContent = '';
+      } else {
+        btn.style.backgroundImage = '';
+        btn.textContent = '+';
+      }
+
+      if (trash) trash.style.display = 'flex';
+    } else {
+      btn.classList.remove('has-data');
+      btn.style.backgroundImage = '';
+      btn.textContent = '+';
+      btn.title = isAllowed ? `슬롯 ${slotNum}` : `멤버십 업그레이드가 필요합니다!`;
+
+      if (trash) trash.style.display = 'none';
+    }
+  });
+
+  updatePresetPagerUI(maxSlot);
+  if (typeof _syncPresetbarHeight_mobile === 'function') {
+    _syncPresetbarHeight_mobile();
+  }
+}
+
+// ====== 서버 연동 (fpreset_*) ======
+async function refreshFpresetList_mobile() {
+  try {
+    const res = await apiJSON('fpreset_list', {});
+    if (!res || !res.ok) throw new Error(res?.error || 'fpreset_list_fail');
+
+    presetSlots.data = {};
+    const items = Array.isArray(res.items) ? res.items : [];
+    items.forEach(it => {
+      const n = Number(it?.slot);
+      if (!Number.isFinite(n) || n < 1 || n > PRESET_UI_TOTAL) return;
+      presetSlots.data[String(n)] = {
+        slot: n,
+        label: String(it?.label || `프리셋 ${n}`),
+        savedAt: Number(it?.savedAt || 0) || null,
+        meta: it?.meta || null,
+      };
+    });
+
+    updatePresetButtonsUI();
+  } catch (e) {
+    console.warn('[fpreset_list] fail:', e);
+    // 목록 실패는 UI를 "비어있음"으로라도 유지
+    updatePresetButtonsUI();
+  }
+}
+
+function _clonePlain(obj) {
+  try {
+    if (typeof structuredClone === 'function') return structuredClone(obj);
+  } catch (e) {}
+  return JSON.parse(JSON.stringify(obj || {}));
+}
+
+// 현재 프론트 state 전체를 스냅샷으로 만들어서 서버에 보낼 객체로 반환
+function buildFrontPresetState_mobile() {
+  // 모바일도 결국 window.state가 “PC와 동일한 구조”로 유지되는 걸 전제로 함
+  return _clonePlain(window.state || {});
+}
+
+// 저장된 state를 window.state에 반영하고, 화면을 state 기준으로 갱신
+function applyFrontPresetState_mobile(presetState) {
+  const s = _clonePlain(presetState || {});
+  window.state = s;
+
+  // 1) 캐릭터 UI
+  if (s.currentCharacter) {
+    applyPickedCharacterUI(s.currentCharacter);
+    ensurePage4Init();
+    renderSkillPageMobile(s.currentCharacter);
+  }
+
+  // 2) 장비 UI
+  try {
+    const sels = s.selections || {};
+    for (const [slotKey, info] of Object.entries(sels)) {
+      applyPickedEquipUI(slotKey, info);
+    }
+  } catch (e) {
+    console.warn('[preset] apply equip ui fail', e);
+  }
+
+  // 3) Page3 요약 텍스트들(시간/몬스터/룬각인/성안의 봉인) 즉시 반영
+  try {
+    // 시간 기준
+    const tSel = document.getElementById('timeSelectM');
+    if (tSel && s.timeKey) tSel.value = String(s.timeKey);
+
+    // 몬스터
+    const mSel = document.getElementById('monsterSelectM');
+    if (mSel && s.monsterName) mSel.value = String(s.monsterName);
+
+    // 룬각인
+    const reName = s.runeEngrave?.name ? String(s.runeEngrave.name) : '';
+    const reLv   = s.runeEngrave?.level ? String(s.runeEngrave.level) : '';
+    const reSum  = document.getElementById('runeEngraveSummaryM');
+    if (reSum) reSum.textContent = (reName && reLv) ? `${reName} (${reLv})` : '선택 없음';
+
+    // 성안의 봉인(요약 + 아래 표시)
+    const main = s.castleSeal?.mainName ? String(s.castleSeal.mainName) : '';
+    const sub  = s.castleSeal?.subName ? String(s.castleSeal.subName) : '';
+    const csSum = document.getElementById('castleSealSummaryM');
+    if (csSum) csSum.textContent = (main || sub) ? `${main || '—'} / ${sub || '—'}` : '선택 없음';
+
+    const mainEl = document.getElementById('castleSealMainPickM');
+    const subEl  = document.getElementById('castleSealSubPickM');
+    if (mainEl) mainEl.textContent = main || '—';
+    if (subEl)  subEl.textContent = sub  || '—';
+  } catch (e) {
+    console.warn('[preset] page3 sync fail', e);
+  }
+
+  // 4) 최종적으로 저장슬롯 UI도 재갱신
+  updatePresetButtonsUI();
+}
+
+async function saveToFpresetSlot_mobile(slotNum) {
+  const st = buildFrontPresetState_mobile();
+  const charName = st?.currentCharacter?.name ? String(st.currentCharacter.name) : '';
+  const label = charName ? charName : `프리셋 ${slotNum}`;
+
+  const res = await apiJSON('fpreset_save', { slot: slotNum, label, state: st });
+  if (!res || !res.ok) throw new Error(res?.error || 'fpreset_save_fail');
+
+  await refreshFpresetList_mobile();
+}
+
+async function loadFromFpresetSlot_mobile(slotNum) {
+  const res = await apiJSON('fpreset_load', { slot: slotNum });
+  if (!res || !res.ok) throw new Error(res?.error || 'fpreset_load_fail');
+
+  applyFrontPresetState_mobile(res.state || {});
+  // (로드 직후 meta가 갱신될 수 있으니 한 번 더 목록 갱신)
+  await refreshFpresetList_mobile();
+}
+
+async function clearFpresetSlot_mobile(slotNum) {
+  const res = await apiJSON('fpreset_clear', { slot: slotNum });
+  if (!res || !res.ok) throw new Error(res?.error || 'fpreset_clear_fail');
+
+  await refreshFpresetList_mobile();
+}
+
+// ✅ 슬롯 클릭/휴지통 클릭 바인딩(한 번만)
+function bindPresetBarOnce_mobile() {
+  const bar = document.getElementById('mobilePresetBar');
+  if (!bar || bar._bound) return;
+  bar._bound = true;
+
+  bar.addEventListener('click', async (e) => {
+    const trash = e.target?.closest?.('.preset-trash');
+    const btn   = e.target?.closest?.('.preset-btn');
+
+    // 휴지통
+    if (trash) {
+      const slotNum = Number(trash.dataset.slot || '0');
+      if (!slotNum) return;
+
+      if (!confirm(`슬롯 ${slotNum}을(를) 초기화할까요?`)) return;
+      try {
+        await clearFpresetSlot_mobile(slotNum);
+      } catch (err) {
+        console.error(err);
+        (window.toast || alert)('초기화에 실패했습니다.');
+      }
+      return;
+    }
+
+    // 슬롯 버튼
+    if (btn) {
+      if (btn.disabled) return;
+
+      const slotNum = Number(btn.dataset.slot || '0');
+      if (!slotNum) return;
+
+      const info = presetSlots.data[String(slotNum)];
+      try {
+        if (info) {
+          // 데이터 있음 → 불러오기
+          const title = info?.label || info?.meta?.charName || `슬롯 ${slotNum}`;
+          if (!confirm(`"${title}" 불러올까요?\n(현재 설정은 덮어쓰지 않고 단순히 화면만 교체됩니다)`)) return;
+          await loadFromFpresetSlot_mobile(slotNum);
+        } else {
+          // 비어있음 → 저장
+          if (!confirm(`현재 설정을 슬롯 ${slotNum}에 저장할까요?`)) return;
+          await saveToFpresetSlot_mobile(slotNum);
+        }
+      } catch (err) {
+        console.error(err);
+        (window.toast || alert)('저장슬롯 작업에 실패했습니다.');
+      }
+    }
+  }, true);
+}
+
+function setPresetPage(p) {
+  const maxSlot = _getMobilePresetMaxSlot();
+  const maxPage = getPresetMaxPage(maxSlot);
+
+  presetPage = Math.max(0, Math.min(maxPage, (p | 0)));
+
+  // 1) data-slot 재매핑
+  applyPresetPageToDom();
+
+  // 2) 버튼 UI 즉시 갱신
+  updatePresetButtonsUI();
+}
+
+// ✅ 이벤트 바인딩 + 초기 세팅
+(function initPresetPager() {
+  const prev = document.getElementById('presetPagePrev');
+  const next = document.getElementById('presetPageNext');
+
+  if (prev && !prev._bound) {
+    prev._bound = true;
+    prev.addEventListener('click', () => setPresetPage(presetPage - 1));
+  }
+  if (next && !next._bound) {
+    next._bound = true;
+    next.addEventListener('click', () => setPresetPage(presetPage + 1));
+  }
+
+  bindPresetBarOnce_mobile();
+  setPresetPage(0);
+
+  // ✅ 핵심: 서버에서 fpreset_list 불러오기
+  refreshFpresetList_mobile();
+})();
+
 
   </script>
 
