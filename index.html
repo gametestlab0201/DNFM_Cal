@@ -6927,6 +6927,68 @@ function updateSpecialUserButton() {
     state.leveling = state.leveling || {}; // { 15: n, 20: n, 25: n, ... }
     state.skillDmg = state.skillDmg || {};   // ★ 스킬 현재 데미지 캐시 {id: { per, flat, lv }}
 
+          // ✅ [MOBILE→PC 프리셋 호환]
+      // 모바일은 skillTrees[charKey][skillName] = { spLv, tpLv } 형태로 저장하는 경우가 있음.
+      // PC는 skillLv/skillTpLv (id→레벨 맵) 형태를 사용하므로, 여기서 변환한다.
+      try {
+        const hasTrees = (state.skillTrees && typeof state.skillTrees === 'object');
+        const hasLvMap = (state.skillLv && Object.keys(state.skillLv).length > 0);
+
+        // ownerKey(=charKey) 우선, 없으면 currentCharacter.ownerKey 보조
+        const _ok = String(ownerKey || '').replace(/\s+/g, '');
+        const _ck = String(state?.currentCharacter?.ownerKey || '').replace(/\s+/g, '');
+        const treeStore = hasTrees ? (state.skillTrees[_ok] || state.skillTrees[_ck]) : null;
+
+        if (!hasLvMap && treeStore && typeof treeStore === 'object') {
+          // 스킬명 → row 매핑
+          const idxByName = {};
+          for (const r of (ST2.rows || [])) {
+            const k = normKey(r?.name || '');
+            if (k && !idxByName[k]) idxByName[k] = r;
+          }
+
+          // 변환: skillTrees(name) → skillLv(id)
+          for (const k in treeStore) {
+            const node = treeStore[k] || {};
+            const spLv = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
+            const tpLv = Number(node.tpLv ?? node.tp ?? 0) || 0;
+            const row = idxByName[normKey(k)];
+            if (!row) continue;
+
+            const maxLv = Number(row.maxLv || 0) || 0;
+            const cappedSp = Math.max(0, maxLv ? Math.min(spLv, maxLv) : spLv);
+            const cappedTp = Math.max(0, Math.min(tpLv, 5));
+
+            if (cappedSp) state.skillLv[row.id] = cappedSp;
+            if (cappedTp) state.skillTpLv[row.id] = cappedTp;
+          }
+
+          // SP/TP 재계산 (총량은 캐릭터 시트 값을 우선)
+          const totalSp = Number(state?.currentCharacter?.sp || state?.sp?.total || 0) || 0;
+          const totalTp = Number(state?.currentCharacter?.tp || state?.tp?.total || 0) || 0;
+          let usedSp = 0, usedTp = 0;
+
+          for (const r of (ST2.rows || [])) {
+            const lv = Number(state.skillLv?.[r.id] || 0) || 0;
+            const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
+            usedSp += lv * Number(r.sp || 0);
+            usedTp += tp * Number(r.tpCost || 0);
+          }
+
+          state.sp.total = totalSp;
+          state.sp.left = Math.max(0, totalSp - usedSp);
+          state.tp.total = totalTp;
+          state.tp.left = Math.max(0, totalTp - usedTp);
+          state.stUsedSP = usedSp;
+          state.stUsedTP = usedTp;
+
+          if (typeof renderSpTp === 'function') renderSpTp();
+        }
+      } catch (e) {
+        console.warn('[renderSkillTreeBands] mobile preset skillTrees 변환 실패:', e);
+      }
+
+
     // ===== 아바타 / 스킬룬 / 룬각인 버킷 =====
     state.avatar = state.avatar || {};             // 아바타/무기압 선택 정보
     state.skillrune = state.skillrune || null;           // 스킬룬 전체 테이블(= state.runes 미러)
@@ -8723,6 +8785,95 @@ function updateSpecialUserButton() {
       state.tp = state.tp || { total: 0, left: 0 };
       state.skillLv = state.skillLv || {};
       state.skillTpLv = state.skillTpLv || {};
+
+
+      // ✅ [MOBILE→PC 스킬프리셋 호환]
+      // 모바일 저장본은 state.skillTrees[캐릭키][스킬명] = { spLv, tpLv } 형태가 흔함.
+      // PC 렌더는 state.skillLv / state.skillTpLv (row.id → 레벨) 맵을 사용하므로 여기서 변환한다.
+      try {
+        const trees = (state.skillTrees && typeof state.skillTrees === 'object') ? state.skillTrees : null;
+        if (trees) {
+          // ownerKey(=jobGroupLabel+name)로 우선 찾고, 없으면 정규화 비교로 가장 가까운 키를 찾는다.
+          const nk = (v) => String(v || '')
+            .normalize('NFC')
+            .replace(/[\uFEFF\u00A0\u200B-\u200D\u2060\u180E]/g, '')
+            .replace(/[\s_\-]+/g, '');
+
+          let treeStore = trees[ownerKey] || null;
+          if (!treeStore) {
+            const want = nk(ownerKey);
+            for (const k of Object.keys(trees)) {
+              if (nk(k) === want) { treeStore = trees[k]; break; }
+            }
+          }
+
+          // treeStore 안에 찍힌 스킬이 1개라도 있으면 변환 수행(기존 skillLv에 초기값/기본스킬이 있어도 덮어씀)
+          const treeHasAny = (obj) => {
+            if (!obj || typeof obj !== 'object') return false;
+            for (const k in obj) {
+              const node = obj[k] || {};
+              const spLv = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
+              const tpLv = Number(node.tpLv ?? node.tp ?? 0) || 0;
+              if (spLv > 0 || tpLv > 0) return true;
+            }
+            return false;
+          };
+
+          if (treeHasAny(treeStore)) {
+            // 스킬명 → row 매핑
+            const idxByName = {};
+            for (const r of (ST2.rows || [])) {
+              const key = nk(r?.name || '');
+              if (key && !idxByName[key]) idxByName[key] = r;
+            }
+
+            // 변환: (스킬명) → (row.id)
+            for (const k in treeStore) {
+              const node = treeStore[k] || {};
+              const spLvRaw = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
+              const tpLvRaw = Number(node.tpLv ?? node.tp ?? 0) || 0;
+
+              const row = idxByName[nk(k)];
+              if (!row) continue;
+
+              const maxLv = Number(row.maxLv || 0) || 0;
+              const minLv = Number(row.minLv ?? 0) || 0;
+
+              const spLv = Math.max(minLv, maxLv ? Math.min(spLvRaw, maxLv) : spLvRaw);
+              const tpLv = Math.max(0, Math.min(tpLvRaw, 5));
+
+              // ✅ 기존값(기본스킬 등)이 있더라도 모바일 저장값을 우선 반영 (minLv는 보장)
+              if (spLv > 0) state.skillLv[row.id] = spLv;
+              if (tpLv > 0) state.skillTpLv[row.id] = tpLv;
+            }
+
+            // ✅ SP/TP 재계산(기본 minLv는 "무료"로 취급: (lv - minLv)만 SP 차감)
+            const totalSp = Number(state?.currentCharacter?.sp || state?.sp?.total || 0) || 0;
+            const totalTp = Number(state?.currentCharacter?.tp || state?.tp?.total || 0) || 0;
+            let usedSp = 0, usedTp = 0;
+
+            for (const r of (ST2.rows || [])) {
+              const lv = Number(state.skillLv?.[r.id] || 0) || 0;
+              const base = Number(r.minLv ?? 0) || 0;
+              const perSp = Number(r.sp || 0) || 0;
+              usedSp += Math.max(0, lv - base) * perSp;
+
+              const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
+              const perTp = Number(r.tpCost || 0) || 0;
+              usedTp += Math.max(0, tp) * perTp;
+            }
+
+            state.sp.total = totalSp;
+            state.sp.left = Math.max(0, totalSp - usedSp);
+            state.tp.total = totalTp;
+            state.tp.left = Math.max(0, totalTp - usedTp);
+            state.stUsedSP = usedSp;
+            state.stUsedTP = usedTp;
+          }
+        }
+      } catch (e) {
+        console.warn('[renderSkillTreeBands] mobile skillTrees → skillLv 변환 실패:', e);
+      }
 
       const TP_MIN = 0, TP_MAX = 5;
       const canSpendSp = need => (state.sp.left || 0) >= need;
@@ -10981,13 +11132,15 @@ function updateSpecialUserButton() {
             btnMain.classList.remove('customopt-' + name);
           });
 
-          const pickedMain = cs.type || cs.customType || '';
-          if (!pickedMain) {
-            btnMain.textContent = '고유효과(무기)';
-          } else {
-            btnMain.textContent = pickedMain;
-            btnMain.classList.add('customopt-' + pickedMain);
-          }
+          const pickedMain = cs.type || cs.customType || cs.weaponType || '';
+const pickedMainNorm = (String(pickedMain || '').trim() === '없음') ? '' : String(pickedMain || '').trim();
+
+if (!pickedMainNorm) {
+  btnMain.textContent = '고유효과(무기)';
+} else {
+  btnMain.textContent = pickedMainNorm;
+  btnMain.classList.add('customopt-' + pickedMainNorm);
+}
         }
       }
 
@@ -17316,10 +17469,79 @@ function updateSpecialUserButton() {
         target[k] = v;
       });
 
+      // ✅ 모바일→PC 프리셋 호환: 엠블렘 스냅샷 정규화
+// - level_num: "10" → 10 (숫자)
+// - levelVal: 없으면 '' (플래티넘은 tag를 보조로 사용)
+// - name/type: 유니코드/제로폭/공백 정리
+// - img: "./img/..." → "img/..."
+try {
+  const normTxt = (v) => String(v ?? '')
+    .normalize('NFC')
+    .replace(/[﻿ ​-\u200D\u2060\u180E]/g, '')
+    .trim();
+
+  const normImg = (p) => {
+    const s2 = String(p ?? '').trim();
+    return s2.startsWith('./') ? s2.slice(2) : s2;
+  };
+
+  const em = target.emblems;
+  if (em && typeof em === 'object') {
+    for (const [slotKey, arr] of Object.entries(em)) {
+      if (!Array.isArray(arr)) continue;
+
+      em[slotKey] = arr.map((e) => {
+        if (!e || !e.name) return null;
+
+        const ne = { ...e };
+
+        ne.name = normTxt(ne.name);
+        ne.type = normTxt(ne.type);
+
+        // levelVal 우선, 없으면 tag(플래티넘 속성 등)로 보조
+        const lv = (ne.levelVal != null) ? ne.levelVal : (ne.tag != null ? ne.tag : '');
+        ne.levelVal = normTxt(lv);
+
+        // level_num: 숫자화
+        if (ne.level_num != null && ne.level_num !== '') {
+          const n = Number(ne.level_num);
+          if (Number.isFinite(n)) ne.level_num = n;
+        }
+
+        // img 경로 정규화
+        if (ne.img) ne.img = normImg(ne.img);
+
+        return ne;
+      });
+    }
+  }
+} catch (e) {
+  console.warn('[applyFrontPresetState] emblems normalize failed:', e);
+}
+
       // 여기부터는 target을 로컬 변수로 사용 (state라는 이름은 쓰지 않음)
-      const s = target;
+const s = target;
 
+// ✅ (중요) 모바일 프리셋은 런타임 캐시/컨테이너가 비어있을 수 있음
+//    state를 통째로 덮어쓴 직후에 필수 컨테이너를 반드시 복구한다.
+try {
+  if (!s.skillLv || typeof s.skillLv !== 'object') s.skillLv = {};
+  if (!s.skillTpLv || typeof s.skillTpLv !== 'object') s.skillTpLv = {};
 
+  // simulateSkillUsage에서 바로 참조 (없으면 SK_0_귀참 같은 키에서 터짐)
+  if (!s.skillDmg || typeof s.skillDmg !== 'object') s.skillDmg = {};
+  if (!s.skillUseOpts || typeof s.skillUseOpts !== 'object') s.skillUseOpts = {};
+
+  // SP/TP도 구조가 다를 수 있으니 최소 형태 보장
+  if (!s.sp || typeof s.sp !== 'object') s.sp = { total: 0, left: 0 };
+  if (!s.tp || typeof s.tp !== 'object') s.tp = { total: 0, left: 0 };
+
+  // 계산 루틴에서 숫자 기대하는 값들 보정
+  if (!Number.isFinite(Number(s.stUsedSP))) s.stUsedSP = 0;
+  if (!Number.isFinite(Number(s.stUsedTP))) s.stUsedTP = 0;
+} catch (e) {
+  console.warn('[applyFrontPresetState] runtime container init fail:', e);
+}
       // 🔸 UI 전용 상태는 프리셋 스냅샷에 안 들어오므로 여기서 기본 객체 다시 세팅
       if (!s.ui || typeof s.ui !== 'object') {
         s.ui = {
@@ -17338,28 +17560,108 @@ function updateSpecialUserButton() {
         }
       }
 
-      // ★ SP/TP 기본 구조 보정 (스냅샷에 없으면라도)
-      if (!s.sp || typeof s.sp !== 'object') {
-        s.sp = { total: 0, left: 0 };
-      } else {
-        s.sp.total = Number(s.sp.total || 0);
-        s.sp.left = Number(s.sp.left ?? s.sp.total ?? 0);
+            // ★ SP/TP 기본 구조 보정
+      //    (모바일 프리셋은 sp/tp가 없거나 0으로 저장될 수 있으니 currentCharacter 기반으로 보정)
+      const _snapSpTotal = Number(src?.sp?.total || 0);
+      const _snapTpTotal = Number(src?.tp?.total || 0);
+      const _charSpTotal = Number(s?.currentCharacter?.sp || 0);
+      const _charTpTotal = Number(s?.currentCharacter?.tp || 0);
+
+      if (!s.sp || typeof s.sp !== 'object') s.sp = { total: 0, left: 0 };
+      s.sp.total = Number(s.sp.total || 0);
+      s.sp.left = Number(s.sp.left ?? s.sp.total ?? 0);
+
+      if (!s.tp || typeof s.tp !== 'object') s.tp = { total: 0, left: 0 };
+      s.tp.total = Number(s.tp.total || 0);
+      s.tp.left = Number(s.tp.left ?? s.tp.total ?? 0);
+
+      // ✅ 모바일 프리셋 보정: total이 0이면 캐릭터 총 SP/TP로 채워넣기 (left도 함께)
+      if (!_snapSpTotal && _charSpTotal) {
+        s.sp.total = _charSpTotal;
+        if (!Number.isFinite(s.sp.left) || s.sp.left <= 0) s.sp.left = _charSpTotal;
       }
-      if (!s.tp || typeof s.tp !== 'object') {
-        s.tp = { total: 0, left: 0 };
-      } else {
-        s.tp.total = Number(s.tp.total || 0);
-        s.tp.left = Number(s.tp.left ?? s.tp.total ?? 0);
+      if (!_snapTpTotal && _charTpTotal) {
+        s.tp.total = _charTpTotal;
+        if (!Number.isFinite(s.tp.left) || s.tp.left <= 0) s.tp.left = _charTpTotal;
       }
 
-      // ★ 프리셋 적용 직후 SP/TP UI 갱신
-      try {
-        if (typeof renderSpTp === 'function') {
-          renderSpTp();
+      // ✅ (핵심) 모바일 프리셋/스킬Lv 포함 프리셋이면:
+//    "스킬트리 모달을 열지 않아도" skillLv 기반으로 SP/TP 남은값을 즉시 재계산해서 UI에 반영
+//    (ST2.rows 로딩 타이밍 때문에 짧게 재시도 로직 포함)
+const _hasAnySkillLv = !!(s.skillLv && Object.keys(s.skillLv || {}).length);
+const _hasAnyTpLv = !!(s.skillTpLv && Object.keys(s.skillTpLv || {}).length);
+
+if (src?.skillTrees || _hasAnySkillLv || _hasAnyTpLv) {
+  s._needRecalcSpTp = true; // 기존 로직과의 호환용 플래그
+
+  const _tryRecalcSpTp = (attempt = 0) => {
+    try {
+      const rows = (window.ST2 && Array.isArray(window.ST2.rows)) ? window.ST2.rows : null;
+
+      // ST2 로딩 대기 (캐릭/스킬 테이블이 늦게 붙는 케이스)
+      if (!rows || rows.length === 0) {
+        if (attempt < 20) {
+          return setTimeout(() => _tryRecalcSpTp(attempt + 1), 50);
         }
-      } catch (e) {
-        console.warn('[applyFrontPresetState] renderSpTp 실패:', e);
+        // ST2가 끝내 안오면, 일단 현재 값이라도 표시
+        try { if (typeof renderSpTp === 'function') renderSpTp(); } catch (_) {}
+        return;
       }
+
+      const totalSp = Number(s?.currentCharacter?.sp || s?.sp?.total || 0) || 0;
+      const totalTp = Number(s?.currentCharacter?.tp || s?.tp?.total || 0) || 0;
+
+      let usedSp = 0, usedTp = 0;
+
+      for (const r of rows) {
+        if (!r || !r.id) continue;
+
+        // ✅ SP: 기본 minLv는 "무료" → (lv - minLv)만 SP 차감
+        const lv = Number(s.skillLv?.[r.id] || 0) || 0;
+        const base = Number(r.minLv ?? 0) || 0;
+        const perSp = Number(r.sp || 0) || 0;
+        usedSp += Math.max(0, lv - base) * perSp;
+
+        // ✅ TP: 찍은 만큼 그대로 차감
+        const tp = Number(s.skillTpLv?.[r.id] || 0) || 0;
+        const perTp = Number(r.tpCost || 0) || 0;
+        usedTp += Math.max(0, tp) * perTp;
+      }
+
+      if (!s.sp || typeof s.sp !== 'object') s.sp = { total: 0, left: 0 };
+      if (!s.tp || typeof s.tp !== 'object') s.tp = { total: 0, left: 0 };
+
+      s.sp.total = totalSp;
+      s.sp.left = Math.max(0, totalSp - usedSp);
+      s.tp.total = totalTp;
+      s.tp.left = Math.max(0, totalTp - usedTp);
+      s.stUsedSP = usedSp;
+      s.stUsedTP = usedTp;
+
+      // ★ 즉시 UI 갱신
+      try { if (typeof renderSpTp === 'function') renderSpTp(); } catch (_) {}
+    } catch (e) {
+      console.warn('[applyFrontPresetState] SP/TP 재계산 실패:', e);
+      if (attempt < 5) {
+        return setTimeout(() => _tryRecalcSpTp(attempt + 1), 50);
+      }
+      try { if (typeof renderSpTp === 'function') renderSpTp(); } catch (_) {}
+    }
+  };
+
+  // 다음 tick에 1차 시도 (캐릭터/스킬 테이블 렌더 타이밍 고려)
+  setTimeout(() => _tryRecalcSpTp(0), 0);
+
+} else {
+  // ★ 프리셋 적용 직후 SP/TP UI 갱신 (일반 PC 프리셋)
+  try {
+    if (typeof renderSpTp === 'function') {
+      renderSpTp();
+    }
+  } catch (e) {
+    console.warn('[applyFrontPresetState] renderSpTp 실패:', e);
+  }
+}
 
       // 4) 캐릭터 라벨/이미지 반영
       try {
@@ -17400,7 +17702,34 @@ function updateSpecialUserButton() {
 
       // 5) 장비 슬롯 타일 UI 반영
       try {
-        const selections = s.selections || {};
+        const equipsSnap = (s.equips && typeof s.equips === 'object') ? s.equips : {};
+let selections = (s.selections && typeof s.selections === 'object') ? s.selections : {};
+
+const normImgPreset = (src) => {
+  const t = String(src || '').trim();
+  if (!t) return '';
+  if (/^https?:\/\//i.test(t)) return t;
+  if (t.startsWith('img/')) return './' + t.replace(/^\.?\//, '');
+  return t;
+};
+
+// ✅ sub/support 호환 (저장본/버전 차이 대비)
+if (!selections.sub && selections.support) selections.sub = selections.support;
+if (!equipsSnap.sub && equipsSnap.support) equipsSnap.sub = equipsSnap.support;
+
+// ✅ selections가 비어있고 equips만 있는 저장본(구버전/특정 케이스) 대비
+if (Object.keys(selections).length === 0 && Object.keys(equipsSnap).length > 0) {
+  selections = {};
+  Object.entries(equipsSnap).forEach(([k, it]) => {
+    const key = (k === 'support') ? 'sub' : k;
+    const name = String(it?.name || it?.['이름'] || '').trim();
+    if (!name) return;
+    const code = it?.code || it?.['코드'] || '';
+    const img = normImgPreset(it?.img || it?.image || it?.['이미지'] || '');
+    selections[key] = { name, code, img };
+  });
+  s.selections = selections; // ✅ 복원해둬야 이후 계산 payload도 정상
+}
 
         // 5-1) 모든 슬롯 기본 라벨로 초기화
         if (typeof SLOT_BASE_LABELS === 'object') {
@@ -17440,34 +17769,53 @@ function updateSpecialUserButton() {
 
         // 5-3) 각 selection 을 슬롯에 반영 (접두사 라벨 포함)
         Object.entries(selections).forEach(([slotKey, info]) => {
-          const domKey = EQUIP_TO_DOM[slotKey];
-          if (!domKey) return;
+  // ✅ support 키로 들어온 저장본도 sub로 취급
+  const logicalKey = (slotKey === 'support') ? 'sub' : slotKey;
 
-          const slotEl = document.querySelector(`.slot[data-slot="${domKey}"]`);
-          if (!slotEl) return;
+  const domKey = EQUIP_TO_DOM[logicalKey];
+  if (!domKey) return;
 
-          // 접두사 라벨 복원
-          const rawPrefix =
-            info?.prefixLabel ||    // 프리셋 스냅샷에 이미 저장된 값
-            info?.prefix ||         // 혹시 prefix 필드만 있을 때
-            '';
-          const prefixLabel = makeEquipPrefixLabel(rawPrefix);
-          const labelHtml = prefixLabel
-            ? `<div class="equip-prefix">${prefixLabel}</div>`
-            : '';
+  const slotEl = document.querySelector(`.slot[data-slot="${domKey}"]`);
+  if (!slotEl) return;
 
-          const safeAlt = String(info?.name || '').replace(/"/g, '&quot;');
-          const srcImg =
-            info?.img ||
-            (typeof PLACEHOLDER_IMG !== 'undefined' ? PLACEHOLDER_IMG : '');
-          if (!srcImg) return;
+  // 접두사 라벨 복원
+  const rawPrefix =
+    info?.prefixLabel ||
+    info?.prefix ||
+    '';
+  const prefixLabel = makeEquipPrefixLabel(rawPrefix);
+  const labelHtml = prefixLabel
+    ? `<div class="equip-prefix">${prefixLabel}</div>`
+    : '';
 
-          slotEl.innerHTML =
-            labelHtml +
-            `<img class="item-img" alt="${safeAlt}" src="${srcImg}"` +
-            ` style="width:70%;height:70%;border-radius:8px;">`;
-          slotEl.classList.add('selected');
-        });
+  // ✅ 모바일 저장본은 selections에 img가 없는 경우가 많아서 equips에서 보강
+  const eq = equipsSnap[logicalKey] || equipsSnap[slotKey] || null;
+
+  const safeAlt = String(info?.name || eq?.name || eq?.['이름'] || '').replace(/"/g, '&quot;');
+
+  let srcImg = normImgPreset(
+    info?.img ||
+    eq?.img ||
+    eq?.image ||
+    eq?.['이미지'] ||
+    ''
+  );
+
+  if (!srcImg) {
+    srcImg = (typeof PLACEHOLDER_IMG !== 'undefined' ? PLACEHOLDER_IMG : '');
+  }
+  if (!srcImg) return;
+
+  slotEl.innerHTML =
+    labelHtml +
+    `<img class="item-img" alt="${safeAlt}" src="${srcImg}"` +
+    ` style="width:70%;height:70%;border-radius:8px;">`;
+
+  // ✅ “들어갔는지” 확인용: hover 툴팁
+  slotEl.title = String(info?.name || eq?.name || eq?.['이름'] || '');
+
+  slotEl.classList.add('selected');
+});
 
         // 5-4) 캐슬 씰/엠블렘/강화 라벨 등 부가 UI도 상태 기반으로 리프레시
         try {
@@ -17576,10 +17924,43 @@ function updateSpecialUserButton() {
       } catch (e) {
         console.warn('[applyFrontPresetState] refine 라벨 갱신 실패:', e);
       }
-      // 커스텀옵 버튼 UI도 state 기준으로 동기화
+            // 커스텀옵 버튼 UI도 state 기준으로 동기화 (모바일→PC 호환 포함)
+      try {
+        // 모바일은 customSkills.weaponType(강타/광채/분쇄/선명 or ''/없음)을 쓰고,
+        // PC는 customSkills.type + weaponName 을 쓰는 경우가 많다.
+        // 모바일 프리셋을 불러왔을 때도 PC 로직(버튼/계산)이 바로 동작하도록 서로 맞춰준다.
+        const cs = (s.customSkills && typeof s.customSkills === 'object') ? s.customSkills : (s.customSkills = {});
+        const normPick = (v) => {
+          const t = String(v ?? '').trim();
+          return (t === '없음') ? '' : t;
+        };
+
+        const wType = normPick(cs.weaponType);
+        const pType = normPick(cs.type || cs.customType);
+
+        // (1) PC 필드(type) 복구
+        if (!pType && wType) cs.type = wType;
+
+        // (2) 모바일 필드(weaponType)도 같이 맞춰둠(계산 payload 호환)
+        if (!wType && (cs.type || cs.customType)) cs.weaponType = normPick(cs.type || cs.customType);
+
+        // (3) weaponName 없으면 현재 무기 선택에서 유추
+        if (!cs.weaponName) {
+          const wName = s?.selections?.weapon?.name;
+          if (wName) cs.weaponName = String(wName).trim();
+        }
+
+        // (4) 혹시라도 type에 '없음'이 들어온 경우 빈값으로 정규화
+        if (String(cs.type || '').trim() === '없음') cs.type = '';
+        if (String(cs.customType || '').trim() === '없음') cs.customType = '';
+      } catch (e) {
+        console.warn('[applyFrontPresetState] customSkills normalize failed:', e);
+      }
+
       if (typeof applyCustomOptUIFromState === 'function') {
         applyCustomOptUIFromState();
       }
+
       // 🔹 프리셋 적용 후 스킬룬 개수 UI도 갱신
       try {
         if (typeof ensureRunesInitialized === 'function') {
@@ -17602,8 +17983,90 @@ function updateSpecialUserButton() {
       } catch (e) {
         console.warn('[applyFrontPresetState] runeEngrave UI 갱신 실패:', e);
       }
-    }
+          // ===== 모바일 프리셋 호환: 아바타/무기압 + 성안의 봉인 즉시 반영 =====
+      try {
+        // (A) 아바타/무기압: 모바일은 avatarSel, PC는 avatar
+        const avSrc = (src?.avatar && typeof src.avatar === 'object') ? src.avatar : null;
+        const avSel = (src?.avatarSel && typeof src.avatarSel === 'object') ? src.avatarSel : null;
 
+        const aName = String(avSrc?.avatarName || avSel?.avatarName || '').trim();
+        const iName = String(avSrc?.imprintName || avSel?.imprintName || '').trim();
+
+        if (aName || iName) {
+          s.avatar = s.avatar || {};
+          if (aName) s.avatar.avatarName = aName;
+          if (iName) s.avatar.imprintName = iName;
+
+          const applySelectValue = ($sel, val) => {
+            if (!$sel || !val) return;
+            const has = Array.from($sel.options || []).some(o => String(o.value || '').trim() === val);
+            if (has) {
+              $sel.value = val;
+              // change 핸들러가 state를 다시 미러링(안전)
+              try { $sel.dispatchEvent(new Event('change', { bubbles: true })); } catch (_) {}
+            }
+          };
+
+          const $selA = document.getElementById('selAvatar');
+          const $selI = document.getElementById('selImprint');
+
+          // 드롭다운이 아직 비어있으면(초기 로딩 타이밍) 채운 뒤 적용
+          if ((($selA && $selA.options.length === 0) || ($selI && $selI.options.length === 0)) &&
+              typeof populateAvatarImprintDropdowns === 'function') {
+            populateAvatarImprintDropdowns()
+              .then(() => {
+                try {
+                  applySelectValue(document.getElementById('selAvatar'), aName);
+                  applySelectValue(document.getElementById('selImprint'), iName);
+                } catch (_) {}
+              })
+              .catch(() => {});
+          } else {
+            applySelectValue($selA, aName);
+            applySelectValue($selI, iName);
+          }
+        }
+      } catch (e) {
+        console.warn('[applyFrontPresetState] avatar/imprint 호환 반영 실패:', e);
+      }
+
+      try {
+        // (B) 성안의 봉인: 모바일은 castleSeal.mainName/subName(문자열), PC는 CastleSeal.main/sub({name})
+        const pickName = (v) => {
+          if (!v) return '';
+          if (typeof v === 'string') return v.trim();
+          if (typeof v === 'object') return String(v.name || v.mainName || v.subName || '').trim();
+          return String(v).trim();
+        };
+
+        const cs =
+          (src?.CastleSeal && typeof src.CastleSeal === 'object') ? src.CastleSeal :
+          (src?.castleSeal && typeof src.castleSeal === 'object') ? src.castleSeal :
+          (src?.castle_seal && typeof src.castle_seal === 'object') ? src.castle_seal :
+          null;
+
+        let mainName = '';
+        let subName = '';
+        if (cs) {
+          mainName = pickName(cs.mainName) || pickName(cs.main?.name) || pickName(cs.main);
+          subName  = pickName(cs.subName)  || pickName(cs.sub?.name)  || pickName(cs.sub);
+        }
+
+        if (mainName || subName) {
+          const obj = {
+            main: mainName ? { name: mainName } : null,
+            sub: subName ? { name: subName } : null,
+          };
+
+          // ✅ compute payload는 state.castleSeal || state.CastleSeal 을 읽음
+          // ✅ openCastleSealModal은 state.CastleSeal을 사용(하이라이트 복구)
+          s.castleSeal = obj;
+          s.CastleSeal = obj;
+        }
+      } catch (e) {
+        console.warn('[applyFrontPresetState] castleSeal 호환 반영 실패:', e);
+      }
+    }
 
     // ★ 프리셋 스냅샷 → 화면 슬롯/캐릭터 UI 반영
     // ★ preset_load 응답의 snapshot → 캐릭터/슬롯 이미지 + 라벨까지 싹 반영
@@ -17705,6 +18168,7 @@ function updateSpecialUserButton() {
         necklace: 'R3',
         ring: 'R4',
         sub: 'R5',
+        support: 'R5',
         magestone: 'R6',
 
         aura: 'C1',
@@ -17763,23 +18227,31 @@ function updateSpecialUserButton() {
           const imgSrc = (found && found.img) || PLACEHOLDER_IMG;
           const safeAlt = String(wantedName).replace(/"/g, '&quot;');
 
-          slotEl.innerHTML =
-            `<img class="item-img" alt="${safeAlt}"` +
-            ` src="${imgSrc}" style="width:70%;height:70%;border-radius:8px;">`;
-          slotEl.classList.add('selected');
+          // ✅ 프리셋 불러오기 장비 복원:
+//    - PC에서 직접 선택했을 때와 동일한 state.selections 구조( desc/img/rarity/type/level/prefixLabel... )로 맞춘다.
+//    - applyItemToSlot이 타일까지 함께 그려주므로(접두사 포함), found가 있으면 그걸 우선 사용.
+if (found && typeof applyItemToSlot === 'function') {
+  applyItemToSlot(slotKey, found); // ← state.selections 풀 메타 + 타일/UI 동기화
+} else {
+  // found가 없으면 기존 방식대로 타일만 표시 + 최소 selections 유지
+  slotEl.innerHTML =
+    `<img class="item-img" alt="${safeAlt}"` +
+    ` src="${imgSrc}" style="width:70%;height:70%;border-radius:8px;">`;
+  slotEl.classList.add('selected');
 
-          // 프론트 상태에도 기억 (커스텀옵 / 기타에서 사용)
-          state.selections[slotKey] = {
-            name: found ? found.name : wantedName,
-            img: found ? (found.img || null) : null,
-            code: found ? (found.code || null) : null,
-          };
-        } catch (e) {
+  state.selections[slotKey] = {
+    name: wantedName,
+    img: null,
+    code: null,
+  };
+}
+} catch (e) {
           console.warn('[preset] equip 슬롯 복원 실패:', equipKey, e);
         }
       }
 
     }
+
 
 
     // 모달 열기
@@ -17992,18 +18464,104 @@ function updateSpecialUserButton() {
         }
 
         // 1) 프론트 state 교체 + 슬롯/캐릭터 UI 반영
-        applyFrontPresetState(snap);
+applyFrontPresetState(snap);
 
-        // 1-1) 스킬트리 프리셋도 바로 반영되도록, 스킬트리 그리드/데이터 미리 로딩
-        if (typeof renderSkillTreeBands === 'function') {
-          try {
-            await renderSkillTreeBands();   // ST2.rows 로드 + state.skillLv / TP 반영
-          } catch (e) {
-            console.warn('[fpreset_load] renderSkillTreeBands 실패:', e);
-          }
-        }
+// 1-1) 스킬트리 프리셋도 바로 반영되도록, 스킬트리 그리드/데이터 미리 로딩
+if (typeof renderSkillTreeBands === 'function') {
+  try {
+    await renderSkillTreeBands();   // ST2.rows 로드 + state.skillLv / TP 반영
+  } catch (e) {
+    console.warn('[fpreset_load] renderSkillTreeBands 실패:', e);
+  }
+}
 
-        alert(`슬롯 ${slot}의 프리셋을 불러왔습니다.`);
+// 1-2) (중요) 모바일 skillTrees 형태 프리셋을 PC 스킬맵(skillLv/skillTpLv)으로 즉시 변환한다.
+//      (스킬트리 설정 모달을 열지 않아도 불러오기 직후 적용되도록)
+try {
+  const hasTrees = (state.skillTrees && typeof state.skillTrees === 'object');
+  if (hasTrees && Array.isArray(window.ST2?.rows) && window.ST2.rows.length) {
+    // ownerKey 산출
+    const cc2 = state.currentCharacter || {};
+    let ownerKey2 = '';
+    const job2 = String(cc2.jobGroupLabel || cc2.jobGroup || '').trim();
+    const nm2  = String(cc2.name || '').trim();
+    if (job2 || nm2) ownerKey2 = (job2 + nm2).replace(/\s+/g, '');
+    if (!ownerKey2) ownerKey2 = String(state?.CurrentSumStats?.ownerKey || '').trim();
+
+    const _ok2 = String(ownerKey2 || '').replace(/\s+/g, '');
+    const _ck2 = String(state?.currentCharacter?.ownerKey || '').replace(/\s+/g, '');
+    const charKey2 = _ok2 || _ck2;
+    const treeStore2 = charKey2 ? (state.skillTrees[_ok2] || state.skillTrees[_ck2]) : null;
+
+    const hasAnyPositive2 = (m) => {
+      if (!m || typeof m !== 'object') return false;
+      for (const k in m) if ((Number(m[k]) || 0) > 0) return true;
+      return false;
+    };
+
+    const hasPosLv2 = hasAnyPositive2(state.skillLv);
+    const hasPosTp2 = hasAnyPositive2(state.skillTpLv);
+    const alreadyConverted2 = (String(state._skillTreesConvertedFor || '') === String(charKey2 || ''));
+
+    if (!alreadyConverted2 && treeStore2 && typeof treeStore2 === 'object' && (!hasPosLv2 && !hasPosTp2)) {
+      state.skillLv = {};
+      state.skillTpLv = state.skillTpLv || {};
+
+      const idxByName2 = {};
+      for (const r of (window.ST2.rows || [])) {
+        const k = normKey(r?.name || '');
+        if (k && !idxByName2[k]) idxByName2[k] = r;
+      }
+
+      for (const k in treeStore2) {
+        const node = treeStore2[k] || {};
+        const spLv = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
+        const tpLv = Number(node.tpLv ?? node.tp ?? 0) || 0;
+
+        const row = idxByName2[normKey(k)];
+        if (!row) continue;
+
+        const maxLv = Number(row.maxLv || 0) || 0;
+        const cappedSp = Math.max(0, maxLv ? Math.min(spLv, maxLv) : spLv);
+        const cappedTp = Math.max(0, Math.min(tpLv, 5));
+
+        if (cappedSp) state.skillLv[row.id] = cappedSp;
+        if (cappedTp) state.skillTpLv[row.id] = cappedTp;
+      }
+
+      const totalSp = Number(state?.currentCharacter?.sp || state?.sp?.total || 0) || 0;
+      const totalTp = Number(state?.currentCharacter?.tp || state?.tp?.total || 0) || 0;
+      let usedSp = 0, usedTp = 0;
+
+      for (const r of (window.ST2.rows || [])) {
+        const lv = Number(state.skillLv?.[r.id] || 0) || 0;
+        const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
+        usedSp += lv * Number(r.sp || 0);
+        usedTp += tp * Number(r.tpCost || 0);
+      }
+
+      state.sp.total = totalSp;
+      state.sp.left  = Math.max(0, totalSp - usedSp);
+      state.tp.total = totalTp;
+      state.tp.left  = Math.max(0, totalTp - usedTp);
+      state.stUsedSP = usedSp;
+      state.stUsedTP = usedTp;
+
+      state._skillTreesConvertedFor = String(charKey2 || '');
+      if (typeof renderSpTp === 'function') renderSpTp();
+    }
+
+    // 서버 세션에도 반영(계산하기에서 바로 적용되도록)
+    if (typeof saveSkillSelections === 'function') {
+      try { await saveSkillSelections(); }
+      catch (e) { console.warn('[fpreset_load] saveSkillSelections 실패:', e); }
+    }
+  }
+} catch (e) {
+  console.warn('[fpreset_load] mobile skillTrees 즉시 변환 실패:', e);
+}
+
+alert(`슬롯 ${slot}의 프리셋을 불러왔습니다.`);
       } catch (err) {
         console.error('[fpreset_load] 에러:', err);
         alert('프리셋 불러오기 중 오류가 발생했습니다.');
@@ -18224,14 +18782,22 @@ function updateSpecialUserButton() {
           if (!Array.isArray(arr)) continue;
 
           // 슬롯 내 소켓별 스냅샷 (없으면 null)    서버로 넘겨주는 컬럼 목록
-          const mapped = arr.map(e => {
-            if (!e || !e.name) return null;
-            return {
-              name: e.name,
-              levelVal: e.levelVal,
-              type: e.type
-            };
-          });
+const _normEmTxt = (v) => String(v ?? '')
+  .normalize('NFC')
+  .replace(/[﻿ ​-\u200D\u2060\u180E]/g, '')
+  .trim();
+
+const mapped = arr.map(e => {
+  if (!e || !e.name) return null;
+
+  const name = _normEmTxt(e.name);
+  const type = _normEmTxt(e.type);
+
+  // levelVal은 모바일 저장본에 없을 수 있음 → tag로 보조(특히 플래티넘)
+  const levelVal = _normEmTxt(e.levelVal ?? e.level_val ?? e.tag ?? '');
+
+  return { name, levelVal, type };
+});
 
           // 최소 하나라도 유효한 엠블렘이 있으면 전송
           if (mapped.some(x => x)) {

@@ -2673,10 +2673,11 @@
       color: rgba(233, 238, 247, 0.96);
     }
 
-    /* ✅ 기존 is-hidden 동작 유지 */
-    #skillRemainBarM.is-hidden {
-      display: none;
-    }
+    /* Skill remaining bar */
+#skillRemainBarM.is-hidden { display: none; }
+
+/* ✅ 공통 숨김 유틸(모바일 전역) */
+.is-hidden { display: none !important; }
 
     /* ✅ Page4: 남은 SP/TP (PC 느낌) */
     .st-counters {
@@ -3502,11 +3503,77 @@
   color:#fff;
 }
 
+/* ===== 로딩 오버레이(PC와 동일) ===== */
+.loading {
+  opacity: 0.7;
+}
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, .55);
+  display: grid;
+  place-items: center;
+}
+
+.loading-box {
+  width: min(480px, 90vw);
+  background: #0f1115;
+  color: #e6e9ef;
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+}
+
+.loading-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.loading-bar {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .12);
+  overflow: hidden;
+}
+
+.loading-bar__fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #6ea8ff, #8fe3ff);
+  transition: width .2s ease;
+}
+
+.loading-info {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  opacity: .9;
+}
 
   </style>
 </head>
 
 <body>
+  <!-- 로딩 오버레이 (기본 hidden) -->
+  <div id="loadingOverlay" class="loading-overlay" hidden>
+    <div class="loading-box">
+      <div class="loading-title">데이터 불러오는 중…</div>
+      <div class="loading-bar">
+        <div class="loading-bar__fill" style="width:0%"></div>
+      </div>
+      <div class="loading-info">
+        <span id="loadingLabel">초기화…</span>
+        <span id="loadingPct">0%</span>
+      </div>
+    </div>
+  </div>
+
   <div class="m-shell">
 
     <!-- ====== Header ====== -->
@@ -4481,19 +4548,30 @@
               </div>
             </div>
 
-            <!-- ✅ 와일드베인 전용: 스킬트리 선택 -->
-            <div id="wildbaneTreeBoxM" class="wb-tree-box is-hidden">
-              <div class="wb-tree-head">
-                <div class="wb-tree-title">스킬선택</div>
-                <button id="btnWildbaneTreeM" class="btn primary" type="button">선택</button>
-              </div>
+            <!-- ✅ 와일드베인/윈드시어 전용: 스킬트리 선택 -->
+<div id="wildbaneTreeBoxM" class="wb-tree-box is-hidden">
+  <div class="wb-tree-head">
+    <div class="wb-tree-title">스킬선택</div>
+    <button id="btnWildbaneTreeM" class="btn primary" type="button">선택</button>
+  </div>
 
-              <div class="wb-tree-summary">
-                <div>선택 스킬트리 : <b id="wildbaneTreePickM">-</b></div>
-                <div>사이클 횟수 : <b id="wildbaneCyclePickM">-</b> <span class="wb-tree-hint">(0이면 자동)</span></div>
-              </div>
-            </div>
+  <div class="wb-tree-summary">
+    <div>선택 스킬트리 : <b id="wildbaneTreePickM">-</b></div>
+    <div>사이클 횟수 : <b id="wildbaneCyclePickM">-</b> <span class="wb-tree-hint">(0이면 자동)</span></div>
+  </div>
+</div>
 
+<div id="windshearTreeBoxM" class="wb-tree-box is-hidden">
+  <div class="wb-tree-head">
+    <div class="wb-tree-title">스킬선택</div>
+    <button id="btnWindshearTreeM" class="btn primary" type="button">선택</button>
+  </div>
+
+  <div class="wb-tree-summary">
+    <div>선택 스킬트리 : <b id="windshearTreePickM">-</b></div>
+    <div>사이클 횟수 : <b id="windshearCyclePickM">-</b> <span class="wb-tree-hint">(0이면 자동)</span></div>
+  </div>
+</div>
             <div id="skillListM" class="skill-list"></div>
 
             <div class="skill-footnote">
@@ -4738,6 +4816,45 @@
     </div>
   </div>
 
+  <!-- ▼ 워리어 윈드시어: 스킬트리 3안 선택 모달 (모바일) -->
+<div id="windshearTreeModalM" class="modal" aria-hidden="true">
+  <div class="backdrop" data-ws-close></div>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="wsTreeTitleM" style="width:min(520px,92vw);">
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <h2 id="wsTreeTitleM" style="margin:0;">스킬트리 선택</h2>
+      <button type="button" class="close" data-ws-close>닫기</button>
+    </header>
+
+    <div class="items" style="padding:14px;">
+      <div style="font-size:13px;color:#fff;line-height:1.45;opacity:.95;">
+        워리어 윈드시어는 <b>스킬을 직접 찍는 방식이 아니라</b>,<br>
+        정형화된 3가지 스킬트리 중 하나를 선택 한 뒤 <b>사이클 횟수</b>를 입력합니다.<br><br>
+        ※ 사이클 횟수 = 0 이면 “시간 기준”으로 자동 계산됩니다.
+      </div>
+
+      <div class="wb-tree-grid" style="margin-top:12px;">
+        <button type="button" class="wb-tree-btn" data-ws-tree="A">A (파파파파빨)</button>
+        <button type="button" class="wb-tree-btn" data-ws-tree="B">B (파파파빨)</button>
+        <button type="button" class="wb-tree-btn" data-ws-tree="C">C (파파빨)</button>
+      </div>
+
+      <!-- ✅ 사이클 횟수 입력 -->
+      <div class="wb-cycle-wrap" style="margin-top:12px;">
+        <div class="wb-cycle-label">사이클 횟수 직접 입력</div>
+        <div class="wb-cycle-row">
+          <input id="wsCycleCountM" class="wb-cycle-input"
+                 type="number" inputmode="numeric" min="0" step="1" value="0" placeholder="0">
+        </div>
+      </div>
+
+      <div class="modal-foot" style="margin-top:12px;">
+        <button id="btnWindshearTreeApplyM" class="st-apply-btn" type="button" style="width:100%;">설정 하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   <div id="toast" class="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -4857,6 +4974,62 @@
 
       return __mobileInitPromise;
     }
+/* ===== 로딩 오버레이 제어(모바일) ===== */
+let __progressPct_mobile = 0;
+
+function setProgressExactMonotonic_mobile(nextPct, label) {
+  const p = Math.max(__progressPct_mobile, Math.min(100, Math.round(nextPct)));
+  __progressPct_mobile = p;
+
+  const bar = document.querySelector('.loading-bar__fill');
+  const txt = document.getElementById('loadingPct');
+  const lbl = document.getElementById('loadingLabel');
+
+  if (bar) bar.style.width = p + '%';
+  if (txt) txt.textContent = p + '%';
+  if (lbl && label) lbl.textContent = String(label);
+}
+
+function showOverlay_mobile(label) {
+  __progressPct_mobile = 0;
+  setProgressExactMonotonic_mobile(0, label || '데이터 불러오는 중…');
+
+  const ov = document.getElementById('loadingOverlay');
+  if (ov) {
+    ov.removeAttribute('hidden');
+    // 혹시 이전에 display:none을 강제로 박아둔 케이스 복구
+    ov.style.display = '';
+  }
+}
+
+function hideOverlay_mobile() {
+  const ov = document.getElementById('loadingOverlay');
+  if (!ov) return;
+
+  // 1) 표준 hidden 처리
+  ov.setAttribute('hidden', '');
+
+  // 2) 혹시라도 hidden이 CSS/렌더링 문제로 안 먹는 상황까지 대비(강제)
+  ov.style.display = 'none';
+}
+
+
+function startFakeProgress_mobile(from, to, label, intervalMs = 250, step = 2) {
+  let cur = from;
+  let stopped = false;
+
+  const id = setInterval(() => {
+    if (stopped) { clearInterval(id); return; }
+    if (cur >= to) { clearInterval(id); return; }
+    cur += step;
+    setProgressExactMonotonic_mobile(cur, label);
+  }, intervalMs);
+
+  return function stopFakeProgress() {
+    stopped = true;
+    clearInterval(id);
+  };
+}
 
     // ===== 캐릭터 선택 (모바일 전용: 좌 썸네일 / 우 이름) =====
     window.state = window.state || {};
@@ -5327,16 +5500,89 @@ function _getCharMainImage(c) {
       el._t = setTimeout(() => el.classList.remove('show'), 1400);
     }
 
-    // ✅ 페이지 열리면 즉시 경량리스트 전부 로드 + (원하면) 3페이지 init도 즉시 실행
-    initMobileAllLightListsOnce()
-      .then(() => {
-        ensurePage3Init();
-        ensurePage4Init();   // ✅ 추가
-      })
-      .catch((e) => {
-        console.error(e);
-        toast('초기 데이터 로딩 실패');
-      });
+// ✅ 페이지 열리면 즉시 경량리스트 전부 로드
+// - 0→70%: 경량리스트 로딩과 "동시에" 올라감
+// - 70% 도달 후: 2초 뒤 80%, 그 후 3초 뒤 90%
+// - 단, 그 사이(또는 그 이전)에 경량리스트 로딩이 끝나면 즉시 100% + 오버레이 닫기
+(async () => {
+  let stopFake = null;
+  let t80 = null;
+  let t90 = null;
+  let loaded = false;
+
+  // progress가 target 이상이 되거나(=70 도달), 혹은 로딩이 끝나면(loaded) 풀리는 대기
+  const waitUntilPctOrLoaded = (targetPct) => new Promise((resolve) => {
+    const id = setInterval(() => {
+      const pct = (typeof __progressPct_mobile === 'number') ? __progressPct_mobile : 0;
+      if (loaded || pct >= targetPct) {
+        clearInterval(id);
+        resolve();
+      }
+    }, 50);
+  });
+
+  try {
+    // 1) 오버레이 표시
+    showOverlay_mobile('데이터 불러오는 중…');
+
+    // 2) ✅ 실제 경량 로딩 "시작"
+    const lightLoadPromise = initMobileAllLightListsOnce()
+      .then(() => { loaded = true; });
+
+    // 3) ✅ 로딩 동안 0 → 70% 가짜 진행률
+    stopFake = startFakeProgress_mobile(0, 70, '모바일 버전 로딩중…', 60, 1);
+
+    // 4) 70% 도달 또는 로딩 완료 중 먼저 일어나는 것까지 대기
+    await waitUntilPctOrLoaded(70);
+
+    // 5) 가짜 진행 멈추기(70까지 가는 구간 종료)
+    if (typeof stopFake === 'function') stopFake();
+
+    // 6) 로딩이 너무 빨리 끝나서 70 전에 종료된 경우: 70까지 빠르게 보정
+    if (typeof __progressPct_mobile === 'number' && __progressPct_mobile < 70) {
+      const stopFast = startFakeProgress_mobile(__progressPct_mobile, 70, '모바일 버전 로딩중…', 16, 4);
+      await new Promise(r => setTimeout(r, 200));
+      stopFast();
+    }
+    setProgressExactMonotonic_mobile(70, '모바일 버전 로딩중…');
+
+    // 7) ✅ 70 이후 단계: 2초 뒤 80%, (추가 3초 뒤) 90%
+    //    단, 그 사이에 loaded가 true가 되면 타이머는 무시/취소되고 즉시 100%로 감
+    if (!loaded) {
+      t80 = setTimeout(() => {
+        if (!loaded) setProgressExactMonotonic_mobile(80, '모바일 버전 로딩중…');
+      }, 2000);
+
+      t90 = setTimeout(() => {
+        if (!loaded) setProgressExactMonotonic_mobile(90, '모바일 버전 로딩중…');
+      }, 5000); // 70 도달 기준 2초 후 80, 추가 3초 후 90 => 총 5초
+    }
+
+    // 8) ✅ 실제 경량 로딩 완료 대기 (완료되는 순간 즉시 100%)
+    await lightLoadPromise;
+
+    // 9) 타이머 정리 후 완료 처리
+    if (t80) { clearTimeout(t80); t80 = null; }
+    if (t90) { clearTimeout(t90); t90 = null; }
+
+    setProgressExactMonotonic_mobile(100, '완료');
+    await new Promise(r => setTimeout(r, 180));
+
+    ensurePage3Init();
+    ensurePage4Init();
+
+  } catch (e) {
+    console.error(e);
+    toast('초기 데이터 로딩 실패');
+  } finally {
+    // ✅ 어떤 경우에도 오버레이는 닫는다 + 타이머/가짜진행 정리
+    try { if (typeof stopFake === 'function') stopFake(); } catch (_) {}
+    try { if (t80) clearTimeout(t80); } catch (_) {}
+    try { if (t90) clearTimeout(t90); } catch (_) {}
+    hideOverlay_mobile();
+  }
+})();
+
 
     function fillSelectOptions_(sel, items, placeholder) {
       if (!sel) return;
@@ -5364,22 +5610,13 @@ function _getCharMainImage(c) {
 
     // 3페이지: 아바타/무기압 드롭다운 채우기 (ENH list 기반)
     async function populateAvatarImprintMobile() {
-      console.log('[AVATAR] start');
       await initMobileAllLightListsOnce();
-      console.log('[AVATAR] after init', {
-        hasCore: !!window.CORE,
-        hasLists: !!window.CORE?.lists,
-        keys: Object.keys(window.CORE?.lists || {}).slice(0, 20),
-        enhListLen: Array.isArray(window.CORE?.lists?.['enh:list']) ? window.CORE.lists['enh:list'].length : null
-      });
 
       const aSel = document.getElementById('selAvatarM');
       const iSel = document.getElementById('selImprintM');
-      console.log('[AVATAR] selects', { aSel: !!aSel, iSel: !!iSel, aId: aSel?.id, iId: iSel?.id });
 
       const rows = Array.isArray(CORE?.lists?.['enh:list']) ? CORE.lists['enh:list'] : [];
       // 샘플 3개만 구조 확인
-      console.log('[AVATAR] enh:list sample', rows.slice(0, 3));
 
       // 타입/이름이 실제로 어떤 키로 들어오는지 “자동 탐색”용
       const probe = rows.slice(0, 50).map(r => ({
@@ -5387,7 +5624,6 @@ function _getCharMainImage(c) {
         name: r?.name, 이름: r?.['이름'],
         keys: Object.keys(r || {}).slice(0, 10)
       }));
-      console.log('[AVATAR] probe(50)', probe);
 
       const pickNames = (wantType) => {
         const out = [];
@@ -5405,15 +5641,11 @@ function _getCharMainImage(c) {
 
       const avatars = pickNames('아바타');
       const imprints = pickNames('무기압');
-      console.log('[AVATAR] picked', { avatarsLen: avatars.length, imprintsLen: imprints.length, avatars0: avatars[0], imprints0: imprints[0] });
 
       try {
-        console.log('[AVATAR] before fill', { aOptions: aSel?.options?.length, iOptions: iSel?.options?.length });
         fillSelectOptions_(aSel, avatars, '아바타 선택');
         fillSelectOptions_(iSel, imprints, '무기압 선택');
-        console.log('[AVATAR] after fill', { aOptions: aSel?.options?.length, iOptions: iSel?.options?.length });
       } catch (e) {
-        console.error('[AVATAR] fillSelectOptions_ crashed', e);
       }
 
       /* ✅✅✅ [추가 시작] 선택값을 window.state.avatarSel에 저장/복원 + change 바인딩 */
@@ -5449,7 +5681,6 @@ function _getCharMainImage(c) {
         aSel.addEventListener('change', () => {
           s.avatarSel = s.avatarSel || {};
           s.avatarSel.avatarName = String(aSel.value || '').trim();
-          console.log('[AVATAR] state.avatarSel updated', s.avatarSel);
         });
         aSel.dataset.boundAvatar = '1';
       }
@@ -5458,15 +5689,11 @@ function _getCharMainImage(c) {
         iSel.addEventListener('change', () => {
           s.avatarSel = s.avatarSel || {};
           s.avatarSel.imprintName = String(iSel.value || '').trim();
-          console.log('[AVATAR] state.avatarSel updated', s.avatarSel);
         });
         iSel.dataset.boundImprint = '1';
       }
 
-      console.log('[AVATAR] init mirror done', s.avatarSel);
       /* ✅✅✅ [추가 끝] */
-
-      console.log('[AVATAR] done');
 
     }
 
@@ -5478,7 +5705,7 @@ function _getCharMainImage(c) {
       if (!sel) return;
 
       const list = CORE?.lists?.['monster:list'] || [];
-      console.log('[M3][MON] raw list len =', Array.isArray(list) ? list.length : -1, 'sample =', list?.[0]);
+      //console.log('[M3][MON] raw list len =', Array.isArray(list) ? list.length : -1, 'sample =', list?.[0]);
 
       // ✅ monster 시트는 '몬스터명' 컬럼이 핵심
       const names = (Array.isArray(list) ? list : [])
@@ -5490,7 +5717,7 @@ function _getCharMainImage(c) {
         })
         .filter(Boolean);
 
-      console.log('[M3][MON] parsed names len =', names.length, 'head =', names.slice(0, 5));
+      //console.log('[M3][MON] parsed names len =', names.length, 'head =', names.slice(0, 5));
 
       fillSelectOptions_(sel, names.length ? names : ['(데이터 없음)'], '몬스터 선택');
 
@@ -5506,7 +5733,7 @@ function _getCharMainImage(c) {
         // ✅ 기본값: 가장 윗값
         sel.value = names[0];
         s.monsterName = String(sel.value || '').trim();
-        console.log('[M3][MON] default applied:', s.monsterName);
+        //console.log('[M3][MON] default applied:', s.monsterName);
       }
 
 
@@ -6234,7 +6461,102 @@ function _getCharMainImage(c) {
       updateRuneCountSummary();
     }
 
+// ✅ 윈드시어 스킬트리 요약 갱신
+function updateWindshearTreeSummaryMobile() {
+  const s = window.state || {};
+  const preset = String(s.windshearTreePreset || 'A').trim() || 'A';
+  const cycle = Number.isFinite(+s.windshearCycleCount) ? Math.max(0, Math.floor(+s.windshearCycleCount)) : 0;
 
+  const labelMap = { A: 'A (파파파파빨)', B: 'B (파파파빨)', C: 'C (파파빨)' };
+  const pEl = document.getElementById('windshearTreePickM');
+  const cEl = document.getElementById('windshearCyclePickM');
+
+  if (pEl) pEl.textContent = (labelMap[preset] || preset);
+  if (cEl) cEl.textContent = (cycle > 0 ? `${cycle}회` : '자동');
+}
+
+// ✅ 윈드시어 모달 열기
+function openWindshearTreeModalMobile() {
+  const modal = document.getElementById('windshearTreeModalM');
+  if (!modal) return;
+
+  const s = (window.state || (window.state = {}));
+
+  // 기본값 보정
+  s.windshearTreePreset = String(s.windshearTreePreset || 'A').trim() || 'A';
+  s.windshearCycleCount = Number.isFinite(+s.windshearCycleCount) ? Math.max(0, Math.floor(+s.windshearCycleCount)) : 0;
+
+  // 임시값(모달에서 선택 중)
+  s._wsTreeTemp = s.windshearTreePreset;
+  s._wsCycleCountTemp = s.windshearCycleCount;
+
+  // 버튼 active 반영
+  modal.querySelectorAll('[data-ws-tree]').forEach(btn => {
+    btn.classList.toggle('wb-active', btn.dataset.wsTree === s._wsTreeTemp);
+  });
+
+  // 입력값 반영
+  const inp = modal.querySelector('#wsCycleCountM');
+  if (inp) inp.value = String(s._wsCycleCountTemp ?? 0);
+
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+// ✅ 윈드시어 모달 바인딩(1회)
+function bindWindshearTreeModalMobile() {
+  const modal = document.getElementById('windshearTreeModalM');
+  if (!modal || modal.dataset.bound) return;
+  modal.dataset.bound = '1';
+
+  const close = () => {
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+  };
+
+  // 닫기(배경/닫기 버튼)
+  modal.querySelectorAll('[data-ws-close]').forEach(el => {
+    el.addEventListener('click', close);
+  });
+
+  // 트리 버튼 선택
+  modal.querySelectorAll('[data-ws-tree]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const s = (window.state || (window.state = {}));
+      s._wsTreeTemp = btn.dataset.wsTree;
+
+      modal.querySelectorAll('[data-ws-tree]').forEach(b => {
+        b.classList.toggle('wb-active', b.dataset.wsTree === s._wsTreeTemp);
+      });
+    });
+  });
+
+  // 사이클 입력
+  const inp = modal.querySelector('#wsCycleCountM');
+  if (inp) {
+    inp.addEventListener('input', () => {
+      const s = (window.state || (window.state = {}));
+      const v = Math.floor(Number(inp.value || 0));
+      s._wsCycleCountTemp = Math.max(0, isFinite(v) ? v : 0);
+    });
+  }
+
+  // 설정 하기
+  modal.querySelector('#btnWindshearTreeApplyM')?.addEventListener('click', () => {
+    const s = (window.state || (window.state = {}));
+    const preset = String(s._wsTreeTemp || 'A').trim() || 'A';
+    const cycle = Number.isFinite(+s._wsCycleCountTemp) ? Math.max(0, Math.floor(+s._wsCycleCountTemp)) : 0;
+
+    s.windshearTreePreset = preset;
+    s.windshearCycleCount = cycle;
+
+    updateWindshearTreeSummaryMobile();
+    close();
+
+    // 토스트 함수가 있으면 사용(없어도 안전)
+    if (typeof toast === 'function') toast('윈드시어 스킬트리 설정이 적용되었습니다.');
+  });
+}
 
     async function bindCastleSealMobile() {
       // 0) 데이터 준비
@@ -6552,12 +6874,16 @@ function _getCharMainImage(c) {
     function _calcUsedSpTp() {
       const charKey = _getCurrentCharKey() || '__nochar__';
       const store = window.state?.skillTrees?.[charKey] || {};
+      const isStriker = String(charKey || '').replace(/\s+/g, '') === '격투가스트라이커';
       let usedSP = 0;
       let usedTP = 0;
 
       for (const k in store) {
         const it = store[k];
         if (!it) continue;
+
+        // ✅ 본 크러셔는 로킥 연동(무료) → 남은 SP 계산에서 제외
+        if (isStriker && String(k || '').replace(/\s+/g, '') === '본크러셔') continue;
 
         const spLv = _num(it.spLv, 0);
         const spMin = _num(it.spMin, 0);
@@ -6573,38 +6899,48 @@ function _getCharMainImage(c) {
     }
 
     function updateSkillRemainBar() {
-      const bar = document.getElementById('skillRemainBarM');
-      if (!bar) return;
+  const bar = document.getElementById('skillRemainBarM');
+  const elSp = document.getElementById('skillRemainSpM');
+  const elTp = document.getElementById('skillRemainTpM');
+  if (!bar || !elSp || !elTp) return;
 
-      // ✅ 와일드베인(스킬트리 선택형)에서는 남은 SP/TP 표시를 사용하지 않음
-      const s0 = window.state || {};
-      const ok0 = String(s0.ownerKey || s0.CurrentSumStats?.ownerKey || '').trim()
-        || (String(s0.currentCharacter?.jobGroupLabel || s0.currentCharacter?.jobGroup || '').trim()
-          + String(s0.currentCharacter?.name || s0.currentCharacter?.charName || '').trim()
-        ).replace(/\s+/g, '');
+  // ✅ 와일드베인(스킬트리 선택형)에서는 남은 SP/TP 표시를 사용하지 않음
+  const s0 = window.state || {};
+  const ok0 = String(s0.ownerKey || s0.CurrentSumStats?.ownerKey || '').trim()
+    || (String(s0.currentCharacter?.jobGroupLabel || s0.currentCharacter?.jobGroup || '').trim()
+      + String(s0.currentCharacter?.name || s0.currentCharacter?.charName || '').trim()
+    ).replace(/\s+/g, '');
 
-      if (ok0 === '워리어와일드베인') {
-        bar.classList.add('is-hidden');
-        return;
-      }
+  if (ok0 === '워리어와일드베인') {
+    bar.classList.add('is-hidden');
+    elSp.textContent = '-';
+    elTp.textContent = '-';
+    return;
+  }
 
-      const spEl = document.getElementById('skillRemainSpM');
-      const tpEl = document.getElementById('skillRemainTpM');
+  const { totalSP, totalTP } = _getCharTotalSpTp();
+  const hasAny = Number.isFinite(totalSP) || Number.isFinite(totalTP);
 
-      const { totalSP, totalTP } = _getCharTotalSpTp();
-      const hasAny = Number.isFinite(totalSP) || Number.isFinite(totalTP);
+  if (!hasAny) {
+    bar.classList.add('is-hidden');
+    elSp.textContent = '-';
+    elTp.textContent = '-';
+    return;
+  }
 
-      if (!hasAny) {
-        bar.classList.add('is-hidden');
-        return;
-      }
+  bar.classList.remove('is-hidden');
 
-      bar.classList.remove('is-hidden');
+  // ✅ 핵심: 현재 찍은 스킬로 사용한 SP/TP를 빼서 "남은 값" 표시
+  const { usedSP, usedTP } = _calcUsedSpTp();
 
-      if (spEl) spEl.textContent = String(Number.isFinite(totalSP) ? totalSP : '-');
-      if (tpEl) tpEl.textContent = String(Number.isFinite(totalTP) ? totalTP : '-');
-    }
+  elSp.textContent = Number.isFinite(totalSP)
+    ? String(Math.max(0, Math.round(totalSP - usedSP)))
+    : '-';
 
+  elTp.textContent = Number.isFinite(totalTP)
+    ? String(Math.max(0, Math.round(totalTP - usedTP)))
+    : '-';
+}
 
 
     function _getCurrentCharKey() {
@@ -6618,102 +6954,390 @@ function _getCharMainImage(c) {
       return (job + nm).replace(/\s+/g, '');
     }
 
+    function _syncStrikerBoneCrusherFromLowKick_mobile() {
+  const s = (window.state || (window.state = {}));
+  const charKey = _getCurrentCharKey() || '__nochar__';
+  const ownerKeyNow = String(charKey || '').replace(/\s+/g, '');
+  if (ownerKeyNow !== '격투가스트라이커') return null;
+
+  s.skillTrees = s.skillTrees || {};
+  s.skillTrees[charKey] = s.skillTrees[charKey] || {};
+  const store = s.skillTrees[charKey];
+
+  const norm = (v) => String(v || '').replace(/\s+/g, '');
+  const findKey = (wantNorm) => {
+    for (const k in store) {
+      if (norm(k) === wantNorm) return k;
+    }
+    return '';
+  };
+
+  const lowKey = findKey('로킥') || '로킥';
+  const boneKey = findKey('본크러셔') || '본 크러셔';
+
+  const low = store[lowKey] || { spLv: 0 };
+  const bone = store[boneKey] || { spLv: 0, tpLv: 0, spMin: 0, spMax: 0, tpMax: 0, spCost: 0, tpCost: 1 };
+
+  // ✅ 본 크러셔 = max(0, 로킥 - 10)
+  const target = Math.max(0, _num(low.spLv, 0) - 10);
+
+  const spMin = _num(bone.spMin, 0);
+  const spMax = _num(bone.spMax, target); // spMax가 없으면 target로
+  const next = Math.max(spMin, Math.min(spMax, target));
+
+  const prev = _num(bone.spLv, 0);
+  const changed = (prev !== next) || (_num(bone.spCost ?? 0, 0) !== 0);
+
+  // ✅ 본 크러셔는 “연동 무료”로 취급: SP 소모 0 고정
+  store[boneKey] = { ...bone, spLv: next, spCost: 0 };
+
+  return { boneKey, boneLv: next, changed };
+}
+
+function _refreshStrikerBoneCrusherRowUiMobile(info) {
+  if (!info) return;
+  const listEl = document.getElementById('skillListM');
+  if (!listEl) return;
+
+  const norm = (v) => String(v || '').replace(/\s+/g, '');
+
+  let row = null;
+  for (const r of listEl.querySelectorAll('.skill-row')) {
+  const nm = norm(r.dataset.skill || r.dataset.skillName || '');
+  if (nm === '본크러셔') { row = r; break; }
+}
+  if (!row) return;
+
+  const val = row.querySelector('.skill-val[data-val="sp"]');
+  if (val) val.textContent = String(info.boneLv);
+
+  // 혹시 렌더에서 disabled 처리 누락된 경우 대비
+  row.querySelectorAll('button[data-act^="sp-"]').forEach((b) => {
+    b.disabled = true;
+  });
+}
+
+function _syncFMechGMagneticFromSyncroCorona_mobile() {
+  const s = (window.state || (window.state = {}));
+  const charKey = _getCurrentCharKey() || '__nochar__';
+  const ownerKeyNow = String(charKey || '').replace(/\s+/g, '');
+  if (ownerKeyNow !== '여거너메카닉') return null;
+
+  s.skillTrees = s.skillTrees || {};
+  s.skillTrees[charKey] = s.skillTrees[charKey] || {};
+  const store = s.skillTrees[charKey];
+
+  const norm = (v) => String(v || '').replace(/\s+/g, '');
+  const findKey = (wantNorm) => {
+    for (const k in store) {
+      if (norm(k) === wantNorm) return k;
+    }
+    return '';
+  };
+
+  const coronaKey = findKey('싱크로:코로나');
+  const magKey    = findKey('G마그네틱');
+  if (!coronaKey || !magKey) return null;
+
+  const corona = store[coronaKey] || {};
+  const mag = store[magKey] || {};
+
+  // ✅ "레벨 차이 없이 동일" 이므로 그대로 복사
+  const target = _num(corona.spLv, 0);
+
+  const spMin = _num(mag.spMin, 0);
+  const spMax = _num(mag.spMax, target); // spMax 없으면 target
+  const next = Math.max(spMin, Math.min(spMax, target));
+
+  const prev = _num(mag.spLv, 0);
+  const changed = (prev !== next) || (_num(mag.spCost ?? 0, 0) !== 0);
+
+  // ✅ G마그네틱은 항상 무료(=spCost 0) + 레벨 동기화
+  store[magKey] = { ...mag, spLv: next, spCost: 0 };
+
+  return { magKey, magLv: next, changed };
+}
+
+function _refreshFMechGMagneticRowUiMobile(info) {
+  if (!info) return;
+  const listEl = document.getElementById('skillListM');
+  if (!listEl) return;
+
+  const norm = (v) => String(v || '').replace(/\s+/g, '');
+
+  let row = null;
+  for (const r of listEl.querySelectorAll('.skill-row')) {
+    const nm = norm(r.dataset.skill || r.dataset.skillName || '');
+    if (nm === 'G마그네틱') { row = r; break; }
+  }
+  if (!row) return;
+
+  const val = row.querySelector('.skill-val[data-val="sp"]');
+  if (val) val.textContent = String(info.magLv);
+
+  // 혹시 렌더에서 disabled 처리 누락된 경우 대비(안전장치)
+  row.querySelectorAll('button[data-act^="sp-"]').forEach((b) => {
+    b.disabled = true;
+  });
+}
 
     function bindSkillPageMobile() {
-      const listEl = document.getElementById('skillListM');
-      const resetBtn = document.getElementById('btnSkillResetM');
-      if (!listEl) return;
+  const listEl = document.getElementById('skillListM');
+  const resetBtn = document.getElementById('btnSkillResetM');
+  if (!listEl) return;
 
-      // (1) 버튼 이벤트(위임)
-      if (!listEl.dataset.bound) {
-        listEl.dataset.bound = '1';
+  // (1) 버튼 이벤트(위임)
+  if (!listEl.dataset.bound) {
+    listEl.dataset.bound = '1';
 
-        listEl.addEventListener('click', (e) => {
-          const btn = e.target?.closest?.('button[data-act]');
-          if (!btn) return;
+    listEl.addEventListener('click', (e) => {
+      const btn = e.target?.closest?.('button[data-act]');
+      if (!btn) return;
 
-          const row = btn.closest('.skill-row');
-          if (!row) return;
+      const row = btn.closest('.skill-row');
+      if (!row) return;
 
-          const skillName = row.dataset.skillName || '';
-          const act = btn.dataset.act || '';
-          const isSp = (row.dataset.col === 'sp');
-          const isTp = (row.dataset.col === 'tp');
+      const act = btn.dataset.act || '';
 
-          if (!isSp && !isTp) return;
-          if (!skillName) return;
+      // ✅ row.dataset.col에 의존하지 말고, act 접두사로 SP/TP 판별
+      const isSp = act.startsWith('sp-');
+      const isTp = act.startsWith('tp-');
+      if (!isSp && !isTp) return;
 
-          const s = (window.state || (window.state = {}));
-          const charKey = _getCurrentCharKey() || '__nochar__';
+      // ✅ 렌더쪽이 data-skill을 쓰는 경우가 많으니 우선 사용
+      const skillName = row.dataset.skill || row.dataset.skillName || '';
+      if (!skillName) return;
 
-          s.skillTrees = s.skillTrees || {};
-          s.skillTrees[charKey] = s.skillTrees[charKey] || {};
-          const store = s.skillTrees[charKey];
+      const s = (window.state || (window.state = {}));
+      const charKey = _getCurrentCharKey() || '__nochar__';
 
-          const cur = store[skillName] || { spLv: 0, tpLv: 0, spMin: 0, spMax: 0, tpMax: 0 };
-          const spMin = _num(cur.spMin, 0);
-          const spMax = _num(cur.spMax, 0);
-          const tpMax = _num(cur.tpMax, 0);
+      const isFMech = String(charKey || '').replace(/\s+/g, '') === '여거너메카닉';
+      const isStriker = String(charKey || '').replace(/\s+/g, '') === '격투가스트라이커';
+const normSkill = String(skillName || '').replace(/\s+/g, '');
 
-          let spLv = _num(cur.spLv, 0);
-          let tpLv = _num(cur.tpLv, 0);
+// ✅ 격투가 스트라이커: '본 크러셔' SP는 수동 조작 불가(안전장치)
+if (isStriker && isSp && normSkill === '본크러셔') {
+  return;
+}
 
-          const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+// ✅ 여거너메카닉: 'G 마그네틱' SP는 수동 조작 불가(싱크로:코로나와 자동 동일화)
+if (isFMech && isSp && normSkill === 'G마그네틱') {
+  return;
+}
 
-          const applySp = (next) => {
-            spLv = clamp(next, spMin, spMax);
-            store[skillName] = { ...cur, spLv, tpLv };
-          };
-          const applyTp = (next) => {
-            tpLv = clamp(next, 0, tpMax);
-            store[skillName] = { ...cur, spLv, tpLv };
-          };
+/* ================================
+ * ✅ 여거너메카닉: G-2 롤링썬더 ↔ G-3 랩터 동시 SP 불가
+ * - 한쪽이 1 이상이면, 다른쪽을 1 이상으로 올리려는 시도를 차단
+ * - SP 내리는 건(0으로 만드는 것) 허용
+ * ================================ */
 
-          if (isSp) {
-            if (act === 'sp-min') applySp(spMin);
-            if (act === 'sp-dec') applySp(spLv - 1);
-            if (act === 'sp-inc') applySp(spLv + 1);
-            if (act === 'sp-max') applySp(spMax);
-          } else if (isTp) {
-            if (act === 'tp-min') applyTp(0);
-            if (act === 'tp-dec') applyTp(tpLv - 1);
-            if (act === 'tp-inc') applyTp(tpLv + 1);
-            if (act === 'tp-max') applyTp(tpMax);
-          }
+// 공백 제거 비교용
+const _norm = (v) => String(v || '').replace(/\s+/g, '');
 
-          // 화면 반영
-          const valSpan = row.querySelector(`.skill-val[data-val="${isSp ? 'sp' : 'tp'}"]`);
-          if (valSpan) valSpan.textContent = String(isSp ? spLv : tpLv);
+// store 안에서 "정규화된 스킬명"으로 실제 key 찾기
+const _findSkillKeyByNorm = (storeObj, normTarget) => {
+  if (!storeObj) return null;
+  for (const k of Object.keys(storeObj)) {
+    if (_norm(k) === normTarget) return k;
+  }
+  return null;
+};
 
-          updateSkillRemainBar(); // ✅ 추가
-        });
-      }
+// 상대 스킬 SP 레벨 얻기(없으면 0)
+const _getOtherSpLv = (storeObj, normTarget) => {
+  const k = _findSkillKeyByNorm(storeObj, normTarget);
+  if (!k) return 0;
+  const o = storeObj[k] || {};
+  return _num(o.spLv, 0);
+};
 
-      // (2) 초기화 버튼
-      if (resetBtn && !resetBtn.dataset.bound) {
-        resetBtn.dataset.bound = '1';
-        resetBtn.addEventListener('click', () => {
-          const s = (window.state || (window.state = {}));
-          const charKey = _getCurrentCharKey() || '__nochar__';
-          if (s.skillTrees && s.skillTrees[charKey]) {
-            delete s.skillTrees[charKey];
-          }
-          renderSkillPageMobile();
-          updateSkillRemainBar(); // ✅ 추가
-          toast('스킬이 초기화되었습니다.');
-        });
-      }
+// 두 스킬 정규화명(공백 제거)
+const RT = _norm('G-2 롤링썬더');
+const RP = _norm('G-3 랩터');
 
-      // (3) 워리어 와일드베인: 스킬트리 선택 버튼/모달
-      const wbBtn = document.getElementById('btnWildbaneTreeM');
-      if (wbBtn && !wbBtn.dataset.bound) {
-        wbBtn.dataset.bound = '1';
-        wbBtn.addEventListener('click', () => {
-          openWildbaneTreeModalMobile();
-        });
-      }
-      bindWildbaneTreeModalMobile();
+// 현재 클릭한 스킬이 둘 중 하나면, 상대 스킬의 norm 지정
+let _otherNorm = null;
+if (isFMech) {
+  if (normSkill === RT) _otherNorm = RP;
+  else if (normSkill === RP) _otherNorm = RT;
+}
+
+// “이 스킬을 nextSp(>0)로 만들려는 순간” 상대가 이미 >0이면 차단
+const _blockIfExclusive = (nextSp, storeObj) => {
+  if (!isFMech) return false;
+  if (!_otherNorm) return false;
+  if (_num(nextSp, 0) <= 0) return false; // 0 이하는 허용(내리기)
+  const otherLv = _getOtherSpLv(storeObj, _otherNorm);
+  if (otherLv > 0) {
+    const warn = `'G-2 롤링썬더'와 'G-3 랩터'중 하나만 찍어주세요.`;
+    (typeof toast === 'function' ? toast : alert)(warn);
+    return true;
+  }
+  return false;
+};
+/* ================================
+ * ✅ 여거너메카닉: 팔콘 4종 중 1개만 SP 가능
+ * - 인서트 : 팔콘
+ * - G-SP 팔콘(코로나 폼)
+ * - G-SP 팔콘(롤링 썬더 폼)
+ * - G-SP 팔콘(랩터 폼)
+ * ================================ */
+const FAL1 = _norm('인서트 : 팔콘');
+const FAL2 = _norm('G-SP 팔콘(코로나 폼)');
+const FAL3 = _norm('G-SP 팔콘(롤링 썬더 폼)');
+const FAL4 = _norm('G-SP 팔콘(랩터 폼)');
+
+let _falconOthers = null;
+if (isFMech) {
+  const all = [FAL1, FAL2, FAL3, FAL4];
+  const idx = all.findIndex(x => x === normSkill);
+  if (idx >= 0) _falconOthers = all.filter((_, i) => i !== idx);
+}
+
+// nextSp(>0)로 올리려는 순간, 나머지 3개 중 하나라도 이미 >0이면 차단
+const _blockIfExclusiveFalcon = (nextSp, storeObj) => {
+  if (!isFMech) return false;
+  if (!_falconOthers) return false;
+  if (_num(nextSp, 0) <= 0) return false; // 0 이하는 허용(내리기)
+
+  for (const otherNorm of _falconOthers) {
+    const otherLv = _getOtherSpLv(storeObj, otherNorm);
+    if (otherLv > 0) {
+      toast(
+        `팔콘류 스킬은 한가지 종류만 찍어주세요.`
+      );
+      return true;
     }
+  }
+  return false;
+};
+
+
+      s.skillTrees = s.skillTrees || {};
+      s.skillTrees[charKey] = s.skillTrees[charKey] || {};
+      const store = s.skillTrees[charKey];
+
+      const cur = store[skillName] || { spLv: 0, tpLv: 0, spMin: 0, spMax: 0, tpMax: 0 };
+
+      const spMin = _num(cur.spMin, 0);
+      const spMax = _num(cur.spMax, 0);
+      const tpMax = _num(cur.tpMax, 0);
+
+      let spLv = _num(cur.spLv, 0);
+      let tpLv = _num(cur.tpLv, 0);
+
+      const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+      // ✅ 핵심: 남은 SP/TP로 “이 스킬이 찍을 수 있는 최대치”를 매번 계산
+      const { totalSP, totalTP } = _getCharTotalSpTp();
+      const { usedSP, usedTP } = _calcUsedSpTp();
+
+      const spCost = _num(cur.spCost ?? cur.sp ?? 0, 0);
+      const tpCost = _num(cur.tpCost ?? 1, 1);
+
+      const curSpentSP = Math.max(0, spLv - spMin) * (spCost > 0 ? spCost : 0);
+      const curSpentTP = Math.max(0, tpLv) * (tpCost > 0 ? tpCost : 0);
+
+      const remainSPForThis = Math.max(0, totalSP - (usedSP - curSpentSP));
+      const remainTPForThis = Math.max(0, totalTP - (usedTP - curSpentTP));
+
+      const spCap = (spCost > 0)
+        ? Math.min(spMax, spMin + Math.floor(remainSPForThis / spCost))
+        : spMax;
+
+      const tpCap = (tpCost > 0)
+        ? Math.min(tpMax, Math.floor(remainTPForThis / tpCost))
+        : tpMax;
+
+      const applySp = (next) => {
+        // ✅ spMax가 아니라 spCap(남은 SP 기준 상한)으로 clamp
+        spLv = clamp(next, spMin, spCap);
+        store[skillName] = { ...cur, spLv, tpLv };
+      };
+      const applyTp = (next) => {
+        // ✅ tpMax가 아니라 tpCap(남은 TP 기준 상한)으로 clamp
+        tpLv = clamp(next, 0, tpCap);
+        store[skillName] = { ...cur, spLv, tpLv };
+      };
+
+      if (isSp) {
+  if (act === 'sp-min') {
+    const next = spMin;
+    if (_blockIfExclusive(next, store)) return;
+    if (_blockIfExclusiveFalcon(next, store)) return;
+    applySp(next);
+  }
+  if (act === 'sp-dec') {
+    applySp(spLv - 1); // 내리기는 항상 허용
+  }
+  if (act === 'sp-inc') {
+    const next = spLv + 1;
+    if (_blockIfExclusive(next, store)) return;
+    if (_blockIfExclusiveFalcon(next, store)) return;
+    applySp(next);
+  }
+  if (act === 'sp-max') {
+    const next = spCap;
+    if (_blockIfExclusive(next, store)) return;
+    if (_blockIfExclusiveFalcon(next, store)) return;
+    applySp(next);
+  }
+} else if (isTp) {
+  if (act === 'tp-min') applyTp(0);
+  if (act === 'tp-dec') applyTp(tpLv - 1);
+  if (act === 'tp-inc') applyTp(tpLv + 1);
+  if (act === 'tp-max') applyTp(tpCap);
+}
+
+      // 화면 반영
+      const valSpan = row.querySelector(`.skill-val[data-val="${isSp ? 'sp' : 'tp'}"]`);
+      if (valSpan) valSpan.textContent = String(isSp ? spLv : tpLv);
+
+            // ✅ 격투가 스트라이커: 로킥 ↔ 본 크러셔 자동 연동(실시간)
+      if (isStriker) {
+        const info = _syncStrikerBoneCrusherFromLowKick_mobile();
+        if (info && info.changed) {
+          _refreshStrikerBoneCrusherRowUiMobile(info);
+        }
+      }
+
+      // ✅ 여거너메카닉: 싱크로:코로나 ↔ G마그네틱 자동 연동(실시간)
+      if (isFMech) {
+        const info2 = _syncFMechGMagneticFromSyncroCorona_mobile();
+        if (info2 && info2.changed) {
+          _refreshFMechGMagneticRowUiMobile(info2);
+        }
+      }
+
+      updateSkillRemainBar();
+    });
+  }
+
+  // (2) 초기화 버튼
+  if (resetBtn && !resetBtn.dataset.bound) {
+    resetBtn.dataset.bound = '1';
+    resetBtn.addEventListener('click', () => {
+      const s = (window.state || (window.state = {}));
+      const charKey = _getCurrentCharKey() || '__nochar__';
+      if (s.skillTrees && s.skillTrees[charKey]) {
+        delete s.skillTrees[charKey];
+      }
+      renderSkillPageMobile();
+      updateSkillRemainBar();
+      toast('스킬이 초기화되었습니다.');
+    });
+  }
+
+  // (3) 워리어 와일드베인: 스킬트리 선택 버튼/모달
+  const wbBtn = document.getElementById('btnWildbaneTreeM');
+  if (wbBtn && !wbBtn.dataset.bound) {
+    wbBtn.dataset.bound = '1';
+    wbBtn.addEventListener('click', () => {
+      openWildbaneTreeModalMobile();
+    });
+  }
+  bindWildbaneTreeModalMobile();
+}
 
     // ✅ 공백 제거 정규화(스킬명/캐릭키 비교용)
 function _normNoSpace(v) {
@@ -6847,206 +7471,242 @@ function syncSkillTreesFromLvMaps_mobile(charObj) {
   }
 }
 
-    function renderSkillPageMobile(charObj) {
-      const listEl = document.getElementById('skillListM');
-      if (!listEl) return;
+    function renderSkillPageMobile(cObj) {
+  const listEl = document.getElementById('skillListM');
+  if (!listEl) return;
 
-      const c = charObj || window.state?.currentCharacter || {};
-      const charKey = String(c.ownerKey || '').trim().replace(/\s+/g, '') || _getCurrentCharKey();
-      if (!charKey) {
-        listEl.innerHTML = `<div style="padding:14px 10px; color:#c7b589;">캐릭터를 먼저 선택하세요.</div>`;
-        updateSkillRemainBar();
-        return;
-      }
+  const s = (window.state || (window.state = {}));
+  const c = cObj || window.state?.currentCharacter || {};
+  const charKey = String(c.ownerKey || '').trim().replace(/\s+/g, '') || _getCurrentCharKey();
 
-            // ✅ 워리어 와일드베인: 스킬을 직접 찍는 방식이 아니라 "스킬트리 선택" UI를 노출
-      const wbBox = document.getElementById('wildbaneTreeBoxM');
-      const remainBar = document.getElementById('skillRemainBarM');
-      const footnote = document.querySelector('#pageSkill .skill-footnote');
+  if (!charKey) {
+    listEl.innerHTML = `<div style="padding:14px 10px; color:#c7b589;">캐릭터를 먼저 선택하세요.</div>`;
+    updateSkillRemainBar();
+    return;
+  }
 
-      const ownerKeyNow = String(charKey || '').trim().replace(/\s+/g, '');
-      const isWildbane = (ownerKeyNow === '워리어와일드베인');
+  // ✅ 워리어 와일드베인/윈드시어 UI 처리(402 유지)
+  const wbBox = document.getElementById('wildbaneTreeBoxM');
+  const wsBox = document.getElementById('windshearTreeBoxM');
+  const remainBar = document.getElementById('skillRemainBarM');
+  const footnote = document.querySelector('#pageSkill .skill-footnote');
 
-      if (isWildbane) {
-        // 스킬 리스트/카운터는 숨기고, 트리 선택 UI만 표시
-        wbBox?.classList.remove('is-hidden');
-        remainBar?.classList.add('is-hidden');
-        footnote?.classList.add('is-hidden');
-        listEl.innerHTML = '';
+  const ownerKeyNow = String(charKey || '').trim().replace(/\s+/g, '');
+  const isStriker = (ownerKeyNow === '격투가스트라이커');
+  const isFMech   = (ownerKeyNow === '여거너메카닉');   // ✅ 추가
+  const isWildbane = (ownerKeyNow === '워리어와일드베인');
+  const isWindshear = (ownerKeyNow === '워리어윈드시어');
 
-        // 기본값 보정 + 요약 갱신
-        const s = (window.state || (window.state = {}));
-        s.wildbaneTreePreset = String(s.wildbaneTreePreset || '파파초').trim() || '파파초';
-        s.wildbaneCycleCount = Number.isFinite(+s.wildbaneCycleCount) ? Math.max(0, Math.floor(+s.wildbaneCycleCount)) : 0;
-        updateWildbaneTreeSummaryMobile();
-        return;
-      } else {
-        // 다른 캐릭이면 전용 UI 숨김 + 원래 UI 복구
-        wbBox?.classList.add('is-hidden');
-        footnote?.classList.remove('is-hidden');
-      }
+  if (isWildbane) {
+    wsBox?.classList.add('is-hidden');
+    wbBox?.classList.remove('is-hidden');
+    remainBar?.classList.add('is-hidden');
+    footnote?.classList.add('is-hidden');
+    listEl.innerHTML = '';
+    updateWildbaneTreeSummaryMobile?.();
+    return;
+  }
 
-      const raw = _getSkillListRaw();
-      const rows = Array.isArray(raw) ? raw : [];
+  if (isWindshear) {
+    wbBox?.classList.add('is-hidden');
+    wsBox?.classList.remove('is-hidden');
+    remainBar?.classList.add('is-hidden');
+    footnote?.classList.add('is-hidden');
+    listEl.innerHTML = '';
+    updateWindshearTreeSummaryMobile?.();
+    return;
+  }
 
-      // 캐릭 + 노출여부 필터 (show=1만)
-const mine = rows.filter(r =>
-  _looseOwnerMatch(_getSkillChar(r), charKey) &&
-  (typeof _getSkillShow === 'function' ? _getSkillShow(r) : (String(r?.show ?? r?.['노출여부'] ?? '').trim() === '1'))
-);
+  // 그 외 캐릭터: 트리 UI 숨기고 일반 스킬 UI 표시
+  wbBox?.classList.add('is-hidden');
+  wsBox?.classList.add('is-hidden');
+  remainBar?.classList.remove('is-hidden');
+  footnote?.classList.remove('is-hidden');
 
-      if (!mine.length) {
-        listEl.innerHTML = `<div style="padding:14px 10px; color:#c7b589;">표시할 스킬이 없습니다. (skill:list / 캐릭터명 매칭 확인)</div>`;
-        return;
-      }
+  // ✅ 402 방식: 스킬 원본은 _getSkillListRaw()에서 가져오고,
+  // 캐릭 매칭은 느슨 매칭 + 노출여부(show=1)만 통과
+  const raw = _getSkillListRaw();
+  const rows = Array.isArray(raw) ? raw : [];
 
-      // 저장소(캐릭별)  ✅ charKey로 통일
-      const s = (window.state || (window.state = {}));
-      s.skillTrees = s.skillTrees || {};
-      s.skillTrees[charKey] = s.skillTrees[charKey] || {};
-      const store = s.skillTrees[charKey];
+  const mine = rows.filter(r =>
+    _looseOwnerMatch(_getSkillChar(r), charKey) &&
+    (typeof _getSkillShow === 'function'
+      ? _getSkillShow(r)
+      : (String(r?.show ?? r?.['노출여부'] ?? '').trim() === '1'))
+  );
 
+  if (!mine.length) {
+    listEl.innerHTML = `<div style="padding:14px 10px; color:#c7b589;">표시할 스킬이 없습니다. (skill:list / 캐릭터명 매칭 확인)</div>`;
+    updateSkillRemainBar();
+    return;
+  }
 
-      // 정렬: 요구레벨 → 이름
-      mine.sort((a, b) => {
-        const da = _getSkillReq(a) - _getSkillReq(b);
-        if (da !== 0) return da;
-        return _getSkillName(a).localeCompare(_getSkillName(b), 'ko');
-      });
+  // ✅ 저장소(캐릭별)
+  s.skillTrees = s.skillTrees || {};
+  s.skillTrees[charKey] = s.skillTrees[charKey] || {};
+  const store = s.skillTrees[charKey];
 
-      // 렌더
-      listEl.innerHTML = '';
-      const frag = document.createDocumentFragment();
+  // ✅ 정렬: 요구레벨 → 이름 (402 유지)
+  mine.sort((a, b) => {
+    const da = _getSkillReq(a) - _getSkillReq(b);
+    if (da !== 0) return da;
+    return _getSkillName(a).localeCompare(_getSkillName(b), 'ko');
+  });
 
-      let lastReq = null;
+  // 렌더 (402 DOM 구조 유지)
+  listEl.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  let lastReq = null;
 
-      for (const r of mine) {
-        const skillName = _getSkillName(r);
-        if (!skillName) continue;
+  for (const r of mine) {
+    const skillName = _getSkillName(r);
+    if (!skillName) continue;
 
-        const spMin = _getSkillMin(r);
-        const spMax = _getSkillMax(r);
-        const tpMax = _getSkillTPCap(r);
-        const spCost = _getSkillSpCost(r);
-        const tpCost = _getSkillTpCost(r);
-        const reqLv = _getSkillReq(r);
-        // ✅ 렙제 바뀌면 구분 헤더(구분선) 삽입
-        if (lastReq !== reqLv) {
-          lastReq = reqLv;
+        const normSkillName = String(skillName || '').replace(/\s+/g, '');
 
-          const div = document.createElement('div');
-          div.className = 'skill-divider';
+    // ✅ 스트라이커: 본 크러셔는 SP 직접 조작 불가 + SP 소모 0
+    const isBoneCrusher = (isStriker && normSkillName === '본크러셔');
 
-          const t = document.createElement('div');
-          t.className = 'txt';
-          t.textContent = `Lv ${reqLv}`;
+    // ✅ 여거너메카닉: G 마그네틱은 SP 직접 조작 불가 + SP 소모 0 (싱크로:코로나와 동일화)
+    const isGMagnetic   = (isFMech && normSkillName === 'G마그네틱');
 
-          const line = document.createElement('div');
-          line.className = 'line';
+    const spMin = _getSkillMin(r);
+    const spMax = _getSkillMax(r);
+    const tpMax = _getSkillTPCap(r);
 
-          div.appendChild(t);
-          div.appendChild(line);
-          frag.appendChild(div);
-        }
-        const cur = store[skillName] || {};
-        const spLv = _clamp(cur.spLv ?? spMin, spMin, spMax);
-        const tpLv = _clamp(cur.tpLv ?? 0, 0, tpMax);
+    const spCost = _getSkillSpCost(r);
+    const effSpCost = (isBoneCrusher || isGMagnetic) ? 0 : spCost;
 
-        // cap 정보도 저장(클릭 로직에서 사용)
-        store[skillName] = { ...cur, spLv, tpLv, spMin, spMax, tpMax, spCost, tpCost };
+    const tpCost = _getSkillTpCost(r);
+    const reqLv = _getSkillReq(r);
 
-        const row = document.createElement('div');
-        row.className = 'skill-row';
-        row.dataset.skill = skillName;
-        row.dataset.spcost = String(spCost ?? 0);
-        row.dataset.tpcost = String(tpCost ?? 1);
+    // ✅ 렙제 구분선(402 유지)
+    if (lastReq !== reqLv) {
+      lastReq = reqLv;
 
+      const div = document.createElement('div');
+      div.className = 'skill-divider';
 
-        const left = document.createElement('div');
-        left.className = 'skill-left';
+      const t = document.createElement('div');
+      t.className = 'txt';
+      t.textContent = `Lv ${reqLv}`;
 
-        // (추가) 스킬 이미지
-        const imgSrc = _getSkillImg(r);   // 아래 2)에서 새로 만드는 헬퍼
-        if (imgSrc) {
-          const icon = document.createElement('div');
-          icon.className = 'skill-icon';
+      const line = document.createElement('div');
+      line.className = 'line';
 
-          const img = document.createElement('img');
-          img.alt = skillName;
-          img.loading = 'lazy';
-          img.decoding = 'async';
-          img.src = imgSrc;
-
-          icon.appendChild(img);
-          left.appendChild(icon);
-        }
-
-        const nm = document.createElement('div');
-        nm.className = 'skill-name';
-        nm.textContent = skillName;
-
-        // ✅ meta(요구Lv/SP/TP) 완전 제거
-        left.appendChild(nm);
-
-
-        const right = document.createElement('div');
-        right.className = 'skill-right';
-
-        const mkCtrl = (label, valKey, acts, disabledAll = false) => {
-          const line = document.createElement('div');
-          line.className = 'skill-ctrl';
-
-          const lbl = document.createElement('span');
-          lbl.className = 'lbl' + (valKey === 'sp' ? ' c-sp' : (valKey === 'tp' ? ' c-tp' : ''));
-lbl.textContent = label;
-
-          const makeBtn = (text, act, wide = false, disabled = false) => {
-            const b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'skill-mini' + (wide ? ' is-wide' : '');
-            b.textContent = text;
-            b.dataset.act = act;
-            if (disabledAll || disabled) b.disabled = true;
-            return b;
-          };
-
-          const v = document.createElement('span');
-          v.className = 'skill-val';
-          v.dataset.val = valKey;
-          v.textContent = String(valKey === 'sp' ? spLv : tpLv);
-
-          line.appendChild(lbl);
-
-          // ✅ 좌측: MAX, +
-          line.appendChild(makeBtn('MAX', acts.max, true));
-          line.appendChild(makeBtn('+', acts.inc));
-
-          line.appendChild(v);
-
-          // ✅ 우측: -, MIN
-          line.appendChild(makeBtn('-', acts.dec));
-          line.appendChild(makeBtn('MIN', acts.min, true));
-
-          return line;
-
-        };
-
-        right.appendChild(mkCtrl('SP', 'sp', {
-          min: 'sp-min', dec: 'sp-dec', inc: 'sp-inc', max: 'sp-max'
-        }));
-
-        right.appendChild(mkCtrl('TP', 'tp', {
-          min: 'tp-min', dec: 'tp-dec', inc: 'tp-inc', max: 'tp-max'
-        }, tpMax <= 0)); // tpCap=0이면 비활성
-
-        row.appendChild(left);
-        row.appendChild(right);
-        frag.appendChild(row);
-      }
-
-      listEl.appendChild(frag);
-      updateSkillRemainBar(); // ✅ 추가
+      div.appendChild(t);
+      div.appendChild(line);
+      frag.appendChild(div);
     }
+
+    const cur = store[skillName] || {};
+    const spLv = _clamp(cur.spLv ?? spMin, spMin, spMax);
+    const tpLv = _clamp(cur.tpLv ?? 0, 0, tpMax);
+
+    // ✅ cap/cost 포함 저장(403에서 필요로 하던 구조 포함)
+    store[skillName] = { ...cur, spLv, tpLv, spMin, spMax, tpMax, spCost: effSpCost, tpCost };
+
+    const row = document.createElement('div');
+    row.className = 'skill-row';
+    row.dataset.skill = skillName;
+    row.dataset.spcost = String(effSpCost ?? 0);
+    row.dataset.tpcost = String(tpCost ?? 1);
+
+    // ✅ LEFT (402: 이미지 + 스킬명)
+    const left = document.createElement('div');
+    left.className = 'skill-left';
+
+    const imgSrc = _getSkillImg(r);
+    if (imgSrc) {
+      const icon = document.createElement('div');
+      icon.className = 'skill-icon';
+
+      const img = document.createElement('img');
+      img.alt = skillName;
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.src = imgSrc;
+
+      icon.appendChild(img);
+      left.appendChild(icon);
+    }
+
+    const nm = document.createElement('div');
+    nm.className = 'skill-name';
+    nm.textContent = skillName;
+    left.appendChild(nm);
+
+    // ✅ RIGHT (402: skill-ctrl / skill-mini)
+    const right = document.createElement('div');
+    right.className = 'skill-right';
+
+    const mkCtrl = (label, valKey, acts, disabledAll = false) => {
+      const line = document.createElement('div');
+      line.className = 'skill-ctrl';
+
+      const lbl = document.createElement('span');
+      lbl.className = 'lbl' + (valKey === 'sp' ? ' c-sp' : (valKey === 'tp' ? ' c-tp' : ''));
+      lbl.textContent = label;
+
+      const makeBtn = (text, act, wide = false, disabled = false) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'skill-mini' + (wide ? ' is-wide' : '');
+        b.textContent = text;
+        b.dataset.act = act;
+        if (disabledAll || disabled) b.disabled = true;
+        return b;
+      };
+
+      const v = document.createElement('span');
+      v.className = 'skill-val';
+      v.dataset.val = valKey;
+      v.textContent = String(valKey === 'sp' ? spLv : tpLv);
+
+      line.appendChild(lbl);
+
+      // 좌측: MAX, +
+      line.appendChild(makeBtn('MAX', acts.max, true));
+      line.appendChild(makeBtn('+', acts.inc));
+
+      line.appendChild(v);
+
+      // 우측: -, MIN
+      line.appendChild(makeBtn('-', acts.dec));
+      line.appendChild(makeBtn('MIN', acts.min, true));
+
+      return line;
+    };
+
+        // ✅ 본 크러셔 / G마그네틱은 SP 컨트롤 버튼 비활성화(“찍을 수 없음” UI 반영)
+    right.appendChild(mkCtrl('SP', 'sp', {
+      min: 'sp-min', dec: 'sp-dec', inc: 'sp-inc', max: 'sp-max'
+    }, (isBoneCrusher || isGMagnetic)));
+
+    right.appendChild(mkCtrl('TP', 'tp', {
+      min: 'tp-min', dec: 'tp-dec', inc: 'tp-inc', max: 'tp-max'
+    }, tpMax <= 0)); // tpCap=0이면 비활성
+
+    row.appendChild(left);
+    row.appendChild(right);
+    frag.appendChild(row);
+  }
+
+  listEl.appendChild(frag);
+  updateSkillRemainBar();
+
+    // ✅ 격투가 스트라이커: 로킥→본크러셔 동기화 + UI 즉시 반영(403 기능 유지)
+  if (isStriker) {
+    const info = _syncStrikerBoneCrusherFromLowKick_mobile?.();
+    if (info) _refreshStrikerBoneCrusherRowUiMobile?.(info);
+  }
+
+  // ✅ 여거너메카닉: 싱크로:코로나 → G마그네틱 동기화 + UI 즉시 반영
+  if (isFMech) {
+    const info2 = _syncFMechGMagneticFromSyncroCorona_mobile?.();
+    if (info2) _refreshFMechGMagneticRowUiMobile?.(info2);
+  }
+}
 
     // ===== Header actions =====
 function _modalRememberOpener_(m) {
@@ -7575,26 +8235,103 @@ function makePreviewFromCurrentState() {
     `;
 
         btn.addEventListener('click', () => {
-          window.state = window.state || {};
-          window.state.equips = window.state.equips || {};
-          window.state.equips[slot] = it;
+  window.state = window.state || {};
+  window.state.equips = window.state.equips || {};
+  window.state.selections = window.state.selections || {};
 
+  // ✅ 1) CORE DB로 가능한 "풀 아이템"으로 업그레이드
+  const fullIt = _upgradeEquipByCore_(slot, it) || it;
 
-          // ✅ PC판과 동일한 스냅샷 구조(state.selections)도 함께 유지
-          window.state.selections = window.state.selections || {};
-          window.state.selections[slot] = {
-            name: String((it && (it.name || it['이름'])) || '').trim(),
-            code: (it && (it.code || it['코드'])) || '',
-          };
-          applyPickedEquipUI(slot, it);
-          closeEquipModal();
-        });
+  // ✅ 2) equips는 풀 객체로 저장
+  window.state.equips[slot] = fullIt;
+
+  // ✅ 3) selections도 PC처럼 "풀 메타"로 저장
+  window.state.selections[slot] = _buildSelectionFromEquip_(fullIt);
+
+  // ✅ UI 반영도 풀 객체 기준으로
+  applyPickedEquipUI(slot, fullIt);
+  closeEquipModal();
+});
 
         wrap.appendChild(btn);
       }
 
       catalog.appendChild(wrap);
     }
+
+    /* =========================
+   ✅ 프리셋 저장 호환: selections에 "풀 메타" 저장
+========================= */
+
+// code 키가 파일/버전마다 달라서 최대한 넓게 흡수
+function _getEquipCodeAny_(it) {
+  return String(
+    it?.code ??
+    it?.Code ??
+    it?.itemCode ??
+    it?.key ??
+    it?.id ??
+    it?.['코드'] ??
+    ''
+  ).trim();
+}
+
+// name에서 괄호(세트명 보조표기 등) 제거
+function _stripParenName_(name) {
+  return String(name ?? '').replace(/\s*\([^)]*\)\s*$/, '').trim();
+}
+
+// PC 쪽 state.selections 형태(확장 필드 포함)로 맞춰 저장
+function _buildSelectionFromEquip_(it) {
+  const rawName = String(it?.name ?? it?.['이름'] ?? '').trim();
+  const name = _stripParenName_(rawName);
+
+  const code = _getEquipCodeAny_(it);
+  const img = _normImg(it?.img || it?.image || it?.thumb || it?.icon || it?.['이미지'] || '');
+
+  const desc = String(it?.desc ?? it?.['설명'] ?? it?.description ?? '').trim();
+  const rarity = String(it?.rarity ?? it?.['레어리티'] ?? it?.['희귀도'] ?? it?.['등급'] ?? '').trim();
+  const type = String(it?.type ?? it?.['타입'] ?? it?.['종류'] ?? '').trim();
+
+  let level = it?.level ?? it?.['레벨'] ?? it?.['요구레벨'];
+  level = (level === '' || level == null) ? null : (Number.isFinite(+level) ? +level : null);
+
+  // "레거시: XXX" 같은 경우 prefixLabel만 따로 들고 있으면 PC와 콘솔 출력이 더 유사해짐
+  let prefixLabel = String(it?.prefixLabel ?? it?.prefix ?? '').trim();
+  if (!prefixLabel && name.includes(':')) {
+    prefixLabel = name.split(':')[0].trim();
+  }
+
+  // code는 PC쪽이 null을 더 선호(빈문자열이면 매칭 실패 잦음)
+  return {
+    name,
+    code: code ? code : null,
+    img: img || null,
+    desc: desc || undefined,
+    rarity: rarity || undefined,
+    type: type || undefined,
+    level: level,
+    prefixLabel: prefixLabel || undefined,
+  };
+}
+
+// code로 CORE DB에서 "진짜 아이템 객체" 찾아 업그레이드
+function _upgradeEquipByCore_(slot, it) {
+  try {
+    const code = _getEquipCodeAny_(it);
+    if (!code) return it;
+
+    if (typeof _equipListKey !== 'function') return it;
+    const listKey = _equipListKey(slot);
+    const list = CORE?.lists?.[listKey];
+    if (!Array.isArray(list)) return it;
+
+    const found = list.find(x => String(x?.code ?? x?.Code ?? x?.itemCode ?? x?.key ?? x?.id ?? x?.['코드'] ?? '') === code);
+    return found || it;
+  } catch (e) {
+    return it;
+  }
+}
 
     function applyPickedEquipUI(slot, it) {
       // ✅ 보험: 불러온 it에 이미지가 없으면 code로 DB에서 다시 찾아오기
@@ -7606,7 +8343,19 @@ function makePreviewFromCurrentState() {
       const list = CORE?.lists?.[listKey];
       if (Array.isArray(list)) {
         const found = list.find(x => String(x?.code ?? x?.Code ?? x?.itemCode ?? x?.key) === String(code));
-        if (found) it = found; // 👈 여기서 “진짜 아이템 객체”로 교체
+        if (found) {
+  it = found; // 👈 “진짜 아이템 객체”로 교체
+
+  // ✅ 여기서 끝내면 UI만 바뀌고 저장데이터는 안 바뀜 → state에도 반영
+  try {
+    window.state = window.state || {};
+    window.state.equips = window.state.equips || {};
+    window.state.selections = window.state.selections || {};
+    window.state.equips[slot] = found;
+    window.state.selections[slot] = _buildSelectionFromEquip_(found);
+  } catch (e) {}
+}
+
       }
     }
   } catch (e) {}
@@ -9331,10 +10080,14 @@ function _closeModalById_(id) {
         const code = String(raw.code ?? '');
 
         // 1) UI용/모달 재오픈용
-        state.equips[p.slot] = it;
+        // ✅ 1) 세트 조각도 CORE DB로 가능한 "풀 아이템"으로 업그레이드
+const fullIt = _upgradeEquipByCore_(p.slot, it) || it;
 
-        // 2) ✅ 계산 payload용 (이게 없어서 “이름만 바뀌고 계산이 안 됨”)
-        state.selections[p.slot] = { name: cleanName, code };
+// ✅ 2) equips는 풀 객체
+state.equips[p.slot] = fullIt;
+
+// ✅ 3) selections는 PC처럼 풀 메타
+state.selections[p.slot] = _buildSelectionFromEquip_(fullIt);
 
         // 3) UI 반영
         if (typeof applyPickedEquipUI === 'function') {
@@ -10385,8 +11138,19 @@ function _closeModalById_(id) {
             state.customSkills.earringType ??
             '');
 
-        // ✅ 실제 적용 (모바일 state 구조)
+                // ✅ 실제 적용 (모바일 state 구조)
         state.customSkills.weaponType = pickWeapon;
+
+        // ✅ PC 호환 필드도 같이 채움 (PC는 customSkills.type/weaponName 을 보는 경우가 있음)
+        try {
+          const _wPick = (String(pickWeapon || '').trim() === '없음') ? '' : String(pickWeapon || '').trim();
+          state.customSkills.type = _wPick;
+          if (!state.customSkills.weaponName) {
+            const _wName = state?.selections?.weapon?.name;
+            if (_wName) state.customSkills.weaponName = String(_wName).trim();
+          }
+        } catch (e) { /* ignore */ }
+
         state.customSkills.armorType = pickOther;
         state.customSkills.braceletType = pickOther;
         state.customSkills.earringType = pickOther;
@@ -10810,15 +11574,14 @@ document.getElementById('pageEquip')?.addEventListener('click', async (e) => {
         payload.wildbaneCycleCount = cycle;
         payload.wbCycleCount = cycle; // 호환용
       } else if (ownerKeyNow === '워리어윈드시어') {
-        const preset = String(s.windshearTreePreset || '파파초').trim() || '파파초';
-        const cycle = Number.isFinite(+s.windshearCycleCount) ? Math.max(0, Math.floor(+s.windshearCycleCount)) : 0;
+  const preset = String(s.windshearTreePreset || 'A').trim() || 'A';
+  const cycle = Number.isFinite(+s.windshearCycleCount) ? Math.max(0, Math.floor(+s.windshearCycleCount)) : 0;
 
-        payload.windshearTreePreset = preset;
-        payload.wsTree = preset; // 호환용
-        payload.windshearCycleCount = cycle;
-        payload.wsCycleCount = cycle; // 호환용
-      }
-
+  payload.windshearTreePreset = preset;
+  payload.wsTree = preset; // 호환용
+  payload.windshearCycleCount = cycle;
+  payload.wsCycleCount = cycle; // 호환용
+}
       return payload;
     }
 
@@ -11056,11 +11819,12 @@ async function applyOchingkraAuto_mobile(tierText) {
     window.state.selections = window.state.selections || {};
 
     window.state.equips[slot] = it;
-    window.state.selections[slot] = {
-      name: it.name,
-      code: (it.code || it['코드'] || ''),
-    };
-
+    const _img = _normImg(it?.image || it?.img || it?.['이미지'] || '');
+window.state.selections[slot] = {
+  name: it.name,
+  code: (it.code || it['코드'] || ''),
+  img: _img,
+};
     applyPickedEquipUI(slot, it);
   }
 
