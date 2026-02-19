@@ -5230,29 +5230,33 @@ function applyMarqueeIfOverflow(rootEl) {
     const cw = msgText.clientWidth;
     const sw = inner.scrollWidth;
 
-    const dist = Math.max(0, sw - cw + 6);
-    const overflow = dist > 2; // 약간의 여유
+    // ✅ 1) 실제로 "넘친 양"만으로 overflow 판정
+    const rawDist = sw - cw;
+    const overflow = rawDist > 2;
     if (!overflow) return;
 
+    // ✅ 2) 끝부분이 완전히 보이도록 트레일(px) 추가 (CSS padding-right와 맞춰주기)
+    const TRAIL_PX = 7; // CSS에서 padding-right: 7px 쓰고 있으니 동일하게
+    const dist = Math.max(0, rawDist + TRAIL_PX);
+
     // ✅ 속도 설정 (숫자 클수록 더 빠름)
-const SPEED_PX_PER_SEC = 110;   // 80이면 느림, 110~140 추천
+    const SPEED_PX_PER_SEC = 110;
 
-// ✅ “움직이는 구간”만 시간 계산 (dist px를 SPEED로 나눔)
-const moveSec = Math.max(1.2, dist / SPEED_PX_PER_SEC);
+    // ✅ “움직이는 구간”만 시간 계산
+    const moveSec = Math.max(1.2, dist / SPEED_PX_PER_SEC);
 
-// ✅ 앞/뒤 정지 시간(원하면 조절)
-const holdStart = 0.8;  // 처음 멈춤
-const holdEnd   = 0.6;  // 끝에서 멈춤
+    // ✅ 앞/뒤 정지 시간
+    const holdStart = 0.8;
+    const holdEnd   = 0.6;
 
-// ✅ 전체 루프 시간 = 시작정지 + 이동 + 끝정지 + (리셋 여유)
-const dur = holdStart + moveSec + holdEnd + 0.4;
+    // ✅ 전체 루프 시간
+    const dur = holdStart + moveSec + holdEnd + 0.4;
 
-msgText.classList.add('is-marquee');
-msgText.style.setProperty('--marquee-dur', `${dur}s`);
-msgText.style.setProperty('--marquee-dist', `${dist}`);
+    msgText.classList.add('is-marquee');
+    msgText.style.setProperty('--marquee-dur', `${dur}s`);
+    msgText.style.setProperty('--marquee-dist', `${dist}`);
   });
 }
-
     // 첫 표시
     show(0);
 
