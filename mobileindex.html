@@ -810,6 +810,11 @@
       margin: 0;
     }
 
+    /* ✅ 자동 입력 아래 '무기' 제목(= 구분선 다음) 윗 여백만 더 주기 */
+#pageEquip .equip-auto-sep + .equip-group-head{
+  margin-top: 12px;  /* 8~14px 사이 취향 */
+}
+
 
 
     /* ✅ 무기 상단: 자동 입력 버튼 4개 */
@@ -817,7 +822,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin: 0 0 10px 0;
+      margin: 0 0 0px 0;
     }
 
     #pageEquip .equip-auto-btn {
@@ -837,7 +842,7 @@
     #pageEquip .equip-auto-sep {
       height: 1px;
       background: rgba(255, 255, 255, 0.10);
-      margin: 1px 0 1px 0;
+      margin: 6px 0;
     }
 
     #pageEquip .equip-auto-btn.primary {
@@ -1211,7 +1216,7 @@
     #pageEquip .equip-set-bar {
       display: flex;
       gap: 8px;
-      margin: 2px 0 10px;
+      margin: 2px 0 0px;
     }
 
     /* 4개가 한 줄에서 동일 비율로 나뉘게 */
