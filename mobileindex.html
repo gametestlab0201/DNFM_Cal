@@ -55,7 +55,7 @@
       position: sticky;
       top: 0;
       z-index: 50;
-      padding: calc(10px + var(--safe-top)) 12px 10px 12px;
+      padding: calc(10px + var(--safe-top)) 12px 2px 12px;
       border-bottom: 1px solid var(--line);
       background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.15));
       backdrop-filter: blur(10px);
@@ -67,6 +67,220 @@
       justify-content: space-between;
       gap: 10px;
     }
+
+    /* ====== 한마디 (헤더 바로 아래) ====== */
+.m-oneliner {
+  margin-top: 6px !important;      /* 간격도 같이 축소 */
+  padding: 6px 10px !important;    /* 내부도 축소 */
+
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+
+  display: flex;
+  align-items: center !important;  /* ✅ 핵심: 가운데 정렬로 높이 흔들림 방지 */
+  gap: 6px !important;
+
+  height: 40px !important;         /* ✅ 핵심: 고정 높이 */
+  min-height: 40px !important;     /* 혹시 min-height가 다른 곳에서 살아있을 때 대비 */
+  max-height: 40px !important;
+
+  overflow: hidden !important;     /* ✅ 내용이 커도 박스가 늘지 않게 */
+}
+    .m-oneliner .bullet {
+      opacity: 0.65;
+      line-height: 1.2;
+      flex: 0 0 auto;
+      padding-top: 1px;
+    }
+    .m-oneliner .text {
+      font-size: 12px;
+      line-height: 1.25;
+      color: rgba(233, 238, 247, 0.92);
+      overflow: hidden;
+
+      /* 2줄까지만 보여주기 */
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+    }
+    .m-oneliner .muted {
+      color: var(--muted);
+    }
+
+/* ===== 한마디(PC 배지/아이콘 스타일 이식) ===== */
+.m-oneliner .text.fade-out { opacity: 0; transition: opacity .18s ease; }
+.m-oneliner .text { opacity: 1; transition: opacity .18s ease; }
+
+.m-oneliner .hdrmsg{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  white-space:nowrap;
+}
+.m-oneliner .msg-nick{ font-weight:900; }
+.m-oneliner .msg-bullet{ opacity:.7; padding:0 2px; }
+.m-oneliner .msg-text{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width: 72vw;
+}
+/* ===== 한마디 마퀴(전광판) ===== */
+.m-oneliner .msg-text{
+  position: relative;
+}
+
+/* 기본(inner) */
+.m-oneliner .msg-text .marquee{
+  display: inline-block;
+}
+
+/* ✅ 넘칠 때만 마퀴 동작 */
+.m-oneliner .msg-text.is-marquee{
+  overflow: hidden;              /* ellipsis 대신 잘라내기 */
+  text-overflow: clip;           /* … 사용 안 함 */
+}
+
+.m-oneliner .msg-text.is-marquee .marquee{
+  white-space: nowrap;
+  will-change: transform;
+
+  /* ✅ 처음에는 그대로(0) 보이고, 이후에만 이동 */
+  animation: m_one_marquee var(--marquee-dur, 14s) linear infinite;
+}
+
+/* ✅ 0~15%: 정지(보이는 만큼 먼저 보여줌)
+   ✅ 15~70%: 왼쪽으로 스크롤 (넘친 만큼만)
+   ✅ 70~85%: 끝에서 잠깐 정지
+   ✅ 85~100%: 0으로 복귀(다음 루프 준비) */
+@keyframes m_one_marquee{
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(0); }
+  70%  { transform: translateX(calc(-1px * var(--marquee-dist, 0))); }
+  85%  { transform: translateX(calc(-1px * var(--marquee-dist, 0))); }
+  100% { transform: translateX(0); }
+}
+
+/* 접근성: 모션 최소화 설정이면 애니메이션 끔 */
+@media (prefers-reduced-motion: reduce){
+  .m-oneliner .msg-text.is-marquee .marquee{
+    animation: none !important;
+    padding-left: 0 !important;
+    transform: none !important;
+  }
+}
+
+
+/* ===== 한마디 배지 (PC 수석 스타일 이식) ===== */
+
+/* 공통: hdrmsg 라인 정렬 */
+.m-oneliner .hdrmsg{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  white-space:nowrap;
+}
+
+/* ✅ 수석 배지: PC처럼 골드 pill + 은은한 반짝임 */
+.m-oneliner .tag-senior{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 2px 10px;
+  min-width: 32px;
+  height: 20px;
+  border-radius: 999px;
+
+  font-size: 13px;
+  line-height: 1;
+
+  background: linear-gradient(135deg, #ffe08a 0%, #ffd257 45%, #ffc63a 100%);
+  border: 1px solid rgba(172, 124, 22, 0.55);
+  color: #2a1b00;
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* shimmer */
+.m-oneliner .tag-senior::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, .45) 35%, transparent 70%);
+  transform: translateX(-120%);
+  animation: m_one_shimmer 2.4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes m_one_shimmer{
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+
+/* 이모지 살짝 정렬 */
+.m-oneliner .badge-emoji{
+  transform: translateY(-.5px);
+}
+
+/* ✅ 책임은 아이콘/배지가 아예 없으니 tag-lead 스타일은 필요 없음 (남겨도 되지만 사용 안 됨) */
+
+/* ===== 수석 한마디: PC 네온 스타일 이식 ===== */
+.m-oneliner .hdrmsg.senior{
+  position: relative;
+  filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.35));
+}
+
+/* 수석 본문 텍스트 네온 */
+.m-oneliner .hdrmsg.senior .msg-text{
+  color: #fef9c3;
+  text-shadow:
+    0 0 4px rgba(250, 204, 21, 0.65),
+    0 0 8px rgba(250, 204, 21, 0.82),
+    0 0 14px rgba(250, 204, 21, 0.95);
+}
+
+/* 수석 닉네임도 PC처럼 푸른 그림자 */
+.m-oneliner .hdrmsg.senior .msg-nick{
+  color: #e5e7eb;
+  font-weight: 600; /* PC가 600쪽 느낌 */
+  text-shadow:
+    0 0 3px rgba(59, 130, 246, 0.55),
+    0 0 7px rgba(59, 130, 246, 0.75);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 198, 58, .7);
+  text-underline-offset: 2px;
+}
+
+/* (참고) 수석은 원칙상 점이 없지만, 혹시 남아있을 때만 색 보정 */
+.m-oneliner .hdrmsg.senior .msg-bullet{
+  color: #facc15;
+  opacity: 0.9;
+}
+
+/* ===== 책임 한마디: 닉네임만 진하게(PC 규칙) ===== */
+.m-oneliner .hdrmsg.lead .msg-nick{
+  font-weight: 700;
+}
+
+/* 책임 점(·)은 닉네임 앞에서 너무 튀지 않게 */
+.m-oneliner .hdrmsg.lead .msg-bullet{
+  opacity: .7;
+  padding: 0 4px 0 0; /* 닉네임과 간격 (앞에 붙으니 오른쪽만) */
+}
+/* ✅ 책임: 닉네임 앞 ‘두꺼운 점’(PC의 tag-lead 원형 도트 이식) */
+.m-oneliner .tag-lead{
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(120, 120, 120, .75);
+  box-shadow: 0 0 0 1px rgba(120, 120, 120, .28);
+  margin-right: 2px;
+  vertical-align: middle;
+}
+
 
     .m-title {
       display: flex;
@@ -303,7 +517,7 @@
       flex: 0 0 100%;
       height: 100%;
       scroll-snap-align: start;
-      padding: 14px 12px 0px 12px;
+      padding: 2px 12px 0px 12px;
       /* ✅ 16px → 10px */
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
@@ -612,7 +826,7 @@
     #pageEquip .equip-auto-sep {
       height: 1px;
       background: rgba(255, 255, 255, 0.10);
-      margin: 8px 0 12px 0;
+      margin: 1px 0 1px 0;
     }
 
     #pageEquip .equip-auto-btn.primary {
@@ -3599,6 +3813,10 @@
           </button>
         </div>
       </div>
+      <div id="mOneLiner" class="m-oneliner" aria-live="polite">
+  <div class="text muted">한마디 불러오는 중…</div>
+</div>
+
     </header>
 
     <!-- ====== Main (Swipe) ====== -->
@@ -3615,8 +3833,7 @@
               <img id="pickedCharImg" class="picked-char-img" alt="" />
             </div>
             <div class="hint">
-              • 좌/우로 넘겨가며 설정합니다.<br />
-              • 지금은 모바일 UI 뼈대만 만든 상태입니다.
+              • 좌/우로 넘겨가며 설정합니다.
             </div>
           </div>
         </section>
@@ -4862,6 +5079,210 @@
     window.idToken = sessionStorage.getItem('id_token') || null;
     window.WEBAPP_URL = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
     const WEBAPP_URL = window.WEBAPP_URL;   // 기존 코드들이 쓰는 식별자 보존
+     // ✅ 한마디(헤더 아래) 표시
+    // ✅ 한마디(헤더 아래) 표시 - PC 로직 이식(아이콘/배지/순환)
+async function initOneLinerMobile() {
+  const box = document.getElementById('mOneLiner');
+  if (!box) return;
+
+  const textEl = box.querySelector('.text');
+  if (!textEl) return;
+
+  // 중복 호출 방지
+  if (box.dataset.inited === '1') return;
+  box.dataset.inited = '1';
+
+  // PC처럼 fade 효과를 쓰려면(선택)
+  const FADE_MS = 200;
+  const DISPLAY_MS = 6000;
+
+  function escapeHTML(s = '') {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;').replace(/`/g, '&#96;');
+  }
+  function shuffleInPlace(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  try {
+    // PC와 동일 endpoint
+    const r = await fetch(WEBAPP_URL + '?type=phrase&public=1', {
+      method: 'GET',
+      mode: 'cors',
+      cache: 'no-store'
+    });
+    if (!r.ok) throw new Error('phrase_fetch_failed');
+
+    const data = await r.json().catch(() => ({ ok: false }));
+    const items = Array.isArray(data?.items) ? data.items : [];
+
+    // ✅ items가 없으면 message 단일 fallback
+    if (!items.length) {
+      const msg = (data && data.ok && data.message) ? String(data.message).trim() : '';
+      if (!msg) {
+        textEl.classList.add('muted');
+        textEl.textContent = '등록된 한마디가 없습니다.';
+      } else {
+        textEl.classList.remove('muted');
+        textEl.textContent = msg;
+      }
+      return;
+    }
+
+    // PC와 같은 필터/가공(“수석/책임(이벤트 포함)” 허용)
+    let messages = items
+      .filter(x => {
+        const pos = String(x?.position || '').trim();
+        const pos0 = pos.replace(/^\[이벤트\]\s*/, '');
+        const msg = String(x?.message || '').trim();
+        if (!msg) return false;
+        return /수석|책임/.test(pos0);
+      })
+      .map(x => {
+        const pos = String(x?.position || '').trim();
+        const pos0 = pos.replace(/^\[이벤트\]\s*/, '');
+        const isSenior = /수석/.test(pos0);
+
+        // 닉네임 우선순위(PC쪽 규칙을 그대로 흉내)
+        const nick = String(x?.ingame || x?.youtube || x?.google || '').trim();
+        const msg = String(x?.message || '').trim();
+
+        // ✅ 수석: 아이콘(골드 pill) / 책임: 닉네임 앞 두꺼운 점(원형 도트)
+const prefixMark = isSenior
+  ? '<span class="tag tag-senior" aria-label="수석" title="수석"><span class="badge-emoji">👑</span></span>'
+  : '<span class="tag-lead" aria-hidden="true"></span>';
+
+// ✅ 수석/책임 공통: 닉네임과 한마디 사이에는 항상 점(·)
+const midBullet = '<span class="msg-bullet" aria-hidden="true">·</span>';
+
+return `
+  <span class="hdrmsg ${isSenior ? 'senior' : 'lead'}">
+    ${prefixMark}
+    ${nick ? `<span class="msg-nick">${escapeHTML(nick)} 님</span>` : ''}
+    ${midBullet}
+    <span class="msg-text"><span class="marquee">${escapeHTML(msg)}</span></span>
+  </span>
+`.trim();
+      });
+
+    // 중복 제거
+    messages = Array.from(new Set(messages));
+
+    // 수석/책임 가중치(PC처럼 수석이 약 1.5배 더 자주)
+    const seniorMsgs = messages.filter(html => html.includes('hdrmsg senior'));
+    const leadMsgs = messages.filter(html => html.includes('hdrmsg lead'));
+    if (seniorMsgs.length && leadMsgs.length) {
+      const weighted = [];
+      seniorMsgs.forEach(m => weighted.push(m, m, m)); // 수석 3회
+      leadMsgs.forEach(m => weighted.push(m, m));      // 책임 2회
+      messages = weighted;
+    }
+
+    shuffleInPlace(messages);
+
+    if (!messages.length) {
+      textEl.classList.add('muted');
+      textEl.textContent = '등록된 한마디가 없습니다.';
+      return;
+    }
+
+    // 수석 이모지 순환(PC와 동일)
+    const SENIOR_EMOJIS = ['👑', '⭐', '🏅', '✨'];
+    let emojiIdx = 0;
+    function applySeniorEmoji(target) {
+      const node = target.querySelector('.tag-senior .badge-emoji');
+      if (node) node.textContent = SENIOR_EMOJIS[emojiIdx];
+    }
+
+    // 순환 표시
+    let i = 0;
+    let timer = null;
+
+    function show(idx) {
+      textEl.classList.remove('muted');
+      textEl.classList.add('fade-out');
+      setTimeout(() => {
+        textEl.innerHTML = messages[idx % messages.length];
+        applyMarqueeIfOverflow(textEl);
+        textEl.classList.remove('fade-out');
+        applySeniorEmoji(textEl);
+      }, FADE_MS);
+    }
+function applyMarqueeIfOverflow(rootEl) {
+  const msgText = rootEl.querySelector('.msg-text');
+  const inner = msgText ? msgText.querySelector('.marquee') : null;
+  if (!msgText || !inner) return;
+
+  // 초기화
+  msgText.classList.remove('is-marquee');
+  msgText.style.removeProperty('--marquee-dur');
+  msgText.style.removeProperty('--marquee-dist');
+
+  requestAnimationFrame(() => {
+    const cw = msgText.clientWidth;
+    const sw = inner.scrollWidth;
+
+    const dist = Math.max(0, sw - cw);
+    const overflow = dist > 2; // 약간의 여유
+    if (!overflow) return;
+
+    // ✅ 속도 설정 (숫자 클수록 더 빠름)
+const SPEED_PX_PER_SEC = 110;   // 80이면 느림, 110~140 추천
+
+// ✅ “움직이는 구간”만 시간 계산 (dist px를 SPEED로 나눔)
+const moveSec = Math.max(1.2, dist / SPEED_PX_PER_SEC);
+
+// ✅ 앞/뒤 정지 시간(원하면 조절)
+const holdStart = 0.8;  // 처음 멈춤
+const holdEnd   = 0.6;  // 끝에서 멈춤
+
+// ✅ 전체 루프 시간 = 시작정지 + 이동 + 끝정지 + (리셋 여유)
+const dur = holdStart + moveSec + holdEnd + 0.4;
+
+msgText.classList.add('is-marquee');
+msgText.style.setProperty('--marquee-dur', `${dur}s`);
+msgText.style.setProperty('--marquee-dist', `${dist}`);
+  });
+}
+
+    // 첫 표시
+    show(0);
+
+    timer = setInterval(() => {
+      i++;
+      emojiIdx = (emojiIdx + 1) % SENIOR_EMOJIS.length;
+      show(i);
+    }, DISPLAY_MS);
+
+    // (선택) 페이지가 백그라운드면 멈추고 다시 오면 재시작
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (timer) clearInterval(timer);
+        timer = null;
+      } else {
+        if (!timer) {
+          timer = setInterval(() => {
+            i++;
+            emojiIdx = (emojiIdx + 1) % SENIOR_EMOJIS.length;
+            show(i);
+          }, DISPLAY_MS);
+        }
+      }
+    }, { passive: true });
+
+  } catch (e) {
+    textEl.classList.add('muted');
+    textEl.textContent = '한마디를 불러오지 못했습니다.';
+    console.warn('[oneLiner] init fail', e);
+  }
+}
+
     // DB
     const DB = { itemsBySlot: {}, loaded: {}, chars: { loaded: false, groups: [] } };
     // ✅ 전역이 없으면 만들고
@@ -5679,17 +6100,19 @@ function _getCharMainImage(c) {
       // 2) change 이벤트(중복 바인딩 방지)
       if (aSel && !aSel.dataset.boundAvatar) {
         aSel.addEventListener('change', () => {
-          s.avatarSel = s.avatarSel || {};
-          s.avatarSel.avatarName = String(aSel.value || '').trim();
-        });
+  const st = (window.state = window.state || {});
+  st.avatarSel = st.avatarSel || {};
+  st.avatarSel.avatarName = String(aSel.value || '').trim();
+});
         aSel.dataset.boundAvatar = '1';
       }
 
       if (iSel && !iSel.dataset.boundImprint) {
         iSel.addEventListener('change', () => {
-          s.avatarSel = s.avatarSel || {};
-          s.avatarSel.imprintName = String(iSel.value || '').trim();
-        });
+  const st = (window.state = window.state || {});
+  st.avatarSel = st.avatarSel || {};
+  st.avatarSel.imprintName = String(iSel.value || '').trim();
+});
         iSel.dataset.boundImprint = '1';
       }
 
@@ -5739,9 +6162,16 @@ function _getCharMainImage(c) {
 
       // ✅ init이 여러 번 호출돼도 리스너 중복 등록 방지
       if (!sel.dataset.bound) {
-        sel.addEventListener('change', () => { s.monsterName = (sel.value || '').trim(); });
-        sel.dataset.bound = '1';
-      }
+  sel.addEventListener('change', () => {
+    // ✅ PC프리셋을 모바일에 불러온 경우 s.monster(객체)가 함께 들어오는 케이스가 있음.
+    //    이후 드롭다운을 바꿔도 compute 단계에서 s.monster가 우선되어 몬스터가 "고정"되는 문제가 생김.
+    //    -> monsterName 변경 시, monster 객체도 같이 갱신(또는 덮어쓰기)해서 항상 최신 선택이 반영되게 한다.
+    const nm = (sel.value || '').trim();
+    s.monsterName = nm;
+    s.monster = nm ? { name: nm } : null;
+  });
+  sel.dataset.bound = '1';
+}
     }
 
 
@@ -11641,7 +12071,9 @@ document.getElementById('pageEquip')?.addEventListener('click', async (e) => {
         // 5) ✅ 최종 compute
         const s = window.state || {};
         const timeKey = String(s.timeKey || '180');
-        const monster = s.monster || (s.monsterName ? { name: s.monsterName } : null);
+        // ✅ 몬스터는 "현재 드롭다운 선택(monsterName)"을 항상 최우선으로 사용
+//    (PC프리셋에서 넘어온 s.monster 객체가 남아 있으면 변경이 무시되는 문제 방지)
+const monster = (s.monsterName ? { name: String(s.monsterName).trim() } : (s.monster || null));
 
         const resCompute = await apiJSON('compute', {
           p: null,
@@ -12606,8 +13038,13 @@ window.state.selections[slot] = {
 
     // 저장된 state를 window.state에 반영하고, 화면을 state 기준으로 갱신
     function applyFrontPresetState_mobile(presetState) {
-      const s = _clonePlain(presetState || {});
-      window.state = s;
+  const next = _clonePlain(presetState || {});
+
+  // ✅ window.state 객체를 교체하지 말고, 같은 참조를 유지한 채 내용만 갱신
+  window.state = window.state || {};
+  const s = window.state;
+  for (const k of Object.keys(s)) delete s[k];
+  Object.assign(s, next);
 
       // 1) 캐릭터 UI
       if (s.currentCharacter) {
@@ -13274,7 +13711,7 @@ function bindPresetBarOnce_mobile() {
 // ✅ DOM이 다 만들어진 뒤에 실행되도록 변경
 if (!window.__presetPagerBound) {
   window.__presetPagerBound = true;
-  window.addEventListener('DOMContentLoaded', initPresetPager);
+  window.addEventListener('DOMContentLoaded', () => { initPresetPager(); initOneLinerMobile(); });
 }
 
   </script>
