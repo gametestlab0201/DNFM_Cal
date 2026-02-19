@@ -81,9 +81,9 @@
   align-items: center !important;  /* ✅ 핵심: 가운데 정렬로 높이 흔들림 방지 */
   gap: 6px !important;
 
-  height: 40px !important;         /* ✅ 핵심: 고정 높이 */
-  min-height: 40px !important;     /* 혹시 min-height가 다른 곳에서 살아있을 때 대비 */
-  max-height: 40px !important;
+  height: 35px !important;         /* ✅ 핵심: 고정 높이 */
+  min-height: 35px !important;     /* 혹시 min-height가 다른 곳에서 살아있을 때 대비 */
+  max-height: 35px !important;
 
   overflow: hidden !important;     /* ✅ 내용이 커도 박스가 늘지 않게 */
 }
@@ -356,7 +356,7 @@
   border-radius: 14px;
 
   /* ✅ 위/아래 패딩을 조금 줄여서 “상자 ↔ 슬롯” 여백 감소 */
-  padding: 8px 12px;
+  padding: 6px 10px;
 
   display: grid;
   grid-template-columns: repeat(5, 44px);
@@ -685,11 +685,11 @@
 
 
     .big-pick {
-      margin-top: 14px;
+      margin-top: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 210px;
+      min-height: 190px;
       border-radius: 18px;
       border: 1px dashed rgba(255, 255, 255, 0.22);
       background: rgba(255, 255, 255, 0.03);
