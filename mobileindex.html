@@ -116,14 +116,25 @@
   align-items:center;
   gap:6px;
   white-space:nowrap;
+    /* ✅ 중요: inline-flex 자식이 줄어들 수 있게 */
+  min-width: 0;
+  max-width: 100%;
 }
 .m-oneliner .msg-nick{ font-weight:900; }
 .m-oneliner .msg-bullet{ opacity:.7; padding:0 2px; }
 .m-oneliner .msg-text{
+  /* ✅ 중요: inline(span) 상태면 max-width/overflow 측정이 틀어짐 */
+  display: inline-block;
+
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+
+  /* 기존 유지 */
   max-width: 72vw;
+
+  /* (선택) 더 안정적으로 하고 싶으면 아래도 추가 가능
+     vertical-align: bottom; */
 }
 /* ===== 한마디 마퀴(전광판) ===== */
 .m-oneliner .msg-text{
@@ -5224,27 +5235,27 @@ function applyMarqueeIfOverflow(rootEl) {
   msgText.style.removeProperty('--marquee-dist');
 
   requestAnimationFrame(() => {
-    const cw = msgText.clientWidth;
-    const sw = inner.scrollWidth;   // ✅ 이제 CSS에서 padding-right가 항상 적용되므로 sw가 “실제 길이”와 동일
+  const cw = msgText.getBoundingClientRect().width;  // ✅ 더 안정적인 실측
+  const sw = inner.scrollWidth;
 
-    const dist = Math.max(0, sw - cw);
-    const overflow = dist > 2;
-    if (!overflow) return;
+  const rawDist = sw - cw;
+  const overflow = rawDist > 2;
+  if (!overflow) return;
 
-    // ✅ 속도 설정 (숫자 클수록 더 빠름)
-    const SPEED_PX_PER_SEC = 110;
+  const TRAIL_PX = 7;
+  const dist = Math.max(0, rawDist + TRAIL_PX);
 
-    const moveSec = Math.max(1.2, dist / SPEED_PX_PER_SEC);
+  const SPEED_PX_PER_SEC = 110;
+  const moveSec = Math.max(1.2, dist / SPEED_PX_PER_SEC);
 
-    const holdStart = 0.8;
-    const holdEnd   = 0.6;
+  const holdStart = 0.8;
+  const holdEnd   = 0.6;
+  const dur = holdStart + moveSec + holdEnd + 0.4;
 
-    const dur = holdStart + moveSec + holdEnd + 0.4;
-
-    msgText.classList.add('is-marquee');
-    msgText.style.setProperty('--marquee-dur', `${dur}s`);
-    msgText.style.setProperty('--marquee-dist', `${dist}`);
-  });
+  msgText.classList.add('is-marquee');
+  msgText.style.setProperty('--marquee-dur', `${dur}s`);
+  msgText.style.setProperty('--marquee-dist', `${dist}`);
+});
 }
 
     // 첫 표시
