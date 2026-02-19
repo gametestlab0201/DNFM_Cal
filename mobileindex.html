@@ -145,6 +145,9 @@
   white-space: nowrap;
   will-change: transform;
 
+  /* ✅ 끝부분이 완전히 들어오도록 트레일 여백 추가 */
+  padding-right: 24px;
+
   /* ✅ 처음에는 그대로(0) 보이고, 이후에만 이동 */
   animation: m_one_marquee var(--marquee-dur, 14s) linear infinite;
 }
@@ -552,7 +555,7 @@
     }
 
     #pageChar .hint {
-      margin-top: 10px;
+      margin-top: 1px;
     }
 
     /* ===== 모바일 캐릭터 목록: 좌 썸네일 / 우 이름 ===== */
@@ -3833,7 +3836,6 @@
               <img id="pickedCharImg" class="picked-char-img" alt="" />
             </div>
             <div class="hint">
-              • 좌/우로 넘겨가며 설정합니다.
             </div>
           </div>
         </section>
@@ -5228,7 +5230,7 @@ function applyMarqueeIfOverflow(rootEl) {
     const cw = msgText.clientWidth;
     const sw = inner.scrollWidth;
 
-    const dist = Math.max(0, sw - cw);
+    const dist = Math.max(0, sw - cw + 6);
     const overflow = dist > 2; // 약간의 여유
     if (!overflow) return;
 
