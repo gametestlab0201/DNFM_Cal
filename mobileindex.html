@@ -133,6 +133,7 @@
 /* 기본(inner) */
 .m-oneliner .msg-text .marquee{
   display: inline-block;
+  padding-right: 7px;   /* ✅ 항상 동일 여백을 포함시켜 sw 계산과 실제 렌더가 같게 */
 }
 
 /* ✅ 넘칠 때만 마퀴 동작 */
@@ -144,10 +145,6 @@
 .m-oneliner .msg-text.is-marquee .marquee{
   white-space: nowrap;
   will-change: transform;
-
-  /* ✅ 끝부분이 완전히 들어오도록 트레일 여백 추가 */
-  padding-right: 7px;
-
   /* ✅ 처음에는 그대로(0) 보이고, 이후에만 이동 */
   animation: m_one_marquee var(--marquee-dur, 14s) linear infinite;
 }
@@ -5228,28 +5225,20 @@ function applyMarqueeIfOverflow(rootEl) {
 
   requestAnimationFrame(() => {
     const cw = msgText.clientWidth;
-    const sw = inner.scrollWidth;
+    const sw = inner.scrollWidth;   // ✅ 이제 CSS에서 padding-right가 항상 적용되므로 sw가 “실제 길이”와 동일
 
-    // ✅ 1) 실제로 "넘친 양"만으로 overflow 판정
-    const rawDist = sw - cw;
-    const overflow = rawDist > 2;
+    const dist = Math.max(0, sw - cw);
+    const overflow = dist > 2;
     if (!overflow) return;
-
-    // ✅ 2) 끝부분이 완전히 보이도록 트레일(px) 추가 (CSS padding-right와 맞춰주기)
-    const TRAIL_PX = 7; // CSS에서 padding-right: 7px 쓰고 있으니 동일하게
-    const dist = Math.max(0, rawDist + TRAIL_PX);
 
     // ✅ 속도 설정 (숫자 클수록 더 빠름)
     const SPEED_PX_PER_SEC = 110;
 
-    // ✅ “움직이는 구간”만 시간 계산
     const moveSec = Math.max(1.2, dist / SPEED_PX_PER_SEC);
 
-    // ✅ 앞/뒤 정지 시간
     const holdStart = 0.8;
     const holdEnd   = 0.6;
 
-    // ✅ 전체 루프 시간
     const dur = holdStart + moveSec + holdEnd + 0.4;
 
     msgText.classList.add('is-marquee');
@@ -5257,6 +5246,7 @@ function applyMarqueeIfOverflow(rootEl) {
     msgText.style.setProperty('--marquee-dist', `${dist}`);
   });
 }
+
     // 첫 표시
     show(0);
 
