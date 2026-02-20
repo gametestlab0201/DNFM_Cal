@@ -5010,12 +5010,12 @@
                 <ul class="notice-list">
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
-                  <li>01.29 <span class="notice-badge">'스위프트 마스터'</span> 캐릭 추가</li>
-                  <li>01.30 '작열: 콰트로 카시테움 5세트' 쿨타임 감소치 조정</li>
-                  <li>01.31 장비세트, 고유효과 일괄 입력 편의성 패치</li>
                   <li>02.06 오브젝트 데미지 조정</li>
                   <li>02.10 쿠노이치 '강타' 고유효과 쿨타임 감소 옵션 적용</li>
                   <li>02.12 <span class="notice-badge">'빙결사'</span> 캐릭 추가</li>
+                  <li>02.19 몬스터 방어력 재조정</li>
+                  <li>02.19 재해 몬스터 모든 공격 백어택 미적용 패치</li>
+                  <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -6341,6 +6341,9 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
+          <li>26.02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
+          <li>26.02.19 <span style="color: yellow;">재해</span> 몬스터 <span style="color: #ff4444;">모든 공격 백어택 미적용</span> 패치</li>
+          <li>26.02.19 <span style="color: yellow;">몬스터</span> <span style="color: #ff4444;">방어력 재조정</span></li>
           <li>26.02.12 <span class="notice-badge">'빙결사'</span> 캐릭 추가</li>
           <li>26.02.10 쿠노이치 <span style="color: yellow;">'강타'</span> 무기 고유효과 <span style="color: #ff4444;">남은 쿨타임 감소</span> 옵션 적용</li>
           <li>26.02.06 <span style="color: yellow;">오브젝트 데미지</span> <span style="color: #ff4444;">속성부여</span> 적용 조정</li>
@@ -19623,17 +19626,16 @@ const mapped = arr.map(e => {
             btnPC?.setAttribute("disabled", "true");
             btnM?.setAttribute("disabled", "true");
 
-            // ✅ 모바일 버튼: allowed + SPECIAL_USER_EMAILS 일 때만 활성화
-            if (btnM) {
-              if (allowed && isSpecial) {
-                btnM.removeAttribute('disabled');
-                btnM.removeAttribute('title'); // 툴팁 제거(원하면 유지해도 됨)
-              } else {
-                btnM.setAttribute('disabled', 'true');
-                btnM.setAttribute('title', 'Comming Soon.');
-              }
-            }
-
+            // ✅ 모바일 버튼: allowed(회원 허용) 이면 모두 활성화
+if (btnM) {
+  if (allowed) {
+    btnM.removeAttribute('disabled');
+    btnM.removeAttribute('title'); // 툴팁 제거
+  } else {
+    btnM.setAttribute('disabled', 'true');
+    btnM.setAttribute('title', '로그인 후 이용 가능합니다.');
+  }
+}
             if (allowed) {
               btnPC.removeAttribute("disabled");
               //   btnM.removeAttribute("disabled");
