@@ -402,6 +402,32 @@
   box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.12) inset;
 }
 
+/* ✅ 비활성 슬롯(등급 제한): PC처럼 반투명 회색 처리 */
+.save-box .preset-btn:disabled,
+.preset-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+
+  /* 회색 톤으로 죽이기 */
+  background: rgba(148, 163, 184, 0.10) !important;
+  border-color: rgba(148, 163, 184, 0.28) !important;
+  color: rgba(203, 213, 225, 0.55) !important;
+
+  /* 활성 느낌 제거 */
+  box-shadow: none !important;
+  transform: none !important;
+  filter: grayscale(0.25);
+}
+
+/* ✅ 저장 데이터가 있는 슬롯이더라도 disabled면 강조색 제거 */
+.save-box .preset-btn.has-data:disabled,
+.preset-btn.has-data:disabled {
+  background: rgba(148, 163, 184, 0.10) !important;
+  border-color: rgba(148, 163, 184, 0.28) !important;
+  color: rgba(203, 213, 225, 0.55) !important;
+  box-shadow: none !important;
+}
+
 /* ✅ 휴지통 버튼: 슬롯 우측상단에 작게 겹치기 (PC 동일) */
 .save-box .preset-slot .preset-trash {
   position: absolute;
@@ -5400,7 +5426,77 @@ function applyMarqueeIfOverflow(rootEl) {
 
     // ✅ 모바일: 최초 1회 init 호출로 경량리스트(=CORE.lists) 전부 확보
     let __mobileInitPromise = null;
+// ===== PC와 동일: 로그인 이용자 직급/슬롯 제한 상태 =====
+window.__loginPingSent_mobile = false;
+window.__loginPingResult_mobile = null;
 
+// 기본값(비로그인/미확인 상태)
+window.__userRole = window.__userRole || { level: 0, label: '전임', presetSlots: 0 };
+
+// 직급별 프리셋 사용 가능 최대 슬롯 수 (PC와 동일 규칙)
+function getUserPresetLimit() {
+  const info = window.__userRole || {};
+
+  // 1순위: 백엔드에서 내려준 사용자별 슬롯 수
+  if (typeof info.presetSlots === 'number' && info.presetSlots >= 0) {
+    return Math.max(0, Math.min(20, info.presetSlots));
+  }
+
+  // 2순위: 직급 기본값 (백워드 호환)
+  const lvl = (typeof info.level === 'number') ? info.level : 0;
+
+  if (lvl >= 3) return 10;  // 수석 / [이벤트]수석
+  if (lvl === 2) return 3;  // 책임 / [이벤트]책임
+  if (lvl === 1) return 1;  // 선임 / [이벤트]선임
+  return 0;                 // 전임(기본)
+}
+
+// 모바일용 login_ping 1회 호출 (PC와 동일 개념)
+async function loginPingOnce_mobile() {
+  if (window.__loginPingSent_mobile && window.__loginPingResult_mobile) {
+    return window.__loginPingResult_mobile;
+  }
+  window.__loginPingSent_mobile = true;
+
+  try {
+    const data = await apiJSON('login_ping', {
+      ua: navigator.userAgent,
+      screen: `${screen.width}x${screen.height}@${(window.devicePixelRatio || 1)}`,
+      is_mobile: true
+    });
+
+    if (data && data.ok) {
+      const lvl = (typeof data.roleLevel === 'number') ? data.roleLevel : 0;
+
+      // 백엔드 roleLabel 우선 (수석/책임/선임/[이벤트]수석 등 그대로 사용)
+      const label = String(
+        data.roleLabel ||
+        (lvl >= 3 ? '수석' : (lvl === 2 ? '책임' : (lvl === 1 ? '선임' : '전임')))
+      );
+
+      const slots = (typeof data.presetSlots === 'number' && data.presetSlots >= 0)
+        ? Math.min(20, data.presetSlots)
+        : 0;
+
+      // 전역 상태 저장
+      window.__userRole = { level: lvl, label, presetSlots: slots };
+
+      // 슬롯 UI 즉시 재갱신
+      if (typeof updatePresetButtonsUI === 'function') {
+        try { updatePresetButtonsUI(); } catch (e) {
+          console.warn('[mobile preset UI] update 실패:', e);
+        }
+      }
+    }
+
+    window.__loginPingResult_mobile = data;
+    return data;
+  } catch (e) {
+    console.warn('[mobile] login_ping failed:', e);
+    window.__loginPingResult_mobile = { ok: false, error: e.message };
+    return window.__loginPingResult_mobile;
+  }
+}
     async function initMobileAllLightListsOnce() {
       if (__mobileInitPromise) return __mobileInitPromise;
 
@@ -13714,7 +13810,7 @@ function bindPresetBarOnce_mobile() {
     }
 
     // ✅ 이벤트 바인딩 + 초기 세팅
-    function initPresetPager() {
+    async function initPresetPager() {
   // ✅ 356에서 쓰는 ID 우선, 혹시 예전 ID가 남아있어도 동작하게 fallback
   const prev = document.getElementById('btnPresetPrevM') || document.getElementById('presetPagePrev');
   const next = document.getElementById('btnPresetNextM') || document.getElementById('presetPageNext');
@@ -13740,11 +13836,18 @@ function bindPresetBarOnce_mobile() {
   initPresetModalUI_mobile();
   bindPresetBarOnce_mobile();
 
+  // ✅ 먼저 로그인 직급/슬롯 정보 반영 (PC와 동일한 슬롯 제한 적용용)
+  try {
+    await loginPingOnce_mobile();
+  } catch (e) {
+    console.warn('[mobile] loginPingOnce_mobile init 실패:', e);
+  }
+
   // 최초 0페이지로 맞추고 UI 갱신
   setPresetPage(0);
 
   // ✅ 서버 슬롯 목록 불러오기
-  refreshFpresetList_mobile();
+  await refreshFpresetList_mobile();
 }
 
 
