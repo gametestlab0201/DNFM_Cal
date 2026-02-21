@@ -5437,18 +5437,41 @@ window.__userRole = window.__userRole || { level: 0, label: '전임', presetSlot
 function getUserPresetLimit() {
   const info = window.__userRole || {};
 
-  // 1순위: 백엔드에서 내려준 사용자별 슬롯 수
+  // ✅ 1순위: 백엔드가 사용자별 슬롯 수를 명시적으로 내려주면 그 값을 최우선 사용
+  // (이미 [이벤트] 2배 계산이 서버에서 반영되어 내려오는 구조라면 이 값이 정답)
   if (typeof info.presetSlots === 'number' && info.presetSlots >= 0) {
     return Math.max(0, Math.min(20, info.presetSlots));
   }
 
-  // 2순위: 직급 기본값 (백워드 호환)
-  const lvl = (typeof info.level === 'number') ? info.level : 0;
+  // ✅ 2순위: 프론트에서 직급명(roleLabel) 기준으로 계산 (백워드 호환)
+  const label = String(info.label || '').trim();
+  const isEvent = label.includes('[이벤트]');
 
-  if (lvl >= 3) return 10;  // 수석 / [이벤트]수석
-  if (lvl === 2) return 3;  // 책임 / [이벤트]책임
-  if (lvl === 1) return 1;  // 선임 / [이벤트]선임
-  return 0;                 // 전임(기본)
+  let base = 0;
+
+  // 직급명 기준
+  if (label.includes('수석')) {
+    base = 10;
+  } else if (label.includes('책임')) {
+    base = 3;
+  } else if (label.includes('선임')) {
+    base = 1;
+  } else {
+    // ✅ 직급명이 비어있거나 애매하면 level 기준 보조 처리
+    const lvl = (typeof info.level === 'number') ? info.level : 0;
+    if (lvl >= 3) base = 10;
+    else if (lvl === 2) base = 3;
+    else if (lvl === 1) base = 1;
+    else base = 0;
+  }
+
+  // ✅ [이벤트] 직급은 2배
+  if (base > 0 && isEvent) {
+    base *= 2;
+  }
+
+  // 최대 20칸 제한
+  return Math.max(0, Math.min(20, base));
 }
 
 // 모바일용 login_ping 1회 호출 (PC와 동일 개념)
@@ -13069,12 +13092,21 @@ window.state.selections[slot] = {
 
     // PC처럼 "직책별 허용 슬롯 수"가 있으면 그걸 우선 사용
     function _getMobilePresetMaxSlot() {
-      try {
-        const lim = (typeof getUserPresetLimit === 'function') ? Number(getUserPresetLimit() || 0) : 0;
-        if (lim > 0) return Math.min(PRESET_UI_TOTAL, lim);
-      } catch (e) { }
-      return PRESET_UI_TOTAL;
+  try {
+    const lim = (typeof getUserPresetLimit === 'function')
+      ? Number(getUserPresetLimit() || 0)
+      : 0;
+
+    if (lim > 0) {
+      return Math.max(0, Math.min(PRESET_UI_TOTAL, lim));
     }
+
+    // ✅ 비허용/미확인/기타 등급 => 전부 비활성화
+    return 0;
+  } catch (e) {
+    return 0;
+  }
+}
 
     function getPresetMaxPage(maxSlot) {
       const n = Math.max(0, Number(maxSlot || 0));
