@@ -8079,12 +8079,47 @@ function syncSkillTreesFromLvMaps_mobile(charObj) {
   const raw = _getSkillListRaw();
   const rows = Array.isArray(raw) ? raw : [];
 
-  const mine = rows.filter(r =>
-    _looseOwnerMatch(_getSkillChar(r), charKey) &&
-    (typeof _getSkillShow === 'function'
-      ? _getSkillShow(r)
-      : (String(r?.show ?? r?.['노출여부'] ?? '').trim() === '1'))
-  );
+  // ✅ 현재 착용 무기 종류 (기본값 처리 포함)
+// - 남거너스핏파이어는 보우건/머스켓 분기 스킬이 있으므로 무기종류 필터 적용
+// - 무기를 안 꼈거나, 보우건/머스켓이 아니면 기본값을 '보우건'으로 간주
+const weaponTypeRaw = String(window.state?.selections?.weapon?.type || '').trim();
+
+let weaponTypeForSkill = weaponTypeRaw;
+if (charKey === '남거너스핏파이어') {
+  if (weaponTypeRaw !== '보우건' && weaponTypeRaw !== '머스켓') {
+    weaponTypeForSkill = '보우건';
+  }
+}
+
+// ✅ 캐릭 매칭 + 노출여부 + (필요시) 무기종류 필터
+const mine = rows.filter(r => {
+  // 1) 캐릭터 매칭
+  if (!_looseOwnerMatch(_getSkillChar(r), charKey)) return false;
+
+  // 2) 노출여부(show=1)
+  const visible = (typeof _getSkillShow === 'function')
+    ? _getSkillShow(r)
+    : (String(r?.show ?? r?.['노출여부'] ?? '').trim() === '1');
+  if (!visible) return false;
+
+  // 3) 무기종류 필터 (남거너스핏파이어에만 적용)
+  //    - row의 무기종류 컬럼명이 weaponKind / 무기종류 중 무엇이든 대응
+  //    - 공란이면 공통스킬로 간주하여 항상 노출
+  if (charKey === '남거너스핏파이어') {
+    const rowWeapon = String(
+      r?.weaponKind ?? r?.['weaponKind'] ?? r?.['무기종류'] ?? ''
+    ).trim();
+
+    // 공통 스킬은 항상 표시
+    if (!rowWeapon) return true;
+
+    // 보우건/머스켓 지정 스킬은 현재 무기종류와 일치할 때만 표시
+    return rowWeapon === weaponTypeForSkill;
+  }
+
+  // 다른 캐릭터는 기존처럼 통과
+  return true;
+});
 
   if (!mine.length) {
     listEl.innerHTML = `<div style="padding:14px 10px; color:#c7b589;">표시할 스킬이 없습니다. (skill:list / 캐릭터명 매칭 확인)</div>`;
@@ -9046,9 +9081,8 @@ function _upgradeEquipByCore_(slot, it) {
       });
     })();
     function _grindTypeForSlot_mobile(slot) {
-      return (slot === 'weapon') ? '무기연마' : '보조장비연마';
-    }
-
+  return (slot === 'weapon') ? '무기연마' : '보장연마';
+}
     function _getGrindLevelFromName(name) {
       const m = String(name || '').match(/^(\d+)연마$/);
       return m ? Number(m[1]) : 0;
