@@ -11353,50 +11353,66 @@ function updateUniqueEffectDescriptionsMobile(rootEl) {
     }
 
     function bindUniquePickModalOnce() {
-      const modal = document.getElementById("mUniquePickModal");
-      if (!modal || modal.dataset.bound === "1") return;
-      modal.dataset.bound = "1";
+  const modal = document.getElementById("mUniquePickModal");
+  if (!modal || modal.dataset.bound === "1") return;
+  modal.dataset.bound = "1";
 
-      modal.addEventListener("click", (e) => {
-        // 1) 버튼 클릭이면 그대로
-        let btn = e.target.closest("[data-uvalpick]");
+  modal.addEventListener("click", (e) => {
+    // 1) 버튼 클릭이면 그대로
+    let btn = e.target.closest("[data-uvalpick]");
 
-        // 2) 버튼이 아니면(= 설명칸 클릭 등) 같은 row의 버튼을 찾아서 대신 선택 처리
-        if (!btn) {
-          const desc = e.target.closest(".unique-desc");
-          if (desc) {
-            const row = desc.closest(".unique-row");
-            btn = row ? row.querySelector("[data-uvalpick]") : null;
-          }
-        }
-
-        if (!btn) return;
-
-        ensureCustomSkillsMobile();
-        const v = btn.getAttribute("data-uvalpick") || "";
-        const targetKey = modal.dataset.utarget;
-
-        if (targetKey) {
-          state.customSkills[targetKey] = v;
-          syncUniqueMiniLabels();
-
-          // ✅ PC처럼 "선택됨"을 버튼 자체(active)에 부여
-          modal.querySelectorAll(".unique-btn.active").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-
-          // (선택 강조가 row 기반인 CSS도 같이 쓰는 중이라면 row도 동기화)
-          modal.querySelectorAll(".unique-row.is-selected").forEach(r => r.classList.remove("is-selected"));
-          const row = btn.closest(".unique-row");
-          if (row) row.classList.add("is-selected");
-        }
-
-        _closeModalById_("mUniquePickModal");
-      });
-      // 닫기
-      modal.querySelectorAll("[data-mset-close]").forEach(el => {
-        el.addEventListener("click", () => _closeModalById_("mUniquePickModal"));
-      });
+    // 2) 버튼이 아니면(= 설명칸 클릭 등) 같은 row의 버튼을 찾아서 대신 선택 처리
+    if (!btn) {
+      const desc = e.target.closest(".unique-desc");
+      if (desc) {
+        const row = desc.closest(".unique-row");
+        btn = row ? row.querySelector("[data-uvalpick]") : null;
+      }
     }
+
+    if (!btn) return;
+
+    ensureCustomSkillsMobile();
+    const v = btn.getAttribute("data-uvalpick") || "";
+    const targetKey = modal.dataset.utarget;
+
+    if (targetKey) {
+      state.customSkills[targetKey] = v;
+
+      // ✅ 핵심 보정: "고유효과(무기)" 개별 모달에서도 PC 호환 필드(type/weaponName) 같이 채우기
+      if (targetKey === "weaponType") {
+        try {
+          const _wPick = (String(v || "").trim() === "없음") ? "" : String(v || "").trim();
+          state.customSkills.type = _wPick; // 백엔드 payload 해석용 (PC 호환)
+          if (!state.customSkills.weaponName) {
+            const _wName = state?.selections?.weapon?.name;
+            if (_wName) state.customSkills.weaponName = String(_wName).trim();
+          }
+        } catch (err) {
+          // ignore
+        }
+      }
+
+      syncUniqueMiniLabels();
+
+      // ✅ PC처럼 "선택됨"을 버튼 자체(active)에 부여
+      modal.querySelectorAll(".unique-btn.active").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      // (선택 강조가 row 기반인 CSS도 같이 쓰는 중이라면 row도 동기화)
+      modal.querySelectorAll(".unique-row.is-selected").forEach(r => r.classList.remove("is-selected"));
+      const row = btn.closest(".unique-row");
+      if (row) row.classList.add("is-selected");
+    }
+
+    _closeModalById_("mUniquePickModal");
+  });
+
+  // 닫기
+  modal.querySelectorAll("[data-mset-close]").forEach(el => {
+    el.addEventListener("click", () => _closeModalById_("mUniquePickModal"));
+  });
+}
 
     // ✅ 고유효과 "일괄 적용" 모달: 선택(무기/기타) 바인딩 + 현재 state 반영
     function bindUniqueBulkModalOnce() {
