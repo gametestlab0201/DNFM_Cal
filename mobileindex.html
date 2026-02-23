@@ -4828,7 +4828,7 @@
 
   <div class="wb-tree-summary">
     <div>선택 스킬트리 : <b id="wildbaneTreePickM">-</b></div>
-    <div>사이클 횟수 : <b id="wildbaneCyclePickM">-</b> <span class="wb-tree-hint">(0이면 자동)</span></div>
+    <div>사이클 횟수 : <b id="wildbaneCyclePickM">-</b> <span class="wb-tree-hint"></span></div>
   </div>
 </div>
 
@@ -4840,7 +4840,7 @@
 
   <div class="wb-tree-summary">
     <div>선택 스킬트리 : <b id="windshearTreePickM">-</b></div>
-    <div>사이클 횟수 : <b id="windshearCyclePickM">-</b> <span class="wb-tree-hint">(0이면 자동)</span></div>
+    <div>사이클 횟수 : <b id="windshearCyclePickM">-</b> <span class="wb-tree-hint"></span></div>
   </div>
 </div>
             <div id="skillListM" class="skill-list"></div>
@@ -5104,9 +5104,9 @@
       </div>
 
       <div class="wb-tree-grid" style="margin-top:12px;">
-        <button type="button" class="wb-tree-btn" data-ws-tree="A">A (파파파파빨)</button>
-        <button type="button" class="wb-tree-btn" data-ws-tree="B">B (파파파빨)</button>
-        <button type="button" class="wb-tree-btn" data-ws-tree="C">C (파파빨)</button>
+        <button type="button" class="wb-tree-btn" data-ws-tree="A">파파파파빨</button>
+        <button type="button" class="wb-tree-btn" data-ws-tree="B">초초초초파파빨</button>
+        <button type="button" class="wb-tree-btn" data-ws-tree="C">파파파초빨</button>
       </div>
 
       <!-- ✅ 사이클 횟수 입력 -->
@@ -7041,7 +7041,7 @@ function updateWindshearTreeSummaryMobile() {
   const preset = String(s.windshearTreePreset || 'A').trim() || 'A';
   const cycle = Number.isFinite(+s.windshearCycleCount) ? Math.max(0, Math.floor(+s.windshearCycleCount)) : 0;
 
-  const labelMap = { A: 'A (파파파파빨)', B: 'B (파파파빨)', C: 'C (파파빨)' };
+  const labelMap = { A: '파파파파빨', B: '초초초초파파빨', C: '파파파초빨' };
   const pEl = document.getElementById('windshearTreePickM');
   const cEl = document.getElementById('windshearCyclePickM');
 
@@ -7902,7 +7902,7 @@ const _blockIfExclusiveFalcon = (nextSp, storeObj) => {
     });
   }
 
-  // (3) 워리어 와일드베인: 스킬트리 선택 버튼/모달
+    // (3) 워리어 와일드베인: 스킬트리 선택 버튼/모달
   const wbBtn = document.getElementById('btnWildbaneTreeM');
   if (wbBtn && !wbBtn.dataset.bound) {
     wbBtn.dataset.bound = '1';
@@ -7911,6 +7911,16 @@ const _blockIfExclusiveFalcon = (nextSp, storeObj) => {
     });
   }
   bindWildbaneTreeModalMobile();
+
+  // (4) 워리어 윈드시어: 스킬트리 선택 버튼/모달  ✅ 추가
+  const wsBtn = document.getElementById('btnWindshearTreeM');
+  if (wsBtn && !wsBtn.dataset.bound) {
+    wsBtn.dataset.bound = '1';
+    wsBtn.addEventListener('click', () => {
+      openWindshearTreeModalMobile();
+    });
+  }
+  bindWindshearTreeModalMobile();
 }
 
     // ✅ 공백 제거 정규화(스킬명/캐릭키 비교용)
@@ -11995,14 +12005,21 @@ document.getElementById('pageEquip')?.addEventListener('click', async (e) => {
         extra.wbCycleCount = cycle; // 호환용
       }
       if (isWS) {
-        const preset = String(s.windshearTreePreset || '파파초').trim() || '파파초';
-        const cycle = Number.isFinite(+s.windshearCycleCount) ? Math.max(0, Math.floor(+s.windshearCycleCount)) : 0;
+  const presetRaw = String(s.windshearTreePreset || 'A').trim() || 'A';
+  const cycle = Number.isFinite(+s.windshearCycleCount) ? Math.max(0, Math.floor(+s.windshearCycleCount)) : 0;
 
-        extra.windshearTreePreset = preset;
-        extra.wsTree = preset; // 호환용
-        extra.windshearCycleCount = cycle;
-        extra.wsCycleCount = cycle; // 호환용
-      }
+  // ✅ 모바일(A/B/C) → 백엔드 skill_uses 기대값(트리A/B/C)으로 변환
+  const wsPresetForUses =
+    (presetRaw === 'A') ? '트리A' :
+    (presetRaw === 'B') ? '트리B' :
+    (presetRaw === 'C') ? '트리C' :
+    presetRaw;
+
+  extra.windshearTreePreset = wsPresetForUses;
+  extra.wsTree = wsPresetForUses; // 호환용
+  extra.windshearCycleCount = cycle;
+  extra.wsCycleCount = cycle; // 호환용
+}
 
       const res = await apiJSON('skill_uses', {
         ownerKey,
@@ -12213,11 +12230,18 @@ document.getElementById('pageEquip')?.addEventListener('click', async (e) => {
         payload.wildbaneCycleCount = cycle;
         payload.wbCycleCount = cycle; // 호환용
       } else if (ownerKeyNow === '워리어윈드시어') {
-  const preset = String(s.windshearTreePreset || 'A').trim() || 'A';
+  const presetRaw = String(s.windshearTreePreset || 'A').trim() || 'A';
   const cycle = Number.isFinite(+s.windshearCycleCount) ? Math.max(0, Math.floor(+s.windshearCycleCount)) : 0;
 
-  payload.windshearTreePreset = preset;
-  payload.wsTree = preset; // 호환용
+  // ✅ 모바일(A/B/C) → 백엔드 calc_all/세션용 키(트리A/B/C)로 변환
+  const wsPresetForServer =
+    (presetRaw === 'A') ? '트리A' :
+    (presetRaw === 'B') ? '트리B' :
+    (presetRaw === 'C') ? '트리C' :
+    presetRaw;
+
+  payload.windshearTreePreset = wsPresetForServer;
+  payload.wsTree = wsPresetForServer; // 호환용
   payload.windshearCycleCount = cycle;
   payload.wsCycleCount = cycle; // 호환용
 }
