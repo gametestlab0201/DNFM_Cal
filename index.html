@@ -6531,21 +6531,22 @@
 
     // 🔹 직책별 프리셋 사용 가능 최대 슬롯 수
     function getUserPresetLimit() {
-      const info = window.__userRole || {};
+  const info = window.__userRole || {};
 
-      // 1순위: 계산기목록 시트의 '슬롯' 컬럼 값
-      if (typeof info.presetSlots === 'number' && info.presetSlots >= 0) {
-        return Math.max(0, Math.min(20, info.presetSlots));
-      }
+  // 1순위: 계산기목록 시트의 '슬롯' 컬럼 값
+  if (typeof info.presetSlots === 'number' && info.presetSlots >= 0) {
+    return Math.max(0, Math.min(40, info.presetSlots));
+  }
 
-      // 2순위: 기존 직책별 기본값 (백워드 호환용)
-      const lvl = (typeof info.level === 'number') ? info.level : 0;
+  // 2순위: 기존 직책별 기본값 (백워드 호환용)
+  const lvl = (typeof info.level === 'number') ? info.level : 0;
 
-      if (lvl >= 3) return 10;  // 수석
-      if (lvl === 2) return 3;  // 책임
-      if (lvl === 1) return 1;  // 선임
-      return 0;                 // 전임
-    }
+  if (lvl >= 4) return 40; // 관리자
+  if (lvl >= 3) return 10; // 수석
+  if (lvl === 2) return 3; // 책임
+  if (lvl === 1) return 1; // 선임
+  return 0;                // 전임
+}
 
     async function loginPingOnce() {
       if (window.__loginPingSent && window.__loginPingResult) {
@@ -6574,7 +6575,7 @@
 
           // ★ 백엔드에서 내려준 사용자별 프리셋 슬롯 수
           const slots = (typeof data.presetSlots === 'number' && data.presetSlots >= 0)
-            ? Math.min(20, data.presetSlots)        // 0~10 사이로 클램프
+            ? Math.min(40, data.presetSlots)        // 0~10 사이로 클램프
             : 0;
 
           // 🔹 전역 직책/슬롯 상태 저장
@@ -6869,7 +6870,6 @@
       'ssm941112@gmail.com',
       'ionix4566543@gmail.com',
       'ionix4566544@gmail.com',
-      'yeguhn2@gmail.com'
 
       // 'another.account@example.com',
     ];
@@ -17278,7 +17278,7 @@ if (!pickedMainNorm) {
       data: {}
     };
     // ✅ 프리셋 슬롯 페이징(10개씩, 최대 20슬롯)
-    const PRESET_UI_TOTAL = 20;
+    const PRESET_UI_TOTAL = 40;
     const PRESET_UI_PER_PAGE = 10;
     let presetPage = 0; // 0=1페이지(1~10), 1=2페이지(11~20)
 
