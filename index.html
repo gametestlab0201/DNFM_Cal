@@ -5010,12 +5010,12 @@
                 <ul class="notice-list">
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
-                  <li>02.19 몬스터 방어력 재조정</li>
                   <li>02.19 재해 몬스터 모든 공격 백어택 미적용 패치</li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
                   <li>02.21 <span style="color: greenyellow;">[모바일]</span> 남스핏파이어 중복 스킬 버그 수정</li>
                   <li>02.22 <span style="color: greenyellow;">[모바일]</span> 무기 고유효과, 보장 연마 버그 수정</li>
                   <li>02.23 <span style="color: greenyellow;">[모바일]</span> 윈드시어 스킬 선택 버그 수정</li>
+                  <li>02.26 합산스탯 물리/마법 공격력 변수 표기 오류 수정 </li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -5158,10 +5158,27 @@
         <div class="center-top-row">
           <!-- ✅ 왼쪽: 테스트 전용 버튼들 (방어구 / 악세사리) -->
           <div class="center-special-col">
-            <!-- ✅ 지정 세트 자동계산 버튼 -->
-            <button id="btnAutoSetSweepSelected" class="btn btn-special-patch" type="button" style="display:none;">
-              선택 세트 자동계산
-            </button>
+            <!-- ✅ SPECIAL_USER 전용: 강제 계산 옵션 -->
+<div id="specialDamageOptRow" class="special-dmg-opt-row" style="display:none; margin-bottom:8px;">
+  <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; margin-bottom:4px;">
+    <input type="checkbox" id="chkForceCrit100">
+    크리티컬 100%
+  </label>
+  <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;">
+    <input type="checkbox" id="chkTohampo12">
+    투함포 (+12%)
+  </label>
+</div>
+
+<!-- ✅ SPECIAL_USER 전용: 스킬별 데미지 보기 -->
+<button id="btnSkillDamageViewer" class="btn btn-special-patch" type="button" style="display:none;">
+  데미지 보기
+</button>
+
+<!-- ✅ 지정 세트 자동계산 버튼 -->
+<button id="btnAutoSetSweepSelected" class="btn btn-special-patch" type="button" style="display:none;">
+  선택 세트 자동계산
+</button>
 
             <button id="btnAutoSetSweepMissing" class="ui-btnetc" style="display:none;">
               누락만 재계산(방어구 고정)
@@ -5584,6 +5601,35 @@
       </div>
     </div>
   </div>
+
+<div id="skillDamageModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-close></div>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="skillDamageDlgTitle" style="width:min(960px,96vw);">
+    <header>
+      <h2 id="skillDamageDlgTitle">스킬별 데미지</h2>
+      <button type="button" class="close" data-close aria-label="닫기">✕</button>
+    </header>
+
+    <div style="padding:12px 14px 14px;">
+      <div id="skillDamageMeta" style="margin-bottom:10px; font-size:12px; opacity:.9;"></div>
+
+      <div style="max-height:60vh; overflow:auto; border:1px solid rgba(255,255,255,.08); border-radius:10px;">
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead style="position:sticky; top:0; background:#111827; z-index:1;">
+            <tr>
+              <th style="text-align:left; padding:8px 10px;">스킬명</th>
+              <th style="text-align:left; padding:8px 10px;">구분</th>
+              <th style="text-align:right; padding:8px 10px;">사용횟수</th>
+              <th style="text-align:right; padding:8px 10px;">1회 데미지</th>
+              <th style="text-align:right; padding:8px 10px;">합계 데미지</th>
+            </tr>
+          </thead>
+          <tbody id="skillDamageTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
 
   <!-- ✅ 방어구 세트 선택 모달 -->
@@ -6341,6 +6387,7 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
+          <li>26.02.26 합산스탯 <span style="color: yellow;">물리/마법 공격력 변수</span> <span style="color: #ff4444;">표기 오류</span> 수정 </li>
           <li>26.02.23 [모바일] <span style="color: yellow;">윈드시어 스킬 선택</span> <span style="color: #ff4444;">버그 수정</span></li>
           <li>26.02.22 [모바일] <span style="color: yellow;">무기 고유효과, 보장 연마</span> <span style="color: #ff4444;">버그 수정</span></li>
           <li>26.02.21 [모바일] <span style="color: yellow;">남스핏파이어 중복 스킬</span> <span style="color: #ff4444;">버그 수정</span></li>         
@@ -6838,6 +6885,10 @@
       enchants: {},   // 슬롯별 마법부여 선택
       ui: { weaponTypeTab: null, enhTargetSlot: null, enhTargetBtn: null },
       currentSlotKey: null,
+      lastComputeBreakdown: [],
+lastComputeObjBreakdown: [],
+lastComputeCoeffs: {},
+lastComputeMeta: null,
 
       // 🔹 자동계산에 사용할 세트 선택 상태
       autoSweep: {
@@ -6903,15 +6954,19 @@ function updateSpecialUserButton() {
   }
 
   // ✅ [특정 유저 전용 유지] 아래 4개는 그대로 제한
-  const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
-  const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
-  const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
-  const rowUnique = document.getElementById('uniqueOnOffRow');
+  const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
+const rowDmgOpt = document.getElementById('specialDamageOptRow');   // ✅ 추가
+const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
+const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
+const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
+const rowUnique = document.getElementById('uniqueOnOffRow');
 
-  if (btnAutoSet) btnAutoSet.style.display = isSpecialUser ? 'inline-flex' : 'none';
-  if (btnAutoSetMissing) btnAutoSetMissing.style.display = isSpecialUser ? 'inline-flex' : 'none';
-  if (btnAutoWeapon) btnAutoWeapon.style.display = isSpecialUser ? 'inline-flex' : 'none';
-  if (rowUnique) rowUnique.style.display = isSpecialUser ? 'flex' : 'none';
+if (btnSkillDamage) btnSkillDamage.style.display = isSpecialUser ? 'inline-flex' : 'none';
+if (rowDmgOpt) rowDmgOpt.style.display = isSpecialUser ? 'block' : 'none';   // ✅ 추가
+if (btnAutoSet) btnAutoSet.style.display = isSpecialUser ? 'inline-flex' : 'none';
+if (btnAutoSetMissing) btnAutoSetMissing.style.display = isSpecialUser ? 'inline-flex' : 'none';
+if (btnAutoWeapon) btnAutoWeapon.style.display = isSpecialUser ? 'inline-flex' : 'none';
+if (rowUnique) rowUnique.style.display = isSpecialUser ? 'flex' : 'none';
 }
 
 
@@ -14514,8 +14569,8 @@ if (!pickedMainNorm) {
 
       // 파워 의존 라벨/값
       const atkLabel = label('물리 데미지', '마법 데미지', '물리/마법 데미지');
-      const atkVal = pick(((S.phys_atk * (1 + S.str_rate / 100)) / 250 + 1) * (1 * (S.phys_atk) * (1 + S.phys_atk_rate / 100)),
-        ((S.mag_atk * (1 + S.int_rate / 100)) / 250 + 1) * (1 * (S.mag_atk) * (1 + S.mag_atk_rate / 100)));
+      const atkVal = pick(((S.str * (1 + S.str_rate / 100)) / 250 + 1) * (1 * (S.phys_atk) * (1 + S.phys_atk_rate / 100)),
+        ((S.int * (1 + S.int_rate / 100)) / 250 + 1) * (1 * (S.mag_atk) * (1 + S.mag_atk_rate / 100)));
 
       const atkPctLabel = label('물리 공격력(%)', '마법 공격력(%)', '물리/마법 공격력(%)');
       const atkPctVal = pick(S.phys_atk_rate, S.mag_atk_rate);
@@ -18982,23 +19037,29 @@ const mapped = arr.map(e => {
         await simulateSkillUsage();
 
         // 5) 최종 데미지 계산 (compute 분기 호출)
-        const monster = state.monster || null;   // { name } 형태
-        const timeKey = (typeof getTimeKey === 'function'
-          ? getTimeKey()
-          : '1m');   // 혹시 몰라서 기본값 1분
+const monster = state.monster || null;   // { name } 형태
+const timeKey = (typeof getTimeKey === 'function'
+  ? getTimeKey()
+  : '1m');   // 혹시 몰라서 기본값 1분
 
-        async function callComputeOnce(token) {
-          return fetch(`${WEBAPP_URL}?type=compute`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              id_token: token,
-              p: p || null,
-              monster,
-              window: timeKey,
-            }),
-          }).then(r => r.json());
-        }
+// ✅ SPECIAL_USER 체크박스 상태 (compute 호출 전에 읽기)
+const dmgFlags = _getSpecialDamageFlags();
+
+async function callComputeOnce(token) {
+  return fetch(`${WEBAPP_URL}?type=compute`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id_token: token,
+      p: p || null,
+      monster,
+      window: timeKey,
+
+      // ✅ 백엔드에서 실제 계산에 반영할 플래그
+      forceCrit100: !!dmgFlags.forceCrit100,
+    }),
+  }).then(r => r.json());
+}
 
         let resCompute = await callComputeOnce(id_token);
 
@@ -19033,7 +19094,58 @@ const mapped = arr.map(e => {
           throw new Error(resCompute?.message || resCompute?.error || 'compute_failed');
         }
 
-        const total = Number(resCompute.total || 0);
+        const rawTotal = Number(resCompute.total || 0);
+
+// ✅ 위에서 이미 읽은 체크값 재사용
+// const dmgFlags = _getSpecialDamageFlags();  // ← 삭제(중복)
+
+// ✅ coeffs
+const powerHint = (p || charPayload?.power || state?.currentCharacter?.power || '');
+const coeffsForAdj = (resCompute && typeof resCompute.coeffs === 'object' && resCompute.coeffs) ? resCompute.coeffs : {};
+
+// ✅ 백엔드가 이미 크리100 적용했다면 프론트 비율보정은 1로 고정 (중복 방지)
+const backendCritApplied = !!(coeffsForAdj.forceCrit100Applied);
+
+const critForceRatio = backendCritApplied
+  ? 1
+  : _calcCritForceRatioFromCoeffs(coeffsForAdj, powerHint, dmgFlags.forceCrit100);
+
+// ✅ 투함포(+12%)는 계속 프론트 보정
+const tohampoRatio = dmgFlags.tohampo12 ? 1.12 : 1.0;
+
+// ✅ 최종 표시값
+const total = rawTotal * critForceRatio * tohampoRatio;
+
+// ✅ 스킬별 데미지 보기용 캐시 저장 (SPECIAL_USER 버튼에서 사용)
+state.lastComputeBreakdown = Array.isArray(resCompute.breakdown) ? resCompute.breakdown : [];
+state.lastComputeObjBreakdown = Array.isArray(resCompute.objBreakdown) ? resCompute.objBreakdown : [];
+state.lastComputeCoeffs = coeffsForAdj;
+
+state.lastComputeMeta = {
+  total,          // ✅ 보정 후 최종값
+  rawTotal,       // ✅ 원본 백엔드 최종값(디버깅용)
+  critForceRatio, // ✅ 모달에서도 동일 계산에 사용
+  tohampoRatio,   // ✅ 모달에서도 동일 계산에 사용
+  forceCrit100: !!dmgFlags.forceCrit100,
+  tohampo12: !!dmgFlags.tohampo12,
+
+  targetId: String(targetId || ''),
+  timeKey: String(timeKey || ''),
+  monsterName: String((monster && monster.name) || state?.monster?.name || ''),
+  characterName: String(state?.currentCharacter?.name || ''),
+
+  rawBreakdownTotal: Array.isArray(resCompute.breakdown)
+    ? resCompute.breakdown.reduce((acc, r) => acc + (Number(r?.sum || 0) || 0), 0)
+    : 0,
+
+  isDisasterMonster:
+    !!(state?.monster?.isDisaster
+    || state?.monster?.baseIsDisaster
+    || state?.monster?.disaster
+    || monster?.isDisaster
+    || monster?.baseIsDisaster
+    || monster?.disaster)
+};
 
         // 🔹 고유효과 토글(ON)일 때만 '계산값' 시트에 로그 적재
         try {
@@ -19523,6 +19635,230 @@ const mapped = arr.map(e => {
       }
     }
 
+    function _fmtSkillDmgNum(v) {
+  const n = Number(v || 0);
+  if (!Number.isFinite(n)) return '-';
+  return Math.floor(n).toLocaleString();
+}
+
+function bindSkillDamageModalCloseOnce() {
+  const modal = document.getElementById('skillDamageModal');
+  if (!modal || modal.__closeBound) return;
+  modal.__closeBound = true;
+
+  modal.querySelectorAll('[data-close]').forEach(el => {
+    el.addEventListener('click', () => showModal(modal, false));
+  });
+}
+
+function _getSpecialDamageFlags() {
+  const forceCrit100 = !!document.getElementById('chkForceCrit100')?.checked;
+  const tohampo12 = !!document.getElementById('chkTohampo12')?.checked;
+  return { forceCrit100, tohampo12 };
+}
+
+function _pick01(vA, vB) {
+  // coeffs 값이 0~1 또는 0~100 형태로 들어올 수 있어서 둘 다 대응
+  const norm01 = (v) => {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return 0;
+    return (n > 1.000001) ? (n / 100) : n;
+  };
+  return [norm01(vA), norm01(vB)];
+}
+
+function _calcCritForceRatioFromCoeffs(C, powerHint, forceCrit100) {
+  if (!forceCrit100) return 1;
+
+  const ptxt = String(powerHint || '').toLowerCase();
+  const useMag = /mag|마법/.test(ptxt);
+
+  // coeffs 키가 버전별로 조금 다를 수 있어서 후보 여러 개 체크
+  const [physCrit01_a, magCrit01_a] = _pick01(C?.final_phys_crit, C?.final_mag_crit);
+  const [physCrit01_b, magCrit01_b] = _pick01(C?.final_phys_crit_pct, C?.final_mag_crit_pct);
+
+  const curCrit01 = useMag
+    ? (magCrit01_a || magCrit01_b || 0)
+    : (physCrit01_a || physCrit01_b || 0);
+
+  // crit_dmg_inc / crit_damage_inc 둘 다 대응 (0.25 or 25 형태 대응)
+  let critDmgInc = Number(C?.crit_dmg_inc ?? C?.crit_damage_inc ?? 0);
+  if (!Number.isFinite(critDmgInc)) critDmgInc = 0;
+  if (critDmgInc > 3) critDmgInc = critDmgInc / 100; // 25 -> 0.25 보정
+
+  // 현재 기대크리계수 vs 강제 100% 기대크리계수
+  const curMul = (curCrit01 * (1.5 + critDmgInc)) + (1 - curCrit01);
+  const forcedMul = (1.0 * (1.5 + critDmgInc));
+
+  if (!Number.isFinite(curMul) || curMul <= 0) return 1;
+  const ratio = forcedMul / curMul;
+
+  return Number.isFinite(ratio) && ratio > 0 ? ratio : 1;
+}
+
+function openSkillDamageViewerModal() {
+  if (!window.__IS_SPECIAL_USER__) {
+    toast('권한이 없습니다.');
+    return;
+  }
+
+  const modal = document.getElementById('skillDamageModal');
+  const tbody = document.getElementById('skillDamageTbody');
+  const meta = document.getElementById('skillDamageMeta');
+  if (!modal || !tbody || !meta) return;
+
+  const rows = Array.isArray(state.lastComputeBreakdown) ? [...state.lastComputeBreakdown] : [];
+  if (!rows.length) {
+    toast('먼저 계산하기를 눌러주세요.');
+    return;
+  }
+
+  bindSkillDamageModalCloseOnce();
+
+  // ✅ 원본 기준 합계가 큰 순으로 정렬(표시 순서만)
+  rows.sort((a, b) => Number(b?.sum || 0) - Number(a?.sum || 0));
+
+  const m = state.lastComputeMeta || {};
+const C = state.lastComputeCoeffs || {};
+
+const forceCrit100 = !!m.forceCrit100;
+const tohampo12 = !!m.tohampo12;
+const critForceRatio = Number(m.critForceRatio || 1) || 1;
+const tohampoRatio = Number(m.tohampoRatio || 1) || 1;
+
+  // ===== 계수 복원 (백코드 compute 식과 맞추기) =====
+  // 백코드 기준:
+  // total = (skillTotal + statusTotal + objTotal) * 1.3 * (1 + final_dmg_up) * (1 + def_break)
+  // skillTotal = skillBase * (백어택계수 + fin_sangbyun_dam/100) * (1 + all_type_dmg)
+  // statusTotal = statusBase * (1 + all_type_dmg)
+  // objTotal = (이미 all_type_dmg 반영된 상태로 내려옴/내부계산됨)
+  //
+  // ※ 여기서는 breakdown row를 direct/status로 나눠서 각각 최종값 기준으로 환산
+  // ※ 오브젝트는 "스킬이 아니므로" 별도 합계로 분리 표시
+
+  const allTypeDmg = Number(C?.all_type_dmg || 0);          // 예: 0.25 형태(=25%)로 들어오는 구조
+  const finalDmgUp = Number(C?.final_dmg_up || 0);          // 예: 0.30
+  const defBreak   = Number(C?.def_break || 0);             // 예: 0.10
+  const finSang    = Number(C?.fin_sangbyun_dam || 0);      // 예: 35 (퍼센트값)
+
+  // 재해 여부 판정 (버전별 키 차이 + 이름 fallback)
+  const isDisaster =
+    !!m.isDisasterMonster ||
+    /재해/.test(String(m.monsterName || ''));
+
+  // 일반(직접딜) 백어택 계수
+  const backAtkMul = isDisaster ? 1.0 : 1.1;
+
+  // 공통 후단 계수: 카운터 * 최종증뎀 * 방깎증뎀
+  const commonPostMul = 1.3 * (1 + finalDmgUp) * (1 + defBreak) * (tohampo12 ? 1.12 : 1);
+
+  // 공통 전단 계수: 모든타입피해
+  const allTypeMul = (1 + allTypeDmg);
+
+  // direct/status 각각의 "row.sum -> 최종기준 row.sum" 환산 계수
+  const directMul = (backAtkMul + (finSang / 100)) * allTypeMul * commonPostMul;
+  const statusMul = allTypeMul * commonPostMul;
+
+  // ===== row 분류 =====
+  // 상변 판정:
+  // 1) statusKind 존재
+  // 2) kind 문자열에 "(상변)" 포함
+  // 3) kind 문자열에 "상변" 포함 (버전 대응)
+  const isStatusRow = (r) => {
+    if (!r) return false;
+    if (r.statusKind) return true;
+    const k = String(r.kind || '');
+    return k.includes('(상변)') || k.includes('상변');
+  };
+
+  // ===== 스킬별 최종값 계산 =====
+  let directBaseSum = 0;
+  let statusBaseSum = 0;
+
+  const renderedRows = rows.map((r) => {
+    const name = String(r?.name || '-');
+    const kind = String(r?.kind || '-');
+    const uses = Number(r?.uses || 0);
+
+    const dmgPerUseRaw = Number(r?.dmgPerUse || 0);
+    const sumRaw = Number(r?.sum || 0);
+
+    const status = isStatusRow(r);
+    let mul = status ? statusMul : directMul;
+
+// ✅ 크리100 강제는 "스킬류"에만 추가 보정 (오브젝트는 제외)
+if (forceCrit100) {
+  mul *= critForceRatio;
+}
+
+    if (status) statusBaseSum += sumRaw;
+    else directBaseSum += sumRaw;
+
+    const dmgPerUseFinal = dmgPerUseRaw * mul;
+    const sumFinal = sumRaw * mul;
+
+    return {
+      name,
+      kind,
+      uses,
+      dmgPerUseFinal,
+      sumFinal
+    };
+  });
+
+  // ===== 합계 계산 =====
+  const directFinalTotal = directBaseSum * directMul * (forceCrit100 ? critForceRatio : 1);
+const statusFinalTotal = statusBaseSum * statusMul * (forceCrit100 ? critForceRatio : 1);
+
+  // 오브젝트는 스킬이 아니므로 별도.
+  // 백엔드에서 total은 "(skill+status+obj) * commonPost" 구조이므로
+  // 최종 오브젝트값은 total - (직접딜최종 + 상변최종)로 역산하면 가장 안전함.
+  const finalTotal = Number(m.total || 0);
+  let objectFinalTotal = finalTotal - directFinalTotal - statusFinalTotal;
+
+  // 부동소수점 오차 방어
+  if (!Number.isFinite(objectFinalTotal)) objectFinalTotal = 0;
+  if (Math.abs(objectFinalTotal) < 0.5) objectFinalTotal = 0;
+
+  // 표시용 스킬합(최종기준)
+  const skillFinalShownTotal = directFinalTotal + statusFinalTotal;
+
+  // ===== 상단 메타 표시 =====
+  meta.innerHTML = `
+    <div>
+      캐릭터: <b>${m.characterName || '-'}</b>
+      &nbsp;|&nbsp; 몬스터: <b>${m.monsterName || '-'}</b>
+      &nbsp;|&nbsp; 시간: <b>${m.timeKey || '-'}</b>
+    </div>
+    <div style="margin-top:6px;">
+      일반 스킬 합계: <b>${_fmtSkillDmgNum(directFinalTotal)}</b>
+      &nbsp;|&nbsp; 상변 스킬 합계: <b>${_fmtSkillDmgNum(statusFinalTotal)}</b>
+      &nbsp;|&nbsp; 스킬 합계(최종): <b>${_fmtSkillDmgNum(skillFinalShownTotal)}</b>
+    </div>
+    <div style="margin-top:6px;">
+      오브젝트 데미지(별도): <b>${_fmtSkillDmgNum(objectFinalTotal)}</b>
+      &nbsp;|&nbsp; 최종 합계: <b>${_fmtSkillDmgNum(finalTotal)}</b>
+    </div>
+  `;
+
+  // ===== 표 렌더링 (스킬만) =====
+  tbody.innerHTML = renderedRows.map(r => `
+    <tr style="border-top:1px solid rgba(255,255,255,.06);">
+      <td style="padding:8px 10px;">${r.name}</td>
+      <td style="padding:8px 10px; opacity:.9;">${r.kind}</td>
+      <td style="padding:8px 10px; text-align:right;">${r.uses}</td>
+      <td style="padding:8px 10px; text-align:right;">${_fmtSkillDmgNum(r.dmgPerUseFinal)}</td>
+      <td style="padding:8px 10px; text-align:right; font-weight:700;">${_fmtSkillDmgNum(r.sumFinal)}</td>
+    </tr>
+  `).join('');
+
+  showModal(modal, true);
+}
+
+// ✅ 버튼 이벤트
+document.getElementById('btnSkillDamageViewer')?.addEventListener('click', () => {
+  openSkillDamageViewerModal();
+});
 
     document.getElementById('btn-sum-all-final')?.setAttribute('data-compute-btn', '');
     document.getElementById('btn-sum-all-final2')?.setAttribute('data-compute-btn', '');
