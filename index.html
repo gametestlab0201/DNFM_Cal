@@ -2360,6 +2360,32 @@
       text-align: right;
     }
 
+    .final-damage-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.prepatch-inline-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.prepatch-inline-toggle input[type="checkbox"] {
+  margin: 0;
+}
+
+.prepatch-inline-toggle:hover {
+  color: #f0e6d2;
+}
+
     /* #은 고유 id를 뜻한다. 클래스와 다른점은 고유하기때문에 단한번만 사용한다는 차이가 있음 */
     /* 강화 선택 모달(텍스트 리스트) */
     #enhanceModal .dialog {
@@ -5010,12 +5036,12 @@
                 <ul class="notice-list">
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
-                  <li>02.19 재해 몬스터 모든 공격 백어택 미적용 패치</li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
                   <li>02.21 <span style="color: greenyellow;">[모바일]</span> 남스핏파이어 중복 스킬 버그 수정</li>
                   <li>02.22 <span style="color: greenyellow;">[모바일]</span> 무기 고유효과, 보장 연마 버그 수정</li>
                   <li>02.23 <span style="color: greenyellow;">[모바일]</span> 윈드시어 스킬 선택 버그 수정</li>
-                  <li>02.26 합산스탯 물리/마법 공격력 변수 표기 오류 수정 </li>
+                  <li>02.25 합산스탯 물리/마법 공격력 변수 표기 오류 수정 </li>
+                  <li>02.26 밸런스 패치 적용 및 패치전 계산 기능 추가</li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -5159,6 +5185,7 @@
           <!-- ✅ 왼쪽: 테스트 전용 버튼들 (방어구 / 악세사리) -->
           <div class="center-special-col">
             <!-- ✅ SPECIAL_USER 전용: 강제 계산 옵션 -->
+
 <div id="specialDamageOptRow" class="special-dmg-opt-row" style="display:none; margin-bottom:8px;">
   <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; margin-bottom:4px;">
     <input type="checkbox" id="chkForceCrit100">
@@ -5566,10 +5593,18 @@
 
           <!-- ▼ 항상 맨 아래 행(3행 auto) -->
           <div class="final-damage">
-            <span class="label">최종데미지</span>
-            <strong class="value" id="finalDamageValue">&nbsp;</strong>
-            <button id="btn-sum-all-final" type="button">계산하기</button>
-          </div>
+  <div class="final-damage-top">
+    <span class="label">최종데미지</span>
+
+    <label id="skillSheetToggleRow" class="prepatch-inline-toggle">
+      <input type="checkbox" id="chkUsePrePatchSkills">
+      <span>패치전</span>
+    </label>
+  </div>
+
+  <strong class="value" id="finalDamageValue">&nbsp;</strong>
+  <button id="btn-sum-all-final" type="button">계산하기</button>
+</div>
         </div>
       </aside>
 
@@ -6387,7 +6422,8 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
-          <li>26.02.26 합산스탯 <span style="color: yellow;">물리/마법 공격력 변수</span> <span style="color: #ff4444;">표기 오류</span> 수정 </li>
+          <li>26.02.26 <span style="color: yellow;">260226 밸런스 패치 적용</span> 및 <span style="color: #ff4444;">패치전 계산 기능 추가</span></li>
+          <li>26.02.25 합산스탯 <span style="color: yellow;">물리/마법 공격력 변수</span> <span style="color: #ff4444;">표기 오류</span> 수정 </li>
           <li>26.02.23 [모바일] <span style="color: yellow;">윈드시어 스킬 선택</span> <span style="color: #ff4444;">버그 수정</span></li>
           <li>26.02.22 [모바일] <span style="color: yellow;">무기 고유효과, 보장 연마</span> <span style="color: #ff4444;">버그 수정</span></li>
           <li>26.02.21 [모바일] <span style="color: yellow;">남스핏파이어 중복 스킬</span> <span style="color: #ff4444;">버그 수정</span></li>         
@@ -9826,7 +9862,9 @@ if (rowUnique) rowUnique.style.display = isSpecialUser ? 'flex' : 'none';
         }
 
         // ★ skill_state_set 호출 (이미 JSON 객체 반환)
-        const res = await apiJSON('skill_state_set', { ownerKey, skills: arr });
+        const patchBefore = !!document.getElementById('chkUsePrePatchSkills')?.checked;
+
+const res = await apiJSON('skill_state_set', { ownerKey, skills: arr, patchBefore });
 
         if (Array.isArray(res?.dbgLightDevotee)) {
           console.table(res.dbgLightDevotee);
@@ -9841,7 +9879,7 @@ if (rowUnique) rowUnique.style.display = isSpecialUser ? 'flex' : 'none';
           const raw2 = state.CurrentSumStats || {};
           ownerKey = String(raw2.ownerKey || ownerKey || '').trim();
 
-          const res2 = await apiJSON('skill_state_set', { ownerKey, skills: arr });
+          const res2 = await apiJSON('skill_state_set', { ownerKey, skills: arr, patchBefore });
 
           if (Array.isArray(res2?.skillsDebug)) {
             //console.log('[skill_state_set] skillsDebug (retry) =', res2.skillsDebug);
@@ -10194,15 +10232,22 @@ if (rowUnique) rowUnique.style.display = isSpecialUser ? 'flex' : 'none';
           payload.wildbaneCycleEnabled = (cc > 0); // 체크박스 없으니 0이면 false
         }
         if (ownerKey === '워리어윈드시어') {
-          // 프리셋(트리A/B/C)
-          payload.windshearTreePreset = state.windshearTreePreset || '트리A';
+  // state는 보통 A/B/C 로 들고 있으므로, skill_uses에서 기대하는 값(트리A/B/C)으로 정규화
+  const presetRaw = String(state.windshearTreePreset || 'A').trim() || 'A';
 
-          // ✅ 사이클 횟수(프론트 입력값)도 같이 보냄
-          const cc = Math.max(0, Math.floor(Number(state.windshearCycleCount || 0)));
-          payload.windshearCycleCount = cc;
-          payload.windshearCycleEnabled = (cc > 0); // 체크박스 없으니 0이면 false
-        }
+  const wsPresetForUses =
+    (presetRaw === 'A') ? '트리A' :
+    (presetRaw === 'B') ? '트리B' :
+    (presetRaw === 'C') ? '트리C' :
+    presetRaw; // 혹시 이미 '트리A' 형태면 그대로
 
+  payload.windshearTreePreset = wsPresetForUses;
+
+  // ✅ 사이클 횟수(프론트 입력값)도 같이 보냄
+  const cc = Math.max(0, Math.floor(Number(state.windshearCycleCount || 0)));
+  payload.windshearCycleCount = cc;
+  payload.windshearCycleEnabled = (cc > 0);
+}
         const j = await apiJSON('skill_uses', payload);
 
 
@@ -18953,10 +18998,14 @@ const mapped = arr.map(e => {
         if (avatarPayload && (avatarPayload.avatarName || avatarPayload.imprintName)) {
           payload.avatar = avatarPayload;
         }
-        // ★ 커스텀옵은 객체 자체를 그대로 전송
+                // ★ 커스텀옵은 객체 자체를 그대로 전송
         if (customSkillsPayload) {
           payload.customSkills = customSkillsPayload;
         }
+
+        // ✅ 패치전 스킬/커스텀 시트 사용 여부
+        payload.patchBefore = !!document.getElementById('chkUsePrePatchSkills')?.checked;
+
         // ★ 특수 스킬룬(가호/지혜/왜곡) 카운트 전송
         if (specialRunesPayload) {
           const g = Number(specialRunesPayload.gaho || 0) || 0;
@@ -19057,6 +19106,9 @@ async function callComputeOnce(token) {
 
       // ✅ 백엔드에서 실제 계산에 반영할 플래그
       forceCrit100: !!dmgFlags.forceCrit100,
+
+      // ✅ 패치전 시트 사용 여부
+      patchBefore: !!document.getElementById('chkUsePrePatchSkills')?.checked,
     }),
   }).then(r => r.json());
 }
