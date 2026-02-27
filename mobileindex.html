@@ -12458,8 +12458,22 @@ payload.patchBefore = getPatchBeforeMobile();
         const resCalc = await apiJSON('calc_all', { payload, p: null });
         if (!resCalc?.ok) throw new Error(resCalc?.message || resCalc?.error || 'calc_all_failed');
 
-        // 2) (모바일) 합산스탯 패널이 없으므로 sum_stats 호출 생략
-window.state.CurrentSumStats = window.state.CurrentSumStats || {};
+        // 2) (선택) sum_stats로 세션 정리/확인
+const sum = await apiJSON('sum_stats', { wantDbg: false });
+
+if (!sum?.ok) {
+  console.warn('[MOBILE sum_stats fail]', sum);
+  // ❗sum_stats가 실패해도 다음 단계 진행은 하되, CurrentSumStats는 최소 객체로 보장
+  window.state.CurrentSumStats = window.state.CurrentSumStats || {};
+} else {
+  // ✅ 플래티넘 엠블렘 등 특정 케이스에서 sum.sum이 비어오는 경우 방어
+  if (sum.sum && typeof sum.sum === 'object') {
+    window.state.CurrentSumStats = sum.sum; // 정상
+  } else {
+    console.warn('[MOBILE sum_stats ok but missing sum.sum]', sum);
+    window.state.CurrentSumStats = window.state.CurrentSumStats || {};
+  }
+}
 
         // 3) ✅ 스킬 상태 저장 (skill_state_set)
         await saveSkillSelectionsMobile();
