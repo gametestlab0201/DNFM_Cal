@@ -1294,19 +1294,32 @@
     }
 
     .meq-row {
-      width: 100%;
-      border: 0;
-      background: var(--card2);
-      color: var(--text);
-      border-radius: 12px;
-      padding: 10px;
-      display: grid;
-      grid-template-columns: 54px 1fr;
-      gap: 10px;
-      align-items: center;
-      text-align: left;
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset;
-    }
+  width: 100%;
+  border: 0;
+  background: var(--card2);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 54px 1fr auto; /* ✅ 설명버튼 칸 추가 */
+  gap: 10px;
+  align-items: center;
+  text-align: left;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+}
+/* ✅ 아이템 설명 버튼 */
+.meq-info-btn{
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: rgba(233,238,247,0.92);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.meq-info-btn:active{ transform: translateY(1px); }
 
     .meq-thumb {
       width: 54px;
@@ -1331,31 +1344,16 @@
       line-clamp: 2;
     }
 
-    /* ✅ 2중 모달: 강화 모달은 장비 모달 위에 */
-    #equipEnhModal {
-      z-index: 1100;
-    }
+  /* ✅ 2중 모달: 강화 모달은 장비 모달 위에 */
+#equipEnhModal { z-index: 1100; }
+#equipSealUModal { z-index: 1110; }
+#equipSealNModal { z-index: 1110; }
+#equipEnchantModal { z-index: 1120; }
+#equipEmblemModal { z-index: 1130; }
+#equipGrindModal { z-index: 1108; }
 
-    #equipSealUModal {
-      z-index: 1110;
-    }
-
-    #equipSealNModal {
-      z-index: 1110;
-    }
-
-    #equipEnchantModal {
-      z-index: 1120;
-    }
-
-    #equipEmblemModal {
-      z-index: 1130;
-    }
-
-    #equipGrindModal {
-      z-index: 1108;
-    }
-
+/* ✅ (추가) 아이템/세트 설명 모달은 "항상 최상단" */
+#equipInfoModal { z-index: 2000; }
 
     /* ✅ (PC와 유사한 리스트 스타일) 강화 + 마법봉인(고유/일반) + 마법부여 공통 */
     #equipEnhModal .dialog,
@@ -1479,9 +1477,29 @@
 .m-result .label {
   font-size: 11px;
   color: var(--muted);
-
-  /* ✅ 라벨-값 간격 축소 */
   margin-bottom: 4px;
+
+  /* ✅ 왼쪽: 계산 결과 / 오른쪽 끝: 패치전 토글 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* ✅ 패치전 토글 자체를 우측에 붙이고, "텍스트 → 체크박스" 순서 유지 */
+.m-prepatch{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;              /* 혹시 모를 케이스 대비 */
+  color: var(--muted);
+  font-weight: 800;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 체크박스 기본 마진 제거(정렬 흔들림 방지) */
+.m-prepatch input{
+  margin: 0;
 }
 
 
@@ -3103,17 +3121,34 @@
       padding: 10px;
     }
 
-    /* 카드 헤더: 세트명 + 적용버튼 */
-    .armor-set-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 8px;
-      font-size: 13px;
-      font-weight: 900;
-      color: #f6e7d2;
-    }
+   /* 카드 헤더: ✅ 대표 아이콘 + 세트명 + 설명/적용 버튼 */
+.armor-set-header{
+  display: grid;
+  grid-template-columns: 1fr auto auto; /* ✅ 제목 | 설명 | 적용 */
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 900;
+  color: #f6e7d2;
+}
+
+.armor-set-thumb{
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: #0b1220;
+  border: 1px solid rgba(255,255,255,0.10);
+  display: block;
+}
+
+.armor-set-header-title{
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
     /* “세트 적용” 버튼(PC 토글 느낌) */
     .set-auto-toggle {
@@ -4204,6 +4239,25 @@
           </div>
         </div>
 
+        <!-- ✅ (추가) 아이템 설명 모달 -->
+<div id="equipInfoModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-equip-info-close></div>
+
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="equipInfoModalTitle"
+       style="width:min(720px,92vw);">
+    <header>
+      <h2 id="equipInfoModalTitle">아이템 설명</h2>
+      <button type="button" class="close" data-equip-info-close>✕</button>
+    </header>
+
+    <div class="items" style="padding:12px 12px 16px;">
+      <div id="equipInfoModalBody"
+           style="white-space:pre-wrap; line-height:1.55; font-size:13px; color:rgba(233,238,247,0.92);">
+      </div>
+    </div>
+  </div>
+</div>
+
         <section class="m-page" id="pageEquip">
           <div class="m-card">
             <div class="page-title">2 / 4</div>
@@ -4891,9 +4945,18 @@
         <button id="btnMobileCompute" class="m-calc-btn" type="button">계산하기</button>
 
         <div class="m-result">
-          <div class="label">계산 결과</div>
-          <div id="mobileFinalDamage" class="value">-</div>
-        </div>
+  <div class="label">
+  <span class="m-label-txt">계산 결과</span>
+
+  <!-- ✅ 패치전 (최우측) / 체크박스는 텍스트 우측 -->
+  <label class="m-prepatch">
+    <span>패치전</span>
+    <input id="chkUsePrePatchSkillsM" type="checkbox">
+  </label>
+</div>
+
+  <div id="mobileFinalDamage" class="value">-</div>
+</div>
       </div>
     </footer>
 
@@ -8830,55 +8893,109 @@ function makePreviewFromCurrentState() {
       if (e.target?.classList?.contains('backdrop')) closeEquipModal();
     });
 
-    function renderMobileEquipList(slot, items) {
-      const titleEl = document.getElementById('equipModalTitle');
-      if (titleEl) titleEl.textContent = `${EQUIP_SLOT_LABELS[slot] || slot} 선택`;
+    function _pickDesc_mobile(it){
+  // ✅ 다양한 시트/데이터 키를 최대한 커버
+  const raw = it?._raw || it?.raw || it || {};
+  const cand =
+    raw['설명'] ?? raw.desc ?? raw.description ??
+    raw['옵션'] ?? raw['효과'] ?? raw['세부설명'] ??
+    raw['세트설명'] ?? raw['비고'] ??
+    it?.desc ?? it?.description ?? '';
+  return String(cand ?? '').trim();
+}
 
-      const catalog = document.getElementById('equipCatalog');
-      if (!catalog) return;
-      catalog.innerHTML = '';
+function openEquipInfoModal(title, desc){
+  const m = document.getElementById('equipInfoModal');
+  if (!m) return;
+  const t = document.getElementById('equipInfoModalTitle');
+  const b = document.getElementById('equipInfoModalBody');
+  if (t) t.textContent = title || '아이템 설명';
+  if (b) b.textContent = desc || '설명이 없습니다.';
+  m.classList.add('show');
+  m.setAttribute('aria-hidden', 'false');
+}
+function closeEquipInfoModal(){
+  const m = document.getElementById('equipInfoModal');
+  if (!m) return;
+  m.classList.remove('show');
+  m.setAttribute('aria-hidden', 'true');
+}
 
-      const wrap = document.createElement('div');
-      wrap.className = 'meq-wrap';
+// ✅ 닫기 바인딩(1회)
+(function bindEquipInfoModalCloseOnce(){
+  const m = document.getElementById('equipInfoModal');
+  if (!m || m.dataset.bound) return;
+  m.dataset.bound = '1';
+  m.addEventListener('click', (e) => {
+    if (e.target?.classList?.contains('backdrop')) return closeEquipInfoModal();
+    if (e.target?.closest?.('[data-equip-info-close]')) return closeEquipInfoModal();
+  });
+})();
 
-      for (const it of items) {
-        const name = String(it?.name || '').trim();
-        if (!name) continue;
+function renderMobileEquipList(slot, items) {
+  const titleEl = document.getElementById('equipModalTitle');
+  if (titleEl) titleEl.textContent = `${EQUIP_SLOT_LABELS[slot] || slot} 선택`;
 
-        const img = _normImg(it?.image || '');
+  const catalog = document.getElementById('equipCatalog');
+  if (!catalog) return;
+  catalog.innerHTML = '';
 
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'meq-row';
-        btn.innerHTML = `
-      <img class="meq-thumb" src="${img}" alt="">
-      <div class="meq-name">${name}</div>
-    `;
+  const wrap = document.createElement('div');
+  wrap.className = 'meq-wrap';
 
-        btn.addEventListener('click', () => {
-  window.state = window.state || {};
-  window.state.equips = window.state.equips || {};
-  window.state.selections = window.state.selections || {};
+  for (const it of (items || [])) {
+    const name = String(it?.name || '').trim();
+    if (!name) continue;
 
-  // ✅ 1) CORE DB로 가능한 "풀 아이템"으로 업그레이드
-  const fullIt = _upgradeEquipByCore_(slot, it) || it;
+    const img = _normImg(it?.image || it?.img || '');
 
-  // ✅ 2) equips는 풀 객체로 저장
-  window.state.equips[slot] = fullIt;
+    // ✅ “행 전체 클릭 = 장비 선택” 버튼
+    const rowBtn = document.createElement('button');
+    rowBtn.type = 'button';
+    rowBtn.className = 'meq-row';
 
-  // ✅ 3) selections도 PC처럼 "풀 메타"로 저장
-  window.state.selections[slot] = _buildSelectionFromEquip_(fullIt);
+    // 썸네일
+    const thumb = document.createElement('img');
+    thumb.className = 'meq-thumb';
+    thumb.src = img || PLACEHOLDER_IMG;
+    thumb.alt = name;
+    thumb.onerror = () => { thumb.src = PLACEHOLDER_IMG; };
 
-  // ✅ UI 반영도 풀 객체 기준으로
-  applyPickedEquipUI(slot, fullIt);
-  closeEquipModal();
-});
+    // 이름
+    const nm = document.createElement('div');
+    nm.className = 'meq-name';
+    nm.textContent = name;
 
-        wrap.appendChild(btn);
+    // ✅ 설명 버튼 (rowBtn 안에 넣되, 클릭은 stopPropagation)
+    const infoBtn = document.createElement('button');
+    infoBtn.type = 'button';
+    infoBtn.className = 'meq-info-btn';
+    infoBtn.textContent = '설명';
+
+    infoBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation(); // ✅ 장비 선택 클릭 방지
+      const desc = _pickDesc_mobile(it);
+      openEquipInfoModal(name, desc);
+    });
+
+    rowBtn.appendChild(thumb);
+    rowBtn.appendChild(nm);
+    rowBtn.appendChild(infoBtn);
+
+    // ✅ 행 클릭 시: 기존 로직대로 “장비 선택”
+    rowBtn.addEventListener('click', () => {
+      if (typeof setEquipForSlot_mobile === 'function') {
+        setEquipForSlot_mobile(slot, it);
       }
+      closeEquipModal(); // 기존 모달 닫기
+    });
 
-      catalog.appendChild(wrap);
-    }
+    wrap.appendChild(rowBtn);
+  }
+
+  catalog.appendChild(wrap);
+}
 
     /* =========================
    ✅ 프리셋 저장 호환: selections에 "풀 메타" 저장
@@ -10768,10 +10885,21 @@ state.selections[p.slot] = _buildSelectionFromEquip_(fullIt);
         const num = toNum(r.num);
         const name = norm(r.name || r['이름'] || type);
 
-        const prev = armorSetByType.get(type);
-        if (!prev || num > prev.num) {
-          armorSetByType.set(type, { type, name, num, rarity });
-        }
+        const prev = armorSetByType.get(type) || { type, name, num: 0, rarity, desc3: '', desc5: '' };
+
+// ✅ 3세트/5세트 설명 각각 저장
+const desc = (typeof _pickDesc_mobile === 'function') ? _pickDesc_mobile(r) : '';
+if (num === 3) prev.desc3 = desc;
+if (num === 5) prev.desc5 = desc;
+
+// ✅ 대표 표시용(name/rarity/num)은 기존처럼 가장 큰 num 기준
+if (!prev.num || num > prev.num) {
+  prev.num = num;
+  prev.name = name;
+  prev.rarity = rarity;
+}
+
+armorSetByType.set(type, prev);
       }
 
 
@@ -10871,12 +10999,14 @@ state.selections[p.slot] = _buildSelectionFromEquip_(fullIt);
         }
 
         cards.push({
-          id: typeKey,
-          type: typeKey,
-          name: info.name,
-          num: info.num,
-          pieces,
-        });
+  id: typeKey,
+  type: typeKey,
+  name: info.name,
+  num: info.num,
+  desc3: info.desc3 || '',
+  desc5: info.desc5 || '',
+  pieces,
+});
       });
 
       // 보기 좋게 세트 이름 순 정렬
@@ -10932,9 +11062,10 @@ state.selections[p.slot] = _buildSelectionFromEquip_(fullIt);
         const name = norm(r.name || r['이름'] || type);
 
         const prev = accSetByType.get(type);
-        if (!prev || num > prev.num) {
-          accSetByType.set(type, { type, name, num, rarity });
-        }
+if (!prev || num > prev.num) {
+  const desc = (typeof _pickDesc_mobile === 'function') ? _pickDesc_mobile(r) : String(r?.desc || '').trim();
+  accSetByType.set(type, { type, name, num, rarity, desc });
+}
       }
 
       if (!accSetByType.size) return [];
@@ -11028,12 +11159,13 @@ state.selections[p.slot] = _buildSelectionFromEquip_(fullIt);
         }
 
         cards.push({
-          id: typeKey,
-          type: typeKey,
-          name: info.name,
-          num: info.num,
-          pieces,
-        });
+  id: typeKey,
+  type: typeKey,
+  name: info.name,
+  num: info.num,
+  desc: info.desc || '',
+  pieces,
+});
       });
 
       // 시트 순서 유지 (정렬 안 함)
@@ -11091,9 +11223,10 @@ state.selections[p.slot] = _buildSelectionFromEquip_(fullIt);
         const name = norm(r.name || r['이름'] || type);
 
         const prev = specSetByType.get(type);
-        if (!prev || num > prev.num) {
-          specSetByType.set(type, { type, name, num, rarity });
-        }
+if (!prev || num > prev.num) {
+  const desc = (typeof _pickDesc_mobile === 'function') ? _pickDesc_mobile(r) : String(r?.desc || '').trim();
+  specSetByType.set(type, { type, name, num, rarity, desc });
+}
       }
 
       if (!specSetByType.size) return [];
@@ -11188,12 +11321,13 @@ state.selections[p.slot] = _buildSelectionFromEquip_(fullIt);
         }
 
         cards.push({
-          id: typeKey,
-          type: typeKey,
-          name: info.name,
-          num: info.num,
-          pieces,
-        });
+  id: typeKey,
+  type: typeKey,
+  name: info.name,
+  num: info.num,
+  desc: info.desc || '',
+  pieces,
+});
       });
 
       window._debugSpecSets = cards;
@@ -11679,22 +11813,51 @@ function updateUniqueEffectDescriptionsMobile(rootEl) {
 
         // header
         const header = document.createElement('div');
-        header.className = 'armor-set-header';
+header.className = 'armor-set-header';
 
-        const titleSpan = document.createElement('span');
-        titleSpan.textContent = s?.name || '(세트)';
-        header.appendChild(titleSpan);
+// ✅ 세트명
+const titleSpan = document.createElement('span');
+titleSpan.className = 'armor-set-header-title';
+titleSpan.textContent = s?.name || '(세트)';
+header.appendChild(titleSpan);
 
-        const applyBtn = document.createElement('button');
-        applyBtn.type = 'button';
-        applyBtn.className = 'set-auto-toggle';
-        applyBtn.textContent = '세트 적용';
-        applyBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          applyAndClose(s);
-        });
-        header.appendChild(applyBtn);
+// ✅ 설명 버튼 (아이템 썸네일 우측 위치)
+const infoBtn = document.createElement('button');
+infoBtn.type = 'button';
+infoBtn.className = 'meq-info-btn';
+infoBtn.textContent = '설명';
+infoBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
 
+  // 1) 방어구(3/5세트): desc3/desc5 우선
+  const d3 = String(s?.desc3 || '').trim();
+  const d5 = String(s?.desc5 || '').trim();
+  const merged =
+    (d3 ? `【3세트】\n${d3}` : '') +
+    (d3 && d5 ? '\n\n' : '') +
+    (d5 ? `【5세트】\n${d5}` : '');
+
+  // 2) 악세/특수: 카드의 desc 사용(없으면 _pickDesc_mobile로 fallback)
+  const fallbackDesc = (typeof _pickDesc_mobile === 'function')
+    ? _pickDesc_mobile(s)
+    : String(s?.desc || '').trim();
+
+  const finalDesc = merged.trim() || fallbackDesc || '설명이 없습니다.';
+  openEquipInfoModal(String(s?.name || '세트 설명'), finalDesc);
+});
+header.appendChild(infoBtn);
+
+// ✅ 세트 적용 버튼
+const applyBtn = document.createElement('button');
+applyBtn.type = 'button';
+applyBtn.className = 'set-auto-toggle';
+applyBtn.textContent = '세트 적용';
+applyBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  applyAndClose(s);
+});
+header.appendChild(applyBtn);
         card.appendChild(header);
 
         // items
@@ -11972,7 +12135,11 @@ document.getElementById('pageEquip')?.addEventListener('click', async (e) => {
       }
 
       // ✅ 핵심: byName이 아니라 skills 배열로 보낸다 (PC 동일)
-      const res = await apiJSON('skill_state_set', { ownerKey, skills });
+      const patchBefore = getPatchBeforeMobile();
+window.state = window.state || {};
+window.state.patchBefore = patchBefore; // state에도 캐시
+
+const res = await apiJSON('skill_state_set', { ownerKey, skills, patchBefore });
       if (!res?.ok) throw new Error(res?.message || res?.error || 'skill_state_set_failed');
       return res;
     }
@@ -12247,8 +12414,20 @@ document.getElementById('pageEquip')?.addEventListener('click', async (e) => {
   payload.windshearCycleCount = cycle;
   payload.wsCycleCount = cycle; // 호환용
 }
+payload.patchBefore = getPatchBeforeMobile();
       return payload;
     }
+
+    function getPatchBeforeMobile() {
+  const s = window.state || {};
+  const el = document.getElementById('chkUsePrePatchSkillsM');
+
+  // 1) UI 체크박스가 있으면 그 값을 최우선
+  if (el) return !!el.checked;
+
+  // 2) 혹시 저장된 state가 있으면 그걸 사용(프리셋/복구 대비)
+  return (s.patchBefore === true) || (String(s.patchBefore || '') === '1');
+}
 
     // (디버그) 현재 스냅샷을 콘솔에서 바로 확인하고 싶을 때
     window.__buildCalcAllPayloadMobile = buildCalcAllPayloadMobile;
@@ -12279,22 +12458,8 @@ document.getElementById('pageEquip')?.addEventListener('click', async (e) => {
         const resCalc = await apiJSON('calc_all', { payload, p: null });
         if (!resCalc?.ok) throw new Error(resCalc?.message || resCalc?.error || 'calc_all_failed');
 
-        // 2) (선택) sum_stats로 세션 정리/확인
-        const sum = await apiJSON('sum_stats', { wantDbg: false });
-
-        if (!sum?.ok) {
-          console.warn('[MOBILE sum_stats fail]', sum);
-          // ❗sum_stats가 실패해도 다음 단계 진행은 하되, CurrentSumStats는 최소 객체로 보장
-          window.state.CurrentSumStats = window.state.CurrentSumStats || {};
-        } else {
-          // ✅ 플래티넘 엠블렘 등 특정 케이스에서 sum.sum이 비어오는 경우 방어
-          if (sum.sum && typeof sum.sum === 'object') {
-            window.state.CurrentSumStats = sum.sum; // 정상
-          } else {
-            console.warn('[MOBILE sum_stats ok but missing sum.sum]', sum);
-            window.state.CurrentSumStats = window.state.CurrentSumStats || {};
-          }
-        }
+        // 2) (모바일) 합산스탯 패널이 없으므로 sum_stats 호출 생략
+window.state.CurrentSumStats = window.state.CurrentSumStats || {};
 
         // 3) ✅ 스킬 상태 저장 (skill_state_set)
         await saveSkillSelectionsMobile();
