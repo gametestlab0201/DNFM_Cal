@@ -5023,45 +5023,6 @@
     </div>
   </div>
 
-    <!-- ✅ 공지/안내사항 모달 -->
-  <div id="noticeModal" class="modal" aria-hidden="true">
-    <div class="backdrop" data-notice-close></div>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="noticeTitle">
-      <header>
-        <h2 id="noticeTitle">안내사항</h2>
-        <button type="button" class="close" data-notice-close>닫기</button>
-      </header>
-
-      <div class="contact-body">
-        <div class="contact-notice" id="noticeBody" data-static="1">
-          
-          <strong style="font-size:18px;">[데미지 감소 관련 공지]</strong>
-          
-          <br><br><br>안녕하세요 게임실험연구소 입니다.<br><br>
-            
-            02월 19일자 몬스터 방어력 조정 패치 진행시, 카운터 데미지 계산이 비정상적으로 증가, 적용되는 버그가 발생하였습니다. 02월 27일자로 버그가 픽스되면서, 현재 계산값이 해당 기간내 계산하신 데미지보다 감소하게 되었는데, 이는 정상 데미지계산값 입니다.<br><br>
-            
-            버그 픽스가 늦어지게 된 점 진심으로 죄송하다는 말씀 올립니다.<br><br>
-
-            착용하고 있는 장비와는 관련없이 모든 상황에서 카운터 데미지 계산이 비정상적으로 증가되었기에, 장비간 데미지 차이 비율은 변동이 없습니다. 다시는 이런일이 발생하지 않도록 만전을 기하도록 하겠습니다.<br><br>
-            
-            더불어 현재 만크리, 투함포 옵션을 테스트 중입니다.<br>
-            조만간 실제 인게임에서 측정할 수 있는 크적카백투 거대누골 데미지값과 동일한 데미지값을 계산해 보실 수 있으니, 조금만 기다려주시면 감사하겠습니다.<br><br>
-
-            더욱 노력하는 게임실험연구소가 되겠습니다.<br><br>
-
-            감사합니다.<br><br><br>
-            - 게임실험연구소장 드림 -
-           
-        
-        </div>
-
-        <div class="contact-actions">
-          <button type="button" class="ui-btnetc" data-notice-close>확인</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- ✅ 스킬룬 설정 모달 (모바일) -->
   <div id="runeModalM" class="modal" aria-hidden="true">
@@ -6239,7 +6200,6 @@ function _getCharMainImage(c) {
 
     ensurePage3Init();
     ensurePage4Init();
-    showNoticeOnce_mobile(); // ✅ 로딩 끝나면 공지 자동 오픈
 
   } catch (e) {
     console.error(e);
@@ -8655,72 +8615,6 @@ function makePreviewFromCurrentState() {
 }
 
         // ===== 문의하기 / Q&A =====
-        // ===== 공지/안내사항 =====
-function _getNoticeItems_mobile() {
-  // ✅ PC처럼 "경량 리스트(CORE.lists)" 기반을 최우선으로 사용
-  // - 어떤 키로 올지 몰라서 후보를 여러 개 둠(없으면 빈 배열)
-  const L = (window.CORE && CORE.lists) ? CORE.lists : (window.CORE_DATA || {});
-  const cand =
-    L?.['notice:list'] ||
-    L?.['공지:list'] ||
-    L?.['announcement:list'] ||
-    L?.['announce:list'] ||
-    L?.['notice'] ||
-    [];
-  return Array.isArray(cand) ? cand : (cand ? [cand] : []);
-}
-
-function _renderNotice_mobile() {
-  const box = document.getElementById('noticeBody');
-  if (!box) return;
-
-   // ✅ (추가) HTML에 직접 공지 넣는 모드면 JS 렌더링 하지 않음
-  if (box.dataset.static === '1') return;
-
-  const items = _getNoticeItems_mobile();
-  if (!items.length) {
-    box.textContent = '등록된 공지사항이 없습니다.';
-    return;
-  }
-
-  // 문자열/객체 혼용 방어
-  const lines = [];
-  for (const it of items) {
-    if (typeof it === 'string') {
-      const t = it.trim();
-      if (t) lines.push(t);
-      continue;
-    }
-    // 흔한 필드명 방어
-    const title = String(it?.title || it?.t || it?.제목 || '').trim();
-    const body  = String(it?.body  || it?.text || it?.내용 || it?.desc || '').trim();
-
-    if (title && body) lines.push(`• ${title}\n${body}`);
-    else if (title) lines.push(`• ${title}`);
-    else if (body) lines.push(body);
-  }
-
-  // 줄바꿈 유지 렌더 (contact-notice는 <br/>로도 무방하지만 여기선 안전하게 text로)
-  box.textContent = lines.join('\n\n');
-}
-
-function openNoticeModal_mobile() {
-  _renderNotice_mobile();
-  openModal('noticeModal');
-}
-
-function showNoticeOnce_mobile() {
-  // ✅ “페이지 최초 로딩 후 1회만”
-  if (window.__noticeShown_mobile) return;
-  window.__noticeShown_mobile = true;
-
-  // DOM/레이아웃 안정화 후 오픈 (첫 클릭 2번 문제 같은 레이스 방지용)
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      openNoticeModal_mobile();
-    });
-  });
-}
     function openContactModal() {
       openModal('contactModal');
       const ta = document.getElementById('contactTalk');
@@ -8863,13 +8757,6 @@ function showNoticeOnce_mobile() {
     document.getElementById('faqAnswerModal')?.addEventListener('click', (e) => {
       if (e.target?.classList?.contains('backdrop')) closeModal('faqAnswerModal');
     });
-
-    document.querySelectorAll('[data-notice-close]').forEach(el => {
-  el.addEventListener('click', () => closeModal('noticeModal'));
-});
-document.getElementById('noticeModal')?.addEventListener('click', (e) => {
-  if (e.target?.classList?.contains('backdrop')) closeModal('noticeModal');
-});
 
 
     // ===== Equip Picker =====
@@ -9096,13 +8983,40 @@ function renderMobileEquipList(slot, items) {
     rowBtn.appendChild(nm);
     rowBtn.appendChild(infoBtn);
 
-    // ✅ 행 클릭 시: 기존 로직대로 “장비 선택”
-    rowBtn.addEventListener('click', () => {
-      if (typeof setEquipForSlot_mobile === 'function') {
-        setEquipForSlot_mobile(slot, it);
-      }
-      closeEquipModal(); // 기존 모달 닫기
-    });
+    // ✅ 행 클릭 시: “선택 적용 + UI 반영 + 모달 닫기”를 여기서 확정 처리
+rowBtn.addEventListener('click', () => {
+  window.state = window.state || {};
+  window.state.equips = window.state.equips || {};
+  window.state.selections = window.state.selections || {};
+
+  // 1) 가능하면 CORE DB 기준으로 “풀 아이템”으로 업그레이드
+  const fullIt =
+    (typeof _upgradeEquipByCore_ === 'function')
+      ? (_upgradeEquipByCore_(slot, it) || it)
+      : it;
+
+  // 2) equips / selections 저장
+  window.state.equips[slot] = fullIt;
+
+  if (typeof _buildSelectionFromEquip_ === 'function') {
+    window.state.selections[slot] = _buildSelectionFromEquip_(fullIt);
+  } else {
+    // 보험: 최소 메타라도 저장
+    window.state.selections[slot] = {
+      name: String(fullIt?.name || '').trim(),
+      code: String(fullIt?.code ?? fullIt?.Code ?? fullIt?.itemCode ?? fullIt?.key ?? fullIt?.id ?? '').trim() || null,
+      img: String(fullIt?.image || fullIt?.img || fullIt?.thumb || fullIt?.icon || fullIt?.['이미지'] || '').trim() || null,
+    };
+  }
+
+  // 3) 메인 UI 반영
+  if (typeof applyPickedEquipUI === 'function') {
+    applyPickedEquipUI(slot, fullIt);
+  }
+
+  // 4) 모달 닫기
+  closeEquipModal();
+});
 
     wrap.appendChild(rowBtn);
   }
@@ -12571,22 +12485,8 @@ payload.patchBefore = getPatchBeforeMobile();
         const resCalc = await apiJSON('calc_all', { payload, p: null });
         if (!resCalc?.ok) throw new Error(resCalc?.message || resCalc?.error || 'calc_all_failed');
 
-        // 2) (선택) sum_stats로 세션 정리/확인
-const sum = await apiJSON('sum_stats', { wantDbg: false });
-
-if (!sum?.ok) {
-  console.warn('[MOBILE sum_stats fail]', sum);
-  // ❗sum_stats가 실패해도 다음 단계 진행은 하되, CurrentSumStats는 최소 객체로 보장
-  window.state.CurrentSumStats = window.state.CurrentSumStats || {};
-} else {
-  // ✅ 플래티넘 엠블렘 등 특정 케이스에서 sum.sum이 비어오는 경우 방어
-  if (sum.sum && typeof sum.sum === 'object') {
-    window.state.CurrentSumStats = sum.sum; // 정상
-  } else {
-    console.warn('[MOBILE sum_stats ok but missing sum.sum]', sum);
-    window.state.CurrentSumStats = window.state.CurrentSumStats || {};
-  }
-}
+        // 2) (모바일) 합산스탯 패널이 없으므로 sum_stats 호출 생략
+window.state.CurrentSumStats = window.state.CurrentSumStats || {};
 
         // 3) ✅ 스킬 상태 저장 (skill_state_set)
         await saveSkillSelectionsMobile();
