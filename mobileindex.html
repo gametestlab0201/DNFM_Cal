@@ -1522,6 +1522,35 @@
       font-variant-numeric: tabular-nums;
     }
 
+    /* ✅ 왼쪽(계산 결과) ↔ 오른쪽(옵션/패치전) 분리 */
+.m-label-spacer{
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ✅ 크리/투함포 옵션 묶음 */
+.m-special-opt{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  flex: 0 0 auto;
+}
+
+.m-special-chk{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+  color: rgba(233,238,247,0.85);
+  user-select:none;
+  white-space:nowrap;
+}
+
+.m-special-chk input[type="checkbox"]{
+  margin:0;
+  width:14px;
+  height:14px;
+}
 
     /* ====== Toast ====== */
     .toast {
@@ -4946,14 +4975,29 @@
 
         <div class="m-result">
   <div class="label">
-  <span class="m-label-txt">계산 결과</span>
+    <span class="m-label-txt">계산 결과</span>
 
-  <!-- ✅ 패치전 (최우측) / 체크박스는 텍스트 우측 -->
-  <label class="m-prepatch">
-    <span>패치전</span>
-    <input id="chkUsePrePatchSkillsM" type="checkbox">
-  </label>
-</div>
+    <!-- ✅ 왼쪽 텍스트 ↔ 오른쪽 옵션/패치전을 분리하기 위한 스페이서 -->
+    <span class="m-label-spacer"></span>
+
+    <!-- ✅ (추가) 크리티컬 / 투함포 -->
+    <span class="m-special-opt">
+      <label class="m-special-chk">
+        <input id="chkForceCrit100M" type="checkbox">
+        <span>크리티컬</span>
+      </label>
+      <label class="m-special-chk">
+        <input id="chkTohampo12M" type="checkbox">
+        <span>투함포</span>
+      </label>
+    </span>
+
+    <!-- ✅ 패치전 (최우측) -->
+    <label class="m-prepatch">
+      <span>패치전</span>
+      <input id="chkUsePrePatchSkillsM" type="checkbox">
+    </label>
+  </div>
 
   <div id="mobileFinalDamage" class="value">-</div>
 </div>
@@ -12569,6 +12613,12 @@ payload.patchBefore = getPatchBeforeMobile();
   return (s.patchBefore === true) || (String(s.patchBefore || '') === '1');
 }
 
+function getSpecialDamageFlagsMobile() {
+  const forceCrit100 = !!document.getElementById('chkForceCrit100M')?.checked;
+  const tohampo12 = !!document.getElementById('chkTohampo12M')?.checked;
+  return { forceCrit100, tohampo12 };
+}
+
     // (디버그) 현재 스냅샷을 콘솔에서 바로 확인하고 싶을 때
     window.__buildCalcAllPayloadMobile = buildCalcAllPayloadMobile;
 
@@ -12629,16 +12679,19 @@ if (!sum?.ok) {
 //    (PC프리셋에서 넘어온 s.monster 객체가 남아 있으면 변경이 무시되는 문제 방지)
 const monster = (s.monsterName ? { name: String(s.monsterName).trim() } : (s.monster || null));
 
-        const resCompute = await apiJSON('compute', {
-          p: null,
-          window: timeKey,
-          monster,
-        });
+        const { forceCrit100, tohampo12 } = getSpecialDamageFlagsMobile();
 
-        if (!resCompute?.ok) throw new Error(resCompute?.message || resCompute?.error || 'compute_failed');
+const resCompute = await apiJSON('compute', {
+  p: null,
+  window: timeKey,
+  monster,
+  forceCrit100,     // ✅ (추가) 만크리 강제
+  tohampo12,         // ✅ 투함포는 백엔드에서 물공/마공%로 처리
+});
 
-        const total = Number(resCompute.total || 0);
-        document.getElementById('mobileFinalDamage').textContent = Math.floor(total).toLocaleString();
+let total = Number(resCompute.total || 0);
+
+document.getElementById('mobileFinalDamage').textContent = Math.floor(total).toLocaleString();
 
         toast('계산 완료!');
         console.log('[MOBILE calc_all payload]', payload);

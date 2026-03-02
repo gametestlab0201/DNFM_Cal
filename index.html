@@ -2367,6 +2367,48 @@
       gap: 10px;
     }
 
+/* ✅ 최종데미지 라벨 줄: 왼쪽(텍스트+i) / 오른쪽(크리/투함포) 양끝 정렬 */
+.final-damage .label-with-tip{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+/* 왼쪽 묶음(텍스트+i) */
+.final-damage .fd-label-left{
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* 오른쪽 체크박스 묶음: 우측으로 밀착 */
+.final-damage .special-dmg-opt-inline{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;   /* ✅ 핵심 */
+  flex-shrink: 0;
+}
+
+.final-damage .special-dmg-opt-item{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.final-damage .special-dmg-opt-item input[type="checkbox"]{
+  margin: 0;
+  width: 14px;
+  height: 14px;
+}
+
     .prepatch-inline-toggle {
       display: inline-flex;
       align-items: center;
@@ -5080,12 +5122,12 @@
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-                  <li>02.25 합산스탯 물리/마법 공격력 변수 표기 오류 수정 </li>
                   <li>02.26 <span style="color: greenyellow;">[PC]</span> 밸런스 패치 적용 및 패치전 계산 기능 추가</li>
                   <li>02.27 <span style="color: greenyellow;">[PC]</span> 스킬 초기화 버튼 추가</li>
                   <li>02.27 <strong><u>비정상적인 카운터 데미지 버그 수정(공지참고)</u></strong></li>
                   <li>02.28 <span style="color: greenyellow;">[모바일]</span> 개별, 세트 아이템 상세 설명 추가<br>
                         　　　<span style="color: greenyellow;">[모바일]</span> 밸런스 패치전 계산 기능 추가</li>
+                  <li>03.02 수련장 크리티컬, 투함포 옵션 추가 </li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -5229,19 +5271,6 @@
           <!-- ✅ 왼쪽: 테스트 전용 버튼들 (방어구 / 악세사리) -->
           <div class="center-special-col">
             <!-- ✅ SPECIAL_USER 전용: 강제 계산 옵션 -->
-
-            <div id="specialDamageOptRow" class="special-dmg-opt-row" style="display:none; margin-bottom:8px;">
-              <label
-                style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; margin-bottom:4px;">
-                <input type="checkbox" id="chkForceCrit100">
-                크리티컬 100%
-              </label>
-              <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;">
-                <input type="checkbox" id="chkTohampo12">
-                투함포 (+12%)
-              </label>
-            </div>
-
             <!-- ✅ SPECIAL_USER 전용: 스킬별 데미지 보기 -->
             <button id="btnSkillDamageViewer" class="btn btn-special-patch" type="button" style="display:none;">
               데미지 보기
@@ -5585,16 +5614,29 @@
           </div>
         </div>
         <div class="final-damage">
-          <span class="label label-with-tip">
-            최종데미지
-            <span class="info-tip" tabindex="0" aria-label="최종 데미지 설명">
-              i
-              <span class="info-tip-content">
-                현재 선택한 모든 효과를 합산하여 총 데미지를 계산합니다.<br>
-                좌측과 우측의 계산하기는 따로 동작이 가능하며, 데미지를 비교해보실 수 있습니다.
-              </span>
-            </span>
-          </span>
+       <span class="label label-with-tip">
+  <span class="fd-label-left">
+    최종데미지
+    <span class="info-tip" tabindex="0" aria-label="최종 데미지 설명">
+      i
+      <span class="info-tip-content">
+        현재 선택한 모든 효과를 합산하여 총 데미지를 계산합니다.<br>
+        좌측과 우측의 계산하기는 따로 동작이 가능하며, 데미지를 비교해보실 수 있습니다.
+      </span>
+    </span>
+  </span>
+
+  <span id="specialDamageOptRow" class="special-dmg-opt-inline">
+    <label class="special-dmg-opt-item">
+      <input type="checkbox" id="chkForceCrit100">
+      크리티컬
+    </label>
+    <label class="special-dmg-opt-item">
+      <input type="checkbox" id="chkTohampo12">
+      투함포
+    </label>
+  </span>
+</span>
           <strong class="value" id="finalDamageValue2">&nbsp;</strong>
           <button id="btn-sum-all-final2" type="button">계산하기</button>
         </div>
@@ -6443,7 +6485,7 @@
             2026년에는 <strong><u>보다 더 정확하고 편리한 계산 환경</u></strong>을 위해 꾸준히 업데이트를 이어가겠습니다.<br>
             올 한 해도 게임실험연구소 계산기와 함께, 효율적인 템세팅 해보시길 바랍니다.<br><br>
           
-          <li>
+          <!--<li>
                <span style="color: yellow;">'10레벨 스킬 공격력 증가'</span> 옵션이 <strong style="color: #ff4444;">평타 데미지에도 영향을 미치는 버그</strong>를 발견하였습니다.<br> 
             </li>
             <li>
@@ -6484,6 +6526,7 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
+          <li>26.03.02 수련장 <span style="color: yellow;">크리티컬, 투함포 옵션</span> <span style="color: #ff4444;"> 추가</span></li>
           <li>26.02.28 [모바일] <span style="color: yellow;">개별, 세트 아이템</span> <span style="color: #ff4444;">상세 설명 추가</span></li>
           <li>26.02.28 [모바일] 밸런스 <span style="color: yellow;">패치전 계산</span><span style="color: #ff4444;"> 기능 추가</span></li>
           <li>26.02.27 <strong><u>비정상적인 카운터 데미지 버그 수정(공지참고)</u></strong></li>
@@ -7073,7 +7116,8 @@
       const rowUnique = document.getElementById('uniqueOnOffRow');
 
       if (btnSkillDamage) btnSkillDamage.style.display = isSpecialUser ? 'inline-flex' : 'none';
-      if (rowDmgOpt) rowDmgOpt.style.display = isSpecialUser ? 'block' : 'none';   // ✅ 추가
+      // ✅ 크리100/투함포 체크박스는 전체 공개
+if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
       if (btnAutoSet) btnAutoSet.style.display = isSpecialUser ? 'inline-flex' : 'none';
       if (btnAutoSetMissing) btnAutoSetMissing.style.display = isSpecialUser ? 'inline-flex' : 'none';
       if (btnAutoWeapon) btnAutoWeapon.style.display = isSpecialUser ? 'inline-flex' : 'none';
@@ -14882,8 +14926,8 @@
 
       const mainStatLabel = label('힘', '지능', '힘/지능');
       const mainStatVal = pick(
-        S.str * (1 + strPct),
-        S.int * (1 + intPct)
+        S.str * (1 + strPct/100),
+        S.int * (1 + intPct/100)
       );
 
       const mainPctLabel = label('힘(%)', '지능(%)', '힘/지능(%)');
@@ -19365,6 +19409,7 @@
 
               // ✅ 백엔드에서 실제 계산에 반영할 플래그
               forceCrit100: !!dmgFlags.forceCrit100,
+              tohampo12: !!dmgFlags.tohampo12,   // ✅ 추가
 
               // ✅ 패치전 시트 사용 여부
               patchBefore: !!document.getElementById('chkUsePrePatchSkills')?.checked,
@@ -19421,11 +19466,11 @@
           ? 1
           : _calcCritForceRatioFromCoeffs(coeffsForAdj, powerHint, dmgFlags.forceCrit100);
 
-        // ✅ 투함포(+12%)는 계속 프론트 보정
-        const tohampoRatio = dmgFlags.tohampo12 ? 1.12 : 1.0;
+        // ✅ 투함포(+12%)는 백엔드에서 처리
+        const finalTotal = rawTotal * critForceRatio;          // ✅ 투함포는 백엔드 처리
 
-        // ✅ 최종 표시값
-        const total = rawTotal * critForceRatio * tohampoRatio;
+        // ✅ 최종 표시값(= 실제 표시/저장용)
+        const total = finalTotal;
 
         // ✅ 스킬별 데미지 보기용 캐시 저장 (SPECIAL_USER 버튼에서 사용)
         state.lastComputeBreakdown = Array.isArray(resCompute.breakdown) ? resCompute.breakdown : [];
@@ -19436,7 +19481,7 @@
           total,          // ✅ 보정 후 최종값
           rawTotal,       // ✅ 원본 백엔드 최종값(디버깅용)
           critForceRatio, // ✅ 모달에서도 동일 계산에 사용
-          tohampoRatio,   // ✅ 모달에서도 동일 계산에 사용
+          tohampoRatio: 1,   // ✅ 모달에서도 동일 계산에 사용
           forceCrit100: !!dmgFlags.forceCrit100,
           tohampo12: !!dmgFlags.tohampo12,
 
@@ -20060,8 +20105,8 @@
       // 일반(직접딜) 백어택 계수
       const backAtkMul = isDisaster ? 1.0 : 1.1;
 
-      // 공통 후단 계수: 카운터 * 최종증뎀 * 방깎증뎀
-      const commonPostMul = 1.3 * (1 + finalDmgUp) * (1 + defBreak) * (tohampo12 ? 1.12 : 1);
+      // 공통 후단 계수: 최종증뎀 * 방깎증뎀
+      const commonPostMul =(1 + finalDmgUp) * (1 + defBreak);
 
       // 공통 전단 계수: 모든타입피해
       const allTypeMul = (1 + allTypeDmg);
