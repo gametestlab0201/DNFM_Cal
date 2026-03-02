@@ -19088,9 +19088,15 @@ if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
       document.getElementById('presetPageNext')?.addEventListener('click', () => setPresetPage(presetPage + 1));
 
       applyPresetPageToDom();
-      // 페이지 로딩 시 서버에 있는 프리셋 메타 동기화
-      refreshPresetSlotsFromServer();
-    })();
+// 페이지 로딩 시 서버에 있는 프리셋 메타 동기화
+refreshPresetSlotsFromServer();
+
+// ✅ (추가) 로그인 토큰이 늦게 발급되면 그 순간 저장슬롯 목록을 다시 동기화
+document.addEventListener('gsi:issued', () => {
+  refreshPresetSlotsFromServer();
+});
+
+})();
 
 
 
