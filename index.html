@@ -1365,12 +1365,32 @@
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) inset, 0 1px 0 rgba(255, 255, 255, 0.04);
     }
 
-    /* :는 의사클래스, hover는 마우스를 위에 올린 상태를 뜻함. 따라서 slot 클래스에 마우스를 올리면 이라는 뜻
-// 그외에도 active : 클릭한 순간(마우스 버튼 누르고 있을때), focus : 입력창 클릭했을때, visited : 방문한 링크, link : 방문하지 않은 링크
-// first-child : 부모 안에서 첫번째 자식, last-child : 부모 안에서 마지막 자식, ntn-child(n) : 부모 안에서 n번째 자식
-//checked : 체크박스나 라디오버튼에 체크된상태, valid, invalid : 입력값이 유효성 검사에 맞거나 아닐때
-//root : 문서 최상위 요소 */
-    .slot:hover {
+.slot .item-img-wrap {
+  position: relative;
+  width: 70%;
+  height: 70%;
+}
+
+.slot .item-main-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.slot .item-set-badge { /* 메인슬롯 배지 */
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  width: 29px;
+  height: 29px;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 1;   /* ✅ 마법봉인 캡션보다 아래 */
+}
+
+.slot:hover {
       transform: translateY(-2px);
       border-color: rgba(110, 168, 255, 0.5);
       box-shadow: 0 0 0 4px var(--ring), 0 10px 24px rgba(0, 0, 0, 0.35) inset;
@@ -1833,6 +1853,43 @@
       height: 100%;
       object-fit: cover
     }
+
+    .iconbox .set-badge-icon {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 배지별 미세 위치 보정 메인슬롯 item-set, 모달 set-badge*/
+.item-set-badge.badge-bithall{
+  left: -2px;   /* 기본 2px → 조금 더 오른쪽 */
+    width: 32px;
+  height: 32px;
+}
+
+.set-badge-icon.badge-bithall {
+  left: -2px;   /* 기본 2px → 조금 더 오른쪽 */
+  bottom: -2px; /* 기본 2px → 조금 더 아래 */
+    width: 30px;
+  height: 30px;
+}
+
+.item-set-badge.badge-tower{
+  bottom: -4px; /* 기본 2px → 조금 더 아래 */
+  width: 32px;
+  height: 32px;
+}
+
+.set-badge-icon.badge-tower {
+  bottom: -4px; /* 기본 2px → 조금 더 아래 */
+  width: 30px;
+  height: 30px;
+}
 
     .badge-lv {
       position: absolute;
@@ -3885,16 +3942,15 @@
 
     /* === Seal text captions inside slots === */
     .seal-captions {
-      position: absolute;
-      left: 6px;
-      bottom: 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      /* 행 간격 2px */
-      pointer-events: none;
-      /* 비클릭 */
-    }
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  z-index: 3;   /* ✅ 배지보다 위 */
+}
 
     .seal-captions .seal-row {
       display: flex;
@@ -5122,12 +5178,12 @@
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-                  <li>02.27 <strong><u>비정상적인 카운터 데미지 버그 수정(공지참고)</u></strong></li>
                   <li>02.28 <span style="color: greenyellow;">[모바일]</span> 개별, 세트 아이템 상세 설명 추가<br>
                         　　　<span style="color: greenyellow;">[모바일]</span> 밸런스 패치전 계산 기능 추가</li>
                   <li>03.02 수련장 크리티컬, 투함포 옵션 추가 </li>
                   <li>03.05 빙결사 헤일스톰 미적용 버그 수정 </li>
                   <li>03.06 남스핏파이어 라스트 슈팅 추가 </li>
+                  <li>03.08 접두사 장비 배지 아이콘 추가 </li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -6528,6 +6584,7 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
+          <li>26.03.08 <span style="color: yellow;">접두사 장비</span><span style="color: #ff4444;"> 배지 아이콘</span> 추가</li>
           <li>26.03.06 <span style="color: yellow;">남스핏파이어</span> <span style="color: #ff4444;"> 라스트 슈팅</span> 추가</li>
           <li>26.03.05 <span style="color: yellow;">빙결사</span> <span style="color: #ff4444;"> 헤일스톰 미적용 버그</span> 수정</li>
           <li>26.03.02 수련장 <span style="color: yellow;">크리티컬, 투함포 옵션</span> <span style="color: #ff4444;"> 추가</span></li>
@@ -8079,21 +8136,29 @@ if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
           btn.title = piece.name || '';
 
           const box = document.createElement('div');
-          box.className = 'iconbox';
+box.className = 'iconbox';
 
-          const img = document.createElement('img');
-          img.className = 'icon';
-          img.src = piece.img || PLACEHOLDER_IMG;
-          img.alt = piece.name || piece.slot || '';
+const img = document.createElement('img');
+img.className = 'icon';
+img.src = piece.img || PLACEHOLDER_IMG;
+img.alt = piece.name || piece.slot || '';
 
-          const badge = document.createElement('div');
-          badge.className = 'badge-lv';
-          badge.textContent = piece.level ? `Lv.${piece.level}` : '';
+const setBadgeSrc = getSetBadgeSrc(piece.item || piece, piece.slot || '');
 
-          box.appendChild(img);
-          if (badge.textContent) box.appendChild(badge);
-          btn.appendChild(box);
-          itemsRow.appendChild(btn);
+const setBadgeImg = document.createElement('img');
+setBadgeImg.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
+setBadgeImg.src = setBadgeSrc || '';
+setBadgeImg.alt = '';
+
+const badge = document.createElement('div');
+badge.className = 'badge-lv';
+badge.textContent = piece.level ? `Lv.${piece.level}` : '';
+
+box.appendChild(img);
+if (setBadgeSrc) box.appendChild(setBadgeImg);
+if (badge.textContent) box.appendChild(badge);
+btn.appendChild(box);
+itemsRow.appendChild(btn);
         });
 
         card.appendChild(itemsRow);
@@ -8208,21 +8273,29 @@ if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
           btn.title = piece.name || '';
 
           const box = document.createElement('div');
-          box.className = 'iconbox';
+box.className = 'iconbox';
 
-          const img = document.createElement('img');
-          img.className = 'icon';
-          img.src = piece.img || PLACEHOLDER_IMG;
-          img.alt = piece.name || piece.slot || '';
+const img = document.createElement('img');
+img.className = 'icon';
+img.src = piece.img || PLACEHOLDER_IMG;
+img.alt = piece.name || piece.slot || '';
 
-          const badge = document.createElement('div');
-          badge.className = 'badge-lv';
-          badge.textContent = piece.level ? `Lv.${piece.level}` : '';
+const setBadgeSrc = getSetBadgeSrc(piece.item || piece, piece.slot || '');
 
-          box.appendChild(img);
-          if (badge.textContent) box.appendChild(badge);
-          btn.appendChild(box);
-          itemsRow.appendChild(btn);
+const setBadgeImg = document.createElement('img');
+setBadgeImg.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
+setBadgeImg.src = setBadgeSrc || '';
+setBadgeImg.alt = '';
+
+const badge = document.createElement('div');
+badge.className = 'badge-lv';
+badge.textContent = piece.level ? `Lv.${piece.level}` : '';
+
+box.appendChild(img);
+if (setBadgeSrc) box.appendChild(setBadgeImg);
+if (badge.textContent) box.appendChild(badge);
+btn.appendChild(box);
+itemsRow.appendChild(btn);
         });
 
         card.appendChild(itemsRow);
@@ -8301,21 +8374,29 @@ if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
           btn.title = piece.name || '';
 
           const box = document.createElement('div');
-          box.className = 'iconbox';
+box.className = 'iconbox';
 
-          const img = document.createElement('img');
-          img.className = 'icon';
-          img.src = piece.img || PLACEHOLDER_IMG;
-          img.alt = piece.name || piece.slot || '';
+const img = document.createElement('img');
+img.className = 'icon';
+img.src = piece.img || PLACEHOLDER_IMG;
+img.alt = piece.name || piece.slot || '';
 
-          const badge = document.createElement('div');
-          badge.className = 'badge-lv';
-          badge.textContent = piece.level ? `Lv.${piece.level}` : '';
+const setBadgeSrc = getSetBadgeSrc(piece.item || piece, piece.slot || '');
 
-          box.appendChild(img);
-          if (badge.textContent) box.appendChild(badge);
-          btn.appendChild(box);
-          itemsRow.appendChild(btn);
+const setBadgeImg = document.createElement('img');
+setBadgeImg.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
+setBadgeImg.src = setBadgeSrc || '';
+setBadgeImg.alt = '';
+
+const badge = document.createElement('div');
+badge.className = 'badge-lv';
+badge.textContent = piece.level ? `Lv.${piece.level}` : '';
+
+box.appendChild(img);
+if (setBadgeSrc) box.appendChild(setBadgeImg);
+if (badge.textContent) box.appendChild(badge);
+btn.appendChild(box);
+itemsRow.appendChild(btn);
         });
 
         card.appendChild(itemsRow);
@@ -11209,6 +11290,85 @@ if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
       };
     }
 
+    // ✅ 세트명(=종류) → 배지 이미지
+const SET_BADGE_ICON_MAP = {
+  '침식: 포이즈닝 퀸 스파이더': 'img/etc/icon/강철의브라키움아이콘.png',
+  '수호: 거인의 스펙쿨룸 아이언': 'img/etc/icon/강철의브라키움아이콘.png',
+  '침식: 섬뜩한 강철 용': 'img/etc/icon/강철의브라키움아이콘.png',
+  '수호: 빛의 헌신자': 'img/etc/icon/강철의브라키움아이콘.png',
+  '조화: 신비로운 빛의 소용돌이': 'img/etc/icon/강철의브라키움아이콘.png',
+  '조화: 콰트로 마누스 연산장치': 'img/etc/icon/강철의브라키움아이콘.png',
+  '불굴: 개구쟁이 호문쿨루스': 'img/etc/icon/강철의브라키움아이콘.png',
+  '불굴: 깊은 불구덩이의 섬멸자': 'img/etc/icon/강철의브라키움아이콘.png',
+
+  '보호: 수호자의 초합금': 'img/etc/icon/루크린제아이콘.png',
+  '쇄도: 섬뜩한 강철 용': 'img/etc/icon/루크린제아이콘.png',
+  '쇄도: 여명을 쏘아 올리는 자': 'img/etc/icon/루크린제아이콘.png',
+  '보호: 콰트로 카시테움': 'img/etc/icon/루크린제아이콘.png',
+  '혈독: 엘팅 메모리얼의 기억': 'img/etc/icon/루크린제아이콘.png',
+  '혈독: 화력 개조 탄띠': 'img/etc/icon/루크린제아이콘.png',
+  '격변: 철갑을 두른 탑의 수호꾼': 'img/etc/icon/루크린제아이콘.png',
+  '격변: 부정한 빛의 우상': 'img/etc/icon/루크린제아이콘.png',
+
+  '맹독: 어둠을 쏘아 내리는 자': 'img/etc/icon/매달린망루아이콘.png',
+  '맹독: 스틱키 애시드 웨펀': 'img/etc/icon/매달린망루아이콘.png',
+  '신속: 익스플로시브 버닝 스톤': 'img/etc/icon/매달린망루아이콘.png',
+  '신속: 그란데 전투기갑 파츠': 'img/etc/icon/매달린망루아이콘.png',
+  '초석: 섬뜩한 빛의 관리자': 'img/etc/icon/매달린망루아이콘.png',
+  '초석: 신비로운 빛의 소용돌이': 'img/etc/icon/매달린망루아이콘.png',
+  '질주: 허영 속 어둠의 피조물': 'img/etc/icon/매달린망루아이콘.png',
+  '질주: 부정한 빛의 우상': 'img/etc/icon/매달린망루아이콘.png',
+
+  '전격: 어느 말괄량이의 탐사복': 'img/etc/icon/빛의연회장아이콘.png',
+  '왜곡: 거인의 스펙쿨룸 아이언': 'img/etc/icon/빛의연회장아이콘.png',
+  '왜곡: 스틱키 애시드 웨펀': 'img/etc/icon/빛의연회장아이콘.png',
+  '전격: 그란데 전투기갑 파츠': 'img/etc/icon/빛의연회장아이콘.png',
+  '견고: 엘팅 메모리얼의 기억': 'img/etc/icon/빛의연회장아이콘.png',
+  '견고: 화력 개조 탄띠': 'img/etc/icon/빛의연회장아이콘.png',
+  '촉진: 철갑을 두른 탑의 수호꾼': 'img/etc/icon/빛의연회장아이콘.png',
+  '촉진: 깊은 불구덩이의 섬멸자': 'img/etc/icon/빛의연회장아이콘.png',
+
+  '작열: 포이즈닝 퀸 스파이더': 'img/etc/icon/샐러맨더의화로아이콘.png',
+  '자상: 어둠을 쏘아 내리는 자': 'img/etc/icon/샐러맨더의화로아이콘.png',
+  '자상: 여명을 쏘아 올리는 자': 'img/etc/icon/샐러맨더의화로아이콘.png',
+  '작열: 콰트로 카시테움': 'img/etc/icon/샐러맨더의화로아이콘.png',
+  '가속: 부식된 메탈기어': 'img/etc/icon/샐러맨더의화로아이콘.png',
+  '가속: 콰트로 마누스 연산장치': 'img/etc/icon/샐러맨더의화로아이콘.png',
+  '숙련: 개구쟁이 호문쿨루스': 'img/etc/icon/샐러맨더의화로아이콘.png',
+  '숙련: 라이트닝 에너지 코어': 'img/etc/icon/샐러맨더의화로아이콘.png',
+
+  '허상: 어느 말괄량이의 탐사복': 'img/etc/icon/왕의서고아이콘.png',
+  '허상: 수호자의 초합금': 'img/etc/icon/왕의서고아이콘.png',
+  '연격: 익스플로시브 버닝 스톤': 'img/etc/icon/왕의서고아이콘.png',
+  '연격: 빛의 헌신자': 'img/etc/icon/왕의서고아이콘.png',
+  '각오: 섬뜩한 빛의 관리자': 'img/etc/icon/왕의서고아이콘.png',
+  '각오: 부식된 메탈기어': 'img/etc/icon/왕의서고아이콘.png',
+  '결의: 라이트닝 에너지 코어': 'img/etc/icon/왕의서고아이콘.png',
+  '결의: 허영 속 어둠의 피조물': 'img/etc/icon/왕의서고아이콘.png',
+};
+
+const BADGE_TARGET_SLOTS = new Set([
+  'headshoulder', 'top', 'bottom', 'belt', 'shoes',
+  'bracelet', 'necklace', 'ring',
+  'sub', 'magestone', 'earring',
+]);
+
+function getSetBadgeSrc(item, slotKey = '') {
+  if (!item) return '';
+  if (!BADGE_TARGET_SLOTS.has(String(slotKey || '').trim())) return '';
+  const setName = String(item.type || item['종류'] || '').trim();
+  return SET_BADGE_ICON_MAP[setName] || '';
+}
+
+function getSetBadgeExtraClass(badgeSrc = '') {
+  const s = String(badgeSrc || '');
+
+  if (s.includes('빛의연회장아이콘.png')) return 'badge-bithall';
+  if (s.includes('매달린망루아이콘.png')) return 'badge-tower';
+
+  return '';
+}
+
     /* ===== 강화 행 매핑 (이미지/태그/단계 지원) ===== */
     function mapRowToEnhance(r) {
       const get = (k) => r[k] ?? r[k?.toLowerCase()] ?? '';
@@ -13448,11 +13608,13 @@ if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
       }
 
       items.forEach(it => {
-        const row = document.createElement('button');
-        row.className = 'item-row';
-        const isBottom = (slotKey === 'aura' || slotKey === 'title' || slotKey === 'creature' || slotKey === 'artifact');
-        const badge = isBottom ? (it.level_text && String(it.level_text).trim()) : `Lv.${it.level ?? 65}`;
-        const lvlLabel = isBottom ? (it.level_text && String(it.level_text).trim()) : `${it.level ?? 65}레벨`;
+  const row = document.createElement('button');
+  row.className = 'item-row';
+  const isBottom = (slotKey === 'aura' || slotKey === 'title' || slotKey === 'creature' || slotKey === 'artifact');
+  const badge = isBottom ? (it.level_text && String(it.level_text).trim()) : `Lv.${it.level ?? 65}`;
+  const lvlLabel = isBottom ? (it.level_text && String(it.level_text).trim()) : `${it.level ?? 65}레벨`;
+  const setBadgeSrc = getSetBadgeSrc(it, slotKey);
+  const badgeExtraClass = getSetBadgeExtraClass(setBadgeSrc);
 
         // ✅ 레어리티 텍스트 / 클래스 결정
         const rawRarity = String(
@@ -13488,15 +13650,16 @@ if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
         }
 
         row.innerHTML = `
-      <div class="iconbox">
-        <img class="icon" src="${it.img || PLACEHOLDER_IMG}" alt="${it.name}">
-        ${badge ? `<span class="badge-lv">${badge}</span>` : ``}
-      </div>
-      <div class="meta">
-        <div class="meta-top">${lvlLabel ? `<span class="lvl">${lvlLabel}</span>` : ``}<span class="name">${it.name}</span></div>
-        <div class="meta-sub">${it.type || ''}</div>
-      </div>
-      <div class="right"><span class="rarity-chip ${rarityClass}">${rarityLabel}</span></div>`;
+  <div class="iconbox">
+    <img class="icon" src="${it.img || PLACEHOLDER_IMG}" alt="${it.name}">
+    ${setBadgeSrc ? `<img class="set-badge-icon ${badgeExtraClass}" src="${setBadgeSrc}" alt="">` : ``}
+    ${badge ? `<span class="badge-lv">${badge}</span>` : ``}
+  </div>
+  <div class="meta">
+    <div class="meta-top">${lvlLabel ? `<span class="lvl">${lvlLabel}</span>` : ``}<span class="name">${it.name}</span></div>
+    <div class="meta-sub">${it.type || ''}</div>
+  </div>
+  <div class="right"><span class="rarity-chip ${rarityClass}">${rarityLabel}</span></div>`;
 
         row.onclick = (e) => {
           const isWeapon = (slotKey === 'weapon');
@@ -13571,105 +13734,112 @@ if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
     itemModal.addEventListener('click', (e) => { if (e.target.hasAttribute('data-close') || e.target.classList.contains('backdrop')) closeItemPicker(); });
     // 아이템 선택 후 슬롯에 적용
     async function applyItemToSlot(slotKey, item) {
-      try {
-        if (!window.state) window.state = {};
-        const state = window.state;
-        state.selections = state.selections || {};
+  try {
+    if (!window.state) window.state = {};
+    const state = window.state;
+    state.selections = state.selections || {};
 
-        // ★ 접두사 원본 문자열 가져오기
-        const rawPrefix =
-          (item && item.prefix) ||
-          (item && item._raw && (item._raw['접두사'] ?? item._raw.prefix)) ||
-          '';
+    // ★ 접두사 원본 문자열 가져오기
+    const rawPrefix =
+      (item && item.prefix) ||
+      (item && item._raw && (item._raw['접두사'] ?? item._raw.prefix)) ||
+      '';
 
-        // ★ 슬롯 라벨에 쓸 짧은 텍스트로 변환
-        const prefixLabel = makeEquipPrefixLabel(rawPrefix);
+    // ★ 슬롯 라벨에 쓸 짧은 텍스트로 변환
+    const prefixLabel = makeEquipPrefixLabel(rawPrefix);
 
-        // ★ state.selections 안에도 prefixLabel + 기본 메타(레벨/레어리티) 저장
-        const rawLevel =
-          (item && (item.level ?? item.levelVal ?? (item._raw && (item._raw['렙제'] ?? item._raw.level)))) ?? '';
-        const levelVal = parseInt(String(rawLevel).replace(/[^\d.-]/g, ''), 10);
+    // ★ state.selections 안에도 prefixLabel + 기본 메타(레벨/레어리티) 저장
+    const rawLevel =
+      (item && (item.level ?? item.levelVal ?? (item._raw && (item._raw['렙제'] ?? item._raw.level)))) ?? '';
+    const levelVal = parseInt(String(rawLevel).replace(/[^\d.-]/g, ''), 10);
 
-        const rawRarity = String(
-          (item && (item.rarity ?? '')) ||
-          (item && item._raw && (item._raw.rarity || item._raw['레어리티'] || item._raw['희귀도'] || item._raw['등급'])) ||
-          ''
-        ).trim();
+    const rawRarity = String(
+      (item && (item.rarity ?? '')) ||
+      (item && item._raw && (item._raw.rarity || item._raw['레어리티'] || item._raw['희귀도'] || item._raw['등급'])) ||
+      ''
+    ).trim();
 
-        let rarityNorm = rawRarity;
-        const rarityLower = rarityNorm.toLowerCase();
-        if (rarityNorm === '에픽' || rarityLower === 'epic') {
-          rarityNorm = '에픽';
-        } else if (rarityNorm === '익시드' || rarityLower === 'exceed') {
-          rarityNorm = '익시드';
-        }
-
-        state.selections[slotKey] = {
-          name: item.name,
-          img: item.img || null,
-          code: item.code || null,
-          type: item.type || '',      // ★ 세트 매칭용 타입 추가
-          prefixLabel: prefixLabel || null,
-          desc:
-            item.desc ||
-            (item._raw && (item._raw['설명'] ?? item._raw.desc)) ||
-            '',
-          level: Number.isFinite(levelVal) ? levelVal : null,
-          rarity: rarityNorm || null,
-        };
-
-
-        // ★ 세트 경량리스트 헬퍼 (CORE.lists['set:list'] 사용)
-        function getLightSetList() {
-          const core = (window.CORE && window.CORE.lists) || {};
-          const list = core['set:list'];
-          return Array.isArray(list) ? list : [];
-        }
-        // ★ 슬롯 타일에 라벨 + 이미지 그리기
-        const tile = tileElForSlot(slotKey);
-        if (tile) {
-          const safeAlt = String(item.name || '').replace(/"/g, '&quot;');
-          const src = item.img || PLACEHOLDER_IMG;
-          const labelHtml = prefixLabel
-            ? `<div class="equip-prefix">${prefixLabel}</div>`
-            : '';
-
-          tile.innerHTML =
-            labelHtml +
-            `<img class="item-img" alt="${safeAlt}"` +
-            ` src="${src}" style="width:70%;height:70%;border-radius:8px;">`;
-          tile.classList.add('selected');
-        }
-
-        // 모달 닫기
-        const modal = document.getElementById('itemModal');
-        if (modal) {
-          modal.classList.remove('show');
-          modal.setAttribute('aria-hidden', 'true');
-        }
-
-        // 엠블렘/성안의 봉인/강화 라벨 등 부가 UI 리프레시
-        if (typeof refreshAllDots === 'function') {
-          refreshAllDots();   // 엠블렘 도트
-        }
-        if (typeof refreshSealLabelsFromState === 'function') {
-          refreshSealLabelsFromState();
-        }
-        if (typeof refreshEnhLabelsFromState === 'function') {
-          refreshEnhLabelsFromState();
-        }
-        // ★ 커스텀옵 조건 검사 → 안 맞는 건 자동 초기화
-        if (typeof enforceCustomSkillConstraints === 'function') {
-          enforceCustomSkillConstraints();
-        }
-        // ★ 장비 설명 프리뷰 갱신
-        if (typeof updateEquipDescPreview === 'function') {
-          updateEquipDescPreview();
-        }
-      } catch (e) {
-        console.warn('[applyItemToSlot] 실패:', e);
-      }
+    let rarityNorm = rawRarity;
+    const rarityLower = rarityNorm.toLowerCase();
+    if (rarityNorm === '에픽' || rarityLower === 'epic') {
+      rarityNorm = '에픽';
+    } else if (rarityNorm === '익시드' || rarityLower === 'exceed') {
+      rarityNorm = '익시드';
     }
+
+    state.selections[slotKey] = {
+      name: item.name,
+      img: item.img || null,
+      code: item.code || null,
+      type: item.type || '',      // ★ 세트 매칭용 타입 추가
+      prefixLabel: prefixLabel || null,
+      desc:
+        item.desc ||
+        (item._raw && (item._raw['설명'] ?? item._raw.desc)) ||
+        '',
+      level: Number.isFinite(levelVal) ? levelVal : null,
+      rarity: rarityNorm || null,
+    };
+
+    // ★ 세트 경량리스트 헬퍼 (CORE.lists['set:list'] 사용)
+    function getLightSetList() {
+      const core = (window.CORE && window.CORE.lists) || {};
+      const list = core['set:list'];
+      return Array.isArray(list) ? list : [];
+    }
+
+    // ★ 슬롯 타일에 라벨 + 이미지 그리기
+    const tile = tileElForSlot(slotKey);
+    if (tile) {
+      const safeAlt = String(item.name || '').replace(/"/g, '&quot;');
+      const src = item.img || PLACEHOLDER_IMG;
+      const badgeSrc = getSetBadgeSrc(item, slotKey);
+      const badgeExtraClass = getSetBadgeExtraClass(badgeSrc);
+
+      const labelHtml = prefixLabel
+        ? `<div class="equip-prefix">${prefixLabel}</div>`
+        : '';
+
+      tile.innerHTML =
+  labelHtml +
+  `
+  <div class="item-img-wrap">
+    <img class="item-main-img" alt="${safeAlt}" src="${src}">
+    ${badgeSrc ? `<img class="item-set-badge ${badgeExtraClass}" alt="" src="${badgeSrc}">` : ''}
+  </div>
+  `;
+      tile.classList.add('selected');
+    }
+
+    // 모달 닫기
+    const modal = document.getElementById('itemModal');
+    if (modal) {
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    // 엠블렘/성안의 봉인/강화 라벨 등 부가 UI 리프레시
+    if (typeof refreshAllDots === 'function') {
+      refreshAllDots();   // 엠블렘 도트
+    }
+    if (typeof refreshSealLabelsFromState === 'function') {
+      refreshSealLabelsFromState();
+    }
+    if (typeof refreshEnhLabelsFromState === 'function') {
+      refreshEnhLabelsFromState();
+    }
+    // ★ 커스텀옵 조건 검사 → 안 맞는 건 자동 초기화
+    if (typeof enforceCustomSkillConstraints === 'function') {
+      enforceCustomSkillConstraints();
+    }
+    // ★ 장비 설명 프리뷰 갱신
+    if (typeof updateEquipDescPreview === 'function') {
+      updateEquipDescPreview();
+    }
+  } catch (e) {
+    console.warn('[applyItemToSlot] 실패:', e);
+  }
+}
 
     // ✅ 방어구 세트 한 번에 적용
     async function applyArmorSetToSlots(set) {
@@ -18645,20 +18815,25 @@ if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
           //    - PC에서 직접 선택했을 때와 동일한 state.selections 구조( desc/img/rarity/type/level/prefixLabel... )로 맞춘다.
           //    - applyItemToSlot이 타일까지 함께 그려주므로(접두사 포함), found가 있으면 그걸 우선 사용.
           if (found && typeof applyItemToSlot === 'function') {
-            applyItemToSlot(slotKey, found); // ← state.selections 풀 메타 + 타일/UI 동기화
-          } else {
-            // found가 없으면 기존 방식대로 타일만 표시 + 최소 selections 유지
-            slotEl.innerHTML =
-              `<img class="item-img" alt="${safeAlt}"` +
-              ` src="${imgSrc}" style="width:70%;height:70%;border-radius:8px;">`;
-            slotEl.classList.add('selected');
+  applyItemToSlot(slotKey, found); // ← state.selections 풀 메타 + 타일/UI 동기화
+} else {
+  // found가 없으면 기존 방식대로 타일만 표시 + 최소 selections 유지
+  const badgeSrc = getSetBadgeSrc(found, slotKey);
 
-            state.selections[slotKey] = {
-              name: wantedName,
-              img: null,
-              code: null,
-            };
-          }
+  slotEl.innerHTML = `
+    <div class="item-img-wrap">
+      <img class="item-main-img" alt="${safeAlt}" src="${imgSrc}">
+      ${badgeSrc ? `<img class="item-set-badge" src="${badgeSrc}" alt="">` : ''}
+    </div>
+  `;
+  slotEl.classList.add('selected');
+
+  state.selections[slotKey] = {
+    name: wantedName,
+    img: null,
+    code: null,
+  };
+}
         } catch (e) {
           console.warn('[preset] equip 슬롯 복원 실패:', equipKey, e);
         }
@@ -20336,7 +20511,7 @@ for (const r of renderedRows) {
         name: '기본공격',
         kind: '평타',
         uses: '-',
-        img: r.img || PLACEHOLDER_IMG,
+        img: 'img/etc/icon/기본공격.png',
         dmgPerUseFinal: null,
         sumFinal: 0
       };

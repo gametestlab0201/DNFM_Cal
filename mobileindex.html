@@ -3896,6 +3896,66 @@
   opacity: .9;
 }
 
+/* ===== 모바일 장비 배지 ===== */
+.equip-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.equip-main-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.equip-set-badge {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 개별/세트 선택 모달 공통 배지 */
+.iconbox .set-badge-icon {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 배지별 위치/크기 보정 */
+.equip-set-badge.badge-bithall {
+  left: -2px;
+  width: 30px;
+  height: 30px;
+}
+.equip-set-badge.badge-tower {
+  bottom: 0px;
+  width: 30px;
+  height: 30px;
+}
+
+.iconbox .set-badge-icon.badge-bithall {
+  left: 0px;
+  width: 20px;
+  height: 20px;
+}
+.iconbox .set-badge-icon.badge-tower {
+  bottom: 0px;
+  width: 20px;
+  height: 20px;
+}
   </style>
 </head>
 
@@ -5767,6 +5827,83 @@ function _pickAnyImg(obj) {
   for (const v of cand) {
     if (typeof v === 'string' && v.trim()) return v.trim();
   }
+  return '';
+}
+
+// ✅ 세트명(=종류/type) → 배지 이미지
+const SET_BADGE_ICON_MAP = {
+  '침식: 포이즈닝 퀸 스파이더': 'img/etc/icon/강철의브라키움아이콘.png',
+  '수호: 거인의 스펙쿨룸 아이언': 'img/etc/icon/강철의브라키움아이콘.png',
+  '침식: 섬뜩한 강철 용': 'img/etc/icon/강철의브라키움아이콘.png',
+  '수호: 빛의 헌신자': 'img/etc/icon/강철의브라키움아이콘.png',
+  '조화: 신비로운 빛의 소용돌이': 'img/etc/icon/강철의브라키움아이콘.png',
+  '조화: 콰트로 마누스 연산장치': 'img/etc/icon/강철의브라키움아이콘.png',
+  '불굴: 개구쟁이 호문쿨루스': 'img/etc/icon/강철의브라키움아이콘.png',
+  '불굴: 깊은 불구덩이의 섬멸자': 'img/etc/icon/강철의브라키움아이콘.png',
+
+  '보호: 수호자의 초합금': 'img/etc/icon/루크린제아이콘.png',
+  '쇄도: 섬뜩한 강철 용': 'img/etc/icon/루크린제아이콘.png',
+  '쇄도: 여명을 쏘아 올리는 자': 'img/etc/icon/루크린제아이콘.png',
+  '보호: 콰트로 카시테움': 'img/etc/icon/루크린제아이콘.png',
+  '혈독: 엘팅 메모리얼의 기억': 'img/etc/icon/루크린제아이콘.png',
+  '혈독: 화력 개조 탄띠': 'img/etc/icon/루크린제아이콘.png',
+  '격변: 철갑을 두른 탑의 수호꾼': 'img/etc/icon/루크린제아이콘.png',
+  '격변: 부정한 빛의 우상': 'img/etc/icon/루크린제아이콘.png',
+
+  '맹독: 어둠을 쏘아 내리는 자': 'img/etc/icon/매달린망루아이콘.png',
+  '맹독: 스틱키 애시드 웨펀': 'img/etc/icon/매달린망루아이콘.png',
+  '신속: 익스플로시브 버닝 스톤': 'img/etc/icon/매달린망루아이콘.png',
+  '신속: 그란데 전투기갑 파츠': 'img/etc/icon/매달린망루아이콘.png',
+  '초석: 섬뜩한 빛의 관리자': 'img/etc/icon/매달린망루아이콘.png',
+  '초석: 신비로운 빛의 소용돌이': 'img/etc/icon/매달린망루아이콘.png',
+  '질주: 허영 속 어둠의 피조물': 'img/etc/icon/매달린망루아이콘.png',
+  '질주: 부정한 빛의 우상': 'img/etc/icon/매달린망루아이콘.png',
+
+  '전격: 어느 말괄량이의 탐사복': 'img/etc/icon/빛의연회장아이콘.png',
+  '왜곡: 거인의 스펙쿨룸 아이언': 'img/etc/icon/빛의연회장아이콘.png',
+  '왜곡: 스틱키 애시드 웨펀': 'img/etc/icon/빛의연회장아이콘.png',
+  '전격: 그란데 전투기갑 파츠': 'img/etc/icon/빛의연회장아이콘.png',
+  '견고: 엘팅 메모리얼의 기억': 'img/etc/icon/빛의연회장아이콘.png',
+  '견고: 화력 개조 탄띠': 'img/etc/icon/빛의연회장아이콘.png',
+  '촉진: 철갑을 두른 탑의 수호꾼': 'img/etc/icon/빛의연회장아이콘.png',
+  '촉진: 깊은 불구덩이의 섬멸자': 'img/etc/icon/빛의연회장아이콘.png',
+
+  '작열: 포이즈닝 퀸 스파이더': 'img/etc/icon/샐러맨더의화로아이콘.png',
+  '자상: 어둠을 쏘아 내리는 자': 'img/etc/icon/샐러맨더의화로아이콘.png',
+  '자상: 여명을 쏘아 올리는 자': 'img/etc/icon/샐러맨더의화로아이콘.png',
+  '작열: 콰트로 카시테움': 'img/etc/icon/샐러맨더의화로아이콘.png',
+  '가속: 부식된 메탈기어': 'img/etc/icon/샐러맨더의화로아이콘.png',
+  '가속: 콰트로 마누스 연산장치': 'img/etc/icon/샐러맨더의화로아이콘.png',
+  '숙련: 개구쟁이 호문쿨루스': 'img/etc/icon/샐러맨더의화로아이콘.png',
+  '숙련: 라이트닝 에너지 코어': 'img/etc/icon/샐러맨더의화로아이콘.png',
+
+  '허상: 어느 말괄량이의 탐사복': 'img/etc/icon/왕의서고아이콘.png',
+  '허상: 수호자의 초합금': 'img/etc/icon/왕의서고아이콘.png',
+  '연격: 익스플로시브 버닝 스톤': 'img/etc/icon/왕의서고아이콘.png',
+  '연격: 빛의 헌신자': 'img/etc/icon/왕의서고아이콘.png',
+  '각오: 섬뜩한 빛의 관리자': 'img/etc/icon/왕의서고아이콘.png',
+  '각오: 부식된 메탈기어': 'img/etc/icon/왕의서고아이콘.png',
+  '결의: 라이트닝 에너지 코어': 'img/etc/icon/왕의서고아이콘.png',
+  '결의: 허영 속 어둠의 피조물': 'img/etc/icon/왕의서고아이콘.png',
+};
+
+const BADGE_TARGET_SLOTS = new Set([
+  'headshoulder', 'top', 'bottom', 'belt', 'shoes',
+  'bracelet', 'necklace', 'ring',
+  'sub', 'magestone', 'earring',
+]);
+
+function getSetBadgeSrc(item, slotKey = '') {
+  if (!item) return '';
+  if (!BADGE_TARGET_SLOTS.has(String(slotKey || '').trim())) return '';
+  const setName = String(item.type || item['종류'] || '').trim();
+  return SET_BADGE_ICON_MAP[setName] || '';
+}
+
+function getSetBadgeExtraClass(badgeSrc = '') {
+  const s = String(badgeSrc || '');
+  if (s.includes('빛의연회장아이콘.png')) return 'badge-bithall';
+  if (s.includes('매달린망루아이콘.png')) return 'badge-tower';
   return '';
 }
 
@@ -9128,41 +9265,56 @@ function renderMobileEquipList(slot, items) {
     const name = String(it?.name || '').trim();
     if (!name) continue;
 
-    const img = _normImg(it?.image || it?.img || '');
+const img = _normImg(it?.image || it?.img || '');
+const setBadgeSrc = getSetBadgeSrc(it, slot);
+const badgeExtraClass = getSetBadgeExtraClass(setBadgeSrc);
 
-    // ✅ “행 전체 클릭 = 장비 선택” 버튼
-    const rowBtn = document.createElement('button');
-    rowBtn.type = 'button';
-    rowBtn.className = 'meq-row';
+// ✅ “행 전체 클릭 = 장비 선택” 버튼
+const rowBtn = document.createElement('button');
+rowBtn.type = 'button';
+rowBtn.className = 'meq-row';
 
-    // 썸네일
-    const thumb = document.createElement('img');
-    thumb.className = 'meq-thumb';
-    thumb.src = img || PLACEHOLDER_IMG;
-    thumb.alt = name;
-    thumb.onerror = () => { thumb.src = PLACEHOLDER_IMG; };
+// 썸네일 박스
+const thumbBox = document.createElement('div');
+thumbBox.className = 'iconbox';
 
-    // 이름
-    const nm = document.createElement('div');
-    nm.className = 'meq-name';
-    nm.textContent = name;
+const thumb = document.createElement('img');
+thumb.className = 'meq-thumb icon';
+thumb.src = img || PLACEHOLDER_IMG;
+thumb.alt = name;
+thumb.onerror = () => { thumb.src = PLACEHOLDER_IMG; };
 
-    // ✅ 설명 버튼 (rowBtn 안에 넣되, 클릭은 stopPropagation)
-    const infoBtn = document.createElement('button');
-    infoBtn.type = 'button';
-    infoBtn.className = 'meq-info-btn';
-    infoBtn.textContent = '설명';
+thumbBox.appendChild(thumb);
 
-    infoBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation(); // ✅ 장비 선택 클릭 방지
-      const desc = _pickDesc_mobile(it);
-      openEquipInfoModal(name, desc);
-    });
+if (setBadgeSrc) {
+  const setBadgeImg = document.createElement('img');
+  setBadgeImg.className = `set-badge-icon ${badgeExtraClass}`;
+  setBadgeImg.src = setBadgeSrc;
+  setBadgeImg.alt = '';
+  thumbBox.appendChild(setBadgeImg);
+}
 
-    rowBtn.appendChild(thumb);
-    rowBtn.appendChild(nm);
-    rowBtn.appendChild(infoBtn);
+// 이름
+const nm = document.createElement('div');
+nm.className = 'meq-name';
+nm.textContent = name;
+
+// ✅ 설명 버튼 (rowBtn 안에 넣되, 클릭은 stopPropagation)
+const infoBtn = document.createElement('button');
+infoBtn.type = 'button';
+infoBtn.className = 'meq-info-btn';
+infoBtn.textContent = '설명';
+
+infoBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation(); // ✅ 장비 선택 클릭 방지
+  const desc = _pickDesc_mobile(it);
+  openEquipInfoModal(name, desc);
+});
+
+rowBtn.appendChild(thumbBox);
+rowBtn.appendChild(nm);
+rowBtn.appendChild(infoBtn);
 
     // ✅ 행 클릭 시: “선택 적용 + UI 반영 + 모달 닫기”를 여기서 확정 처리
 rowBtn.addEventListener('click', () => {
@@ -9280,7 +9432,7 @@ function _upgradeEquipByCore_(slot, it) {
 }
 
     function applyPickedEquipUI(slot, it) {
-      // ✅ 보험: 불러온 it에 이미지가 없으면 code로 DB에서 다시 찾아오기
+  // ✅ 보험: 불러온 it에 이미지가 없으면 code로 DB에서 다시 찾아오기
   try {
     const code = it?.code ?? it?.Code ?? it?.itemCode ?? it?.key;
     const hasImg = !!(it?.image || it?.img || it?.thumb || it?.icon || it?.['이미지']);
@@ -9290,21 +9442,21 @@ function _upgradeEquipByCore_(slot, it) {
       if (Array.isArray(list)) {
         const found = list.find(x => String(x?.code ?? x?.Code ?? x?.itemCode ?? x?.key) === String(code));
         if (found) {
-  it = found; // 👈 “진짜 아이템 객체”로 교체
+          it = found; // 👈 “진짜 아이템 객체”로 교체
 
-  // ✅ 여기서 끝내면 UI만 바뀌고 저장데이터는 안 바뀜 → state에도 반영
-  try {
-    window.state = window.state || {};
-    window.state.equips = window.state.equips || {};
-    window.state.selections = window.state.selections || {};
-    window.state.equips[slot] = found;
-    window.state.selections[slot] = _buildSelectionFromEquip_(found);
-  } catch (e) {}
-}
-
+          // ✅ 여기서 끝내면 UI만 바뀌고 저장데이터는 안 바뀜 → state에도 반영
+          try {
+            window.state = window.state || {};
+            window.state.equips = window.state.equips || {};
+            window.state.selections = window.state.selections || {};
+            window.state.equips[slot] = found;
+            window.state.selections[slot] = _buildSelectionFromEquip_(found);
+          } catch (e) {}
+        }
       }
     }
   } catch (e) {}
+
   const row = document.querySelector(
     `#pageEquip .equip-row[data-slot="${slot}"], #pageEquip .oca-item[data-slot="${slot}"]`
   );
@@ -9313,11 +9465,16 @@ function _upgradeEquipByCore_(slot, it) {
   // 왼쪽 이미지
   const imgBox = row.querySelector('.equip-img');
   if (imgBox) {
-    const src = _normImg(it?.image || '');
-    imgBox.style.backgroundImage = src ? `url("${src}")` : '';
-    imgBox.style.backgroundSize = 'cover';
-    imgBox.style.backgroundPosition = 'center';
-    imgBox.style.backgroundRepeat = 'no-repeat';
+    const src = _normImg(it?.image || it?.img || it?.thumb || it?.icon || it?.['이미지'] || '');
+    const badgeSrc = getSetBadgeSrc(it, slot);
+    const badgeExtraClass = getSetBadgeExtraClass(badgeSrc);
+
+    imgBox.innerHTML = `
+      <div class="equip-img-wrap">
+        <img class="equip-main-img" src="${src || PLACEHOLDER_IMG}" alt="">
+        ${badgeSrc ? `<img class="equip-set-badge ${badgeExtraClass}" src="${badgeSrc}" alt="">` : ''}
+      </div>
+    `;
   }
 
   // 이미지 아래 “장비이름”
@@ -12070,40 +12227,52 @@ header.appendChild(applyBtn);
 
         // items
         const items = document.createElement('div');
-        items.className = 'armor-set-items';
+items.className = 'armor-set-items';
 
-        (s.pieces || []).forEach((p) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'armor-set-item';
-          btn.title = p?.item?.name || p?.name || '';
+(s.pieces || []).forEach((p) => {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'armor-set-item';
+  btn.title = p?.item?.name || p?.name || '';
 
-          // ✅ 아이콘/레벨을 눌러도 "세트 적용"되도록
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            applyAndClose(s);
-          });
+  // ✅ 아이콘/레벨을 눌러도 "세트 적용"되도록
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    applyAndClose(s);
+  });
 
-          const box2 = document.createElement('div');
-          box2.className = 'iconbox';
+  const box2 = document.createElement('div');
+  box2.className = 'iconbox';
 
-          const img = document.createElement('img');
-          img.className = 'icon';
-          img.src = p?.img || p?.item?.img || (typeof PLACEHOLDER_I !== 'undefined' ? PLACEHOLDER_I : '');
-          img.alt = '';
-          box2.appendChild(img);
+  const img = document.createElement('img');
+  img.className = 'icon';
+  img.src = p?.img || p?.item?.img || (typeof PLACEHOLDER_I !== 'undefined' ? PLACEHOLDER_I : '');
+  img.alt = '';
+  box2.appendChild(img);
 
-          const lv = p?.level ?? p?.item?.level ?? null;
-          if (lv) {
-            const badge = document.createElement('div');
-            badge.className = 'badge-lv';
-            badge.textContent = String(lv);
-            box2.appendChild(badge);
-          }
+  const setBadgeSrc = getSetBadgeSrc(p?.item || p, p?.slot || '');
+const badgeExtraClass = getSetBadgeExtraClass(setBadgeSrc);
 
-          btn.appendChild(box2);
-          items.appendChild(btn);
-        });
+if (setBadgeSrc) {
+  const setBadgeImg = document.createElement('img');
+  setBadgeImg.className = `set-badge-icon ${badgeExtraClass}`;
+  setBadgeImg.src = setBadgeSrc;
+  setBadgeImg.alt = '';
+  box2.appendChild(setBadgeImg);
+}
+
+const lv = p?.level ?? p?.item?.level ?? null;
+// ✅ 배지가 있으면 렙제 숨김
+if (lv && !setBadgeSrc) {
+  const badge = document.createElement('div');
+  badge.className = 'badge-lv';
+  badge.textContent = String(lv);
+  box2.appendChild(badge);
+}
+
+  btn.appendChild(box2);
+  items.appendChild(btn);
+});
 
         card.appendChild(items);
         box.appendChild(card);
