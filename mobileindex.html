@@ -294,11 +294,18 @@
 
 
     .m-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.m-title:active {
+  transform: translateY(1px);
+  opacity: 0.9;
+}
 
     .m-title .txt {
       font-weight: 800;
@@ -3912,9 +3919,9 @@
     <!-- ====== Header ====== -->
     <header class="m-header">
       <div class="m-header-row">
-        <div class="m-title">
-          <div class="txt">게임실험연구소 계산기 (시즌5)</div>
-        </div>
+        <div class="m-title" id="btnGoMain" role="button" tabindex="0" aria-label="메인으로 이동">
+  <div class="txt">게임실험연구소 계산기 (시즌5)</div>
+</div>
 
         <div class="m-actions">
           <!-- 문의하기 (PC와 동일 id 유지) -->
@@ -8698,6 +8705,22 @@ function makePreviewFromCurrentState() {
     nameInput?.addEventListener('keydown', onEnter);
   });
 }
+
+
+  const btnGoMain = document.getElementById('btnGoMain');
+  if (btnGoMain) {
+    const goMain = () => {
+      location.href = 'index.html';
+    };
+
+    btnGoMain.addEventListener('click', goMain);
+    btnGoMain.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        goMain();
+      }
+    });
+  }
 
         // ===== 문의하기 / Q&A =====
         // ===== 공지/안내사항 =====

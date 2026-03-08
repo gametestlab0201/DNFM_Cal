@@ -5739,14 +5739,14 @@
         <div style="max-height:60vh; overflow:auto; border:1px solid rgba(255,255,255,.08); border-radius:10px;">
           <table style="width:100%; border-collapse:collapse; font-size:12px;">
             <thead style="position:sticky; top:0; background:#111827; z-index:1;">
-              <tr>
-                <th style="text-align:left; padding:8px 10px;">스킬명</th>
-                <th style="text-align:left; padding:8px 10px;">구분</th>
-                <th style="text-align:right; padding:8px 10px;">사용횟수</th>
-                <th style="text-align:right; padding:8px 10px;">1회 데미지</th>
-                <th style="text-align:right; padding:8px 10px;">합계 데미지</th>
-              </tr>
-            </thead>
+  <tr>
+    <th style="text-align:left; padding:8px 10px;">스킬</th>
+    <th style="text-align:right; padding:8px 10px;">사용횟수</th>
+    <th style="text-align:right; padding:8px 10px;">합계 데미지</th>
+    <th style="text-align:right; padding:8px 10px;">1회 데미지</th>
+    <th style="text-align:right; padding:8px 10px;">점유율</th>
+  </tr>
+</thead>
             <tbody id="skillDamageTbody"></tbody>
           </table>
         </div>
@@ -20081,11 +20081,12 @@ document.addEventListener('gsi:issued', () => {
 
       bindSkillDamageModalCloseOnce();
 
-      // ✅ 원본 기준 합계가 큰 순으로 정렬(표시 순서만)
-      rows.sort((a, b) => Number(b?.sum || 0) - Number(a?.sum || 0));
-
       const m = state.lastComputeMeta || {};
       const C = state.lastComputeCoeffs || {};
+      const currentSkills = skillsForCurrentChar(Array.isArray(ST2.rows) ? ST2.rows : []);
+const skillImgMap = new Map(
+  currentSkills.map(s => [String(s?.name || '').trim(), String(s?.img || '').trim()])
+);
 
       const forceCrit100 = !!m.forceCrit100;
       const tohampo12 = !!m.tohampo12;
@@ -20107,6 +20108,24 @@ document.addEventListener('gsi:issued', () => {
       const defBreak = Number(C?.def_break || 0);             // 예: 0.10
       const finSang = Number(C?.fin_sangbyun_dam || 0);      // 예: 35 (퍼센트값)
 
+      const finSangParts = C?.fin_sangbyun_parts || {};
+
+const finBleed = Number(finSangParts.bleed || 0);
+const finBurn = Number(finSangParts.burn || 0);
+const finPoison = Number(finSangParts.poison || 0);
+const finShock = Number(finSangParts.shock || 0);
+
+const finSangTotalSafe =
+  (finBleed + finBurn + finPoison + finShock) > 0
+    ? (finBleed + finBurn + finPoison + finShock)
+    : 1;
+
+const finSangRatioMap = {
+  출혈: finBleed / finSangTotalSafe,
+  화상: finBurn / finSangTotalSafe,
+  중독: finPoison / finSangTotalSafe,
+  감전: finShock / finSangTotalSafe,
+};
       // 재해 여부 판정 (버전별 키 차이 + 이름 fallback)
       const isDisaster =
         !!m.isDisasterMonster ||
@@ -20141,36 +20160,214 @@ document.addEventListener('gsi:issued', () => {
       let directBaseSum = 0;
       let statusBaseSum = 0;
 
-      const renderedRows = rows.map((r) => {
-        const name = String(r?.name || '-');
-        const kind = String(r?.kind || '-');
-        const uses = Number(r?.uses || 0);
+      const renderedRows = [];
 
-        const dmgPerUseRaw = Number(r?.dmgPerUse || 0);
-        const sumRaw = Number(r?.sum || 0);
+for (const r of rows) {
+  const name = String(r?.name || '-');
+  const kind = String(r?.kind || '-');
+  const uses = Number(r?.uses || 0);
 
-        const status = isStatusRow(r);
-        let mul = status ? statusMul : directMul;
+  const dmgPerUseRaw = Number(r?.dmgPerUse || 0);
+  const sumRaw = Number(r?.sum || 0);
 
-        // ✅ 크리100 강제는 "스킬류"에만 추가 보정 (오브젝트는 제외)
-        if (forceCrit100) {
-          mul *= critForceRatio;
-        }
+  const status = isStatusRow(r);
+  const img = skillImgMap.get(name) || PLACEHOLDER_IMG;
 
-        if (status) statusBaseSum += sumRaw;
-        else directBaseSum += sumRaw;
+  // 1) 스킬 자체 상변행은 스킬명으로 남기지 말고, 상변종류 버킷용 행으로 만든다
+if (status) {
+  let mul = statusMul;
+  if (forceCrit100) mul *= critForceRatio;
 
-        const dmgPerUseFinal = dmgPerUseRaw * mul;
-        const sumFinal = sumRaw * mul;
+  statusBaseSum += sumRaw;
 
-        return {
-          name,
-          kind,
-          uses,
-          dmgPerUseFinal,
-          sumFinal
-        };
-      });
+  const statusKindRaw =
+    String(r?.statusKind || r?.status?.kind || r?.kind || '').trim();
+
+  let mergedStatusName = '';
+  if (statusKindRaw.includes('출혈')) mergedStatusName = '출혈';
+  else if (statusKindRaw.includes('화상')) mergedStatusName = '화상';
+  else if (statusKindRaw.includes('중독')) mergedStatusName = '중독';
+  else if (statusKindRaw.includes('감전')) mergedStatusName = '감전';
+
+  // 종류 판정이 되면 상변 통합 버킷으로 보낼 행 생성
+  if (mergedStatusName) {
+    renderedRows.push({
+      name: mergedStatusName,
+      kind: '스킬상변',
+      uses: '-',
+      img: `img/etc/icon/${mergedStatusName}.png`,
+      dmgPerUseFinal: null,
+      sumFinal: sumRaw * mul,
+      isSkillStatusRow: true,
+      parentSkillName: name
+    });
+  } else {
+    // 혹시 판정 실패한 상변은 기존처럼 남겨둠 (안전장치)
+    renderedRows.push({
+      name,
+      kind,
+      uses,
+      img,
+      dmgPerUseFinal: dmgPerUseRaw * mul,
+      sumFinal: sumRaw * mul
+    });
+  }
+
+  continue;
+}
+
+  // 2) 일반 스킬행: 옵션상변 포함 상태로 내려온 값
+  directBaseSum += sumRaw;
+
+  const directBaseDenom = backAtkMul + (finSang / 100);
+
+// 옵션상변이 없으면 기존처럼 한 줄만
+if (!(finSang > 0) || !(directBaseDenom > 0)) {
+  let mul = directMul;
+  if (forceCrit100) mul *= critForceRatio;
+
+  renderedRows.push({
+    name,
+    kind,
+    uses,
+    img,
+    dmgPerUseFinal: dmgPerUseRaw * mul,
+    sumFinal: sumRaw * mul
+  });
+  continue;
+}
+
+// ✅ 먼저 "원래 일반 스킬 최종값"을 구한다
+let directFinalMul = directMul;
+if (forceCrit100) directFinalMul *= critForceRatio;
+
+const originalDirectFinalSum = sumRaw * directFinalMul;
+const originalDirectFinalPerUse = dmgPerUseRaw * directFinalMul;
+
+// ✅ 최종값 기준으로 비율 분해
+const pureDirectRatio = backAtkMul / directBaseDenom;
+const optionStatusRatio = (finSang / 100) / directBaseDenom;
+
+// 3-1) 순수 직접딜 행
+renderedRows.push({
+  name,
+  kind,
+  uses,
+  img,
+  dmgPerUseFinal: originalDirectFinalPerUse * pureDirectRatio,
+  sumFinal: originalDirectFinalSum * pureDirectRatio
+});
+
+// 3-2) 옵션상변 행들
+const optionKinds = ['출혈', '화상', '중독', '감전'];
+
+for (const sk of optionKinds) {
+  const ratio = Number(finSangRatioMap[sk] || 0);
+  if (!(ratio > 0)) continue;
+
+  const partFinalSum = originalDirectFinalSum * optionStatusRatio * ratio;
+
+  if (!(partFinalSum > 0)) continue;
+
+  renderedRows.push({
+    name: sk,
+    kind: '옵션상변',
+    uses: '-',
+    img: `img/etc/icon/${sk}.png`,
+    dmgPerUseFinal: null,
+    sumFinal: partFinalSum,
+    isOptionStatusRow: true
+  });
+}
+}
+
+const mergedRows = [];
+let basicAttackBucket = null;
+
+// 옵션상변 종류별 버킷
+const optionStatusBuckets = {
+  출혈: {
+    name: '출혈',
+    kind: '옵션상변',
+    uses: '-',
+    img: 'img/etc/icon/출혈.png',
+    dmgPerUseFinal: null,
+    sumFinal: 0,
+    isOptionStatusRow: true
+  },
+  화상: {
+    name: '화상',
+    kind: '옵션상변',
+    uses: '-',
+    img: 'img/etc/icon/화상.png',
+    dmgPerUseFinal: null,
+    sumFinal: 0,
+    isOptionStatusRow: true
+  },
+  중독: {
+    name: '중독',
+    kind: '옵션상변',
+    uses: '-',
+    img: 'img/etc/icon/중독.png',
+    dmgPerUseFinal: null,
+    sumFinal: 0,
+    isOptionStatusRow: true
+  },
+  감전: {
+    name: '감전',
+    kind: '옵션상변',
+    uses: '-',
+    img: 'img/etc/icon/감전.png',
+    dmgPerUseFinal: null,
+    sumFinal: 0,
+    isOptionStatusRow: true
+  }
+};
+
+for (const r of renderedRows) {
+  const isBasicAttackRow = (r.kind === '평타' || r.kind === '연결평타');
+  const isMergedStatusRow =
+    ((r.kind === '옵션상변' || r.kind === '스킬상변') && optionStatusBuckets[r.name]);
+
+  // 1) 평타/연결평타 묶기
+  if (isBasicAttackRow) {
+    if (!basicAttackBucket) {
+      basicAttackBucket = {
+        name: '기본공격',
+        kind: '평타',
+        uses: '-',
+        img: r.img || PLACEHOLDER_IMG,
+        dmgPerUseFinal: null,
+        sumFinal: 0
+      };
+    }
+    basicAttackBucket.sumFinal += Number(r.sumFinal || 0);
+    continue;
+  }
+
+  // 2) 옵션상변 + 스킬자체상변 모두 종류별 묶기
+  if (isMergedStatusRow) {
+    optionStatusBuckets[r.name].sumFinal += Number(r.sumFinal || 0);
+    continue;
+  }
+
+  // 3) 그 외는 그대로 유지
+  mergedRows.push(r);
+}
+
+if (basicAttackBucket) {
+  mergedRows.push(basicAttackBucket);
+}
+
+// 옵션상변 버킷 중 합계가 0보다 큰 것만 추가
+for (const key of ['출혈', '화상', '중독', '감전']) {
+  const bucket = optionStatusBuckets[key];
+  if (Number(bucket.sumFinal || 0) > 0) {
+    mergedRows.push(bucket);
+  }
+}
+
+mergedRows.sort((a, b) => Number(b.sumFinal || 0) - Number(a.sumFinal || 0));
 
       // ===== 합계 계산 =====
       const directFinalTotal = directBaseSum * directMul * (forceCrit100 ? critForceRatio : 1);
@@ -20188,6 +20385,7 @@ document.addEventListener('gsi:issued', () => {
 
       // 표시용 스킬합(최종기준)
       const skillFinalShownTotal = directFinalTotal + statusFinalTotal;
+const safeSkillTotal = finalTotal > 0 ? finalTotal : 1;
 
       // ===== 상단 메타 표시 =====
       meta.innerHTML = `
@@ -20207,16 +20405,63 @@ document.addEventListener('gsi:issued', () => {
     </div>
   `;
 
+  const forceUseOneNames = new Set([
+  '작열탄',
+  '전격탄',
+  '은탄',
+  '흑염의 칼라',
+  '살의의 파동',
+  '리버레이트 - 벅샷',
+  'G-2 롤링썬더',
+  'G-3 랩터',
+  'G - 게일포스',
+  'G-4 호넷',
+  'G - 게일포스V2',
+  '자율 기동 메카 게일포스',
+  '인서트 : 팔콘',
+  '싱크로 : 코로나',
+  '오버 차지(화속성)',
+  '오버 차지(명속성)',
+  '케미컬 파우더',
+  '체이서',
+  '헤일스톰',
+  '스매쉬'
+
+]);
       // ===== 표 렌더링 (스킬만) =====
-      tbody.innerHTML = renderedRows.map(r => `
+      tbody.innerHTML = mergedRows.map(r => {
+  const ratio = (Number(r.sumFinal || 0) / safeSkillTotal) * 100;
+  const isMergedBasic = (r.name === '기본공격');
+const isMergedStatusRow = !!r.isOptionStatusRow || !!r.isSkillStatusRow || r.kind === '옵션상변' || r.kind === '스킬상변';
+const hideUseAndPerUse = isMergedBasic || isMergedStatusRow;
+const displayUses = hideUseAndPerUse
+    ? '-'
+    : (forceUseOneNames.has(String(r.name || '').trim()) ? 1 : r.uses);
+
+  const displayPerUse = (hideUseAndPerUse || !Number(r.dmgPerUseFinal))
+    ? '-'
+    : _fmtSkillDmgNum(r.dmgPerUseFinal);
+
+  return `
     <tr style="border-top:1px solid rgba(255,255,255,.06);">
-      <td style="padding:8px 10px;">${r.name}</td>
-      <td style="padding:8px 10px; opacity:.9;">${r.kind}</td>
-      <td style="padding:8px 10px; text-align:right;">${r.uses}</td>
-      <td style="padding:8px 10px; text-align:right;">${_fmtSkillDmgNum(r.dmgPerUseFinal)}</td>
+      <td style="padding:8px 10px;">
+        <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+          <img
+            src="${r.img}"
+            alt="${r.name}"
+            style="width:26px; height:26px; border-radius:6px; object-fit:cover; flex:0 0 auto; background:#0b1220; border:1px solid rgba(255,255,255,.08);"
+            onerror="this.src='${PLACEHOLDER_IMG}'"
+          >
+          <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.name}</span>
+        </div>
+      </td>
+      <td style="padding:8px 10px; text-align:right;">${displayUses}</td>
       <td style="padding:8px 10px; text-align:right; font-weight:700;">${_fmtSkillDmgNum(r.sumFinal)}</td>
+      <td style="padding:8px 10px; text-align:right;">${displayPerUse}</td>
+      <td style="padding:8px 10px; text-align:right; color:#93c5fd;">${ratio.toFixed(2)}%</td>
     </tr>
-  `).join('');
+  `;
+}).join('');
 
       showModal(modal, true);
     }
