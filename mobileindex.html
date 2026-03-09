@@ -529,6 +529,232 @@
   pointer-events: auto;
 }
 
+/* ===== 데미지 비교 토글 + 시트 ===== */
+
+.m-dmgcmp-toggle{
+  position: fixed;
+  left: 18px; /* ✅ 조금 더 오른쪽 */
+  bottom: calc(var(--footer-h) + var(--safe-bottom) + var(--presetbar-h)); /* ✅ 저장슬롯에 딱 닿게 */
+  z-index: 96;
+  width: 30px;
+  height: 22px;
+  border-radius: 10px 10px 0 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-bottom: none;
+  background: rgba(10,14,24,0.94);
+  color: rgba(233,238,247,0.94);
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 -6px 18px rgba(0,0,0,0.22);
+
+  transition: bottom .18s ease;
+}
+
+.m-dmgcmp-toggle-icon{
+  display: inline-block;
+  line-height: 1;
+  transition: transform .18s ease;
+}
+
+.m-dmgcmp-toggle:active{
+  transform: translateY(1px);
+}
+
+/* ✅ 열리면 버튼 위치만 위로 이동 */
+.m-dmgcmp-toggle[aria-expanded="true"]{
+  bottom: calc(var(--footer-h) + var(--safe-bottom) + var(--presetbar-h) + 240px);
+}
+
+/* ✅ 텍스트만 뒤집기 */
+.m-dmgcmp-toggle[aria-expanded="true"] .m-dmgcmp-toggle-icon{
+  transform: rotate(180deg);
+}
+
+.m-dmgcmp-toggle[aria-expanded="true"]:active{
+  transform: translateY(-1px);
+}
+
+/* 시트는 닫혀 있을 때 완전히 안 보이게 */
+.m-dmgcmp-sheet{
+  position: fixed;
+  left: 0;
+  right: 0;
+
+  /* ✅ 데미지 비교 패널도 저장슬롯 바로 위를 기준으로 삼음 */
+  bottom: calc(var(--footer-h) + var(--safe-bottom) + var(--presetbar-h));
+
+  z-index: 95;
+  display: flex;
+  justify-content: center;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .18s ease, visibility .18s ease;
+}
+
+.m-dmgcmp-sheet.open{
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.m-dmgcmp-panel{
+  width: min(720px, calc(100vw - 16px));
+  border-radius: 18px 18px 0 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-bottom: none;
+  background: rgba(10,14,24,0.97);
+  box-shadow: 0 -14px 34px rgba(0,0,0,0.38);
+  backdrop-filter: blur(12px);
+
+  height: auto;                  /* ✅ 내용만큼만 */
+  max-height: min(46vh, 380px);  /* ✅ 너무 클 때만 제한 */
+  min-height: 200px;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.m-dmgcmp-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.m-dmgcmp-title{
+  font-size: 14px;
+  font-weight: 900;
+  color: rgba(233,238,247,0.96);
+}
+
+.m-dmgcmp-close{
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.m-dmgcmp-body{
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 14px 16px 18px;
+}
+
+.m-dmgcmp-empty{
+  border: 1px dashed rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+  border-radius: 14px;
+  padding: 18px 14px;
+  color: rgba(233,238,247,0.72);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.m-dmgcmp-actions{
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.m-dmgcmp-btn{
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: rgba(233,238,247,0.92);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.m-dmgcmp-btn.primary{
+  background: rgba(37,99,235,0.88);
+  border-color: rgba(37,99,235,0.45);
+  color: #fff;
+}
+
+.m-dmgcmp-list{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.m-dmgcmp-list:empty{
+  display: none;
+}
+
+.m-dmgcmp-card{
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  border-radius: 14px;
+  padding: 14px 14px 12px;
+}
+
+.m-dmgcmp-card-top{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.m-dmgcmp-card-title{
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 900;
+  color: rgba(233,238,247,0.96);
+  line-height: 1.35;
+}
+
+.m-dmgcmp-card-dmg{
+  flex: 0 0 auto;
+  font-size: 22px; /* ✅ 최종데미지 더 크게 */
+  font-weight: 900;
+  color: #ff6878;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.m-dmgcmp-compare{
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
+  color: rgba(233,238,247,0.88);
+}
+
+.m-dmgcmp-compare.up{
+  color: #60a5fa;
+}
+
+.m-dmgcmp-compare.down{
+  color: #fda4af;
+}
+
+.m-dmgcmp-compare .pct{
+  font-size: 18px;     /* ✅ 퍼센트 더 크게 */
+  font-weight: 950;    /* ✅ 더 굵게 */
+  line-height: 1;
+  letter-spacing: -0.2px;
+}
 
     .m-main {
       flex: 1 1 auto;
@@ -5035,6 +5261,47 @@
       </div>
     </div>
 
+        </div>
+
+        <!-- ====== 데미지 비교 토글 ====== -->
+    <button
+  type="button"
+  id="btnMobileDamageCompareToggle"
+  class="m-dmgcmp-toggle"
+  aria-label="데미지 비교 열기"
+  aria-expanded="false"
+>
+  <span class="m-dmgcmp-toggle-icon">^</span>
+</button>
+
+    <!-- ====== 데미지 비교 시트 ====== -->
+    <div id="mobileDamageCompareSheet" class="m-dmgcmp-sheet" aria-hidden="true">
+      <section class="m-dmgcmp-panel" aria-label="데미지 비교 패널">
+        <div class="m-dmgcmp-head">
+          <div class="m-dmgcmp-title">데미지 비교</div>
+          <button type="button" id="btnMobileDamageCompareClose" class="m-dmgcmp-close">닫기</button>
+        </div>
+
+        <div class="m-dmgcmp-body">
+  <div id="mobileDamageCompareEmpty" class="m-dmgcmp-empty">
+    아직 저장된 비교 데이터가 없습니다.<br>
+    계산하기 완료 후 현재 세팅 저장을 누르면 데미지를 단순비교 해 보실 수 있습니다.
+  </div>
+
+  <div id="mobileDamageCompareList" class="m-dmgcmp-list" aria-live="polite"></div>
+
+  <div class="m-dmgcmp-actions">
+    <button type="button" class="m-dmgcmp-btn primary" id="btnMobileDamageCompareSaveCurrent">
+      현재 세팅 저장
+    </button>
+    <button type="button" class="m-dmgcmp-btn" id="btnMobileDamageCompareClearAll">
+      비우기
+    </button>
+  </div>
+</div>
+      </section>
+    </div>
+
     <!-- ====== Bottom Fixed ====== -->
     <footer class="m-footer" style="height: var(--footer-h);">
       <div class="m-footer-row">
@@ -5370,6 +5637,7 @@ async function initOneLinerMobile() {
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;').replace(/`/g, '&#96;');
   }
+
   function shuffleInPlace(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -12437,13 +12705,15 @@ document.getElementById('pageEquip')?.addEventListener('click', async (e) => {
 
     // ===== Main actions (placeholders) =====
     document.getElementById('btnPickChar')?.addEventListener('click', async () => {
-      try {
-        await openMobileCharacterPicker();
-      } catch (e) {
-        console.error(e);
-        toast('캐릭터 목록을 불러오지 못했습니다.');
-      }
-    });
+  try {
+    await openMobileCharacterPicker();
+  } catch (e) {
+    console.error(e);
+    toast('캐릭터 목록을 불러오지 못했습니다.');
+  }
+});
+
+bindMobileDamageCompareUI();
 
     document.getElementById('btnContactSend')?.addEventListener('click', async () => {
   const ta = document.getElementById('contactTalk');
@@ -12872,7 +13142,7 @@ if (!sum?.ok) {
 //    (PC프리셋에서 넘어온 s.monster 객체가 남아 있으면 변경이 무시되는 문제 방지)
 const monster = (s.monsterName ? { name: String(s.monsterName).trim() } : (s.monster || null));
 
-        const { forceCrit100, tohampo12 } = getSpecialDamageFlagsMobile();
+const { forceCrit100, tohampo12 } = getSpecialDamageFlagsMobile();
 
 const resCompute = await apiJSON('compute', {
   p: null,
@@ -12884,9 +13154,20 @@ const resCompute = await apiJSON('compute', {
 
 let total = Number(resCompute.total || 0);
 
+/* ✅ 데미지 비교 저장용 마지막 계산 결과 보관 */
+window.state = window.state || {};
+window.state.lastComputedTotal = total;
+window.state.lastComputedAt = Date.now();
+
+window.state.forceCrit100 = !!forceCrit100;
+window.state.tohampo12 = !!tohampo12;
+
 document.getElementById('mobileFinalDamage').textContent = Math.floor(total).toLocaleString();
 
-        toast('계산 완료!');
+/* ✅ 저장된 비교 데미지가 있으면 비교 문구도 즉시 갱신 */
+renderMobileDamageCompareList();
+
+toast('계산 완료!');
         console.log('[MOBILE calc_all payload]', payload);
         console.log('[MOBILE skill_uses]', uses);
         console.log('[MOBILE compute]', resCompute);
@@ -13659,11 +13940,243 @@ window.state.selections[slot] = {
     /* ===== end auto input ===== */
 
     // ✅ 저장슬롯(푸터 위 고정) 높이를 실제 DOM 기준으로 측정해서 본문 padding-bottom에 반영
-    function _syncPresetbarHeight_mobile() {
-      const el = document.getElementById('mobilePresetBar');
-      const h = el ? Math.ceil(el.getBoundingClientRect().height) : 0;
-      document.documentElement.style.setProperty('--presetbar-h', `${h}px`);
-    }
+function _syncPresetbarHeight_mobile() {
+  const el = document.getElementById('mobilePresetBar');
+  const h = el ? Math.ceil(el.getBoundingClientRect().height) : 0;
+  document.documentElement.style.setProperty('--presetbar-h', `${h}px`);
+}
+
+function isMobileDamageCompareOpen() {
+  return !!document.getElementById('mobileDamageCompareSheet')?.classList.contains('open');
+}
+
+function openMobileDamageCompare() {
+  const sheet = document.getElementById('mobileDamageCompareSheet');
+  const btn = document.getElementById('btnMobileDamageCompareToggle');
+  if (!sheet) return;
+
+  sheet.classList.add('open');
+  sheet.setAttribute('aria-hidden', 'false');
+  if (btn) {
+    btn.setAttribute('aria-expanded', 'true');
+    btn.setAttribute('aria-label', '데미지 비교 닫기');
+  }
+}
+
+function closeMobileDamageCompare() {
+  const sheet = document.getElementById('mobileDamageCompareSheet');
+  const btn = document.getElementById('btnMobileDamageCompareToggle');
+  if (!sheet) return;
+
+  sheet.classList.remove('open');
+  sheet.setAttribute('aria-hidden', 'true');
+  if (btn) {
+    btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-label', '데미지 비교 열기');
+  }
+}
+
+function toggleMobileDamageCompare() {
+  if (isMobileDamageCompareOpen()) closeMobileDamageCompare();
+  else openMobileDamageCompare();
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function getMobileDamageCompareMessage(savedTotal) {
+  const currentTotal = Number(window.state?.lastComputedTotal || 0);
+  const saved = Number(savedTotal || 0);
+
+  if (!(saved > 0) || !(currentTotal > 0)) {
+    return { html: '현재 데미지와 비교할 수 없습니다.', cls: '' };
+  }
+
+  if (currentTotal === saved) {
+    return { html: '현재 데미지와 저장 데미지가 같습니다.', cls: '' };
+  }
+
+  if (currentTotal > saved) {
+    const pct = ((currentTotal - saved) / saved) * 100;
+    return {
+      html: `현재 데미지가 <span class="pct">${pct.toFixed(1)}%</span> 더 높습니다.`,
+      cls: 'up'
+    };
+  }
+
+  const pct = ((saved - currentTotal) / currentTotal) * 100;
+  return {
+    html: `저장 데미지가 <span class="pct">${pct.toFixed(1)}%</span> 더 높습니다.`,
+    cls: 'down'
+  };
+}
+
+function _getMobileCompareStore() {
+  if (!window.state) window.state = {};
+  if (!Array.isArray(window.state.mobileDamageCompareEntries)) {
+    window.state.mobileDamageCompareEntries = [];
+  }
+  return window.state.mobileDamageCompareEntries;
+}
+
+function _getMobileSelectedEquipCount() {
+  const sels = window.state?.selections || {};
+  return Object.values(sels).filter(v => v && typeof v === 'object' && String(v.name || '').trim()).length;
+}
+
+function _getMobileCompareCharacterLabel() {
+  return '비교 데미지값';
+}
+
+function _getMobileCompareMonsterLabel() {
+  const s = window.state || {};
+  return String(
+    s.monsterName ||
+    s.monster?.name ||
+    '몬스터 미선택'
+  ).trim() || '몬스터 미선택';
+}
+
+function _getMobileCompareTimeLabel() {
+  const s = window.state || {};
+  const tk = String(s.timeKey || '180');
+  return `${tk}초`;
+}
+
+function _buildMobileDamageCompareSnapshot() {
+  const s = window.state || {};
+  const total = Number(s.lastComputedTotal || 0);
+  if (!(total > 0)) return null;
+
+  const charLabel = _getMobileCompareCharacterLabel();
+  const equipCount = _getMobileSelectedEquipCount();
+  const monsterLabel = _getMobileCompareMonsterLabel();
+  const timeLabel = _getMobileCompareTimeLabel();
+
+  return {
+    id: `cmp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    savedAt: Date.now(),
+    title: charLabel,
+    total,
+    totalText: Math.floor(total).toLocaleString(),
+    equipCount,
+    monsterLabel,
+    timeLabel,
+    patchBefore: !!s.patchBefore,
+    forceCrit100: !!s.forceCrit100,
+    tohampo12: !!s.tohampo12
+  };
+}
+
+function renderMobileDamageCompareList() {
+  const listEl = document.getElementById('mobileDamageCompareList');
+  const emptyEl = document.getElementById('mobileDamageCompareEmpty');
+  if (!listEl || !emptyEl) return;
+
+  const row = _getMobileCompareStore()[0];
+
+  if (!row) {
+    listEl.innerHTML = '';
+    emptyEl.style.display = '';
+    return;
+  }
+
+  emptyEl.style.display = 'none';
+
+  const cmp = getMobileDamageCompareMessage(row.total);
+
+  listEl.innerHTML = `
+    <div class="m-dmgcmp-card" data-cmp-id="${escapeHtml(row.id || '')}">
+      <div class="m-dmgcmp-card-top">
+        <div class="m-dmgcmp-card-title">비교 데미지값</div>
+        <div class="m-dmgcmp-card-dmg">${escapeHtml(row.totalText || '0')}</div>
+      </div>
+
+      <div class="m-dmgcmp-compare ${escapeHtml(cmp.cls || '')}">
+  ${cmp.html || ''}
+</div>
+    </div>
+  `;
+}
+
+function saveCurrentMobileDamageCompare() {
+  const s = window.state || {};
+  const total = Number(s.lastComputedTotal || 0);
+
+  if (!(total > 0)) {
+    toast('먼저 계산하기 버튼을 눌러 데미지를 계산해주세요.');
+    return;
+  }
+
+  const snap = _buildMobileDamageCompareSnapshot();
+  if (!snap) {
+    toast('현재 저장할 계산 결과가 없습니다.');
+    return;
+  }
+
+  const arr = _getMobileCompareStore();
+  arr.length = 0;
+  arr.push(snap);
+
+  renderMobileDamageCompareList();
+  toast('비교 데미지값을 저장했습니다.');
+}
+
+function bindMobileDamageCompareUI() {
+  const toggleBtn = document.getElementById('btnMobileDamageCompareToggle');
+  const closeBtn = document.getElementById('btnMobileDamageCompareClose');
+  const saveBtn = document.getElementById('btnMobileDamageCompareSaveCurrent');
+  const clearBtn = document.getElementById('btnMobileDamageCompareClearAll');
+
+  if (toggleBtn && !toggleBtn.dataset.bound) {
+    toggleBtn.dataset.bound = '1';
+    toggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleMobileDamageCompare();
+    });
+  }
+
+  if (closeBtn && !closeBtn.dataset.bound) {
+    closeBtn.dataset.bound = '1';
+    closeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      closeMobileDamageCompare();
+    });
+  }
+
+  if (saveBtn && !saveBtn.dataset.bound) {
+    saveBtn.dataset.bound = '1';
+    saveBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      saveCurrentMobileDamageCompare();
+    });
+  }
+
+  if (clearBtn && !clearBtn.dataset.bound) {
+    clearBtn.dataset.bound = '1';
+    clearBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const arr = _getMobileCompareStore();
+      arr.length = 0;
+      renderMobileDamageCompareList();
+      toast('비교 목록을 모두 비웠습니다.');
+    });
+  }
+
+  renderMobileDamageCompareList();
+  closeMobileDamageCompare();
+}
 
     // 최초 1회 + 리사이즈/회전 대응
     requestAnimationFrame(_syncPresetbarHeight_mobile);
