@@ -18390,15 +18390,33 @@ function getSetBadgeExtraClass(badgeSrc = '') {
           }
           if (!srcImg) return;
 
-          slotEl.innerHTML =
-            labelHtml +
-            `<img class="item-img" alt="${safeAlt}" src="${srcImg}"` +
-            ` style="width:70%;height:70%;border-radius:8px;">`;
+          const restoredItem = {
+  name: String(info?.name || eq?.name || eq?.['이름'] || '').trim(),
+  img: srcImg || null,
+  type: String(
+    info?.type ||
+    eq?.type ||
+    eq?.['종류'] ||
+    ''
+  ).trim() || null,
+};
 
-          // ✅ “들어갔는지” 확인용: hover 툴팁
-          slotEl.title = String(info?.name || eq?.name || eq?.['이름'] || '');
+const badgeSrc = getSetBadgeSrc(restoredItem, logicalKey);
+const badgeExtraClass = getSetBadgeExtraClass(badgeSrc);
 
-          slotEl.classList.add('selected');
+slotEl.innerHTML =
+  labelHtml +
+  `
+  <div class="item-img-wrap">
+    <img class="item-main-img" alt="${safeAlt}" src="${srcImg}">
+    ${badgeSrc ? `<img class="item-set-badge ${badgeExtraClass}" src="${badgeSrc}" alt="">` : ''}
+  </div>
+  `;
+
+// ✅ “들어갔는지” 확인용: hover 툴팁
+slotEl.title = String(info?.name || eq?.name || eq?.['이름'] || '');
+
+slotEl.classList.add('selected');
         });
 
         // 5-4) 캐슬 씰/엠블렘/강화 라벨 등 부가 UI도 상태 기반으로 리프레시
