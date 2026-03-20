@@ -1365,32 +1365,34 @@
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) inset, 0 1px 0 rgba(255, 255, 255, 0.04);
     }
 
-.slot .item-img-wrap {
-  position: relative;
-  width: 70%;
-  height: 70%;
-}
+    .slot .item-img-wrap {
+      position: relative;
+      width: 70%;
+      height: 70%;
+    }
 
-.slot .item-main-img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  border-radius: 8px;
-}
+    .slot .item-main-img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      border-radius: 8px;
+    }
 
-.slot .item-set-badge { /* 메인슬롯 배지 */
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-  width: 29px;
-  height: 29px;
-  object-fit: contain;
-  pointer-events: none;
-  z-index: 1;   /* ✅ 마법봉인 캡션보다 아래 */
-}
+    .slot .item-set-badge {
+      /* 메인슬롯 배지 */
+      position: absolute;
+      left: 0px;
+      bottom: 0px;
+      width: 29px;
+      height: 29px;
+      object-fit: contain;
+      pointer-events: none;
+      z-index: 1;
+      /* ✅ 마법봉인 캡션보다 아래 */
+    }
 
-.slot:hover {
+    .slot:hover {
       transform: translateY(-2px);
       border-color: rgba(110, 168, 255, 0.5);
       box-shadow: 0 0 0 4px var(--ring), 0 10px 24px rgba(0, 0, 0, 0.35) inset;
@@ -1670,6 +1672,356 @@
       color: #f0e6d2;
     }
 
+    /* ===== 시너지 효과 모달 전용 ===== */
+    .synergy-effect-dialog {
+      width: min(1180px, 96vw);
+      height: min(860px, 94vh);
+    }
+
+    .synergy-effect-catalog {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .synergy-set-box {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 10px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01));
+}
+
+.synergy-set-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px; /* ← 제목과 아래칸 사이 간격 */
+}
+
+.synergy-set-head-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.synergy-enable-check {
+  width: 16px;
+  height: 16px;
+  accent-color: #cfa24f;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.synergy-reset-btn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid #3a2c21;
+  background: #1a130f;
+  color: #f0e6d2;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.synergy-reset-btn:hover {
+  border-color: #cfa24f;
+  box-shadow: 0 0 0 2px rgba(207, 162, 79, .18) inset;
+}
+
+.synergy-reset-btn:active {
+  transform: translateY(1px);
+}
+
+    .synergy-top-row {
+      display: grid;
+      grid-template-columns: 1.1fr 1.4fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .synergy-bottom-row {
+      display: grid;
+      grid-template-columns: 0.60fr 1.40fr 1fr 1fr;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .synergy-char-box > .btnetc,
+.synergy-weapon-box > .btnetc,
+.synergy-equip-box > .btnetc { transform: translateY(10px); }
+
+.synergy-char-box > .synergy-picked-char-wrap,
+.synergy-weapon-box > .synergy-picked-weapon-wrap,
+.synergy-equip-box > .synergy-picked-set-wrap { transform: translateY(10px); }
+
+.synergy-char-box,
+.synergy-weapon-box,
+.synergy-equip-box { padding-bottom: 10px; }
+
+    .synergy-picked-text {
+      font-size: 13px;
+      line-height: 1.45;
+      min-height: 20px;
+    }
+
+    .synergy-picked-char-wrap {
+      width: 100%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      margin-top: 2px;
+    }
+
+    .synergy-picked-char-img {
+      width: 100%;
+      max-width: 180px;
+      aspect-ratio: 16 / 7;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid rgba(207, 162, 79, 0.35);
+      background: #0c0a08;
+    }
+    .synergy-picked-char-wrap,
+.synergy-picked-set-wrap {
+  cursor: pointer;
+}
+
+.synergy-picked-char-wrap:hover,
+.synergy-picked-set-wrap:hover {
+  filter: brightness(1.06);
+}
+    .synergy-picked-set-wrap {
+  width: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.synergy-picked-set-item {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(207, 162, 79, 0.35);
+  background: #0c0a08;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.synergy-picked-set-item .icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.synergy-picked-set-item .set-badge-icon {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 1;
+}
+
+    .synergy-select-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      align-items: center;
+    }
+.synergy-calc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 6px;
+  padding: 12px 4px 2px;
+}
+
+.synergy-compute-btn {
+  min-width: 220px;
+  height: 40px;
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+.synergy-final-box {
+  flex: 1;
+  min-height: 40px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 12px;
+  background: rgba(255,255,255,.03);
+  padding: 8px 12px;
+}
+
+.synergy-final-value {
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffd36b;
+  line-height: 1.15;
+}
+
+.synergy-final-value.loading {
+  color: #e6e9ef;
+}
+    #synergyPickerList .items {
+  overflow: auto;
+  padding: 10px 6px 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-content: start;
+}
+
+#synergyPickerList .items > .item-list {
+  grid-column: 1 / -1;
+}
+
+    #synergyPickerList .set-group-title {
+      grid-column: 1 / -1;
+      margin: 4px 0 0;
+      padding: 4px 2px 2px;
+      color: #b89b63;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .1px;
+    }
+
+    #synergyPickerList .armor-set-card {
+      min-width: 0;
+      background: #15100c;
+      border: 1px solid #3a2c21;
+      border-radius: 12px;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    #synergyPickerList .armor-set-card:hover {
+      border-color: #7c5b37;
+      box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
+    }
+
+    #synergyPickerList .armor-set-header {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 6px;
+      min-height: 20px;
+    }
+
+    #synergyPickerList .armor-set-header-title {
+      color: #f0e6d2;
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    #synergyPickerList .armor-set-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      padding-top: 1px;
+    }
+
+    #synergyPickerList .armor-set-card[data-mode="armor"] .armor-set-items,
+    #synergyPickerList .armor-set-card[data-mode="acc"] .armor-set-items,
+    #synergyPickerList .armor-set-card[data-mode="spec"] .armor-set-items {
+      grid-template-columns: none;
+    }
+
+    #synergyPickerList .armor-set-item {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    #synergyPickerList .armor-set-item .iconbox {
+      width: 56px;
+      height: 56px;
+      border-radius: 10px;
+      aspect-ratio: auto;
+    }
+
+    .synergy-field {
+      display: block;
+    }
+
+    .synergy-field-full {
+      grid-column: auto;
+    }
+
+    .synergy-select {
+      width: 100%;
+    }
+
+    .synergy-weapon-box {
+  min-width: 0;
+}
+
+.synergy-picked-weapon-wrap {
+  width: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.synergy-picked-weapon-wrap:hover {
+  filter: brightness(1.06);
+}
+
+.synergy-picked-weapon-item {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(207, 162, 79, 0.35);
+  background: #0c0a08;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.synergy-picked-weapon-item .icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+    @media (max-width: 980px) {
+      .synergy-top-row {
+        grid-template-columns: 1fr;
+      }
+
+      .synergy-bottom-row {
+        grid-template-columns: 1fr;
+      }
+
+      .synergy-select-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .synergy-field-full {
+        grid-column: auto;
+      }
+    }
+
     /* 캐릭터 카탈로그 */
     .catalog {
       overflow: auto;
@@ -1756,6 +2108,7 @@
       font-size: 14px;
       color: #f0e6d2;
       font-weight: 700;
+      text-align: center;
     }
 
     /* 무기 탭 */
@@ -1855,41 +2208,46 @@
     }
 
     .iconbox .set-badge-icon {
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-  width: 26px;
-  height: 26px;
-  object-fit: contain;
-  pointer-events: none;
-  z-index: 1;
-}
+      position: absolute;
+      left: 0px;
+      bottom: 0px;
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+      pointer-events: none;
+      z-index: 1;
+    }
 
-/* 배지별 미세 위치 보정 메인슬롯 item-set, 모달 set-badge*/
-.item-set-badge.badge-bithall{
-  left: -2px;   /* 기본 2px → 조금 더 오른쪽 */
-    width: 32px;
-  height: 32px;
-}
+    /* 배지별 미세 위치 보정 메인슬롯 item-set, 모달 set-badge*/
+    .item-set-badge.badge-bithall {
+      left: -2px;
+      /* 기본 2px → 조금 더 오른쪽 */
+      width: 32px;
+      height: 32px;
+    }
 
-.set-badge-icon.badge-bithall {
-  left: -2px;   /* 기본 2px → 조금 더 오른쪽 */
-  bottom: -2px; /* 기본 2px → 조금 더 아래 */
-    width: 30px;
-  height: 30px;
-}
+    .set-badge-icon.badge-bithall {
+      left: -2px;
+      /* 기본 2px → 조금 더 오른쪽 */
+      bottom: -2px;
+      /* 기본 2px → 조금 더 아래 */
+      width: 30px;
+      height: 30px;
+    }
 
-.item-set-badge.badge-tower{
-  bottom: -4px; /* 기본 2px → 조금 더 아래 */
-  width: 32px;
-  height: 32px;
-}
+    .item-set-badge.badge-tower {
+      bottom: -4px;
+      /* 기본 2px → 조금 더 아래 */
+      width: 32px;
+      height: 32px;
+    }
 
-.set-badge-icon.badge-tower {
-  bottom: -4px; /* 기본 2px → 조금 더 아래 */
-  width: 30px;
-  height: 30px;
-}
+    .set-badge-icon.badge-tower {
+      bottom: -4px;
+      /* 기본 2px → 조금 더 아래 */
+      width: 30px;
+      height: 30px;
+    }
 
     .badge-lv {
       position: absolute;
@@ -2424,47 +2782,48 @@
       gap: 10px;
     }
 
-/* ✅ 최종데미지 라벨 줄: 왼쪽(텍스트+i) / 오른쪽(크리/투함포) 양끝 정렬 */
-.final-damage .label-with-tip{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-}
+    /* ✅ 최종데미지 라벨 줄: 왼쪽(텍스트+i) / 오른쪽(크리/투함포) 양끝 정렬 */
+    .final-damage .label-with-tip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+    }
 
-/* 왼쪽 묶음(텍스트+i) */
-.final-damage .fd-label-left{
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-}
+    /* 왼쪽 묶음(텍스트+i) */
+    .final-damage .fd-label-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+    }
 
-/* 오른쪽 체크박스 묶음: 우측으로 밀착 */
-.final-damage .special-dmg-opt-inline{
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-left: auto;   /* ✅ 핵심 */
-  flex-shrink: 0;
-}
+    /* 오른쪽 체크박스 묶음: 우측으로 밀착 */
+    .final-damage .special-dmg-opt-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+      /* ✅ 핵심 */
+      flex-shrink: 0;
+    }
 
-.final-damage .special-dmg-opt-item{
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-}
+    .final-damage .special-dmg-opt-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
 
-.final-damage .special-dmg-opt-item input[type="checkbox"]{
-  margin: 0;
-  width: 14px;
-  height: 14px;
-}
+    .final-damage .special-dmg-opt-item input[type="checkbox"] {
+      margin: 0;
+      width: 14px;
+      height: 14px;
+    }
 
     .prepatch-inline-toggle {
       display: inline-flex;
@@ -3942,15 +4301,16 @@
 
     /* === Seal text captions inside slots === */
     .seal-captions {
-  position: absolute;
-  left: 6px;
-  bottom: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  pointer-events: none;
-  z-index: 3;   /* ✅ 배지보다 위 */
-}
+      position: absolute;
+      left: 6px;
+      bottom: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      pointer-events: none;
+      z-index: 3;
+      /* ✅ 배지보다 위 */
+    }
 
     .seal-captions .seal-row {
       display: flex;
@@ -5325,7 +5685,11 @@
         <div class="center-top-row">
           <!-- ✅ 왼쪽: 테스트 전용 버튼들 (방어구 / 악세사리) -->
           <div class="center-special-col">
-            <!-- ✅ SPECIAL_USER 전용: 강제 계산 옵션 -->
+            <!-- ✅ SPECIAL_USER 전용: 시너지 효과 -->
+            <button id="btnSynergyEffect" class="btn btn-special-patch" type="button" style="display:none;">
+              시너지 효과
+            </button>
+
             <!-- ✅ SPECIAL_USER 전용: 스킬별 데미지 보기 -->
             <button id="btnSkillDamageViewer" class="btn btn-special-patch" type="button" style="display:none;">
               데미지 보기
@@ -5669,29 +6033,29 @@
           </div>
         </div>
         <div class="final-damage">
-       <span class="label label-with-tip">
-  <span class="fd-label-left">
-    최종데미지
-    <span class="info-tip" tabindex="0" aria-label="최종 데미지 설명">
-      i
-      <span class="info-tip-content">
-        현재 선택한 모든 효과를 합산하여 총 데미지를 계산합니다.<br>
-        좌측과 우측의 계산하기는 따로 동작이 가능하며, 데미지를 비교해보실 수 있습니다.
-      </span>
-    </span>
-  </span>
+          <span class="label label-with-tip">
+            <span class="fd-label-left">
+              최종데미지
+              <span class="info-tip" tabindex="0" aria-label="최종 데미지 설명">
+                i
+                <span class="info-tip-content">
+                  현재 선택한 모든 효과를 합산하여 총 데미지를 계산합니다.<br>
+                  좌측과 우측의 계산하기는 따로 동작이 가능하며, 데미지를 비교해보실 수 있습니다.
+                </span>
+              </span>
+            </span>
 
-  <span id="specialDamageOptRow" class="special-dmg-opt-inline">
-    <label class="special-dmg-opt-item">
-      <input type="checkbox" id="chkForceCrit100">
-      크리티컬
-    </label>
-    <label class="special-dmg-opt-item">
-      <input type="checkbox" id="chkTohampo12">
-      투함포
-    </label>
-  </span>
-</span>
+            <span id="specialDamageOptRow" class="special-dmg-opt-inline">
+              <label class="special-dmg-opt-item">
+                <input type="checkbox" id="chkForceCrit100">
+                크리티컬
+              </label>
+              <label class="special-dmg-opt-item">
+                <input type="checkbox" id="chkTohampo12">
+                투함포
+              </label>
+            </span>
+          </span>
           <strong class="value" id="finalDamageValue2">&nbsp;</strong>
           <button id="btn-sum-all-final2" type="button">계산하기</button>
         </div>
@@ -5779,6 +6143,263 @@
     </div>
   </div>
 
+  <!-- ✅ 시너지 효과 모달 -->
+  <div id="synergyEffectModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-close></div>
+    <div class="dialog synergy-effect-dialog">
+      <header>
+        <button class="icon-btn" type="button" data-close aria-label="닫기">✕</button>
+        <h2>시너지 효과</h2>
+        <div></div>
+      </header>
+
+      <div class="catalog synergy-effect-catalog">
+
+        <!-- ===== 1번 세트 ===== -->
+        <section class="synergy-set-box">
+          <div class="synergy-set-head">
+  <div class="synergy-set-head-left">
+    <input id="synergyEnabled1" class="synergy-enable-check" type="checkbox" />
+    <div class="opt-title">시너지 1</div>
+  </div>
+
+  <button id="btnSynergyReset1" class="synergy-reset-btn" type="button">
+    초기화
+  </button>
+</div>
+
+          <!-- 윗줄: 캐릭터 + 드롭다운들 -->
+          <div class="synergy-top-row">
+            <section class="opt-box synergy-char-box">
+              <button id="btnSynergyPickChar" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+                캐릭터 선택
+              </button>
+
+              <div id="synergyPickedCharWrap" class="synergy-picked-char-wrap" style="display:none;">
+                <img id="synergyPickedCharImg" class="synergy-picked-char-img" alt="선택 캐릭터">
+              </div>
+
+              <div id="synergyPickedChar" class="muted synergy-picked-text" style="display:none;"></div>
+            </section>
+
+            <section class="opt-box synergy-extra-box">
+  <div class="synergy-select-grid">
+    <label class="synergy-field">
+      <div class="muted" style="margin-bottom:4px;">착용아바타</div>
+      <select id="synergyAvatar1" class="input synergy-select">
+        <option value="없음">없음</option>
+        <option value="레어" selected>레어</option>
+        <option value="상급">상급</option>
+      </select>
+    </label>
+
+    <label class="synergy-field">
+      <div class="muted" style="margin-bottom:4px;">칭호설정</div>
+      <select id="synergyTitle1" class="input synergy-select">
+        <option value="없음">없음</option>
+        <option value="일반">일반</option>
+        <option value="종결" selected>종결</option>
+      </select>
+    </label>
+
+    <label class="synergy-field synergy-field-full">
+      <div class="muted" style="margin-bottom:4px;">마을지능</div>
+      <select id="synergyDetail1" class="input synergy-select">
+        <option value="6000">6,000</option>
+        <option value="6500">6,500</option>
+        <option value="7000">7,000</option>
+        <option value="7500">7,500</option>
+        <option value="8000" selected>8,000</option>
+        <option value="8500">8,500</option>
+        <option value="9000">9,000</option>
+      </select>
+    </label>
+  </div>
+</section>
+          </div>
+
+          <!-- 아랫줄: 방어구 / 악세 / 특수 -->
+          <div class="synergy-bottom-row">
+  <section class="opt-box synergy-weapon-box">
+    <button id="btnSynergyPickWeapon" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+      무기 선택
+    </button>
+
+    <div id="synergyPickedWeaponWrap" class="synergy-picked-weapon-wrap" style="display:none;">
+      <div class="synergy-picked-weapon-item">
+        <img id="synergyPickedWeaponImg" class="icon" alt="선택 무기">
+      </div>
+    </div>
+
+    <div id="synergyPickedWeapon" class="muted synergy-picked-text" style="display:none;"></div>
+  </section>
+
+  <section class="opt-box synergy-equip-box">
+    <button id="btnSynergyPickArmorSet" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+      방어구셋 선택
+    </button>
+
+    <div id="synergyPickedArmorSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
+    <div id="synergyPickedArmorSet" class="muted synergy-picked-text" style="display:none;"></div>
+  </section>
+
+  <section class="opt-box synergy-equip-box">
+    <button id="btnSynergyPickAccSet" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+      악세사리셋 선택
+    </button>
+
+    <div id="synergyPickedAccSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
+    <div id="synergyPickedAccSet" class="muted synergy-picked-text" style="display:none;"></div>
+  </section>
+
+  <section class="opt-box synergy-equip-box">
+    <button id="btnSynergyPickSpecSet" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+      특수장비셋 선택
+    </button>
+
+    <div id="synergyPickedSpecSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
+    <div id="synergyPickedSpecSet" class="muted synergy-picked-text" style="display:none;"></div>
+  </section>
+</div>
+        </section>
+
+        <!-- ===== 2번 세트 ===== -->
+        <section class="synergy-set-box">
+          <div class="synergy-set-head">
+  <div class="synergy-set-head-left">
+    <input id="synergyEnabled2" class="synergy-enable-check" type="checkbox" />
+    <div class="opt-title">시너지 2</div>
+  </div>
+
+  <button id="btnSynergyReset2" class="synergy-reset-btn" type="button">
+    초기화
+  </button>
+</div>
+
+          <!-- 윗줄: 캐릭터 + 드롭다운들 -->
+          <div class="synergy-top-row">
+            <section class="opt-box synergy-char-box">
+  <button id="btnSynergyPickChar2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+    캐릭터 선택
+  </button>
+
+  <div id="synergyPickedCharWrap2" class="synergy-picked-char-wrap" style="display:none;">
+    <img id="synergyPickedCharImg2" class="synergy-picked-char-img" alt="선택 캐릭터">
+  </div>
+
+  <div id="synergyPickedChar2" class="muted synergy-picked-text" style="display:none;"></div>
+</section>
+
+            <section class="opt-box synergy-extra-box">
+  <div class="synergy-select-grid">
+    <label class="synergy-field">
+      <div class="muted" style="margin-bottom:4px;">착용아바타</div>
+      <select id="synergyAvatar2" class="input synergy-select">
+        <option value="없음">없음</option>
+        <option value="레어" selected>레어</option>
+        <option value="상급">상급</option>
+      </select>
+    </label>
+
+    <label class="synergy-field">
+      <div class="muted" style="margin-bottom:4px;">칭호설정</div>
+      <select id="synergyTitle2" class="input synergy-select">
+        <option value="없음">없음</option>
+        <option value="일반">일반</option>
+        <option value="종결" selected>종결</option>
+      </select>
+    </label>
+
+    <label class="synergy-field synergy-field-full">
+      <div class="muted" style="margin-bottom:4px;">마을지능</div>
+      <select id="synergyDetail2" class="input synergy-select">
+        <option value="6000">6,000</option>
+        <option value="6500">6,500</option>
+        <option value="7000">7,000</option>
+        <option value="7500">7,500</option>
+        <option value="8000" selected>8,000</option>
+        <option value="8500">8,500</option>
+        <option value="9000">9,000</option>
+      </select>
+    </label>
+  </div>
+</section>
+          </div>
+
+          <!-- 아랫줄: 방어구 / 악세 / 특수 -->
+          <div class="synergy-bottom-row">
+  <section class="opt-box synergy-weapon-box">
+    <button id="btnSynergyPickWeapon2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+      무기 선택
+    </button>
+
+    <div id="synergyPickedWeaponWrap2" class="synergy-picked-weapon-wrap" style="display:none;">
+      <div class="synergy-picked-weapon-item">
+        <img id="synergyPickedWeaponImg2" class="icon" alt="선택 무기">
+      </div>
+    </div>
+
+    <div id="synergyPickedWeapon2" class="muted synergy-picked-text" style="display:none;"></div>
+  </section>
+
+  <section class="opt-box synergy-equip-box">
+    <button id="btnSynergyPickArmorSet2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+      방어구셋 선택
+    </button>
+
+    <div id="synergyPickedArmorSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
+    <div id="synergyPickedArmorSet2" class="muted synergy-picked-text" style="display:none;"></div>
+  </section>
+
+  <section class="opt-box synergy-equip-box">
+    <button id="btnSynergyPickAccSet2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+      악세사리셋 선택
+    </button>
+
+    <div id="synergyPickedAccSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
+    <div id="synergyPickedAccSet2" class="muted synergy-picked-text" style="display:none;"></div>
+  </section>
+
+  <section class="opt-box synergy-equip-box">
+    <button id="btnSynergyPickSpecSet2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+      특수장비셋 선택
+    </button>
+
+    <div id="synergyPickedSpecSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
+    <div id="synergyPickedSpecSet2" class="muted synergy-picked-text" style="display:none;"></div>
+  </section>
+</div>
+        </section>
+<div class="synergy-calc-footer">
+  <button id="btnSynergyCompute" class="btnetc synergy-compute-btn" type="button" data-compute-btn>
+    시너지효과 포함 계산하기
+  </button>
+
+  <div class="synergy-final-box">
+    <div class="muted" style="font-size:12px; margin-bottom:4px;">최종데미지</div>
+    <div id="synergyFinalDamageValue" class="synergy-final-value">-</div>
+  </div>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ 시너지 선택 공용 모달 -->
+  <div id="synergyPickerModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-close></div>
+    <div class="dialog">
+      <header>
+        <button class="icon-btn" type="button" data-close aria-label="닫기">✕</button>
+        <h2 id="synergyPickerTitle">선택</h2>
+        <div></div>
+      </header>
+
+      <div id="synergyPickerCatalog" class="catalog">
+        <div id="synergyPickerList"></div>
+      </div>
+    </div>
+  </div>
+
   <div id="skillDamageModal" class="modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
     <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="skillDamageDlgTitle"
@@ -5794,14 +6415,14 @@
         <div style="max-height:60vh; overflow:auto; border:1px solid rgba(255,255,255,.08); border-radius:10px;">
           <table style="width:100%; border-collapse:collapse; font-size:12px;">
             <thead style="position:sticky; top:0; background:#111827; z-index:1;">
-  <tr>
-    <th style="text-align:left; padding:8px 10px;">스킬</th>
-    <th style="text-align:right; padding:8px 10px;">사용횟수</th>
-    <th style="text-align:right; padding:8px 10px;">합계 데미지</th>
-    <th style="text-align:right; padding:8px 10px;">1회 데미지</th>
-    <th style="text-align:right; padding:8px 10px;">점유율</th>
-  </tr>
-</thead>
+              <tr>
+                <th style="text-align:left; padding:8px 10px;">스킬</th>
+                <th style="text-align:right; padding:8px 10px;">사용횟수</th>
+                <th style="text-align:right; padding:8px 10px;">합계 데미지</th>
+                <th style="text-align:right; padding:8px 10px;">1회 데미지</th>
+                <th style="text-align:right; padding:8px 10px;">점유율</th>
+              </tr>
+            </thead>
             <tbody id="skillDamageTbody"></tbody>
           </table>
         </div>
@@ -6514,27 +7135,29 @@
           </li>
           <li></li>
           <li><br>안녕하세요 게임실험연구소 입니다.<br><br>
-            
-            02월 19일자 몬스터 방어력 조정 패치 진행시, 카운터 데미지 계산이 비정상적으로 증가, 적용되는 버그가 발생하였습니다. 02월 27일자로 버그가 픽스되면서, 현재 계산값이 해당 기간내 계산하신 데미지보다 감소하게 되었는데, 이는 정상 데미지계산값 입니다.<br><br>
-            
+
+            02월 19일자 몬스터 방어력 조정 패치 진행시, 카운터 데미지 계산이 비정상적으로 증가, 적용되는 버그가 발생하였습니다. 02월 27일자로 버그가 픽스되면서, 현재 계산값이 해당 기간내
+            계산하신 데미지보다 감소하게 되었는데, 이는 정상 데미지계산값 입니다.<br><br>
+
             버그 픽스가 늦어지게 된 점 진심으로 죄송하다는 말씀 올립니다.<br><br>
 
-            착용하고 있는 장비와는 관련없이 모든 상황에서 카운터 데미지 계산이 비정상적으로 증가되었기에, 장비간 데미지 차이 비율은 변동이 없습니다. 다시는 이런일이 발생하지 않도록 만전을 기하도록 하겠습니다.<br><br>
-            
+            착용하고 있는 장비와는 관련없이 모든 상황에서 카운터 데미지 계산이 비정상적으로 증가되었기에, 장비간 데미지 차이 비율은 변동이 없습니다. 다시는 이런일이 발생하지 않도록 만전을 기하도록
+            하겠습니다.<br><br>
+
             <s>더불어 현재 만크리, 투함포 옵션을 테스트 중입니다.<br>
-            조만간 실제 인게임에서 측정할 수 있는 크적카백투 거대누골 데미지값과 동일한 데미지값을 계산해 보실 수 있으니, 조금만 기다려주시면 감사하겠습니다.</s><br>
+              조만간 실제 인게임에서 측정할 수 있는 크적카백투 거대누골 데미지값과 동일한 데미지값을 계산해 보실 수 있으니, 조금만 기다려주시면 감사하겠습니다.</s><br>
             <strong style="color: #ff4444;">[03.02] 만크리, 투함포 옵션 업데이트 완료</strong><br><br>
 
 
             더욱 노력하는 게임실험연구소가 되겠습니다.<br><br>
 
             감사합니다.<br>
-            <li class="sign-row">
+          <li class="sign-row">
             <span class="sign-text">- 게임실험연구소장 드림 -</span>
             <img src="/img/sign.png" alt="게임실험연구소장 직인" class="seal-stamp">
           </li>
 
-           <!--
+          <!--
              저희 <span style="color: yellow;">게임실험연구소</span> <strong style="color: #ff4444; font-size:15px;">'던파모바일 시즌5
               계산기'</strong> 발전에 함께해주신 모든 연구원 여러분께 깊은 감사드립니다.<br>
             여러분의 <strong style="color: white;">후원과 관심, 그리고 세심한 오류·버그 제보</strong> 덕분에<br>
@@ -6583,16 +7206,22 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
-          <li>26.03.09 [모바일] <span style="color: yellow;">최종 데미지 계산값</span><span style="color: #ff4444;"> 단순 비교 기능</span> 추가</li>
+          <li>26.03.09 [모바일] <span style="color: yellow;">최종 데미지 계산값</span><span style="color: #ff4444;"> 단순 비교
+              기능</span> 추가</li>
           <li>26.03.08 <span style="color: yellow;">접두사 장비</span><span style="color: #ff4444;"> 배지 아이콘</span> 추가</li>
           <li>26.03.06 <span style="color: yellow;">남스핏파이어</span> <span style="color: #ff4444;"> 라스트 슈팅</span> 추가</li>
           <li>26.03.05 <span style="color: yellow;">빙결사</span> <span style="color: #ff4444;"> 헤일스톰 미적용 버그</span> 수정</li>
-          <li>26.03.02 수련장 <span style="color: yellow;">크리티컬, 투함포 옵션</span> <span style="color: #ff4444;"> 추가</span></li>
-          <li>26.02.28 [모바일] <span style="color: yellow;">개별, 세트 아이템</span> <span style="color: #ff4444;">상세 설명 추가</span></li>
-          <li>26.02.28 [모바일] 밸런스 <span style="color: yellow;">패치전 계산</span><span style="color: #ff4444;"> 기능 추가</span></li>
+          <li>26.03.02 수련장 <span style="color: yellow;">크리티컬, 투함포 옵션</span> <span style="color: #ff4444;"> 추가</span>
+          </li>
+          <li>26.02.28 [모바일] <span style="color: yellow;">개별, 세트 아이템</span> <span style="color: #ff4444;">상세 설명
+              추가</span></li>
+          <li>26.02.28 [모바일] 밸런스 <span style="color: yellow;">패치전 계산</span><span style="color: #ff4444;"> 기능 추가</span>
+          </li>
           <li>26.02.27 <strong><u>비정상적인 카운터 데미지 버그 수정(공지참고)</u></strong></li>
-          <li>26.02.27 [PC] <span style="color: yellow;">스킬 초기화 버튼 추가</span> 및 <span style="color: #ff4444;">스킬 버튼 활성화 개선</span></li>
-          <li>26.02.26 [PC] <span style="color: yellow;">260226 밸런스 패치 적용</span> 및 <span style="color: #ff4444;">패치전 계산 기능
+          <li>26.02.27 [PC] <span style="color: yellow;">스킬 초기화 버튼 추가</span> 및 <span style="color: #ff4444;">스킬 버튼 활성화
+              개선</span></li>
+          <li>26.02.26 [PC] <span style="color: yellow;">260226 밸런스 패치 적용</span> 및 <span style="color: #ff4444;">패치전 계산
+              기능
               추가</span></li>
           <li>26.02.25 합산스탯 <span style="color: yellow;">물리/마법 공격력 변수</span> <span style="color: #ff4444;">표기 오류</span>
             수정 </li>
@@ -7169,16 +7798,18 @@
       }
 
       // ✅ [특정 유저 전용 유지] 아래 4개는 그대로 제한
+      const btnSynergy = document.getElementById('btnSynergyEffect');
       const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
-      const rowDmgOpt = document.getElementById('specialDamageOptRow');   // ✅ 추가
+      const rowDmgOpt = document.getElementById('specialDamageOptRow');
       const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
       const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
       const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
       const rowUnique = document.getElementById('uniqueOnOffRow');
 
+      if (btnSynergy) btnSynergy.style.display = isSpecialUser ? 'inline-flex' : 'none';
       if (btnSkillDamage) btnSkillDamage.style.display = isSpecialUser ? 'inline-flex' : 'none';
       // ✅ 크리100/투함포 체크박스는 전체 공개
-if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
+      if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
       if (btnAutoSet) btnAutoSet.style.display = isSpecialUser ? 'inline-flex' : 'none';
       if (btnAutoSetMissing) btnAutoSetMissing.style.display = isSpecialUser ? 'inline-flex' : 'none';
       if (btnAutoWeapon) btnAutoWeapon.style.display = isSpecialUser ? 'inline-flex' : 'none';
@@ -7193,6 +7824,27 @@ if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
     // 🔧 전역에서도 같은 객체를 바라보게
     window.state = state;
 
+    state.synergy = state.synergy || {
+  enabled1: false,
+  enabled2: false,
+
+  char: null,
+  char2: null,
+
+  weapon: null,
+  weapon2: null,
+
+  armorSet: null,
+  accSet: null,
+  specSet: null,
+
+  armorSet2: null,
+  accSet2: null,
+  specSet2: null,
+};
+
+    state.ui = state.ui || {};
+    state.ui.synergySetPickTarget = null; // 'armor1' | 'acc1' | 'spec1' | 'armor2' | 'acc2' | 'spec2' | null
     state.slotVer = state.slotVer || {};   // { weapon: 1, ring: 3 ... }
     state.skillLv = state.skillLv || {}; // {skillId: 현재레벨}
     state.stUsedSP = state.stUsedSP || 0;
@@ -8136,29 +8788,29 @@ if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
           btn.title = piece.name || '';
 
           const box = document.createElement('div');
-box.className = 'iconbox';
+          box.className = 'iconbox';
 
-const img = document.createElement('img');
-img.className = 'icon';
-img.src = piece.img || PLACEHOLDER_IMG;
-img.alt = piece.name || piece.slot || '';
+          const img = document.createElement('img');
+          img.className = 'icon';
+          img.src = piece.img || PLACEHOLDER_IMG;
+          img.alt = piece.name || piece.slot || '';
 
-const setBadgeSrc = getSetBadgeSrc(piece.item || piece, piece.slot || '');
+          const setBadgeSrc = getSetBadgeSrc(piece.item || piece, piece.slot || '');
 
-const setBadgeImg = document.createElement('img');
-setBadgeImg.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
-setBadgeImg.src = setBadgeSrc || '';
-setBadgeImg.alt = '';
+          const setBadgeImg = document.createElement('img');
+          setBadgeImg.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
+          setBadgeImg.src = setBadgeSrc || '';
+          setBadgeImg.alt = '';
 
-const badge = document.createElement('div');
-badge.className = 'badge-lv';
-badge.textContent = piece.level ? `Lv.${piece.level}` : '';
+          const badge = document.createElement('div');
+          badge.className = 'badge-lv';
+          badge.textContent = piece.level ? `Lv.${piece.level}` : '';
 
-box.appendChild(img);
-if (setBadgeSrc) box.appendChild(setBadgeImg);
-if (badge.textContent) box.appendChild(badge);
-btn.appendChild(box);
-itemsRow.appendChild(btn);
+          box.appendChild(img);
+          if (setBadgeSrc) box.appendChild(setBadgeImg);
+          if (badge.textContent) box.appendChild(badge);
+          btn.appendChild(box);
+          itemsRow.appendChild(btn);
         });
 
         card.appendChild(itemsRow);
@@ -8273,29 +8925,29 @@ itemsRow.appendChild(btn);
           btn.title = piece.name || '';
 
           const box = document.createElement('div');
-box.className = 'iconbox';
+          box.className = 'iconbox';
 
-const img = document.createElement('img');
-img.className = 'icon';
-img.src = piece.img || PLACEHOLDER_IMG;
-img.alt = piece.name || piece.slot || '';
+          const img = document.createElement('img');
+          img.className = 'icon';
+          img.src = piece.img || PLACEHOLDER_IMG;
+          img.alt = piece.name || piece.slot || '';
 
-const setBadgeSrc = getSetBadgeSrc(piece.item || piece, piece.slot || '');
+          const setBadgeSrc = getSetBadgeSrc(piece.item || piece, piece.slot || '');
 
-const setBadgeImg = document.createElement('img');
-setBadgeImg.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
-setBadgeImg.src = setBadgeSrc || '';
-setBadgeImg.alt = '';
+          const setBadgeImg = document.createElement('img');
+          setBadgeImg.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
+          setBadgeImg.src = setBadgeSrc || '';
+          setBadgeImg.alt = '';
 
-const badge = document.createElement('div');
-badge.className = 'badge-lv';
-badge.textContent = piece.level ? `Lv.${piece.level}` : '';
+          const badge = document.createElement('div');
+          badge.className = 'badge-lv';
+          badge.textContent = piece.level ? `Lv.${piece.level}` : '';
 
-box.appendChild(img);
-if (setBadgeSrc) box.appendChild(setBadgeImg);
-if (badge.textContent) box.appendChild(badge);
-btn.appendChild(box);
-itemsRow.appendChild(btn);
+          box.appendChild(img);
+          if (setBadgeSrc) box.appendChild(setBadgeImg);
+          if (badge.textContent) box.appendChild(badge);
+          btn.appendChild(box);
+          itemsRow.appendChild(btn);
         });
 
         card.appendChild(itemsRow);
@@ -8374,29 +9026,29 @@ itemsRow.appendChild(btn);
           btn.title = piece.name || '';
 
           const box = document.createElement('div');
-box.className = 'iconbox';
+          box.className = 'iconbox';
 
-const img = document.createElement('img');
-img.className = 'icon';
-img.src = piece.img || PLACEHOLDER_IMG;
-img.alt = piece.name || piece.slot || '';
+          const img = document.createElement('img');
+          img.className = 'icon';
+          img.src = piece.img || PLACEHOLDER_IMG;
+          img.alt = piece.name || piece.slot || '';
 
-const setBadgeSrc = getSetBadgeSrc(piece.item || piece, piece.slot || '');
+          const setBadgeSrc = getSetBadgeSrc(piece.item || piece, piece.slot || '');
 
-const setBadgeImg = document.createElement('img');
-setBadgeImg.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
-setBadgeImg.src = setBadgeSrc || '';
-setBadgeImg.alt = '';
+          const setBadgeImg = document.createElement('img');
+          setBadgeImg.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
+          setBadgeImg.src = setBadgeSrc || '';
+          setBadgeImg.alt = '';
 
-const badge = document.createElement('div');
-badge.className = 'badge-lv';
-badge.textContent = piece.level ? `Lv.${piece.level}` : '';
+          const badge = document.createElement('div');
+          badge.className = 'badge-lv';
+          badge.textContent = piece.level ? `Lv.${piece.level}` : '';
 
-box.appendChild(img);
-if (setBadgeSrc) box.appendChild(setBadgeImg);
-if (badge.textContent) box.appendChild(badge);
-btn.appendChild(box);
-itemsRow.appendChild(btn);
+          box.appendChild(img);
+          if (setBadgeSrc) box.appendChild(setBadgeImg);
+          if (badge.textContent) box.appendChild(badge);
+          btn.appendChild(box);
+          itemsRow.appendChild(btn);
         });
 
         card.appendChild(itemsRow);
@@ -9208,100 +9860,164 @@ itemsRow.appendChild(btn);
       };
 
       const clampSkill = (s, v) => Math.max(s.minLv ?? 0, Math.min(s.maxLv ?? 0, Number(v) || 0));
-      const clampTp = v => Math.max(TP_MIN, Math.min(TP_MAX, Number(v) || 0));
-      const getSkill = s => {
-        if (state.skillLv[s.id] === undefined) state.skillLv[s.id] = clampSkill(s, s.minLv ?? 0);
-        return clampSkill(s, state.skillLv[s.id]);
-      };
-      const setSkill = (s, v) => {
-        const target = clampSkill(s, v);
-        const cur = getSkill(s);
-        const delta = target - cur;
-        const perSp = Number(s.sp || 0);
-        if (delta > 0) {
-          // ★ 팔콘 4종 상호배제: 이미 다른 팔콘이 찍혀 있으면 증가 차단
-          if (isFalconGroupedSkill(s)) {
-            const other = pickedOtherFalconExcept(s);
-            if (other) {
-              alert(`
-      팔콘 계열은 동시에 둘 이상 찍을 수 없습니다.\n
-      [인서트 : 팔콘], [G-SP 팔콘(코로나 폼)], \n
-      [G-SP 팔콘(롤링 썬더 폼)], [G-SP 팔콘(랩터 폼)] \n
-      중에 사용하실 하나의 스킬만 선택해서 올려주세요.\n\n
-      현재 [${other.name}]이(가) 선택되어 있습니다.`);
-              return;
-            }
-          }
+const clampTp = v => Math.max(TP_MIN, Math.min(TP_MAX, Number(v) || 0));
 
-          // ★ G-2 롤링썬더 ↔ G-3 랩터 상호배제: 이미 다른 쪽에 SP/TP가 투자되어 있으면 증가 차단
-          if (isRollingRaptorGroupedSkill(s)) {
-            const other = pickedOtherRollingRaptorExcept(s);
-            if (other) {
-              alert(`G-2 롤링썬더와 G-3 랩터는 동시에 사용할 수 없습니다.\n\n현재 [${other.name}]에 SP 또는 TP가 투자되어 있습니다.`);
-              return;
-            }
-          }
+// ✅ PC에서 바뀐 skillLv / skillTpLv 를 모바일 호환 skillTrees에도 즉시 반영
+const syncSkillTreesFromLvMaps_pc = () => {
+  try {
+    let ownerKey2 = '';
 
-          const need = perSp * delta;
-          if (!canSpendSp(need)) return;
-          state.skillLv[s.id] = target;
-          spendSp(need);
-        } else if (delta < 0) {
-          state.skillLv[s.id] = target;
-          refundSp(perSp * (-delta));
-        } else {
-          state.skillLv[s.id] = target;
-          //onSkillTreeChanged();
-        }
-        // ★ 메카닉(여) 전용: G 마그네틱 ↔ 싱크로 : 코로나 SP 연동
-        if (isMagneticCoronaLinkedSkill(s)) {
-          syncMagneticCoronaSpFrom(s);
-        }
-      };
+    if (state.currentCharacter) {
+      const jg = String(state.currentCharacter.jobGroupLabel || state.currentCharacter.jobGroup || '').trim();
+      const nm = String(state.currentCharacter.name || '').trim();
+      if (jg || nm) ownerKey2 = (jg + nm).replace(/\s+/g, '');
+    }
+    if (!ownerKey2) {
+      ownerKey2 = String(state?.CurrentSumStats?.ownerKey || state?.ownerKey || '').trim().replace(/\s+/g, '');
+    }
+    if (!ownerKey2) return;
+
+    state.skillTrees = state.skillTrees || {};
+    state.skillTrees[ownerKey2] = state.skillTrees[ownerKey2] || {};
+    const store = state.skillTrees[ownerKey2];
+
+    const rows = Array.isArray(ST2?.rows) ? ST2.rows : [];
+    if (!rows.length) return;
+
+    const normKey = (v) => String(v ?? '').trim().replace(/\s+/g, '').normalize('NFC');
+
+    for (const r of rows) {
+      if (!r || !r.id) continue;
+
+      const skillName = String(r.name || '').trim();
+      if (!skillName) continue;
+
+      const lv = Number(state.skillLv?.[r.id] || 0) || 0;
+      const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
+      const minLv = Number(r.minLv ?? 0) || 0;
+
+      // ✅ 모바일 저장 형식과 맞추기
+      //    기본 minLv만 있는 스킬도 store에는 남겨두면 다음 렌더에서 안정적이다.
+      if (lv > 0 || tp > 0 || minLv > 0) {
+        const prev = store[skillName] || {};
+        store[skillName] = {
+          ...prev,
+          spLv: Math.max(minLv, lv),
+          tpLv: tp
+        };
+      } else {
+        delete store[skillName];
+      }
+    }
+
+    // ✅ 이번 캐릭터는 이미 PC값 기준으로 동기화 완료 표시
+    state._skillTreesConvertedFor = ownerKey2;
+  } catch (e) {
+    console.warn('[skill sync] PC skillLv/skillTpLv → skillTrees 동기화 실패:', e);
+  }
+};
+
+const getSkill = s => {
+  if (state.skillLv[s.id] === undefined) state.skillLv[s.id] = clampSkill(s, s.minLv ?? 0);
+  return clampSkill(s, state.skillLv[s.id]);
+};
+const setSkill = (s, v) => {
+  const target = clampSkill(s, v);
+  const cur = getSkill(s);
+  const delta = target - cur;
+  const perSp = Number(s.sp || 0);
+  if (delta > 0) {
+    // ★ 팔콘 4종 상호배제: 이미 다른 팔콘이 찍혀 있으면 증가 차단
+    if (isFalconGroupedSkill(s)) {
+      const other = pickedOtherFalconExcept(s);
+      if (other) {
+        alert(`
+  팔콘 계열은 동시에 둘 이상 찍을 수 없습니다.\n
+  [인서트 : 팔콘], [G-SP 팔콘(코로나 폼)], \n
+  [G-SP 팔콘(롤링 썬더 폼)], [G-SP 팔콘(랩터 폼)] \n
+  중에 사용하실 하나의 스킬만 선택해서 올려주세요.\n\n
+  현재 [${other.name}]이(가) 선택되어 있습니다.`);
+        return;
+      }
+    }
+
+    // ★ G-2 롤링썬더 ↔ G-3 랩터 상호배제: 이미 다른 쪽에 SP/TP가 투자되어 있으면 증가 차단
+    if (isRollingRaptorGroupedSkill(s)) {
+      const other = pickedOtherRollingRaptorExcept(s);
+      if (other) {
+        alert(`G-2 롤링썬더와 G-3 랩터는 동시에 사용할 수 없습니다.\n\n현재 [${other.name}]에 SP 또는 TP가 투자되어 있습니다.`);
+        return;
+      }
+    }
+
+    const need = perSp * delta;
+    if (!canSpendSp(need)) return;
+    state.skillLv[s.id] = target;
+    syncSkillTreesFromLvMaps_pc();   // ✅ 추가
+    spendSp(need);
+  } else if (delta < 0) {
+    state.skillLv[s.id] = target;
+    syncSkillTreesFromLvMaps_pc();   // ✅ 추가
+    refundSp(perSp * (-delta));
+  } else {
+    state.skillLv[s.id] = target;
+    syncSkillTreesFromLvMaps_pc();   // ✅ 추가
+    //onSkillTreeChanged();
+  }
+  // ★ 메카닉(여) 전용: G 마그네틱 ↔ 싱크로 : 코로나 SP 연동
+  if (isMagneticCoronaLinkedSkill(s)) {
+    syncMagneticCoronaSpFrom(s);
+    syncSkillTreesFromLvMaps_pc();   // ✅ 연동 후 한번 더 보정
+  }
+};
       const getTp = s => {
         if (state.skillTpLv[s.id] === undefined) state.skillTpLv[s.id] = TP_MIN;
         return clampTp(state.skillTpLv[s.id]);
       };
       const setTp = (s, v) => {
-        const unit = Number(s.tpCost || 0);
-        if (!(unit > 0)) return;
-        const target = clampTp(v);
-        const cur = getTp(s);
-        if (target > cur) {
-          // ★ 팔콘 4종 상호배제: SP 미습득 상태에서 다른 팔콘이 이미 찍혀 있으면 TP 증가 차단
-          if (isFalconGroupedSkill(s)) {
-            const baseLv = Number(state.skillLv?.[s.id] ?? 0) || 0;
-            const other = pickedOtherFalconExcept(s);
-            if (baseLv <= 0 && other) {
-              alert(`팔콘 계열은 동시에 둘 이상 사용할 수 없습니다.\n현재 [${other.name}]이(가) 선택되어 있습니다.`);
-              return;
-            }
-          }
+  const unit = Number(s.tpCost || 0);
+  if (!(unit > 0)) return;
+  const target = clampTp(v);
+  const cur = getTp(s);
+  if (target > cur) {
+    // ★ 팔콘 4종 상호배제: SP 미습득 상태에서 다른 팔콘이 이미 찍혀 있으면 TP 증가 차단
+    if (isFalconGroupedSkill(s)) {
+      const baseLv = Number(state.skillLv?.[s.id] ?? 0) || 0;
+      const other = pickedOtherFalconExcept(s);
+      if (baseLv <= 0 && other) {
+        alert(`팔콘 계열은 동시에 둘 이상 사용할 수 없습니다.\n현재 [${other.name}]이(가) 선택되어 있습니다.`);
+        return;
+      }
+    }
 
-          // ★ G-2 롤링썬더 ↔ G-3 랩터 상호배제: 다른 쪽에 SP/TP가 투자되어 있으면 TP 증가 차단
-          if (isRollingRaptorGroupedSkill(s)) {
-            const other = pickedOtherRollingRaptorExcept(s);
-            if (other) {
-              alert(`G-2 롤링썬더와 G-3 랩터는 동시에 사용할 수 없습니다.\n현재 [${other.name}]에 SP 또는 TP가 투자되어 있습니다.`);
-              return;
-            }
-          }
+    // ★ G-2 롤링썬더 ↔ G-3 랩터 상호배제: 다른 쪽에 SP/TP가 투자되어 있으면 TP 증가 차단
+    if (isRollingRaptorGroupedSkill(s)) {
+      const other = pickedOtherRollingRaptorExcept(s);
+      if (other) {
+        alert(`G-2 롤링썬더와 G-3 랩터는 동시에 사용할 수 없습니다.\n현재 [${other.name}]에 SP 또는 TP가 투자되어 있습니다.`);
+        return;
+      }
+    }
 
-          const need = (target - cur) * unit;
-          if (!canSpendTp(need)) return;
-          state.skillTpLv[s.id] = target;
-          spendTp(need);
-        } else if (target < cur) {
-          state.skillTpLv[s.id] = target;
-          refundTp((cur - target) * unit);
-        } else {
-          state.skillTpLv[s.id] = target;
-        }
-        // ★ 메카닉(여) 전용: G 마그네틱 ↔ 싱크로 : 코로나 TP 연동
-        if (isMagneticCoronaLinkedSkill(s)) {
-          syncMagneticCoronaTpFrom(s);
-        }
-      };
+    const need = (target - cur) * unit;
+    if (!canSpendTp(need)) return;
+    state.skillTpLv[s.id] = target;
+    syncSkillTreesFromLvMaps_pc();   // ✅ 추가
+    spendTp(need);
+  } else if (target < cur) {
+    state.skillTpLv[s.id] = target;
+    syncSkillTreesFromLvMaps_pc();   // ✅ 추가
+    refundTp((cur - target) * unit);
+  } else {
+    state.skillTpLv[s.id] = target;
+    syncSkillTreesFromLvMaps_pc();   // ✅ 추가
+  }
+  // ★ 메카닉(여) 전용: G 마그네틱 ↔ 싱크로 : 코로나 TP 연동
+  if (isMagneticCoronaLinkedSkill(s)) {
+    syncMagneticCoronaTpFrom(s);
+    syncSkillTreesFromLvMaps_pc();   // ✅ 연동 후 한번 더 보정
+  }
+};
 
       // ===== 메카닉(여) 전용: G-4 호넷 → G 풀 블룸 자동 연동 =====
       let hornetSkill = null;
@@ -9658,7 +10374,7 @@ itemsRow.appendChild(btn);
             spanCur.textContent = String(cur);
             spanTp.textContent = String(tp);
 
-                        // ★ 본 크러셔/풀 블룸: SP는 자동습득 → 버튼 완전 비활성화
+            // ★ 본 크러셔/풀 블룸: SP는 자동습득 → 버튼 완전 비활성화
             if (isBoneCrusher || isFullBloom) {
               btnSkillPlus.disabled = true;
               btnSkillMax.disabled = true;
@@ -10880,6 +11596,249 @@ itemsRow.appendChild(btn);
       return cards;
     }
 
+    function buildSynergyArmorSetCardsFromSheets() {
+      const setRows = Array.isArray(CORE?.lists?.['synergyset:list'])
+        ? CORE.lists['synergyset:list']
+        : [];
+
+      const slotKeys = ['headshoulder', 'top', 'bottom', 'belt', 'shoes'];
+
+      const norm = (v) => String(v ?? '').replace(/\s+/g, ' ').trim();
+
+      function S(v) { return String(v ?? '').trim(); }
+      function N(v) {
+        const n = Number(v);
+        return Number.isFinite(n) ? n : 0;
+      }
+
+      function _mapEquipRow(row) {
+        if (!row || typeof row !== 'object') {
+          return {
+            name: '',
+            type: '',
+            level: 0,
+            img: '',
+            rarity: '',
+            _raw: row,
+          };
+        }
+        const 이름 = row['이름'] ?? row.name ?? row.title ?? '';
+        const 종류 = row['종류'] ?? row.type ?? row.category ?? '';
+        const 렙제 = row['레벨제한'] ?? row['렙제'] ?? row.level ?? row.reqLevel ?? 0;
+        const 이미지 = row['이미지'] ?? row.image ?? row.img ?? '';
+        const 레어리티 = row['레어리티'] ?? row.rarity ?? '';
+        return {
+          name: S(이름),
+          type: S(종류),
+          level: N(렙제),
+          img: S(이미지),
+          rarity: S(레어리티),
+          _raw: row,
+        };
+      }
+
+      const equipBySlot = {};
+      for (const slotKey of slotKeys) {
+        equipBySlot[slotKey] = _getListArray(slotKey).map(_mapEquipRow);
+      }
+
+      // synergyset:list 에서 방어구만 추출
+      const armorRows = setRows.filter(r => {
+        const cat = String(r?.category || r?.['분류'] || '').trim();
+        return cat === '방어구';
+      });
+
+      // 메인과 동일하게 type별 대표행 1개만 선택
+      const pickedByType = new Map();
+
+      armorRows.forEach((row) => {
+        const type = norm(row?.type || row?.['종류']);
+        if (!type) return;
+
+        const prev = pickedByType.get(type);
+        const rowNum = Number(row?.num || row?.['세트수'] || 0);
+        const prevNum = Number(prev?.num || prev?.['세트수'] || 0);
+
+        if (!prev || rowNum > prevNum) {
+          pickedByType.set(type, row);
+        }
+      });
+
+      const sets = Array.from(pickedByType.values()).map((setRow) => {
+        const setType = norm(setRow?.type || setRow?.['종류']);
+
+        console.log('[SYNERGY_SET_TYPE]', {
+          setName: String(setRow?.name || setRow?.['이름'] || ''),
+          setType,
+          rawType: setRow?.type ?? setRow?.['종류'] ?? '',
+          rawRow: setRow,
+        });
+
+        const pieces = slotKeys.map((slotKey) => {
+          const rows = equipBySlot[slotKey] || [];
+
+          console.log('[SYNERGY_SLOT_CANDIDATES]', {
+            slotKey,
+            setType,
+            rowsCount: rows.length,
+            candidateTypes: rows.slice(0, 30).map(r => String(r?.type || r?.['종류'] || '')),
+          });
+
+          const row = rows.find(r => norm(r?.type || r?.['종류']) === setType) || null;
+
+          console.log('[SYNERGY_SLOT_MATCH]', {
+            slotKey,
+            setType,
+            found: !!row,
+            foundName: String(row?.name || row?.['이름'] || ''),
+            foundType: String(row?.type || row?.['종류'] || ''),
+            foundImg: String(row?.img || row?.image || row?.['이미지'] || ''),
+          });
+
+          return {
+            slot: slotKey,
+            name: String(row?.name || row?.['이름'] || ''),
+            img: String(row?.img || row?.image || row?.['이미지'] || PLACEHOLDER_IMG),
+            level: row?.level || row?.['레벨'] || '',
+            item: row || null,
+          };
+        });
+
+        return {
+          name: String(setRow?.name || setRow?.['이름'] || ''),
+          type: setType,
+          category: '방어구',
+          num: Number(setRow?.num || setRow?.['세트수'] || 0),
+          pieces,
+          raw: setRow,
+        };
+      });
+
+      // 메인과 같은 정렬 느낌 유지
+      sets.sort((a, b) => {
+        const an = Number(a?.num || 0);
+        const bn = Number(b?.num || 0);
+        if (bn !== an) return bn - an;
+        return String(a?.name || '').localeCompare(String(b?.name || ''), 'ko');
+      });
+
+      return sets;
+    }
+
+    function _makeSynergyAccPiecesFromType(setRow) {
+      const norm = (v) => String(v ?? '').replace(/\s+/g, ' ').trim();
+      const setType = norm(setRow?.type || setRow?.['종류']);
+
+      function S(v) { return String(v ?? '').trim(); }
+      function N(v) {
+        const n = Number(v);
+        return Number.isFinite(n) ? n : 0;
+      }
+
+      function _mapEquipRow(row) {
+        if (!row || typeof row !== 'object') {
+          return {
+            name: '',
+            type: '',
+            level: 0,
+            img: '',
+            rarity: '',
+            _raw: row,
+          };
+        }
+        const 이름 = row['이름'] ?? row.name ?? row.title ?? '';
+        const 종류 = row['종류'] ?? row.type ?? row.category ?? '';
+        const 렙제 = row['레벨제한'] ?? row['렙제'] ?? row.level ?? row.reqLevel ?? 0;
+        const 이미지 = row['이미지'] ?? row.image ?? row.img ?? '';
+        const 레어리티 = row['레어리티'] ?? row.rarity ?? '';
+        return {
+          name: S(이름),
+          type: S(종류),
+          level: N(렙제),
+          img: S(이미지),
+          rarity: S(레어리티),
+          _raw: row,
+        };
+      }
+
+      const defs = [
+        { slotKey: 'bracelet', label: '팔찌' },
+        { slotKey: 'necklace', label: '목걸이' },
+        { slotKey: 'ring', label: '반지' },
+      ];
+
+      return defs.map(({ slotKey, label }) => {
+        const rows = _getListArray(slotKey).map(_mapEquipRow);
+        const row = rows.find(r => norm(r?.type) === setType) || null;
+
+        return {
+          slot: slotKey,
+          slotLabel: label,
+          name: String(row?.name || `${String(setRow?.name || '')} - ${label}`),
+          img: String(row?.img || PLACEHOLDER_IMG),
+          level: row?.level || '',
+          item: row || null,
+        };
+      });
+    }
+
+    function _makeSynergySpecPiecesFromType(setRow) {
+      const norm = (v) => String(v ?? '').replace(/\s+/g, ' ').trim();
+      const setType = norm(setRow?.type || setRow?.['종류']);
+
+      function S(v) { return String(v ?? '').trim(); }
+      function N(v) {
+        const n = Number(v);
+        return Number.isFinite(n) ? n : 0;
+      }
+
+      function _mapEquipRow(row) {
+        if (!row || typeof row !== 'object') {
+          return {
+            name: '',
+            type: '',
+            level: 0,
+            img: '',
+            rarity: '',
+            _raw: row,
+          };
+        }
+        const 이름 = row['이름'] ?? row.name ?? row.title ?? '';
+        const 종류 = row['종류'] ?? row.type ?? row.category ?? '';
+        const 렙제 = row['레벨제한'] ?? row['렙제'] ?? row.level ?? row.reqLevel ?? 0;
+        const 이미지 = row['이미지'] ?? row.image ?? row.img ?? '';
+        const 레어리티 = row['레어리티'] ?? row.rarity ?? '';
+        return {
+          name: S(이름),
+          type: S(종류),
+          level: N(렙제),
+          img: S(이미지),
+          rarity: S(레어리티),
+          _raw: row,
+        };
+      }
+
+      const defs = [
+        { slotKey: 'sub', label: '보조장비' },
+        { slotKey: 'magestone', label: '마법석' },
+        { slotKey: 'earring', label: '귀걸이' },
+      ];
+
+      return defs.map(({ slotKey, label }) => {
+        const rows = _getListArray(slotKey).map(_mapEquipRow);
+        const row = rows.find(r => norm(r?.type) === setType) || null;
+
+        return {
+          slot: slotKey,
+          slotLabel: label,
+          name: String(row?.name || `${String(setRow?.name || '')} - ${label}`),
+          img: String(row?.img || PLACEHOLDER_IMG),
+          level: row?.level || '',
+          item: row || null,
+        };
+      });
+    }
+
     // ✅ 악세사리 세트: CORE.lists['set:list'] + 팔찌/목걸이/반지 시트에서 아이콘/레벨 가져오기
     function buildAccSetCardsFromSheets() {
       const mode = (typeof armorSetMode === 'string') ? armorSetMode : 'exceed';
@@ -11291,83 +12250,83 @@ itemsRow.appendChild(btn);
     }
 
     // ✅ 세트명(=종류) → 배지 이미지
-const SET_BADGE_ICON_MAP = {
-  '침식: 포이즈닝 퀸 스파이더': 'img/etc/icon/강철의브라키움아이콘.png',
-  '수호: 거인의 스펙쿨룸 아이언': 'img/etc/icon/강철의브라키움아이콘.png',
-  '침식: 섬뜩한 강철 용': 'img/etc/icon/강철의브라키움아이콘.png',
-  '수호: 빛의 헌신자': 'img/etc/icon/강철의브라키움아이콘.png',
-  '조화: 신비로운 빛의 소용돌이': 'img/etc/icon/강철의브라키움아이콘.png',
-  '조화: 콰트로 마누스 연산장치': 'img/etc/icon/강철의브라키움아이콘.png',
-  '불굴: 개구쟁이 호문쿨루스': 'img/etc/icon/강철의브라키움아이콘.png',
-  '불굴: 깊은 불구덩이의 섬멸자': 'img/etc/icon/강철의브라키움아이콘.png',
+    const SET_BADGE_ICON_MAP = {
+      '침식: 포이즈닝 퀸 스파이더': 'img/etc/icon/강철의브라키움아이콘.png',
+      '수호: 거인의 스펙쿨룸 아이언': 'img/etc/icon/강철의브라키움아이콘.png',
+      '침식: 섬뜩한 강철 용': 'img/etc/icon/강철의브라키움아이콘.png',
+      '수호: 빛의 헌신자': 'img/etc/icon/강철의브라키움아이콘.png',
+      '조화: 신비로운 빛의 소용돌이': 'img/etc/icon/강철의브라키움아이콘.png',
+      '조화: 콰트로 마누스 연산장치': 'img/etc/icon/강철의브라키움아이콘.png',
+      '불굴: 개구쟁이 호문쿨루스': 'img/etc/icon/강철의브라키움아이콘.png',
+      '불굴: 깊은 불구덩이의 섬멸자': 'img/etc/icon/강철의브라키움아이콘.png',
 
-  '보호: 수호자의 초합금': 'img/etc/icon/루크린제아이콘.png',
-  '쇄도: 섬뜩한 강철 용': 'img/etc/icon/루크린제아이콘.png',
-  '쇄도: 여명을 쏘아 올리는 자': 'img/etc/icon/루크린제아이콘.png',
-  '보호: 콰트로 카시테움': 'img/etc/icon/루크린제아이콘.png',
-  '혈독: 엘팅 메모리얼의 기억': 'img/etc/icon/루크린제아이콘.png',
-  '혈독: 화력 개조 탄띠': 'img/etc/icon/루크린제아이콘.png',
-  '격변: 철갑을 두른 탑의 수호꾼': 'img/etc/icon/루크린제아이콘.png',
-  '격변: 부정한 빛의 우상': 'img/etc/icon/루크린제아이콘.png',
+      '보호: 수호자의 초합금': 'img/etc/icon/루크린제아이콘.png',
+      '쇄도: 섬뜩한 강철 용': 'img/etc/icon/루크린제아이콘.png',
+      '쇄도: 여명을 쏘아 올리는 자': 'img/etc/icon/루크린제아이콘.png',
+      '보호: 콰트로 카시테움': 'img/etc/icon/루크린제아이콘.png',
+      '혈독: 엘팅 메모리얼의 기억': 'img/etc/icon/루크린제아이콘.png',
+      '혈독: 화력 개조 탄띠': 'img/etc/icon/루크린제아이콘.png',
+      '격변: 철갑을 두른 탑의 수호꾼': 'img/etc/icon/루크린제아이콘.png',
+      '격변: 부정한 빛의 우상': 'img/etc/icon/루크린제아이콘.png',
 
-  '맹독: 어둠을 쏘아 내리는 자': 'img/etc/icon/매달린망루아이콘.png',
-  '맹독: 스틱키 애시드 웨펀': 'img/etc/icon/매달린망루아이콘.png',
-  '신속: 익스플로시브 버닝 스톤': 'img/etc/icon/매달린망루아이콘.png',
-  '신속: 그란데 전투기갑 파츠': 'img/etc/icon/매달린망루아이콘.png',
-  '초석: 섬뜩한 빛의 관리자': 'img/etc/icon/매달린망루아이콘.png',
-  '초석: 신비로운 빛의 소용돌이': 'img/etc/icon/매달린망루아이콘.png',
-  '질주: 허영 속 어둠의 피조물': 'img/etc/icon/매달린망루아이콘.png',
-  '질주: 부정한 빛의 우상': 'img/etc/icon/매달린망루아이콘.png',
+      '맹독: 어둠을 쏘아 내리는 자': 'img/etc/icon/매달린망루아이콘.png',
+      '맹독: 스틱키 애시드 웨펀': 'img/etc/icon/매달린망루아이콘.png',
+      '신속: 익스플로시브 버닝 스톤': 'img/etc/icon/매달린망루아이콘.png',
+      '신속: 그란데 전투기갑 파츠': 'img/etc/icon/매달린망루아이콘.png',
+      '초석: 섬뜩한 빛의 관리자': 'img/etc/icon/매달린망루아이콘.png',
+      '초석: 신비로운 빛의 소용돌이': 'img/etc/icon/매달린망루아이콘.png',
+      '질주: 허영 속 어둠의 피조물': 'img/etc/icon/매달린망루아이콘.png',
+      '질주: 부정한 빛의 우상': 'img/etc/icon/매달린망루아이콘.png',
 
-  '전격: 어느 말괄량이의 탐사복': 'img/etc/icon/빛의연회장아이콘.png',
-  '왜곡: 거인의 스펙쿨룸 아이언': 'img/etc/icon/빛의연회장아이콘.png',
-  '왜곡: 스틱키 애시드 웨펀': 'img/etc/icon/빛의연회장아이콘.png',
-  '전격: 그란데 전투기갑 파츠': 'img/etc/icon/빛의연회장아이콘.png',
-  '견고: 엘팅 메모리얼의 기억': 'img/etc/icon/빛의연회장아이콘.png',
-  '견고: 화력 개조 탄띠': 'img/etc/icon/빛의연회장아이콘.png',
-  '촉진: 철갑을 두른 탑의 수호꾼': 'img/etc/icon/빛의연회장아이콘.png',
-  '촉진: 깊은 불구덩이의 섬멸자': 'img/etc/icon/빛의연회장아이콘.png',
+      '전격: 어느 말괄량이의 탐사복': 'img/etc/icon/빛의연회장아이콘.png',
+      '왜곡: 거인의 스펙쿨룸 아이언': 'img/etc/icon/빛의연회장아이콘.png',
+      '왜곡: 스틱키 애시드 웨펀': 'img/etc/icon/빛의연회장아이콘.png',
+      '전격: 그란데 전투기갑 파츠': 'img/etc/icon/빛의연회장아이콘.png',
+      '견고: 엘팅 메모리얼의 기억': 'img/etc/icon/빛의연회장아이콘.png',
+      '견고: 화력 개조 탄띠': 'img/etc/icon/빛의연회장아이콘.png',
+      '촉진: 철갑을 두른 탑의 수호꾼': 'img/etc/icon/빛의연회장아이콘.png',
+      '촉진: 깊은 불구덩이의 섬멸자': 'img/etc/icon/빛의연회장아이콘.png',
 
-  '작열: 포이즈닝 퀸 스파이더': 'img/etc/icon/샐러맨더의화로아이콘.png',
-  '자상: 어둠을 쏘아 내리는 자': 'img/etc/icon/샐러맨더의화로아이콘.png',
-  '자상: 여명을 쏘아 올리는 자': 'img/etc/icon/샐러맨더의화로아이콘.png',
-  '작열: 콰트로 카시테움': 'img/etc/icon/샐러맨더의화로아이콘.png',
-  '가속: 부식된 메탈기어': 'img/etc/icon/샐러맨더의화로아이콘.png',
-  '가속: 콰트로 마누스 연산장치': 'img/etc/icon/샐러맨더의화로아이콘.png',
-  '숙련: 개구쟁이 호문쿨루스': 'img/etc/icon/샐러맨더의화로아이콘.png',
-  '숙련: 라이트닝 에너지 코어': 'img/etc/icon/샐러맨더의화로아이콘.png',
+      '작열: 포이즈닝 퀸 스파이더': 'img/etc/icon/샐러맨더의화로아이콘.png',
+      '자상: 어둠을 쏘아 내리는 자': 'img/etc/icon/샐러맨더의화로아이콘.png',
+      '자상: 여명을 쏘아 올리는 자': 'img/etc/icon/샐러맨더의화로아이콘.png',
+      '작열: 콰트로 카시테움': 'img/etc/icon/샐러맨더의화로아이콘.png',
+      '가속: 부식된 메탈기어': 'img/etc/icon/샐러맨더의화로아이콘.png',
+      '가속: 콰트로 마누스 연산장치': 'img/etc/icon/샐러맨더의화로아이콘.png',
+      '숙련: 개구쟁이 호문쿨루스': 'img/etc/icon/샐러맨더의화로아이콘.png',
+      '숙련: 라이트닝 에너지 코어': 'img/etc/icon/샐러맨더의화로아이콘.png',
 
-  '허상: 어느 말괄량이의 탐사복': 'img/etc/icon/왕의서고아이콘.png',
-  '허상: 수호자의 초합금': 'img/etc/icon/왕의서고아이콘.png',
-  '연격: 익스플로시브 버닝 스톤': 'img/etc/icon/왕의서고아이콘.png',
-  '연격: 빛의 헌신자': 'img/etc/icon/왕의서고아이콘.png',
-  '각오: 섬뜩한 빛의 관리자': 'img/etc/icon/왕의서고아이콘.png',
-  '각오: 부식된 메탈기어': 'img/etc/icon/왕의서고아이콘.png',
-  '결의: 라이트닝 에너지 코어': 'img/etc/icon/왕의서고아이콘.png',
-  '결의: 허영 속 어둠의 피조물': 'img/etc/icon/왕의서고아이콘.png',
-};
+      '허상: 어느 말괄량이의 탐사복': 'img/etc/icon/왕의서고아이콘.png',
+      '허상: 수호자의 초합금': 'img/etc/icon/왕의서고아이콘.png',
+      '연격: 익스플로시브 버닝 스톤': 'img/etc/icon/왕의서고아이콘.png',
+      '연격: 빛의 헌신자': 'img/etc/icon/왕의서고아이콘.png',
+      '각오: 섬뜩한 빛의 관리자': 'img/etc/icon/왕의서고아이콘.png',
+      '각오: 부식된 메탈기어': 'img/etc/icon/왕의서고아이콘.png',
+      '결의: 라이트닝 에너지 코어': 'img/etc/icon/왕의서고아이콘.png',
+      '결의: 허영 속 어둠의 피조물': 'img/etc/icon/왕의서고아이콘.png',
+    };
 
-const BADGE_TARGET_SLOTS = new Set([
-  'headshoulder', 'top', 'bottom', 'belt', 'shoes',
-  'bracelet', 'necklace', 'ring',
-  'sub', 'magestone', 'earring',
-]);
+    const BADGE_TARGET_SLOTS = new Set([
+      'headshoulder', 'top', 'bottom', 'belt', 'shoes',
+      'bracelet', 'necklace', 'ring',
+      'sub', 'magestone', 'earring',
+    ]);
 
-function getSetBadgeSrc(item, slotKey = '') {
-  if (!item) return '';
-  if (!BADGE_TARGET_SLOTS.has(String(slotKey || '').trim())) return '';
-  const setName = String(item.type || item['종류'] || '').trim();
-  return SET_BADGE_ICON_MAP[setName] || '';
-}
+    function getSetBadgeSrc(item, slotKey = '') {
+      if (!item) return '';
+      if (!BADGE_TARGET_SLOTS.has(String(slotKey || '').trim())) return '';
+      const setName = String(item.type || item['종류'] || '').trim();
+      return SET_BADGE_ICON_MAP[setName] || '';
+    }
 
-function getSetBadgeExtraClass(badgeSrc = '') {
-  const s = String(badgeSrc || '');
+    function getSetBadgeExtraClass(badgeSrc = '') {
+      const s = String(badgeSrc || '');
 
-  if (s.includes('빛의연회장아이콘.png')) return 'badge-bithall';
-  if (s.includes('매달린망루아이콘.png')) return 'badge-tower';
+      if (s.includes('빛의연회장아이콘.png')) return 'badge-bithall';
+      if (s.includes('매달린망루아이콘.png')) return 'badge-tower';
 
-  return '';
-}
+      return '';
+    }
 
     /* ===== 강화 행 매핑 (이미지/태그/단계 지원) ===== */
     function mapRowToEnhance(r) {
@@ -13608,13 +14567,13 @@ function getSetBadgeExtraClass(badgeSrc = '') {
       }
 
       items.forEach(it => {
-  const row = document.createElement('button');
-  row.className = 'item-row';
-  const isBottom = (slotKey === 'aura' || slotKey === 'title' || slotKey === 'creature' || slotKey === 'artifact');
-  const badge = isBottom ? (it.level_text && String(it.level_text).trim()) : `Lv.${it.level ?? 65}`;
-  const lvlLabel = isBottom ? (it.level_text && String(it.level_text).trim()) : `${it.level ?? 65}레벨`;
-  const setBadgeSrc = getSetBadgeSrc(it, slotKey);
-  const badgeExtraClass = getSetBadgeExtraClass(setBadgeSrc);
+        const row = document.createElement('button');
+        row.className = 'item-row';
+        const isBottom = (slotKey === 'aura' || slotKey === 'title' || slotKey === 'creature' || slotKey === 'artifact');
+        const badge = isBottom ? (it.level_text && String(it.level_text).trim()) : `Lv.${it.level ?? 65}`;
+        const lvlLabel = isBottom ? (it.level_text && String(it.level_text).trim()) : `${it.level ?? 65}레벨`;
+        const setBadgeSrc = getSetBadgeSrc(it, slotKey);
+        const badgeExtraClass = getSetBadgeExtraClass(setBadgeSrc);
 
         // ✅ 레어리티 텍스트 / 클래스 결정
         const rawRarity = String(
@@ -13734,112 +14693,112 @@ function getSetBadgeExtraClass(badgeSrc = '') {
     itemModal.addEventListener('click', (e) => { if (e.target.hasAttribute('data-close') || e.target.classList.contains('backdrop')) closeItemPicker(); });
     // 아이템 선택 후 슬롯에 적용
     async function applyItemToSlot(slotKey, item) {
-  try {
-    if (!window.state) window.state = {};
-    const state = window.state;
-    state.selections = state.selections || {};
+      try {
+        if (!window.state) window.state = {};
+        const state = window.state;
+        state.selections = state.selections || {};
 
-    // ★ 접두사 원본 문자열 가져오기
-    const rawPrefix =
-      (item && item.prefix) ||
-      (item && item._raw && (item._raw['접두사'] ?? item._raw.prefix)) ||
-      '';
+        // ★ 접두사 원본 문자열 가져오기
+        const rawPrefix =
+          (item && item.prefix) ||
+          (item && item._raw && (item._raw['접두사'] ?? item._raw.prefix)) ||
+          '';
 
-    // ★ 슬롯 라벨에 쓸 짧은 텍스트로 변환
-    const prefixLabel = makeEquipPrefixLabel(rawPrefix);
+        // ★ 슬롯 라벨에 쓸 짧은 텍스트로 변환
+        const prefixLabel = makeEquipPrefixLabel(rawPrefix);
 
-    // ★ state.selections 안에도 prefixLabel + 기본 메타(레벨/레어리티) 저장
-    const rawLevel =
-      (item && (item.level ?? item.levelVal ?? (item._raw && (item._raw['렙제'] ?? item._raw.level)))) ?? '';
-    const levelVal = parseInt(String(rawLevel).replace(/[^\d.-]/g, ''), 10);
+        // ★ state.selections 안에도 prefixLabel + 기본 메타(레벨/레어리티) 저장
+        const rawLevel =
+          (item && (item.level ?? item.levelVal ?? (item._raw && (item._raw['렙제'] ?? item._raw.level)))) ?? '';
+        const levelVal = parseInt(String(rawLevel).replace(/[^\d.-]/g, ''), 10);
 
-    const rawRarity = String(
-      (item && (item.rarity ?? '')) ||
-      (item && item._raw && (item._raw.rarity || item._raw['레어리티'] || item._raw['희귀도'] || item._raw['등급'])) ||
-      ''
-    ).trim();
+        const rawRarity = String(
+          (item && (item.rarity ?? '')) ||
+          (item && item._raw && (item._raw.rarity || item._raw['레어리티'] || item._raw['희귀도'] || item._raw['등급'])) ||
+          ''
+        ).trim();
 
-    let rarityNorm = rawRarity;
-    const rarityLower = rarityNorm.toLowerCase();
-    if (rarityNorm === '에픽' || rarityLower === 'epic') {
-      rarityNorm = '에픽';
-    } else if (rarityNorm === '익시드' || rarityLower === 'exceed') {
-      rarityNorm = '익시드';
-    }
+        let rarityNorm = rawRarity;
+        const rarityLower = rarityNorm.toLowerCase();
+        if (rarityNorm === '에픽' || rarityLower === 'epic') {
+          rarityNorm = '에픽';
+        } else if (rarityNorm === '익시드' || rarityLower === 'exceed') {
+          rarityNorm = '익시드';
+        }
 
-    state.selections[slotKey] = {
-      name: item.name,
-      img: item.img || null,
-      code: item.code || null,
-      type: item.type || '',      // ★ 세트 매칭용 타입 추가
-      prefixLabel: prefixLabel || null,
-      desc:
-        item.desc ||
-        (item._raw && (item._raw['설명'] ?? item._raw.desc)) ||
-        '',
-      level: Number.isFinite(levelVal) ? levelVal : null,
-      rarity: rarityNorm || null,
-    };
+        state.selections[slotKey] = {
+          name: item.name,
+          img: item.img || null,
+          code: item.code || null,
+          type: item.type || '',      // ★ 세트 매칭용 타입 추가
+          prefixLabel: prefixLabel || null,
+          desc:
+            item.desc ||
+            (item._raw && (item._raw['설명'] ?? item._raw.desc)) ||
+            '',
+          level: Number.isFinite(levelVal) ? levelVal : null,
+          rarity: rarityNorm || null,
+        };
 
-    // ★ 세트 경량리스트 헬퍼 (CORE.lists['set:list'] 사용)
-    function getLightSetList() {
-      const core = (window.CORE && window.CORE.lists) || {};
-      const list = core['set:list'];
-      return Array.isArray(list) ? list : [];
-    }
+        // ★ 세트 경량리스트 헬퍼 (CORE.lists['set:list'] 사용)
+        function getLightSetList() {
+          const core = (window.CORE && window.CORE.lists) || {};
+          const list = core['set:list'];
+          return Array.isArray(list) ? list : [];
+        }
 
-    // ★ 슬롯 타일에 라벨 + 이미지 그리기
-    const tile = tileElForSlot(slotKey);
-    if (tile) {
-      const safeAlt = String(item.name || '').replace(/"/g, '&quot;');
-      const src = item.img || PLACEHOLDER_IMG;
-      const badgeSrc = getSetBadgeSrc(item, slotKey);
-      const badgeExtraClass = getSetBadgeExtraClass(badgeSrc);
+        // ★ 슬롯 타일에 라벨 + 이미지 그리기
+        const tile = tileElForSlot(slotKey);
+        if (tile) {
+          const safeAlt = String(item.name || '').replace(/"/g, '&quot;');
+          const src = item.img || PLACEHOLDER_IMG;
+          const badgeSrc = getSetBadgeSrc(item, slotKey);
+          const badgeExtraClass = getSetBadgeExtraClass(badgeSrc);
 
-      const labelHtml = prefixLabel
-        ? `<div class="equip-prefix">${prefixLabel}</div>`
-        : '';
+          const labelHtml = prefixLabel
+            ? `<div class="equip-prefix">${prefixLabel}</div>`
+            : '';
 
-      tile.innerHTML =
-  labelHtml +
-  `
+          tile.innerHTML =
+            labelHtml +
+            `
   <div class="item-img-wrap">
     <img class="item-main-img" alt="${safeAlt}" src="${src}">
     ${badgeSrc ? `<img class="item-set-badge ${badgeExtraClass}" alt="" src="${badgeSrc}">` : ''}
   </div>
   `;
-      tile.classList.add('selected');
-    }
+          tile.classList.add('selected');
+        }
 
-    // 모달 닫기
-    const modal = document.getElementById('itemModal');
-    if (modal) {
-      modal.classList.remove('show');
-      modal.setAttribute('aria-hidden', 'true');
-    }
+        // 모달 닫기
+        const modal = document.getElementById('itemModal');
+        if (modal) {
+          modal.classList.remove('show');
+          modal.setAttribute('aria-hidden', 'true');
+        }
 
-    // 엠블렘/성안의 봉인/강화 라벨 등 부가 UI 리프레시
-    if (typeof refreshAllDots === 'function') {
-      refreshAllDots();   // 엠블렘 도트
+        // 엠블렘/성안의 봉인/강화 라벨 등 부가 UI 리프레시
+        if (typeof refreshAllDots === 'function') {
+          refreshAllDots();   // 엠블렘 도트
+        }
+        if (typeof refreshSealLabelsFromState === 'function') {
+          refreshSealLabelsFromState();
+        }
+        if (typeof refreshEnhLabelsFromState === 'function') {
+          refreshEnhLabelsFromState();
+        }
+        // ★ 커스텀옵 조건 검사 → 안 맞는 건 자동 초기화
+        if (typeof enforceCustomSkillConstraints === 'function') {
+          enforceCustomSkillConstraints();
+        }
+        // ★ 장비 설명 프리뷰 갱신
+        if (typeof updateEquipDescPreview === 'function') {
+          updateEquipDescPreview();
+        }
+      } catch (e) {
+        console.warn('[applyItemToSlot] 실패:', e);
+      }
     }
-    if (typeof refreshSealLabelsFromState === 'function') {
-      refreshSealLabelsFromState();
-    }
-    if (typeof refreshEnhLabelsFromState === 'function') {
-      refreshEnhLabelsFromState();
-    }
-    // ★ 커스텀옵 조건 검사 → 안 맞는 건 자동 초기화
-    if (typeof enforceCustomSkillConstraints === 'function') {
-      enforceCustomSkillConstraints();
-    }
-    // ★ 장비 설명 프리뷰 갱신
-    if (typeof updateEquipDescPreview === 'function') {
-      updateEquipDescPreview();
-    }
-  } catch (e) {
-    console.warn('[applyItemToSlot] 실패:', e);
-  }
-}
 
     // ✅ 방어구 세트 한 번에 적용
     async function applyArmorSetToSlots(set) {
@@ -15100,8 +16059,8 @@ function getSetBadgeExtraClass(badgeSrc = '') {
 
       const mainStatLabel = label('힘', '지능', '힘/지능');
       const mainStatVal = pick(
-        S.str * (1 + strPct/100),
-        S.int * (1 + intPct/100)
+        S.str * (1 + strPct / 100),
+        S.int * (1 + intPct / 100)
       );
 
       const mainPctLabel = label('힘(%)', '지능(%)', '힘/지능(%)');
@@ -18013,6 +18972,8 @@ function getSetBadgeExtraClass(badgeSrc = '') {
         // ★ 커스텀옵
         'customSkills',
         'specialRunes',  // ← 이 줄 추가하면 프리셋에 특수룬도 같이 저장
+
+        'synergy',
       ];
 
       for (const k of keys) {
@@ -18052,6 +19013,25 @@ function getSetBadgeExtraClass(badgeSrc = '') {
       Object.entries(src).forEach(([k, v]) => {
         target[k] = v;
       });
+
+      target.synergy = target.synergy || {
+  enabled1: false,
+  enabled2: false,
+
+  char: null,
+  char2: null,
+
+  weapon: null,
+  weapon2: null,
+
+  armorSet: null,
+  accSet: null,
+  specSet: null,
+
+  armorSet2: null,
+  accSet2: null,
+  specSet2: null,
+};
 
       // ✅ 모바일→PC 프리셋 호환: 엠블렘 스냅샷 정규화
       // - level_num: "10" → 10 (숫자)
@@ -18391,32 +19371,32 @@ function getSetBadgeExtraClass(badgeSrc = '') {
           if (!srcImg) return;
 
           const restoredItem = {
-  name: String(info?.name || eq?.name || eq?.['이름'] || '').trim(),
-  img: srcImg || null,
-  type: String(
-    info?.type ||
-    eq?.type ||
-    eq?.['종류'] ||
-    ''
-  ).trim() || null,
-};
+            name: String(info?.name || eq?.name || eq?.['이름'] || '').trim(),
+            img: srcImg || null,
+            type: String(
+              info?.type ||
+              eq?.type ||
+              eq?.['종류'] ||
+              ''
+            ).trim() || null,
+          };
 
-const badgeSrc = getSetBadgeSrc(restoredItem, logicalKey);
-const badgeExtraClass = getSetBadgeExtraClass(badgeSrc);
+          const badgeSrc = getSetBadgeSrc(restoredItem, logicalKey);
+          const badgeExtraClass = getSetBadgeExtraClass(badgeSrc);
 
-slotEl.innerHTML =
-  labelHtml +
-  `
+          slotEl.innerHTML =
+            labelHtml +
+            `
   <div class="item-img-wrap">
     <img class="item-main-img" alt="${safeAlt}" src="${srcImg}">
     ${badgeSrc ? `<img class="item-set-badge ${badgeExtraClass}" src="${badgeSrc}" alt="">` : ''}
   </div>
   `;
 
-// ✅ “들어갔는지” 확인용: hover 툴팁
-slotEl.title = String(info?.name || eq?.name || eq?.['이름'] || '');
+          // ✅ “들어갔는지” 확인용: hover 툴팁
+          slotEl.title = String(info?.name || eq?.name || eq?.['이름'] || '');
 
-slotEl.classList.add('selected');
+          slotEl.classList.add('selected');
         });
 
         // 5-4) 캐슬 씰/엠블렘/강화 라벨 등 부가 UI도 상태 기반으로 리프레시
@@ -18833,25 +19813,25 @@ slotEl.classList.add('selected');
           //    - PC에서 직접 선택했을 때와 동일한 state.selections 구조( desc/img/rarity/type/level/prefixLabel... )로 맞춘다.
           //    - applyItemToSlot이 타일까지 함께 그려주므로(접두사 포함), found가 있으면 그걸 우선 사용.
           if (found && typeof applyItemToSlot === 'function') {
-  applyItemToSlot(slotKey, found); // ← state.selections 풀 메타 + 타일/UI 동기화
-} else {
-  // found가 없으면 기존 방식대로 타일만 표시 + 최소 selections 유지
-  const badgeSrc = getSetBadgeSrc(found, slotKey);
+            applyItemToSlot(slotKey, found); // ← state.selections 풀 메타 + 타일/UI 동기화
+          } else {
+            // found가 없으면 기존 방식대로 타일만 표시 + 최소 selections 유지
+            const badgeSrc = getSetBadgeSrc(found, slotKey);
 
-  slotEl.innerHTML = `
+            slotEl.innerHTML = `
     <div class="item-img-wrap">
       <img class="item-main-img" alt="${safeAlt}" src="${imgSrc}">
       ${badgeSrc ? `<img class="item-set-badge" src="${badgeSrc}" alt="">` : ''}
     </div>
   `;
-  slotEl.classList.add('selected');
+            slotEl.classList.add('selected');
 
-  state.selections[slotKey] = {
-    name: wantedName,
-    img: null,
-    code: null,
-  };
-}
+            state.selections[slotKey] = {
+              name: wantedName,
+              img: null,
+              code: null,
+            };
+          }
         } catch (e) {
           console.warn('[preset] equip 슬롯 복원 실패:', equipKey, e);
         }
@@ -19285,23 +20265,57 @@ slotEl.classList.add('selected');
       document.getElementById('presetPageNext')?.addEventListener('click', () => setPresetPage(presetPage + 1));
 
       applyPresetPageToDom();
-// 페이지 로딩 시 서버에 있는 프리셋 메타 동기화
-refreshPresetSlotsFromServer();
+      // 페이지 로딩 시 서버에 있는 프리셋 메타 동기화
+      refreshPresetSlotsFromServer();
 
-// ✅ (추가) 로그인 토큰이 늦게 발급되면 그 순간 저장슬롯 목록을 다시 동기화
-document.addEventListener('gsi:issued', () => {
-  refreshPresetSlotsFromServer();
-});
+      // ✅ (추가) 로그인 토큰이 늦게 발급되면 그 순간 저장슬롯 목록을 다시 동기화
+      document.addEventListener('gsi:issued', () => {
+        refreshPresetSlotsFromServer();
+      });
 
-})();
+    })();
 
 
 
     // 전역 1줄(파일 어딘가 상단): 최신 호출만 반영하기 위한 시퀀스
     window.__computeReqSeq = 0;
+function buildSynergyPayload() {
+  const sy = state.synergy || {};
 
+  const makeOne = (idx) => {
+    const suffix = idx === 1 ? '' : '2';
+    return {
+      enabled: !!sy[`enabled${idx}`],
+      char: sy[`char${suffix}`] || null,
+      weapon: sy[`weapon${suffix}`] || null,
+      armorSet: sy[`armorSet${suffix}`] || null,
+      accSet: sy[`accSet${suffix}`] || null,
+      specSet: sy[`specSet${suffix}`] || null,
+      avatar: String(document.getElementById(`synergyAvatar${idx}`)?.value || '').trim(),
+      title: String(document.getElementById(`synergyTitle${idx}`)?.value || '').trim(),
+      detail: String(document.getElementById(`synergyDetail${idx}`)?.value || '').trim(),
+    };
+  };
+
+  const s1 = makeOne(1);
+  const s2 = makeOne(2);
+
+  console.log('[synergy payload built]', {
+  enabled1: !!s1.enabled,
+  enabled2: !!s2.enabled,
+  s1,
+  s2,
+});
+
+  return {
+    enabled1: !!s1.enabled,
+    enabled2: !!s2.enabled,
+    s1,
+    s2,
+  };
+}
     // ★ calc_all + compute 기반 최종 계산
-    async function computeViaBackend(targetId, p /* 'phys' | 'mag' 생략 가능 */) {
+    async function computeViaBackend(targetId, p /* 'phys' | 'mag' 생략 가능 */, opts = {}) {
       const box = document.getElementById(targetId);
       const btns = document.querySelectorAll('[data-compute-btn]');
 
@@ -19537,6 +20551,13 @@ document.addEventListener('gsi:issued', () => {
         if (runeEngravePayload) {
           payload.runeEngrave = runeEngravePayload;
         }
+        const useSynergy = !!opts.useSynergy;
+
+if (useSynergy) {
+  payload.synergy = buildSynergyPayload();
+  console.log('[computeViaBackend] useSynergy=', useSynergy);
+console.log('[computeViaBackend] payload.synergy=', payload.synergy);
+}
 
         // 3) calc_all: 캐릭터 + 장비를 세션에 반영
         async function callCalcAllOnce(token) {
@@ -20277,9 +21298,9 @@ document.addEventListener('gsi:issued', () => {
       const m = state.lastComputeMeta || {};
       const C = state.lastComputeCoeffs || {};
       const currentSkills = skillsForCurrentChar(Array.isArray(ST2.rows) ? ST2.rows : []);
-const skillImgMap = new Map(
-  currentSkills.map(s => [String(s?.name || '').trim(), String(s?.img || '').trim()])
-);
+      const skillImgMap = new Map(
+        currentSkills.map(s => [String(s?.name || '').trim(), String(s?.img || '').trim()])
+      );
 
       const forceCrit100 = !!m.forceCrit100;
       const tohampo12 = !!m.tohampo12;
@@ -20303,22 +21324,22 @@ const skillImgMap = new Map(
 
       const finSangParts = C?.fin_sangbyun_parts || {};
 
-const finBleed = Number(finSangParts.bleed || 0);
-const finBurn = Number(finSangParts.burn || 0);
-const finPoison = Number(finSangParts.poison || 0);
-const finShock = Number(finSangParts.shock || 0);
+      const finBleed = Number(finSangParts.bleed || 0);
+      const finBurn = Number(finSangParts.burn || 0);
+      const finPoison = Number(finSangParts.poison || 0);
+      const finShock = Number(finSangParts.shock || 0);
 
-const finSangTotalSafe =
-  (finBleed + finBurn + finPoison + finShock) > 0
-    ? (finBleed + finBurn + finPoison + finShock)
-    : 1;
+      const finSangTotalSafe =
+        (finBleed + finBurn + finPoison + finShock) > 0
+          ? (finBleed + finBurn + finPoison + finShock)
+          : 1;
 
-const finSangRatioMap = {
-  출혈: finBleed / finSangTotalSafe,
-  화상: finBurn / finSangTotalSafe,
-  중독: finPoison / finSangTotalSafe,
-  감전: finShock / finSangTotalSafe,
-};
+      const finSangRatioMap = {
+        출혈: finBleed / finSangTotalSafe,
+        화상: finBurn / finSangTotalSafe,
+        중독: finPoison / finSangTotalSafe,
+        감전: finShock / finSangTotalSafe,
+      };
       // 재해 여부 판정 (버전별 키 차이 + 이름 fallback)
       const isDisaster =
         !!m.isDisasterMonster ||
@@ -20328,7 +21349,7 @@ const finSangRatioMap = {
       const backAtkMul = isDisaster ? 1.0 : 1.1;
 
       // 공통 후단 계수: 최종증뎀 * 방깎증뎀
-      const commonPostMul =(1 + finalDmgUp) * (1 + defBreak);
+      const commonPostMul = (1 + finalDmgUp) * (1 + defBreak);
 
       // 공통 전단 계수: 모든타입피해
       const allTypeMul = (1 + allTypeDmg);
@@ -20355,212 +21376,212 @@ const finSangRatioMap = {
 
       const renderedRows = [];
 
-for (const r of rows) {
-  const name = String(r?.name || '-');
-  const kind = String(r?.kind || '-');
-  const uses = Number(r?.uses || 0);
+      for (const r of rows) {
+        const name = String(r?.name || '-');
+        const kind = String(r?.kind || '-');
+        const uses = Number(r?.uses || 0);
 
-  const dmgPerUseRaw = Number(r?.dmgPerUse || 0);
-  const sumRaw = Number(r?.sum || 0);
+        const dmgPerUseRaw = Number(r?.dmgPerUse || 0);
+        const sumRaw = Number(r?.sum || 0);
 
-  const status = isStatusRow(r);
-  const img = skillImgMap.get(name) || PLACEHOLDER_IMG;
+        const status = isStatusRow(r);
+        const img = skillImgMap.get(name) || PLACEHOLDER_IMG;
 
-  // 1) 스킬 자체 상변행은 스킬명으로 남기지 말고, 상변종류 버킷용 행으로 만든다
-if (status) {
-  let mul = statusMul;
-  if (forceCrit100) mul *= critForceRatio;
+        // 1) 스킬 자체 상변행은 스킬명으로 남기지 말고, 상변종류 버킷용 행으로 만든다
+        if (status) {
+          let mul = statusMul;
+          if (forceCrit100) mul *= critForceRatio;
 
-  statusBaseSum += sumRaw;
+          statusBaseSum += sumRaw;
 
-  const statusKindRaw =
-    String(r?.statusKind || r?.status?.kind || r?.kind || '').trim();
+          const statusKindRaw =
+            String(r?.statusKind || r?.status?.kind || r?.kind || '').trim();
 
-  let mergedStatusName = '';
-  if (statusKindRaw.includes('출혈')) mergedStatusName = '출혈';
-  else if (statusKindRaw.includes('화상')) mergedStatusName = '화상';
-  else if (statusKindRaw.includes('중독')) mergedStatusName = '중독';
-  else if (statusKindRaw.includes('감전')) mergedStatusName = '감전';
+          let mergedStatusName = '';
+          if (statusKindRaw.includes('출혈')) mergedStatusName = '출혈';
+          else if (statusKindRaw.includes('화상')) mergedStatusName = '화상';
+          else if (statusKindRaw.includes('중독')) mergedStatusName = '중독';
+          else if (statusKindRaw.includes('감전')) mergedStatusName = '감전';
 
-  // 종류 판정이 되면 상변 통합 버킷으로 보낼 행 생성
-  if (mergedStatusName) {
-    renderedRows.push({
-      name: mergedStatusName,
-      kind: '스킬상변',
-      uses: '-',
-      img: `img/etc/icon/${mergedStatusName}.png`,
-      dmgPerUseFinal: null,
-      sumFinal: sumRaw * mul,
-      isSkillStatusRow: true,
-      parentSkillName: name
-    });
-  } else {
-    // 혹시 판정 실패한 상변은 기존처럼 남겨둠 (안전장치)
-    renderedRows.push({
-      name,
-      kind,
-      uses,
-      img,
-      dmgPerUseFinal: dmgPerUseRaw * mul,
-      sumFinal: sumRaw * mul
-    });
-  }
+          // 종류 판정이 되면 상변 통합 버킷으로 보낼 행 생성
+          if (mergedStatusName) {
+            renderedRows.push({
+              name: mergedStatusName,
+              kind: '스킬상변',
+              uses: '-',
+              img: `img/etc/icon/${mergedStatusName}.png`,
+              dmgPerUseFinal: null,
+              sumFinal: sumRaw * mul,
+              isSkillStatusRow: true,
+              parentSkillName: name
+            });
+          } else {
+            // 혹시 판정 실패한 상변은 기존처럼 남겨둠 (안전장치)
+            renderedRows.push({
+              name,
+              kind,
+              uses,
+              img,
+              dmgPerUseFinal: dmgPerUseRaw * mul,
+              sumFinal: sumRaw * mul
+            });
+          }
 
-  continue;
-}
+          continue;
+        }
 
-  // 2) 일반 스킬행: 옵션상변 포함 상태로 내려온 값
-  directBaseSum += sumRaw;
+        // 2) 일반 스킬행: 옵션상변 포함 상태로 내려온 값
+        directBaseSum += sumRaw;
 
-  const directBaseDenom = backAtkMul + (finSang / 100);
+        const directBaseDenom = backAtkMul + (finSang / 100);
 
-// 옵션상변이 없으면 기존처럼 한 줄만
-if (!(finSang > 0) || !(directBaseDenom > 0)) {
-  let mul = directMul;
-  if (forceCrit100) mul *= critForceRatio;
+        // 옵션상변이 없으면 기존처럼 한 줄만
+        if (!(finSang > 0) || !(directBaseDenom > 0)) {
+          let mul = directMul;
+          if (forceCrit100) mul *= critForceRatio;
 
-  renderedRows.push({
-    name,
-    kind,
-    uses,
-    img,
-    dmgPerUseFinal: dmgPerUseRaw * mul,
-    sumFinal: sumRaw * mul
-  });
-  continue;
-}
+          renderedRows.push({
+            name,
+            kind,
+            uses,
+            img,
+            dmgPerUseFinal: dmgPerUseRaw * mul,
+            sumFinal: sumRaw * mul
+          });
+          continue;
+        }
 
-// ✅ 먼저 "원래 일반 스킬 최종값"을 구한다
-let directFinalMul = directMul;
-if (forceCrit100) directFinalMul *= critForceRatio;
+        // ✅ 먼저 "원래 일반 스킬 최종값"을 구한다
+        let directFinalMul = directMul;
+        if (forceCrit100) directFinalMul *= critForceRatio;
 
-const originalDirectFinalSum = sumRaw * directFinalMul;
-const originalDirectFinalPerUse = dmgPerUseRaw * directFinalMul;
+        const originalDirectFinalSum = sumRaw * directFinalMul;
+        const originalDirectFinalPerUse = dmgPerUseRaw * directFinalMul;
 
-// ✅ 최종값 기준으로 비율 분해
-const pureDirectRatio = backAtkMul / directBaseDenom;
-const optionStatusRatio = (finSang / 100) / directBaseDenom;
+        // ✅ 최종값 기준으로 비율 분해
+        const pureDirectRatio = backAtkMul / directBaseDenom;
+        const optionStatusRatio = (finSang / 100) / directBaseDenom;
 
-// 3-1) 순수 직접딜 행
-renderedRows.push({
-  name,
-  kind,
-  uses,
-  img,
-  dmgPerUseFinal: originalDirectFinalPerUse * pureDirectRatio,
-  sumFinal: originalDirectFinalSum * pureDirectRatio
-});
+        // 3-1) 순수 직접딜 행
+        renderedRows.push({
+          name,
+          kind,
+          uses,
+          img,
+          dmgPerUseFinal: originalDirectFinalPerUse * pureDirectRatio,
+          sumFinal: originalDirectFinalSum * pureDirectRatio
+        });
 
-// 3-2) 옵션상변 행들
-const optionKinds = ['출혈', '화상', '중독', '감전'];
+        // 3-2) 옵션상변 행들
+        const optionKinds = ['출혈', '화상', '중독', '감전'];
 
-for (const sk of optionKinds) {
-  const ratio = Number(finSangRatioMap[sk] || 0);
-  if (!(ratio > 0)) continue;
+        for (const sk of optionKinds) {
+          const ratio = Number(finSangRatioMap[sk] || 0);
+          if (!(ratio > 0)) continue;
 
-  const partFinalSum = originalDirectFinalSum * optionStatusRatio * ratio;
+          const partFinalSum = originalDirectFinalSum * optionStatusRatio * ratio;
 
-  if (!(partFinalSum > 0)) continue;
+          if (!(partFinalSum > 0)) continue;
 
-  renderedRows.push({
-    name: sk,
-    kind: '옵션상변',
-    uses: '-',
-    img: `img/etc/icon/${sk}.png`,
-    dmgPerUseFinal: null,
-    sumFinal: partFinalSum,
-    isOptionStatusRow: true
-  });
-}
-}
+          renderedRows.push({
+            name: sk,
+            kind: '옵션상변',
+            uses: '-',
+            img: `img/etc/icon/${sk}.png`,
+            dmgPerUseFinal: null,
+            sumFinal: partFinalSum,
+            isOptionStatusRow: true
+          });
+        }
+      }
 
-const mergedRows = [];
-let basicAttackBucket = null;
+      const mergedRows = [];
+      let basicAttackBucket = null;
 
-// 옵션상변 종류별 버킷
-const optionStatusBuckets = {
-  출혈: {
-    name: '출혈',
-    kind: '옵션상변',
-    uses: '-',
-    img: 'img/etc/icon/출혈.png',
-    dmgPerUseFinal: null,
-    sumFinal: 0,
-    isOptionStatusRow: true
-  },
-  화상: {
-    name: '화상',
-    kind: '옵션상변',
-    uses: '-',
-    img: 'img/etc/icon/화상.png',
-    dmgPerUseFinal: null,
-    sumFinal: 0,
-    isOptionStatusRow: true
-  },
-  중독: {
-    name: '중독',
-    kind: '옵션상변',
-    uses: '-',
-    img: 'img/etc/icon/중독.png',
-    dmgPerUseFinal: null,
-    sumFinal: 0,
-    isOptionStatusRow: true
-  },
-  감전: {
-    name: '감전',
-    kind: '옵션상변',
-    uses: '-',
-    img: 'img/etc/icon/감전.png',
-    dmgPerUseFinal: null,
-    sumFinal: 0,
-    isOptionStatusRow: true
-  }
-};
-
-for (const r of renderedRows) {
-  const isBasicAttackRow = (r.kind === '평타' || r.kind === '연결평타');
-  const isMergedStatusRow =
-    ((r.kind === '옵션상변' || r.kind === '스킬상변') && optionStatusBuckets[r.name]);
-
-  // 1) 평타/연결평타 묶기
-  if (isBasicAttackRow) {
-    if (!basicAttackBucket) {
-      basicAttackBucket = {
-        name: '기본공격',
-        kind: '평타',
-        uses: '-',
-        img: 'img/etc/icon/기본공격.png',
-        dmgPerUseFinal: null,
-        sumFinal: 0
+      // 옵션상변 종류별 버킷
+      const optionStatusBuckets = {
+        출혈: {
+          name: '출혈',
+          kind: '옵션상변',
+          uses: '-',
+          img: 'img/etc/icon/출혈.png',
+          dmgPerUseFinal: null,
+          sumFinal: 0,
+          isOptionStatusRow: true
+        },
+        화상: {
+          name: '화상',
+          kind: '옵션상변',
+          uses: '-',
+          img: 'img/etc/icon/화상.png',
+          dmgPerUseFinal: null,
+          sumFinal: 0,
+          isOptionStatusRow: true
+        },
+        중독: {
+          name: '중독',
+          kind: '옵션상변',
+          uses: '-',
+          img: 'img/etc/icon/중독.png',
+          dmgPerUseFinal: null,
+          sumFinal: 0,
+          isOptionStatusRow: true
+        },
+        감전: {
+          name: '감전',
+          kind: '옵션상변',
+          uses: '-',
+          img: 'img/etc/icon/감전.png',
+          dmgPerUseFinal: null,
+          sumFinal: 0,
+          isOptionStatusRow: true
+        }
       };
-    }
-    basicAttackBucket.sumFinal += Number(r.sumFinal || 0);
-    continue;
-  }
 
-  // 2) 옵션상변 + 스킬자체상변 모두 종류별 묶기
-  if (isMergedStatusRow) {
-    optionStatusBuckets[r.name].sumFinal += Number(r.sumFinal || 0);
-    continue;
-  }
+      for (const r of renderedRows) {
+        const isBasicAttackRow = (r.kind === '평타' || r.kind === '연결평타');
+        const isMergedStatusRow =
+          ((r.kind === '옵션상변' || r.kind === '스킬상변') && optionStatusBuckets[r.name]);
 
-  // 3) 그 외는 그대로 유지
-  mergedRows.push(r);
-}
+        // 1) 평타/연결평타 묶기
+        if (isBasicAttackRow) {
+          if (!basicAttackBucket) {
+            basicAttackBucket = {
+              name: '기본공격',
+              kind: '평타',
+              uses: '-',
+              img: 'img/etc/icon/기본공격.png',
+              dmgPerUseFinal: null,
+              sumFinal: 0
+            };
+          }
+          basicAttackBucket.sumFinal += Number(r.sumFinal || 0);
+          continue;
+        }
 
-if (basicAttackBucket) {
-  mergedRows.push(basicAttackBucket);
-}
+        // 2) 옵션상변 + 스킬자체상변 모두 종류별 묶기
+        if (isMergedStatusRow) {
+          optionStatusBuckets[r.name].sumFinal += Number(r.sumFinal || 0);
+          continue;
+        }
 
-// 옵션상변 버킷 중 합계가 0보다 큰 것만 추가
-for (const key of ['출혈', '화상', '중독', '감전']) {
-  const bucket = optionStatusBuckets[key];
-  if (Number(bucket.sumFinal || 0) > 0) {
-    mergedRows.push(bucket);
-  }
-}
+        // 3) 그 외는 그대로 유지
+        mergedRows.push(r);
+      }
 
-mergedRows.sort((a, b) => Number(b.sumFinal || 0) - Number(a.sumFinal || 0));
+      if (basicAttackBucket) {
+        mergedRows.push(basicAttackBucket);
+      }
+
+      // 옵션상변 버킷 중 합계가 0보다 큰 것만 추가
+      for (const key of ['출혈', '화상', '중독', '감전']) {
+        const bucket = optionStatusBuckets[key];
+        if (Number(bucket.sumFinal || 0) > 0) {
+          mergedRows.push(bucket);
+        }
+      }
+
+      mergedRows.sort((a, b) => Number(b.sumFinal || 0) - Number(a.sumFinal || 0));
 
       // ===== 합계 계산 =====
       const directFinalTotal = directBaseSum * directMul * (forceCrit100 ? critForceRatio : 1);
@@ -20578,7 +21599,7 @@ mergedRows.sort((a, b) => Number(b.sumFinal || 0) - Number(a.sumFinal || 0));
 
       // 표시용 스킬합(최종기준)
       const skillFinalShownTotal = directFinalTotal + statusFinalTotal;
-const safeSkillTotal = finalTotal > 0 ? finalTotal : 1;
+      const safeSkillTotal = finalTotal > 0 ? finalTotal : 1;
 
       // ===== 상단 메타 표시 =====
       meta.innerHTML = `
@@ -20598,44 +21619,44 @@ const safeSkillTotal = finalTotal > 0 ? finalTotal : 1;
     </div>
   `;
 
-  const forceUseOneNames = new Set([
-  '작열탄',
-  '전격탄',
-  '은탄',
-  '흑염의 칼라',
-  '살의의 파동',
-  '리버레이트 - 벅샷',
-  'G-2 롤링썬더',
-  'G-3 랩터',
-  'G - 게일포스',
-  'G-4 호넷',
-  'G - 게일포스V2',
-  '자율 기동 메카 게일포스',
-  '인서트 : 팔콘',
-  '싱크로 : 코로나',
-  '오버 차지(화속성)',
-  '오버 차지(명속성)',
-  '케미컬 파우더',
-  '체이서',
-  '헤일스톰',
-  '스매쉬'
+      const forceUseOneNames = new Set([
+        '작열탄',
+        '전격탄',
+        '은탄',
+        '흑염의 칼라',
+        '살의의 파동',
+        '리버레이트 - 벅샷',
+        'G-2 롤링썬더',
+        'G-3 랩터',
+        'G - 게일포스',
+        'G-4 호넷',
+        'G - 게일포스V2',
+        '자율 기동 메카 게일포스',
+        '인서트 : 팔콘',
+        '싱크로 : 코로나',
+        '오버 차지(화속성)',
+        '오버 차지(명속성)',
+        '케미컬 파우더',
+        '체이서',
+        '헤일스톰',
+        '스매쉬'
 
-]);
+      ]);
       // ===== 표 렌더링 (스킬만) =====
       tbody.innerHTML = mergedRows.map(r => {
-  const ratio = (Number(r.sumFinal || 0) / safeSkillTotal) * 100;
-  const isMergedBasic = (r.name === '기본공격');
-const isMergedStatusRow = !!r.isOptionStatusRow || !!r.isSkillStatusRow || r.kind === '옵션상변' || r.kind === '스킬상변';
-const hideUseAndPerUse = isMergedBasic || isMergedStatusRow;
-const displayUses = hideUseAndPerUse
-    ? '-'
-    : (forceUseOneNames.has(String(r.name || '').trim()) ? 1 : r.uses);
+        const ratio = (Number(r.sumFinal || 0) / safeSkillTotal) * 100;
+        const isMergedBasic = (r.name === '기본공격');
+        const isMergedStatusRow = !!r.isOptionStatusRow || !!r.isSkillStatusRow || r.kind === '옵션상변' || r.kind === '스킬상변';
+        const hideUseAndPerUse = isMergedBasic || isMergedStatusRow;
+        const displayUses = hideUseAndPerUse
+          ? '-'
+          : (forceUseOneNames.has(String(r.name || '').trim()) ? 1 : r.uses);
 
-  const displayPerUse = (hideUseAndPerUse || !Number(r.dmgPerUseFinal))
-    ? '-'
-    : _fmtSkillDmgNum(r.dmgPerUseFinal);
+        const displayPerUse = (hideUseAndPerUse || !Number(r.dmgPerUseFinal))
+          ? '-'
+          : _fmtSkillDmgNum(r.dmgPerUseFinal);
 
-  return `
+        return `
     <tr style="border-top:1px solid rgba(255,255,255,.06);">
       <td style="padding:8px 10px;">
         <div style="display:flex; align-items:center; gap:8px; min-width:0;">
@@ -20654,12 +21675,974 @@ const displayUses = hideUseAndPerUse
       <td style="padding:8px 10px; text-align:right; color:#93c5fd;">${ratio.toFixed(2)}%</td>
     </tr>
   `;
-}).join('');
+      }).join('');
 
       showModal(modal, true);
     }
 
+    const DBSynergy = {
+      chars: null,
+      sets: null,
+      pickerMode: '', // 'char' | 'armor' | 'acc' | 'spec'
+    };
+
+    function bindSynergyModalCloseOnce() {
+      ['synergyEffectModal', 'synergyPickerModal'].forEach(id => {
+        const modal = document.getElementById(id);
+        if (!modal || modal.__closeBound) return;
+        modal.__closeBound = true;
+        modal.querySelectorAll('[data-close]').forEach(el => {
+          el.addEventListener('click', () => showModal(modal, false));
+        });
+      });
+    }
+
+    async function ensureSynergyListsLoaded() {
+      if (!DBSynergy.chars) {
+        DBSynergy.chars =
+          (CORE?.lists?.['char:list']) ||
+          (window.CORE_DATA?.['char:list']) ||
+          [];
+      }
+
+      if (!DBSynergy.sets) {
+        DBSynergy.sets =
+          (CORE?.lists?.['synergyset:list']) ||
+          (window.CORE_DATA?.['synergyset:list']) ||
+          [];
+      }
+    }
+
+    function bindSynergyReselect(targetEl, mode) {
+  if (!targetEl) return;
+  if (targetEl.__synergyReselectBound) return;
+
+  targetEl.__synergyReselectBound = true;
+  targetEl.addEventListener('click', () => {
+    openSynergyPicker(mode);
+  });
+}
+
+function bindSynergyWeaponReselect(targetEl, mode) {
+  if (!targetEl) return;
+  if (targetEl.__synergyWeaponReselectBound) return;
+
+  targetEl.__synergyWeaponReselectBound = true;
+  targetEl.addEventListener('click', () => {
+    openSynergyPicker(mode);
+  });
+}
+
+    function renderSynergyPickedSetPreview({
+  picked,
+  buttonId,
+  wrapId,
+  textId,
+  mode
+}) {
+  const btn = document.getElementById(buttonId);
+  const wrap = document.getElementById(wrapId);
+  const text = document.getElementById(textId);
+
+  const pieces = Array.isArray(picked?.pieces) ? picked.pieces : [];
+  const hasPieces = pieces.length > 0;
+  const pickedName = String(picked?.name || '').trim();
+
+  if (!wrap || !text || !btn) return;
+
+  if (hasPieces) {
+    wrap.innerHTML = '';
+
+    pieces.forEach((piece) => {
+      const item = document.createElement('div');
+      item.className = 'synergy-picked-set-item';
+      item.title = piece?.slotLabel || piece?.name || '';
+
+      const img = document.createElement('img');
+      img.className = 'icon';
+      img.src = piece?.img || PLACEHOLDER_IMG;
+      img.alt = piece?.slotLabel || piece?.name || '';
+      item.appendChild(img);
+
+      const setBadgeSrc = getSetBadgeSrc(piece?.item || piece, piece?.slot || '');
+      if (setBadgeSrc) {
+        const badge = document.createElement('img');
+        badge.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
+        badge.src = setBadgeSrc;
+        badge.alt = '';
+        item.appendChild(badge);
+      }
+
+      wrap.appendChild(item);
+    });
+
+    wrap.style.display = 'flex';
+btn.style.display = 'none';
+text.textContent = '';
+text.style.display = 'none';
+
+bindSynergyReselect(wrap, mode);
+return;
+  }
+
+  wrap.innerHTML = '';
+wrap.style.display = 'none';
+btn.style.display = '';
+text.textContent = '';
+text.style.display = 'none';
+}
+
+function renderSynergyPickedWeaponPreview({
+  picked,
+  buttonId,
+  wrapId,
+  imgId,
+  textId,
+  mode
+}) {
+  const btn = document.getElementById(buttonId);
+  const wrap = document.getElementById(wrapId);
+  const img = document.getElementById(imgId);
+  const text = document.getElementById(textId);
+
+  const hasImg = !!String(picked?.img || '').trim();
+
+  if (!btn || !wrap || !img || !text) return;
+
+  if (hasImg) {
+    img.src = String(picked.img || '');
+    img.alt = picked?.name || '선택 무기';
+
+    wrap.style.display = 'flex';
+    btn.style.display = 'none';
+
+    text.textContent = '';
+    text.style.display = 'none';
+
+    bindSynergyWeaponReselect(wrap, mode);
+    return;
+  }
+
+  img.removeAttribute('src');
+  img.alt = '선택 무기';
+  wrap.style.display = 'none';
+  btn.style.display = '';
+
+  text.textContent = '';
+  text.style.display = 'none';
+}
+
+function renderSynergyPickedTexts() {
+  const pickedCharText = document.getElementById('synergyPickedChar');
+  const pickedCharWrap = document.getElementById('synergyPickedCharWrap');
+  const pickedCharImg = document.getElementById('synergyPickedCharImg');
+  const pickCharBtn = document.getElementById('btnSynergyPickChar');
+
+  const pickedCharText2 = document.getElementById('synergyPickedChar2');
+  const pickedCharWrap2 = document.getElementById('synergyPickedCharWrap2');
+  const pickedCharImg2 = document.getElementById('synergyPickedCharImg2');
+  const pickCharBtn2 = document.getElementById('btnSynergyPickChar2');
+
+  const charImg = String(state.synergy?.char?.img || '').trim();
+  const charImg2 = String(state.synergy?.char2?.img || '').trim();
+
+  // ===== 시너지 1 캐릭터 =====
+  if (charImg) {
+  if (pickedCharImg) pickedCharImg.src = charImg;
+  if (pickedCharImg) pickedCharImg.alt = state.synergy?.char?.name || '선택 캐릭터';
+  if (pickedCharWrap) pickedCharWrap.style.display = 'flex';
+  if (pickCharBtn) pickCharBtn.style.display = 'none';
+  if (pickedCharText) {
+    pickedCharText.textContent = '';
+    pickedCharText.style.display = 'none';
+  }
+  bindSynergyReselect(pickedCharWrap, 'char');
+} else {
+  if (pickedCharWrap) pickedCharWrap.style.display = 'none';
+  if (pickCharBtn) pickCharBtn.style.display = '';
+  if (pickedCharText) {
+    pickedCharText.textContent = '';
+    pickedCharText.style.display = 'none';
+  }
+}
+
+  // ===== 시너지 2 캐릭터 =====
+  if (charImg2) {
+  if (pickedCharImg2) pickedCharImg2.src = charImg2;
+  if (pickedCharImg2) pickedCharImg2.alt = state.synergy?.char2?.name || '선택 캐릭터';
+  if (pickedCharWrap2) pickedCharWrap2.style.display = 'flex';
+  if (pickCharBtn2) pickCharBtn2.style.display = 'none';
+  if (pickedCharText2) {
+    pickedCharText2.textContent = '';
+    pickedCharText2.style.display = 'none';
+  }
+  bindSynergyReselect(pickedCharWrap2, 'char2');
+} else {
+  if (pickedCharWrap2) pickedCharWrap2.style.display = 'none';
+  if (pickCharBtn2) pickCharBtn2.style.display = '';
+  if (pickedCharText2) {
+    pickedCharText2.textContent = '';
+    pickedCharText2.style.display = 'none';
+  }
+}
+
+  renderSynergyPickedSetPreview({
+    picked: state.synergy?.armorSet,
+    buttonId: 'btnSynergyPickArmorSet',
+    wrapId: 'synergyPickedArmorSetWrap',
+    textId: 'synergyPickedArmorSet',
+    mode: 'armor'
+  });
+
+  renderSynergyPickedSetPreview({
+    picked: state.synergy?.accSet,
+    buttonId: 'btnSynergyPickAccSet',
+    wrapId: 'synergyPickedAccSetWrap',
+    textId: 'synergyPickedAccSet',
+    mode: 'acc'
+  });
+
+  renderSynergyPickedSetPreview({
+    picked: state.synergy?.specSet,
+    buttonId: 'btnSynergyPickSpecSet',
+    wrapId: 'synergyPickedSpecSetWrap',
+    textId: 'synergyPickedSpecSet',
+    mode: 'spec'
+  });
+
+  renderSynergyPickedSetPreview({
+    picked: state.synergy?.armorSet2,
+    buttonId: 'btnSynergyPickArmorSet2',
+    wrapId: 'synergyPickedArmorSetWrap2',
+    textId: 'synergyPickedArmorSet2',
+    mode: 'armor2'
+  });
+
+  renderSynergyPickedSetPreview({
+    picked: state.synergy?.accSet2,
+    buttonId: 'btnSynergyPickAccSet2',
+    wrapId: 'synergyPickedAccSetWrap2',
+    textId: 'synergyPickedAccSet2',
+    mode: 'acc2'
+  });
+
+  renderSynergyPickedSetPreview({
+    picked: state.synergy?.specSet2,
+    buttonId: 'btnSynergyPickSpecSet2',
+    wrapId: 'synergyPickedSpecSetWrap2',
+    textId: 'synergyPickedSpecSet2',
+    mode: 'spec2'
+  });
+
+    renderSynergyPickedWeaponPreview({
+    picked: state.synergy?.weapon,
+    buttonId: 'btnSynergyPickWeapon',
+    wrapId: 'synergyPickedWeaponWrap',
+    imgId: 'synergyPickedWeaponImg',
+    textId: 'synergyPickedWeapon',
+    mode: 'weapon'
+  });
+
+  renderSynergyPickedWeaponPreview({
+    picked: state.synergy?.weapon2,
+    buttonId: 'btnSynergyPickWeapon2',
+    wrapId: 'synergyPickedWeaponWrap2',
+    imgId: 'synergyPickedWeaponImg2',
+    textId: 'synergyPickedWeapon2',
+    mode: 'weapon2'
+  });
+}
+
+function resetSynergy1Selections() {
+  state.synergy = state.synergy || {};
+
+  state.synergy.char = null;
+  state.synergy.weapon = null;
+  state.synergy.armorSet = null;
+  state.synergy.accSet = null;
+  state.synergy.specSet = null;
+
+  const avatarEl = document.getElementById('synergyAvatar1');
+  const titleEl = document.getElementById('synergyTitle1');
+  const detailEl = document.getElementById('synergyDetail1');
+
+  if (avatarEl) avatarEl.value = '레어';
+  if (titleEl) titleEl.value = '종결';
+  if (detailEl) detailEl.value = '8000';
+
+  renderSynergyPickedTexts();
+}
+
+function resetSynergy2Selections() {
+  state.synergy = state.synergy || {};
+
+  state.synergy.char2 = null;
+  state.synergy.weapon2 = null;
+  state.synergy.armorSet2 = null;
+  state.synergy.accSet2 = null;
+  state.synergy.specSet2 = null;
+
+  const avatarEl = document.getElementById('synergyAvatar2');
+  const titleEl = document.getElementById('synergyTitle2');
+  const detailEl = document.getElementById('synergyDetail2');
+
+  if (avatarEl) avatarEl.value = '레어';
+  if (titleEl) titleEl.value = '종결';
+  if (detailEl) detailEl.value = '8000';
+
+  renderSynergyPickedTexts();
+}
+
+    function openSynergyEffectModal() {
+  bindSynergyModalCloseOnce();
+
+  const enabled1El = document.getElementById('synergyEnabled1');
+  if (enabled1El) {
+    enabled1El.checked = !!state.synergy?.enabled1;
+  }
+
+  const enabled2El = document.getElementById('synergyEnabled2');
+  if (enabled2El) {
+    enabled2El.checked = !!state.synergy?.enabled2;
+  }
+
+  renderSynergyPickedTexts();
+  showModal(document.getElementById('synergyEffectModal'), true);
+}
+
+    function getSynergyWeaponJobGroup(mode) {
+  if (mode === 'weapon') {
+    return String(
+      state?.synergy?.char?.jobGroup ||
+      state?.synergy?.char?.jobGroupLabel ||
+      ''
+    ).trim();
+  }
+
+  if (mode === 'weapon2') {
+    return String(
+      state?.synergy?.char2?.jobGroup ||
+      state?.synergy?.char2?.jobGroupLabel ||
+      ''
+    ).trim();
+  }
+
+  return '';
+}
+
+function getSynergyWeaponItems(mode) {
+  const job = getSynergyWeaponJobGroup(mode);
+  if (!job) return [];
+
+  const AWT = (window.ALLOWED_WEAPON_TYPES || {});
+  const allowedSet = new Set(AWT[job] || AWT[_baseJG?.(job)] || []);
+
+  const all = Array.isArray(DBSynergy.sets) ? DBSynergy.sets.slice() : [];
+
+  return all.filter(row => {
+    const category = String(row?.category || '').trim();
+    const rowJob = String(row?.jobGroup || '').trim();
+    const rowType = String(row?.type || '').trim();
+
+    if (category !== '무기') return false;
+    if (rowJob && !jgMatches(rowJob, job)) return false;
+    if (allowedSet.size && rowType && !allowedSet.has(rowType)) return false;
+
+    return true;
+  });
+}
+
+    function _synergySetCategoryOf(row) {
+      const cat = String(row?.category || '').trim();
+      return cat;
+    }
+
+    function _synergyFilterSets(mode, list) {
+  if (mode === 'weapon' || mode === 'weapon2') {
+    return list.filter(r => _synergySetCategoryOf(r) === '무기');
+  }
+  if (mode === 'armor' || mode === 'armor2') {
+    return list.filter(r => _synergySetCategoryOf(r) === '방어구');
+  }
+  if (mode === 'acc' || mode === 'acc2') {
+    return list.filter(r => _synergySetCategoryOf(r) === '악세');
+  }
+  if (mode === 'spec' || mode === 'spec2') {
+    return list.filter(r => _synergySetCategoryOf(r) === '특수');
+  }
+  return list;
+}
+
+    async function renderSynergyPickerCards() {
+  const wrap = document.getElementById('synergyPickerList');
+  if (!wrap) return;
+
+  let list = [];
+
+  if (DBSynergy.pickerMode === 'char' || DBSynergy.pickerMode === 'char2') {
+    list = Array.isArray(DBSynergy.chars) ? DBSynergy.chars.slice() : [];
+    list = list.filter(r => String(r?.enabled ?? true) !== 'false');
+    list = list.filter(r => String(r?.synergy || '').trim() === '시너지');
+  } else {
+    list = _synergyFilterSets(
+      DBSynergy.pickerMode,
+      Array.isArray(DBSynergy.sets) ? DBSynergy.sets.slice() : []
+    );
+  }
+
+  // =========================
+  // 캐릭터 모드: 메인 캐릭터 선택 모달과 같은 구조
+  // =========================
+  if (DBSynergy.pickerMode === 'char' || DBSynergy.pickerMode === 'char2') {
+        const groups = new Map();
+
+        list.forEach(r => {
+          const jobGroup = String(r?.jobGroup || '기타').trim() || '기타';
+          if (!groups.has(jobGroup)) groups.set(jobGroup, []);
+          groups.get(jobGroup).push(r);
+        });
+
+        const html = Array.from(groups.entries()).map(([jobGroup, chars]) => {
+          const badgeSrc = String(chars[0]?.type || '').trim();
+
+          const cardsHtml = chars.map(r => {
+            const img = r?.thumbSrc || r?.fullSrc || r?.faceSrc || '';
+            const name = String(r?.name || '');
+            const type = String(r?.type || '');
+            const enabled = String(r?.enabled ?? true) !== 'false';
+
+            return `
+          <div class="char-card${enabled ? '' : ' disabled'}"
+               data-synergy-pick="1"
+               data-name="${name.replace(/"/g, '&quot;')}"
+               data-img="${String(img || '').replace(/"/g, '&quot;')}"
+               data-jobgroup="${jobGroup.replace(/"/g, '&quot;')}"
+               data-category=""
+               title="${name}">
+            <img class="char-img" src="${img}" alt="${name}">
+            <div class="char-name">${name}</div>
+          </div>
+        `;
+          }).join('');
+
+          return `
+        <div class="row">
+          <img class="badge-img" src="${badgeSrc}" alt="${jobGroup}" title="${jobGroup}">
+          <div class="cards">
+            ${cardsHtml}
+          </div>
+          <div></div>
+        </div>
+      `;
+        }).join('');
+
+        wrap.innerHTML = html;
+
+        wrap.querySelectorAll('[data-synergy-pick]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.classList.contains('disabled')) return;
+
+    const picked = {
+      name: btn.dataset.name || '',
+      img: btn.dataset.img || '',
+      jobGroup: btn.dataset.jobgroup || '',
+      category: '캐릭터',
+    };
+
+state.synergy = state.synergy || {
+  enabled1: false,
+  enabled2: false,
+  char: null,
+  char2: null,
+  weapon: null,
+  weapon2: null,
+  armorSet: null,
+  accSet: null,
+  specSet: null,
+  armorSet2: null,
+  accSet2: null,
+  specSet2: null,
+};
+    if (DBSynergy.pickerMode === 'char') {
+      state.synergy.char = picked;
+    }
+    if (DBSynergy.pickerMode === 'char2') {
+      state.synergy.char2 = picked;
+    }
+
+    renderSynergyPickedTexts();
+    showModal(document.getElementById('synergyPickerModal'), false);
+  });
+});
+
+        return;
+      }
+
+         // =========================
+// 무기 모드
+// =========================
+if (DBSynergy.pickerMode === 'weapon' || DBSynergy.pickerMode === 'weapon2') {
+  wrap.innerHTML = '';
+
+  const listBox = document.createElement('div');
+  listBox.className = 'items';
+  wrap.appendChild(listBox);
+
+  const job = getSynergyWeaponJobGroup(DBSynergy.pickerMode);
+  const weaponList = getSynergyWeaponItems(DBSynergy.pickerMode);
+
+  if (!job) {
+    listBox.innerHTML = `
+      <div style="padding:16px; color:#c7b589; font-size:14px;">
+        먼저 시너지 캐릭터를 선택해주세요.
+      </div>
+    `;
+    return;
+  }
+
+  if (!weaponList.length) {
+    listBox.innerHTML = `
+      <div style="padding:16px; color:#c7b589; font-size:14px;">
+        표시할 수 있는 무기가 없습니다.
+      </div>
+    `;
+    return;
+  }
+
+  const cards = weaponList.map(it => {
+    const name = String(it?.name || '').trim();
+    const img = String(
+      it?.image ||
+      it?.img ||
+      it?.pieces?.[0]?.image ||
+      it?.pieces?.[0]?.img ||
+      it?.item?.image ||
+      it?.item?.img ||
+      ''
+    ).trim();
+
+    const rowType = String(it?.type || '').trim();
+    const rowJob = String(it?.jobGroup || '').trim();
+
+    const levelNum = Number(it?.level ?? it?._raw?.level ?? 65) || 65;
+    const badge = `Lv.${levelNum}`;
+    const lvlLabel = `${levelNum}레벨`;
+
+    const rawRarity = String(
+      (it?.rarity ?? '') ||
+      (it?._raw && (it._raw.rarity || it._raw['레어리티'] || it._raw['희귀도'] || it._raw['등급'])) ||
+      ''
+    ).trim();
+
+    let rarityLabel = rawRarity;
+    let rarityClass = '';
+    const lower = rarityLabel.toLowerCase();
+
+    if (!rarityLabel) {
+      rarityLabel = '에픽';
+      rarityClass = 'rarity-epic';
+    } else if (rarityLabel === '에픽' || lower === 'epic') {
+      rarityLabel = '에픽';
+      rarityClass = 'rarity-epic';
+    } else if (rarityLabel === '익시드' || lower === 'exceed') {
+      rarityLabel = '익시드';
+      rarityClass = 'rarity-exceed';
+    } else if (rarityLabel === '레어' || lower === 'rare') {
+      rarityLabel = '레어';
+      rarityClass = 'rarity-rare';
+    } else if (rarityLabel === '유니크' || lower === 'unique') {
+      rarityLabel = '유니크';
+      rarityClass = 'rarity-unique';
+    } else {
+      rarityClass = 'rarity-epic';
+    }
+
+    return `
+      <button type="button"
+              class="item-row"
+              data-synergy-weapon-pick="1"
+              data-name="${name.replace(/"/g, '&quot;')}"
+              data-img="${img.replace(/"/g, '&quot;')}"
+              data-type="${rowType.replace(/"/g, '&quot;')}"
+              data-jobgroup="${rowJob.replace(/"/g, '&quot;')}"
+              title="${name}">
+        <div class="iconbox">
+          <img class="icon" src="${img || PLACEHOLDER_IMG}" alt="${name}">
+          <span class="badge-lv">${badge}</span>
+        </div>
+        <div class="meta">
+          <div class="meta-top">
+            <span class="lvl">${lvlLabel}</span><span class="name">${name}</span>
+          </div>
+          <div class="meta-sub">${rowType}</div>
+        </div>
+        <div class="right">
+          <span class="rarity-chip ${rarityClass}">${rarityLabel}</span>
+        </div>
+      </button>
+    `;
+  }).join('');
+
+  listBox.innerHTML = `<div class="item-list">${cards}</div>`;
+
+  wrap.querySelectorAll('[data-synergy-weapon-pick]').forEach(card => {
+    card.addEventListener('click', () => {
+      const picked = {
+        name: card.dataset.name || '',
+        img: card.dataset.img || '',
+        type: card.dataset.type || '',
+        jobGroup: card.dataset.jobgroup || '',
+        category: '무기'
+      };
+
+      if (DBSynergy.pickerMode === 'weapon') {
+        state.synergy.weapon = picked;
+      }
+      if (DBSynergy.pickerMode === 'weapon2') {
+        state.synergy.weapon2 = picked;
+      }
+
+      renderSynergyPickedTexts();
+      showModal(document.getElementById('synergyPickerModal'), false);
+    });
+  });
+
+  listBox.querySelectorAll('.icon').forEach(icon => {
+    icon.onerror = () => { icon.src = PLACEHOLDER_IMG; };
+  });
+
+  return;
+}
+
+      // =========================
+      // 세트 모드: synergyset:list만 사용
+      // =========================
+      wrap.innerHTML = '';
+
+      const listBox = document.createElement('div');
+      listBox.className = 'items';
+      wrap.appendChild(listBox);
+
+      function getSynergyBaseName(name) {
+        let s = String(name || '').trim();
+
+        // 왜곡:, 맹독:, 작열:, 침식:, 수호:, 조화:, 불굴: 같은 접두어 제거
+        s = s.replace(/^(왜곡|맹독|작열|침식|수호|조화|불굴)\s*[:：]\s*/u, '');
+
+        // 앞뒤 공백 정리
+        s = s.replace(/\s+/g, ' ').trim();
+        return s || '기타';
+      }
+
+      function getSynergySetCardsByMode(mode) {
+        if (mode === 'armor' || mode === 'armor2') {
+          return buildSynergyArmorSetCardsFromSheets();
+        }
+
+        const rawSets = Array.isArray(DBSynergy.sets) ? DBSynergy.sets.slice() : [];
+        const filtered = _synergyFilterSets(mode, rawSets);
+
+        return filtered.map((set) => {
+          let pieces = [];
+
+          if (mode === 'acc' || mode === 'acc2') {
+            pieces = _makeSynergyAccPiecesFromType(set);
+          } else {
+            pieces = _makeSynergySpecPiecesFromType(set);
+          }
+
+          return {
+            name: String(set?.name || ''),
+            type: String(set?.type || set?.['종류'] || ''),
+            category: String(set?.category || set?.['분류'] || ''),
+            pieces,
+            raw: set
+          };
+        });
+      }
+
+      const setCards = getSynergySetCardsByMode(DBSynergy.pickerMode);
+      function getSynergyHardcodedGroups(mode) {
+        const armorGroups = [
+          {
+            title: '수호자의 초합금 세트',
+            names: [
+              '허상: 수호자의 초합금 세트',
+              '보호: 수호자의 초합금 세트',
+              '수호자의 초합금 세트',
+            ],
+          },
+          {
+            title: '스틱키 애시드 웨펀 세트',
+            names: [
+              '맹독: 스틱키 애시드 웨펀 세트',
+              '왜곡: 스틱키 애시드 웨펀 세트',
+              '스틱키 애시드 웨펀 세트',
+            ],
+          },
+          {
+            title: '포이즈닝 퀸 스파이더 세트',
+            names: [
+              '침식: 포이즈닝 퀸 스파이더 세트',
+            ],
+          },
+          {
+            title: '섬뜩한 강철 용 세트',
+            names: [
+              '침식: 섬뜩한 강철 용 세트',
+            ],
+          },
+        ];
+
+        const accGroups = [
+          {
+            title: '부식된 메탈기어 세트',
+            names: [
+              '가속: 부식된 메탈기어 세트',
+              '각오: 부식된 메탈기어 세트',
+              '부식된 메탈기어 세트',
+            ],
+          },
+          {
+            title: '콰트로 마누스 연산장치 세트',
+            names: [
+              '조화: 콰트로 마누스 연산장치 세트',
+            ],
+          },
+        ];
+
+        const specGroups = [
+          {
+            title: '철갑을 두른 탑의 수호꾼 세트',
+            names: [
+              '촉진: 철갑을 두른 탑의 수호꾼 세트',
+              '격변: 철갑을 두른 탑의 수호꾼 세트',
+              '철갑을 두른 탑의 수호꾼 세트',
+            ],
+          },
+        ];
+
+        if (mode === 'armor' || mode === 'armor2') return armorGroups;
+        if (mode === 'acc' || mode === 'acc2') return accGroups;
+        if (mode === 'spec' || mode === 'spec2') return specGroups;
+        return [];
+      }
+
+      if (!setCards.length) {
+        listBox.innerHTML = `
+    <div class="empty-hint" style="grid-column:1/-1; padding:16px; font-size:13px; color:#ddd;">
+      시너지 세트 데이터를 찾을 수 없습니다.
+    </div>
+  `;
+        return;
+      }
+
+      const hardcodedGroups = getSynergyHardcodedGroups(DBSynergy.pickerMode);
+      const cardByName = new Map(
+        setCards.map((set) => [String(set?.name || '').trim(), set])
+      );
+
+      let flatIndex = 0;
+      const renderedNames = new Set();
+
+      for (const group of hardcodedGroups) {
+        const sets = (group.names || [])
+          .map((name) => cardByName.get(String(name).trim()))
+          .filter(Boolean);
+
+        if (!sets.length) continue;
+
+        const groupTitle = document.createElement('div');
+        groupTitle.className = 'set-group-title';
+        groupTitle.textContent = group.title;
+        listBox.appendChild(groupTitle);
+
+        sets.forEach((set) => {
+          renderedNames.add(String(set?.name || '').trim());
+
+          const card = document.createElement('div');
+          card.className = 'armor-set-card';
+          card.dataset.setIndex = String(flatIndex++);
+          card.dataset.mode =
+            (DBSynergy.pickerMode === 'armor' || DBSynergy.pickerMode === 'armor2') ? 'armor' :
+              (DBSynergy.pickerMode === 'acc' || DBSynergy.pickerMode === 'acc2') ? 'acc' :
+                'spec';
+
+          const header = document.createElement('div');
+          header.className = 'armor-set-header';
+
+          const titleSpan = document.createElement('span');
+          titleSpan.className = 'armor-set-header-title';
+          titleSpan.textContent = String(set?.name || '-');
+          header.appendChild(titleSpan);
+
+          card.appendChild(header);
+
+          const itemsRow = document.createElement('div');
+          itemsRow.className = 'armor-set-items';
+
+          const pieces = Array.isArray(set?.pieces) ? set.pieces : [];
+
+          pieces.forEach((piece) => {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'armor-set-item';
+  btn.title = piece?.slotLabel || piece?.name || '';
+
+  const box = document.createElement('div');
+  box.className = 'iconbox';
+
+  const img = document.createElement('img');
+  img.className = 'icon';
+  img.src = piece?.img || PLACEHOLDER_IMG;
+  img.alt = piece?.slotLabel || piece?.name || '';
+
+  const setBadgeSrc = getSetBadgeSrc(piece?.item || piece, piece?.slot || '');
+  if (setBadgeSrc) {
+    const setBadgeImg = document.createElement('img');
+    setBadgeImg.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
+    setBadgeImg.src = setBadgeSrc;
+    setBadgeImg.alt = '';
+    box.appendChild(setBadgeImg);
+  }
+
+  box.appendChild(img);
+  btn.appendChild(box);
+  itemsRow.appendChild(btn);
+});
+
+          card.appendChild(itemsRow);
+
+          card.addEventListener('click', () => {
+  const picked = {
+    name: String(set?.name || ''),
+    img: String(set?.pieces?.[0]?.img || ''),
+    jobGroup: '',
+    category:
+      (DBSynergy.pickerMode === 'armor' || DBSynergy.pickerMode === 'armor2') ? '방어구' :
+        (DBSynergy.pickerMode === 'acc' || DBSynergy.pickerMode === 'acc2') ? '악세' :
+          '특수',
+    type: String(set?.type || ''),
+    pieces: Array.isArray(set?.pieces)
+      ? set.pieces.map(piece => ({
+          slot: piece?.slot || '',
+          slotLabel: piece?.slotLabel || '',
+          name: piece?.name || '',
+          img: piece?.img || '',
+          item: piece?.item || null
+        }))
+      : []
+  };
+
+  if (DBSynergy.pickerMode === 'armor') state.synergy.armorSet = picked;
+  if (DBSynergy.pickerMode === 'acc') state.synergy.accSet = picked;
+  if (DBSynergy.pickerMode === 'spec') state.synergy.specSet = picked;
+  if (DBSynergy.pickerMode === 'armor2') state.synergy.armorSet2 = picked;
+  if (DBSynergy.pickerMode === 'acc2') state.synergy.accSet2 = picked;
+  if (DBSynergy.pickerMode === 'spec2') state.synergy.specSet2 = picked;
+
+  renderSynergyPickedTexts();
+  showModal(document.getElementById('synergyPickerModal'), false);
+});
+
+          listBox.appendChild(card);
+        });
+      }
+    }
+
+    async function openSynergyPicker(mode) {
+      await ensureSynergyListsLoaded();
+      bindSynergyModalCloseOnce();
+
+      DBSynergy.pickerMode = mode;
+
+      const titleMap = {
+  char: '캐릭터 선택',
+  char2: '2번 캐릭터 선택',
+  weapon: '무기 선택',
+  weapon2: '2번 무기 선택',
+  armor: '방어구셋 선택',
+  acc: '악세사리셋 선택',
+  spec: '특수장비셋 선택',
+  armor2: '2번 방어구셋 선택',
+  acc2: '2번 악세사리셋 선택',
+  spec2: '2번 특수장비셋 선택',
+};
+
+      const titleEl = document.getElementById('synergyPickerTitle');
+      if (titleEl) titleEl.textContent = titleMap[mode] || '선택';
+
+      renderSynergyPickerCards();
+      showModal(document.getElementById('synergyPickerModal'), true);
+    }
+
     // ✅ 버튼 이벤트
+    document.getElementById('btnSynergyCompute')?.addEventListener('click', () => {
+  computeViaBackend('synergyFinalDamageValue', null, { useSynergy: true });
+});
+
+    document.getElementById('btnSynergyReset2')?.addEventListener('click', () => {
+  resetSynergy2Selections();
+});
+
+document.getElementById('synergyEnabled2')?.addEventListener('change', (e) => {
+  state.synergy = state.synergy || {};
+  state.synergy.enabled2 = !!e.target.checked;
+});
+
+    document.getElementById('btnSynergyReset1')?.addEventListener('click', () => {
+  resetSynergy1Selections();
+});
+
+document.getElementById('synergyEnabled1')?.addEventListener('change', (e) => {
+  state.synergy = state.synergy || {};
+  state.synergy.enabled1 = !!e.target.checked;
+});
+
+    document.getElementById('btnSynergyPickWeapon')?.addEventListener('click', () => {
+  openSynergyPicker('weapon');
+});
+
+document.getElementById('btnSynergyPickWeapon2')?.addEventListener('click', () => {
+  openSynergyPicker('weapon2');
+});
+
+    document.getElementById('btnSynergyEffect')?.addEventListener('click', () => {
+      openSynergyEffectModal();
+    });
+
+    document.getElementById('btnSynergyPickChar')?.addEventListener('click', () => {
+      openSynergyPicker('char');
+    });
+
+    document.getElementById('btnSynergyPickChar2')?.addEventListener('click', () => {
+  openSynergyPicker('char2');
+});
+
+    document.getElementById('btnSynergyPickArmorSet')?.addEventListener('click', () => {
+      openSynergyPicker('armor');
+    });
+
+    document.getElementById('btnSynergyPickAccSet')?.addEventListener('click', () => {
+      openSynergyPicker('acc');
+    });
+
+    document.getElementById('btnSynergyPickSpecSet')?.addEventListener('click', () => {
+      openSynergyPicker('spec');
+    });
+
+    document.getElementById('btnSynergyPickArmorSet2')?.addEventListener('click', () => {
+      openSynergyPicker('armor2');
+    });
+
+    document.getElementById('btnSynergyPickAccSet2')?.addEventListener('click', () => {
+      openSynergyPicker('acc2');
+    });
+
+    document.getElementById('btnSynergyPickSpecSet2')?.addEventListener('click', () => {
+      openSynergyPicker('spec2');
+    });
+
     document.getElementById('btnSkillDamageViewer')?.addEventListener('click', () => {
       openSkillDamageViewerModal();
     });
