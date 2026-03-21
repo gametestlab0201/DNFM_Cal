@@ -4682,55 +4682,96 @@
       color: var(--tp-red);
     }
 
-    /* ✅ 스킬트리 모달 헤더만 4칸으로:
-   제목 | 빈공간 | reset | counters  */
-    #skillTreeModal .dialog>header {
-      grid-template-columns: auto 1fr auto auto;
-      align-items: center;
-      column-gap: 10px;
-    }
+   /* ✅ 스킬트리 모달 헤더만 5칸으로:
+제목 | 빈공간 | 블레이드 드롭다운 | reset | counters */
+#skillTreeModal .dialog>header {
+  grid-template-columns: auto 1fr auto auto auto;
+  align-items: center;
+  column-gap: 10px;
+}
 
-    /* ===== Modal-only: big counters aligned to the right ===== */
-    #skillTreeModal .st-counters {
-      grid-column: 4;
-      justify-self: end;
-      margin-left: 0;
-      font-size: 20pt;
-    }
+/* 블레이드 와플 프리셋 드롭다운 */
+#skillTreeBladePreset {
+  grid-column: 3;
+  justify-self: end;
 
-    #skillTreeModal .st-counter,
-    #skillTreeModal .st-counter .label,
-    #skillTreeModal .st-counter .val {
-      font-size: 20pt;
-    }
+  min-width: 110px;
+  height: 42px;
+  padding: 0 12px;
 
-    /* ✅ PC 스킬 초기화 버튼 */
-    #btnSkillTreeReset {
-      grid-column: 3;
-      justify-self: end;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: #e6e9ef;
+  font-weight: 700;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+}
 
-      /* ✅ counters 쪽에서 살짝 떼고, 조금 더 왼쪽에 오게 */
-      margin-right: 18px;
+/* 펼쳤을 때 보이는 목록 색상 */
+#skillTreeBladePreset option {
+  background: #1b1f2a;
+  color: #f3f5f8;
+}
 
-      /* ✅ 버튼 크기 소폭 확대 */
-      padding: 10px 16px;
-      min-height: 42px;
-      font-size: 14px;
-      line-height: 1;
+/* 선택된 항목 강조 */
+#skillTreeBladePreset option:checked {
+  background: #2a3142;
+  color: #ffffff;
+}
 
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(255, 255, 255, 0.06);
-      color: #ffd6d6;
-      font-weight: 800;
-      cursor: pointer;
-      white-space: nowrap;
-    }
+#skillTreeBladePreset:hover,
+#skillTreeBladePreset:focus {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.22);
+}
 
-    #btnSkillTreeReset:hover {
-      background: rgba(255, 255, 255, 0.10);
-      border-color: rgba(255, 255, 255, 0.22);
-    }
+#skillTreeBladePreset[hidden] {
+  display: none !important;
+}
+
+/* ===== Modal-only: big counters aligned to the right ===== */
+#skillTreeModal .st-counters {
+  grid-column: 5;
+  justify-self: end;
+  margin-left: 0;
+  font-size: 20pt;
+}
+
+#skillTreeModal .st-counter,
+#skillTreeModal .st-counter .label,
+#skillTreeModal .st-counter .val {
+  font-size: 20pt;
+}
+
+/* ✅ PC 스킬 초기화 버튼 */
+#btnSkillTreeReset {
+  grid-column: 4;
+  justify-self: end;
+
+  /* ✅ counters 쪽에서 살짝 떼고, 조금 더 왼쪽에 오게 */
+  margin-right: 18px;
+
+  /* ✅ 버튼 크기 소폭 확대 */
+  padding: 10px 16px;
+  min-height: 42px;
+  font-size: 14px;
+  line-height: 1;
+
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffd6d6;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#btnSkillTreeReset:hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.22);
+}
 
     /* Modal size */
     #skillTreeModal .dialog {
@@ -5538,11 +5579,11 @@
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-                  <li>03.02 수련장 크리티컬, 투함포 옵션 추가 </li>
                   <li>03.05 빙결사 헤일스톰 미적용 버그 수정 </li>
                   <li>03.06 남스핏파이어 라스트 슈팅 추가 </li>
                   <li>03.08 접두사 장비 배지 아이콘 추가 </li>
                   <li>03.09 <span style="color: greenyellow;">[모바일]</span> 최종 데미지값 단순 비교 기능 추가 </li>
+                  <li>03.21 <span style="color: greenyellow;">[PC]</span> 블레이드 와플 콤보 설정 추가 </li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -7206,6 +7247,7 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
+          <li>26.03.21 [PC] <span style="color: yellow;">블레이드</span><span style="color: #ff4444;"> 와플 콤보 설정</span> 추가</li>
           <li>26.03.09 [모바일] <span style="color: yellow;">최종 데미지 계산값</span><span style="color: #ff4444;"> 단순 비교
               기능</span> 추가</li>
           <li>26.03.08 <span style="color: yellow;">접두사 장비</span><span style="color: #ff4444;"> 배지 아이콘</span> 추가</li>
@@ -7765,6 +7807,7 @@
       'ssm941112@gmail.com',
       'ionix4566543@gmail.com',
       'ionix4566544@gmail.com',
+      'gametestlab0201@gmail.com',
 
       // 'another.account@example.com',
     ];
@@ -10784,15 +10827,17 @@ const setSkill = (s, v) => {
       // 스킬 그리드 렌더
       await renderSkillTreeBands();
 
-      // ✅ PC용 스킬 초기화 버튼 동적 생성
+            // ✅ PC용 스킬 초기화 버튼 + 블레이드 전용 드롭다운 동적 생성
       if (stModal) {
         let resetBtn = document.getElementById('btnSkillTreeReset');
+        let bladePresetSel = document.getElementById('skillTreeBladePreset');
 
         const modalHeader =
           stModal.querySelector('.dialog > header') ||
           stModal.querySelector('header');
 
         const counters = modalHeader?.querySelector('.st-counters');
+        const isBlade = (ownerKey === '여귀검사블레이드');
 
         if (!resetBtn) {
           resetBtn = document.createElement('button');
@@ -10802,13 +10847,63 @@ const setSkill = (s, v) => {
           resetBtn.textContent = '스킬 초기화';
         }
 
-        // ✅ 항상 header 안에서 counters 바로 앞(= 설정하기와 counters 사이) 위치 유지
-        if (modalHeader && counters && resetBtn.parentNode !== modalHeader) {
+        if (!bladePresetSel) {
+          bladePresetSel = document.createElement('select');
+          bladePresetSel.id = 'skillTreeBladePreset';
+          bladePresetSel.className = 'ui-btn';
+
+          bladePresetSel.innerHTML = `
+            <option value="24와플">24와플</option>
+            <option value="27와플">27와플</option>
+            <option value="30와플">30와플</option>
+            <option value="33와플">33와플</option>
+          `;
+        }
+
+                // 현재 선택값 유지용
+        if (!window.state) window.state = {};
+        if (!state.customSkills) state.customSkills = {};
+
+        const savedBladePreset =
+          String(state.customSkills.bladeWildFlowerPreset || state.skillTreeBladePreset || '24와플').trim() || '24와플';
+
+        state.skillTreeBladePreset = savedBladePreset;
+        state.customSkills.bladeWildFlowerPreset = savedBladePreset;
+        bladePresetSel.value = savedBladePreset;
+
+        if (!bladePresetSel.dataset.bound) {
+  bladePresetSel.dataset.bound = '1';
+  bladePresetSel.addEventListener('change', (e) => {
+    const v = String(e.target.value || '24와플').trim() || '24와플';
+
+    state.skillTreeBladePreset = v;
+    if (!state.customSkills) state.customSkills = {};
+    state.customSkills.bladeWildFlowerPreset = v;
+
+    // ✅ 여기서는 값만 저장
+    // 실제 반영은 사용자가 "계산하기"를 눌렀을 때 calc_all/skill_uses 흐름에서 처리
+  });
+}
+
+        // 블레이드일 때만 표시, 아니면 숨김
+        bladePresetSel.hidden = !isBlade;
+
+        // ✅ header 안 순서:
+        // 제목 | 빈공간 | 드롭다운(블레이드일 때만) | 스킬 초기화 | counters
+        if (modalHeader && counters) {
+          if (bladePresetSel.parentNode !== modalHeader) {
+            modalHeader.insertBefore(bladePresetSel, counters);
+          }
+          if (resetBtn.parentNode !== modalHeader) {
+            modalHeader.insertBefore(resetBtn, counters);
+          }
+
+          // 드롭다운이 보일 때는 reset 앞에, 아니면 hidden 상태로 counters 앞에 유지
+          modalHeader.insertBefore(bladePresetSel, resetBtn);
           modalHeader.insertBefore(resetBtn, counters);
-        } else if (modalHeader && counters && resetBtn.nextSibling !== counters) {
-          modalHeader.insertBefore(resetBtn, counters);
-        } else if (modalHeader && !resetBtn.parentNode) {
-          modalHeader.appendChild(resetBtn);
+        } else if (modalHeader) {
+          if (bladePresetSel.parentNode !== modalHeader) modalHeader.appendChild(bladePresetSel);
+          if (resetBtn.parentNode !== modalHeader) modalHeader.appendChild(resetBtn);
         }
 
         if (!resetBtn.dataset.bound) {
