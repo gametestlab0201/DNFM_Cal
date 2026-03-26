@@ -7796,6 +7796,9 @@
     //악세
     //
 
+        //악세
+    //
+
     // ✅ 특정 구글 계정만 전용 버튼을 보이게 하는 허용 리스트
     //  👉 여기에 본인 구글 메일 주소를 넣으면 됨
     const SPECIAL_USER_EMAILS = [
@@ -7807,29 +7810,52 @@
       'ssm941112@gmail.com',
       'ionix4566543@gmail.com',
       'ionix4566544@gmail.com',
-      'gametestlab0201@gmail.com',
+      //'gametestlab0201@gmail.com',
 
       // 'another.account@example.com',
     ];
 
-    function isSpecialUserNow_() {
-      // 1) 백엔드 핑으로 받아둔 CORE.userEmail 우선 사용
+    // ✅ research_user 전용 리스트 추가
+    const RESEARCH_USER_EMAILS = [
+      'gametestlab0201@gmail.com',
+      // 'research1@gmail.com',
+      // 'research2@gmail.com',
+    ];
+
+    function getCurrentUserEmailNorm_() {
       const emailRaw =
         (window.CORE && CORE.userEmail) ? CORE.userEmail
           : (typeof getCurrentUserEmail === 'function' ? getCurrentUserEmail() : '');
 
-      const email = String(emailRaw || '').trim().toLowerCase();
+      return String(emailRaw || '').trim().toLowerCase();
+    }
+
+    function isSpecialUserNow_() {
+      const email = getCurrentUserEmailNorm_();
       if (!email) return false;
 
       const allow = (SPECIAL_USER_EMAILS || []).map(e => String(e || '').trim().toLowerCase());
       return allow.includes(email);
     }
 
+    function isResearchUserNow_() {
+      const email = getCurrentUserEmailNorm_();
+      if (!email) return false;
+
+      const allow = (RESEARCH_USER_EMAILS || []).map(e => String(e || '').trim().toLowerCase());
+      return allow.includes(email);
+    }
+
 
     function updateSpecialUserButton() {
       const isSpecialUser = isSpecialUserNow_();
-      // 모달 렌더링 쪽에서도 재사용하려고 전역에 저장
-      window.__IS_SPECIAL_USER__ = isSpecialUser;
+      const isResearchUser = isResearchUserNow_();
+
+      // research_user는 special_user의 모든 권한 포함
+      window.__IS_SPECIAL_USER__ = (isSpecialUser || isResearchUser);
+      window.__IS_RESEARCH_USER__ = isResearchUser;
+
+      const hasSpecialLike = !!window.__IS_SPECIAL_USER__;
 
       // ✅ [전체 공개] 상단 4개 버튼은 항상 노출
       const publicBtnIds = ['btnSpecialPatch', 'btnSpecialAcc', 'btnSpecialSpec', 'btnUniqueBulk'];
@@ -7840,7 +7866,7 @@
         el.disabled = false;
       }
 
-      // ✅ [특정 유저 전용 유지] 아래 4개는 그대로 제한
+      // ✅ [특정 유저 전용 유지] 아래 버튼들은 special_user / research_user 공통 허용
       const btnSynergy = document.getElementById('btnSynergyEffect');
       const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
       const rowDmgOpt = document.getElementById('specialDamageOptRow');
@@ -7849,21 +7875,87 @@
       const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
       const rowUnique = document.getElementById('uniqueOnOffRow');
 
-      if (btnSynergy) btnSynergy.style.display = isSpecialUser ? 'inline-flex' : 'none';
-      if (btnSkillDamage) btnSkillDamage.style.display = isSpecialUser ? 'inline-flex' : 'none';
+      if (btnSynergy) btnSynergy.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (btnSkillDamage) btnSkillDamage.style.display = hasSpecialLike ? 'inline-flex' : 'none';
       // ✅ 크리100/투함포 체크박스는 전체 공개
       if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
-      if (btnAutoSet) btnAutoSet.style.display = isSpecialUser ? 'inline-flex' : 'none';
-      if (btnAutoSetMissing) btnAutoSetMissing.style.display = isSpecialUser ? 'inline-flex' : 'none';
-      if (btnAutoWeapon) btnAutoWeapon.style.display = isSpecialUser ? 'inline-flex' : 'none';
-      if (rowUnique) rowUnique.style.display = isSpecialUser ? 'flex' : 'none';
+      if (btnAutoSet) btnAutoSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (btnAutoSetMissing) btnAutoSetMissing.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (btnAutoWeapon) btnAutoWeapon.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
     }
 
 
 
-    // (원하면 콘솔에서 직접 호출할 수 있게 전역에 노출)
+        // (원하면 콘솔에서 직접 호출할 수 있게 전역에 노출)
     window.updateSpecialUserButton = updateSpecialUserButton;
 
+    // ✅ research_user: 캐릭터 선택 즉시 SP 스킬을 전부 최대레벨로 채움 (TP 제외)
+    function applyResearchUserAutoMaxSkillsForCharacter() {
+      if (!window.__IS_RESEARCH_USER__) return;
+
+      const cc = state.currentCharacter || {};
+      const job = String(cc.jobGroupLabel || cc.jobGroup || '').trim();
+      const nm = String(cc.name || '').trim();
+      const ownerKey = (job + nm).replace(/\s+/g, '');
+
+      if (!ownerKey) return;
+
+      const src = CORE?.lists?.['skill:list'] || [];
+      if (!Array.isArray(src) || !src.length) return;
+
+      const weaponTypeRaw = state?.selections?.weapon?.type || '';
+      const weaponType = String(weaponTypeRaw).trim();
+
+      const list = src
+        .filter(r => {
+          const charKey = String(r.charName || '').replace(/\s+/g, '');
+          const visible = String(r.show || '').trim() === '1';
+          if (charKey !== ownerKey || !visible) return false;
+
+          const rowWeapon = String(r.weaponKind || '').trim();
+          if (!rowWeapon) return true;
+          if (!weaponType) return true;
+          return rowWeapon === weaponType;
+        })
+        .map((r, idx) => ({
+          id: 'SK_' + idx + '_' + (r.name || ''),
+          name: r.name || '',
+          minLv: Number(r.minLevel || 0),
+          maxLv: Number(r.maxLevel || 0),
+          sp: Number(r.costSP || 0),
+          tpCost: Number(r.tp || 0),
+        }));
+
+      state.skillLv = {};
+      state.skillTpLv = state.skillTpLv || {};
+
+      for (const r of list) {
+        const minLv = Number(r.minLv ?? 0) || 0;
+        const maxLv = Number(r.maxLv ?? 0) || 0;
+        state.skillLv[r.id] = Math.max(minLv, maxLv);
+      }
+
+      const totalSp = Number(state?.currentCharacter?.sp || state?.sp?.total || 0) || 0;
+      const totalTp = Number(state?.currentCharacter?.tp || state?.tp?.total || 0) || 0;
+
+      let usedTp = 0;
+      for (const r of list) {
+        const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
+        const perTp = Number(r.tpCost || 0) || 0;
+        usedTp += Math.max(0, tp) * perTp;
+      }
+
+      state.sp = state.sp || { total: 0, left: 0 };
+      state.tp = state.tp || { total: 0, left: 0 };
+
+      state.sp.total = totalSp;
+      state.sp.left = 0; // 연구자유저는 남은 SP와 무관하게 전부 최대
+      state.tp.total = totalTp;
+      state.tp.left = Math.max(0, totalTp - usedTp);
+
+      if (typeof renderSpTp === 'function') renderSpTp();
+    }
     // 🔧 전역에서도 같은 객체를 바라보게
     window.state = state;
 
@@ -9882,20 +9974,37 @@
         }
       };
 
-      const canSpendSp = need => (state.sp.left || 0) >= need;
+      const canSpendSp = need => {
+        if (window.__IS_RESEARCH_USER__) return true;
+        return (state.sp.left || 0) >= need;
+      };
       const canSpendTp = need => (state.tp.left || 0) >= need;
+
       const spendSp = v => {
-        state.sp.left = Math.max(0, (state.sp.left || 0) - v); renderSpTp();
+        if (!window.__IS_RESEARCH_USER__) {
+          state.sp.left = Math.max(0, (state.sp.left || 0) - v);
+          renderSpTp();
+        } else {
+          state.sp.left = 0;
+          renderSpTp();
+        }
         onSkillTreeChanged();
       };
+
       const refundSp = v => {
-        state.sp.left = Math.min(state.sp.total || 0, (state.sp.left || 0) + v); renderSpTp();
+        if (!window.__IS_RESEARCH_USER__) {
+          state.sp.left = Math.min(state.sp.total || 0, (state.sp.left || 0) + v);
+          renderSpTp();
+        } else {
+          state.sp.left = 0;
+          renderSpTp();
+        }
         onSkillTreeChanged();
       };
+
       const spendTp = v => {
         state.tp.left = Math.max(0, (state.tp.left || 0) - v); renderSpTp();
         onSkillTreeChanged();
-
       };
       const refundTp = v => {
         state.tp.left = Math.min(state.tp.total || 0, (state.tp.left || 0) + v); renderSpTp();
@@ -10826,6 +10935,16 @@ const setSkill = (s, v) => {
 
       // 스킬 그리드 렌더
       await renderSkillTreeBands();
+
+      // ✅ research_user는 스킬트리 열 때도 SP 스킬 최대치 보정
+      if (window.__IS_RESEARCH_USER__) {
+        try {
+          applyResearchUserAutoMaxSkillsForCharacter();
+          await renderSkillTreeBands();
+        } catch (e) {
+          console.warn('[research_user] 스킬트리 오픈 시 자동 스킬 맥스 실패:', e);
+        }
+      }
 
             // ✅ PC용 스킬 초기화 버튼 + 블레이드 전용 드롭다운 동적 생성
       if (stModal) {
@@ -14247,9 +14366,17 @@ const setSkill = (s, v) => {
                 })();
 
 
-                // 4) 스킬트리 상태 초기화 (캐릭터 바뀔 때마다 초기화)
+                // 4) 스킬트리 상태 초기화 / 연구자유저 자동 맥스
                 state.skillLv = {};
                 state.skillTpLv = {};
+
+                if (window.__IS_RESEARCH_USER__) {
+                  try {
+                    applyResearchUserAutoMaxSkillsForCharacter();
+                  } catch (e) {
+                    console.warn('[research_user] 캐릭터 선택 후 자동 스킬 맥스 실패:', e);
+                  }
+                }
 
 
 
@@ -14257,6 +14384,16 @@ const setSkill = (s, v) => {
                 if (typeof setTotals === "function") {
                   setTimeout(() => {
                     setTotals(sp, tp);
+
+                    // ✅ research_user는 setTotals 이후 다시 left=0 보정
+                    if (window.__IS_RESEARCH_USER__) {
+                      state.sp = state.sp || { total: 0, left: 0 };
+                      state.tp = state.tp || { total: 0, left: 0 };
+                      state.sp.total = Number(sp || 0) || 0;
+                      state.sp.left = 0;
+                      state.tp.total = Number(tp || 0) || 0;
+                      if (typeof renderSpTp === 'function') renderSpTp();
+                    }
                   }, 0);
                 }
 
@@ -21737,6 +21874,8 @@ console.log('[computeViaBackend] payload.synergy=', payload.synergy);
         '스매쉬'
 
       ]);
+            const hideSkillImageForResearch = !!window.__IS_RESEARCH_USER__;
+
       // ===== 표 렌더링 (스킬만) =====
       tbody.innerHTML = mergedRows.map(r => {
         const ratio = (Number(r.sumFinal || 0) / safeSkillTotal) * 100;
@@ -21751,16 +21890,22 @@ console.log('[computeViaBackend] payload.synergy=', payload.synergy);
           ? '-'
           : _fmtSkillDmgNum(r.dmgPerUseFinal);
 
-        return `
-    <tr style="border-top:1px solid rgba(255,255,255,.06);">
-      <td style="padding:8px 10px;">
-        <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+        const iconHtml = hideSkillImageForResearch ? '' : `
           <img
             src="${r.img}"
             alt="${r.name}"
             style="width:26px; height:26px; border-radius:6px; object-fit:cover; flex:0 0 auto; background:#0b1220; border:1px solid rgba(255,255,255,.08);"
             onerror="this.src='${PLACEHOLDER_IMG}'"
           >
+        `;
+
+        const gapStyle = hideSkillImageForResearch ? 'gap:0;' : 'gap:8px;';
+
+        return `
+    <tr style="border-top:1px solid rgba(255,255,255,.06);">
+      <td style="padding:8px 10px;">
+        <div style="display:flex; align-items:center; ${gapStyle} min-width:0;">
+          ${iconHtml}
           <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.name}</span>
         </div>
       </td>
@@ -22798,9 +22943,14 @@ document.getElementById('btnSynergyPickWeapon2')?.addEventListener('click', () =
           const ping = await loginPingOnce();
           const allowed = !!(ping && ping.ok);
 
-          // ✅ (추가) ping에서 email 확보 (백엔드가 토큰 검증 후 내려줌)
+                    // ✅ (추가) ping에서 email 확보 (백엔드가 토큰 검증 후 내려줌)
           const loginEmail = String(ping?.email || '').trim().toLowerCase();
-          const isSpecial = !!loginEmail && SPECIAL_USER_EMAILS.includes(loginEmail);
+          const isSpecial =
+            !!loginEmail &&
+            (
+              SPECIAL_USER_EMAILS.map(e => String(e || '').trim().toLowerCase()).includes(loginEmail) ||
+              RESEARCH_USER_EMAILS.map(e => String(e || '').trim().toLowerCase()).includes(loginEmail)
+            );
 
           // (선택) 기존 로직들과 같이 쓰고 싶으면 CORE.userEmail도 여기서 미리 채워둠
           window.CORE = window.CORE || {};
