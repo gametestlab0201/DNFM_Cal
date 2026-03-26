@@ -4444,7 +4444,7 @@
 
     .special-runes-title {
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 18px;
       color: #e7c27a;
       font-size: 13px;
     }
@@ -4459,11 +4459,6 @@
       margin-bottom: 6px;
     }
 
-    .special-rune-row label {
-      margin: 0;
-      font-size: 13px;
-    }
-
     /* ▼ 왜가지 아이콘 */
     .special-rune-icon {
       width: 22px;
@@ -4474,12 +4469,38 @@
 
     /* 드롭다운 크기 적당히 고정 */
     .special-rune-row .rune-select,
-    #specialRune_gaho,
-    #specialRune_jihe,
-    #specialRune_waegok {
-      min-width: 70px;
-      max-width: 90px;
-    }
+#specialRune_cooldown,
+#specialRune_skillDmg,
+#specialRune_gaho,
+#specialRune_jihe,
+#specialRune_waegok {
+  min-width: 70px;
+  max-width: 90px;
+}
+
+.special-runes-grid {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  column-gap: 14px;
+  row-gap: 0;
+  align-items: start;
+}
+
+.special-runes-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.special-runes-col-left {
+  margin-top: 20px;
+}
+
+.special-rune-row label {
+  margin: 0;
+  font-size: 13px;
+  white-space: nowrap;
+}
 
     /* 룬 각인 UI */
     .rune-engrave-row {
@@ -5579,11 +5600,10 @@
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-                  <li>03.05 빙결사 헤일스톰 미적용 버그 수정 </li>
-                  <li>03.06 남스핏파이어 라스트 슈팅 추가 </li>
                   <li>03.08 접두사 장비 배지 아이콘 추가 </li>
                   <li>03.09 <span style="color: greenyellow;">[모바일]</span> 최종 데미지값 단순 비교 기능 추가 </li>
                   <li>03.21 <span style="color: greenyellow;">[PC]</span> 블레이드 와플 콤보 설정 추가 </li>
+                  <li>03.26 쿨감룬/스증룬, 신규 오칭크아, 마부 추가 </li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -6695,40 +6715,104 @@
       <div class="items" style="padding:10px;">
         <div id="runeGrid" class="rune-grid"></div>
 
-        <!-- 가호 / 지혜 / 왜곡 특수 스킬룬 -->
-        <div class="special-runes">
-          <div class="special-runes-title">특수 스킬룬</div>
+        <!-- 특수 스킬룬 -->
+<div class="special-runes">
+  <div class="special-runes-title">특수 스킬룬</div>
 
-          <div class="special-rune-row">
-            <img src="/img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
-            <label for="specialRune_gaho">가호</label>
-            <select id="specialRune_gaho" class="rune-select">
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-            </select>
-          </div>
+  <div class="special-runes-grid">
+    <!-- 1열 : 쿨감 / 스증 -->
+    <div class="special-runes-col special-runes-col-left">
+      <div class="special-rune-row">
+  <img src="/img/etc/skillrune/쿨감.png" alt="쿨감룬" class="special-rune-icon">
+  <label for="specialRune_cooldown">쿨감룬</label>
+  <select id="specialRune_cooldown" class="rune-select">
+    <option value="0">0</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+    <option value="11">11</option>
+    <option value="12">12</option>
+    <option value="13">13</option>
+    <option value="14">14</option>
+    <option value="15">15</option>
+    <option value="16">16</option>
+    <option value="17">17</option>
+    <option value="18">18</option>
+    <option value="19">19</option>
+    <option value="20">20</option>
+  </select>
+</div>
 
-          <div class="special-rune-row">
-            <img src="/img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
-            <label for="specialRune_jihe">지혜</label>
-            <select id="specialRune_jihe" class="rune-select">
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-            </select>
-          </div>
+      <div class="special-rune-row">
+  <img src="/img/etc/skillrune/스증.png" alt="스증룬" class="special-rune-icon">
+  <label for="specialRune_skillDmg">스증룬</label>
+  <select id="specialRune_skillDmg" class="rune-select">
+    <option value="0">0</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+    <option value="11">11</option>
+    <option value="12">12</option>
+    <option value="13">13</option>
+    <option value="14">14</option>
+    <option value="15">15</option>
+    <option value="16">16</option>
+    <option value="17">17</option>
+    <option value="18">18</option>
+    <option value="19">19</option>
+    <option value="20">20</option>
+  </select>
+</div>
+    </div>
 
-          <div class="special-rune-row">
-            <img src="/img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
-            <label for="specialRune_waegok">왜곡</label>
-            <select id="specialRune_waegok" class="rune-select">
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-            </select>
-          </div>
-        </div>
+    <!-- 2열 : 가호 / 지혜 / 왜곡 -->
+    <div class="special-runes-col">
+      <div class="special-rune-row">
+        <img src="/img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
+        <label for="specialRune_gaho">가호</label>
+        <select id="specialRune_gaho" class="rune-select">
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+        </select>
+      </div>
+
+      <div class="special-rune-row">
+        <img src="/img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
+        <label for="specialRune_jihe">지혜</label>
+        <select id="specialRune_jihe" class="rune-select">
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+        </select>
+      </div>
+
+      <div class="special-rune-row">
+        <img src="/img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
+        <label for="specialRune_waegok">왜곡</label>
+        <select id="specialRune_waegok" class="rune-select">
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
       </div>
       <div class="modal-foot">
         <button id="runeCommit" class="ui-btnetc">설정 하기</button>
@@ -7247,6 +7331,7 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
+          <li>26.03.26 <span style="color: yellow;">쿨감룬/스증룬,</span><span style="color: #ff4444;"> 신규 오칭크아, 마부</span> 추가</li>
           <li>26.03.21 [PC] <span style="color: yellow;">블레이드</span><span style="color: #ff4444;"> 와플 콤보 설정</span> 추가</li>
           <li>26.03.09 [모바일] <span style="color: yellow;">최종 데미지 계산값</span><span style="color: #ff4444;"> 단순 비교
               기능</span> 추가</li>
@@ -8061,12 +8146,14 @@
       name: null,
       level: null,
     };
-    // 가호 / 지혜 / 왜곡 특수 스킬룬 값
-    state.specialRunes = state.specialRunes || {
-      gaho: 0,
-      jihe: 0,
-      waegok: 0,
-    };
+    // 특수 스킬룬 값
+state.specialRunes = state.specialRunes || {
+  cooldown: 0,   // 쿨감룬
+  skillDmg: 0,   // 스증룬
+  gaho: 0,
+  jihe: 0,
+  waegok: 0,
+};
 
     let __progressPct = 0;
 
@@ -11283,12 +11370,12 @@ const setSkill = (s, v) => {
         Object.values(row).forEach(v => sum += (Number(v) || 0))
       );
 
-      // 2) 가호 / 지혜 / 왜곡 특수 스킬룬 합산
-      const sr = state.specialRunes || {};
-      ['gaho', 'jihe', 'waegok'].forEach(k => {
-        const v = Number(sr[k] || 0);
-        if (Number.isFinite(v)) sum += v;
-      });
+      // 2) 특수 스킬룬 합산
+const sr = state.specialRunes || {};
+['cooldown', 'skillDmg', 'gaho', 'jihe', 'waegok'].forEach(k => {
+  const v = Number(sr[k] || 0);
+  if (Number.isFinite(v)) sum += v;
+});
 
       return sum;
     }
@@ -16801,25 +16888,33 @@ const setSkill = (s, v) => {
     const runeModal = document.getElementById('runeModal');
     const runeGridEl = document.getElementById('runeGrid');
 
-    // 가호 / 지혜 / 왜곡 특수 룬 정의
-    const specialRuneDefs = [
-      { key: 'gaho', label: '가호' },
-      { key: 'jihe', label: '지혜' },
-      { key: 'waegok', label: '왜곡' },
-    ];
+    // 특수 룬 정의
+const specialRuneDefs = [
+  { key: 'cooldown', label: '쿨감룬' },
+  { key: 'skillDmg', label: '스증룬' },
+  { key: 'gaho', label: '가호' },
+  { key: 'jihe', label: '지혜' },
+  { key: 'waegok', label: '왜곡' },
+];
 
     function ensureSpecialRunesInitialized() {
-      if (!state.specialRunes) {
-        state.specialRunes = { gaho: 0, jihe: 0, waegok: 0 };
-      } else {
-        ['gaho', 'jihe', 'waegok'].forEach(k => {
-          if (typeof state.specialRunes[k] !== 'number') {
-            const v = Number(state.specialRunes[k] || 0);
-            state.specialRunes[k] = Number.isFinite(v) ? v : 0;
-          }
-        });
+  if (!state.specialRunes) {
+    state.specialRunes = {
+      cooldown: 0,
+      skillDmg: 0,
+      gaho: 0,
+      jihe: 0,
+      waegok: 0
+    };
+  } else {
+    ['cooldown', 'skillDmg', 'gaho', 'jihe', 'waegok'].forEach(k => {
+      if (typeof state.specialRunes[k] !== 'number') {
+        const v = Number(state.specialRunes[k] || 0);
+        state.specialRunes[k] = Number.isFinite(v) ? v : 0;
       }
-    }
+    });
+  }
+}
 
     function bindSpecialRuneSelects() {
       ensureSpecialRunesInitialized();
@@ -20758,17 +20853,25 @@ function buildSynergyPayload() {
         // ✅ 패치전 스킬/커스텀 시트 사용 여부
         payload.patchBefore = !!document.getElementById('chkUsePrePatchSkills')?.checked;
 
-        // ★ 특수 스킬룬(가호/지혜/왜곡) 카운트 전송
-        if (specialRunesPayload) {
-          const g = Number(specialRunesPayload.gaho || 0) || 0;
-          const j = Number(specialRunesPayload.jihe || 0) || 0;
-          const w = Number(specialRunesPayload.waegok || 0) || 0;
+        // ★ 특수 스킬룬 카운트 전송
+if (specialRunesPayload) {
+  const c = Number(specialRunesPayload.cooldown || 0) || 0;
+  const s = Number(specialRunesPayload.skillDmg || 0) || 0;
+  const g = Number(specialRunesPayload.gaho || 0) || 0;
+  const j = Number(specialRunesPayload.jihe || 0) || 0;
+  const w = Number(specialRunesPayload.waegok || 0) || 0;
 
-          // 전부 0이면 굳이 안 보냄
-          if (g || j || w) {
-            payload.specialRunes = { gaho: g, jihe: j, waegok: w };
-          }
-        }
+  // 전부 0이면 굳이 안 보냄
+  if (c || s || g || j || w) {
+    payload.specialRunes = {
+      cooldown: c,
+      skillDmg: s,
+      gaho: g,
+      jihe: j,
+      waegok: w
+    };
+  }
+}
         // ★ 성안의 봉인 선택 사항
         if (castleSealPayload) {
           payload.castleSeal = castleSealPayload;
