@@ -5468,8 +5468,64 @@
           style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;"></div>
         <button id="btnRuneRowAddM" class="btn" type="button" style="width:100%;margin:0 0 10px;">+ 스킬룬 행 추가</button>
 
-        <div class="special-runes">
+                <div class="special-runes">
           <div class="special-runes-title">특수 스킬룬</div>
+
+          <div class="special-rune-row">
+            <img src="./img/etc/skillrune/쿨감.png" alt="쿨감룬" class="special-rune-icon">
+            <label for="specialRune_cooldownM">쿨감</label>
+            <select id="specialRune_cooldownM" class="select rune-select" aria-label="쿨감룬 개수">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+              <option value="18">18</option>
+              <option value="19">19</option>
+              <option value="20">20</option>
+            </select>
+          </div>
+
+          <div class="special-rune-row">
+            <img src="./img/etc/skillrune/스증.png" alt="스증룬" class="special-rune-icon">
+            <label for="specialRune_skillDmgM">스증</label>
+            <select id="specialRune_skillDmgM" class="select rune-select" aria-label="스증룬 개수">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+              <option value="18">18</option>
+              <option value="19">19</option>
+              <option value="20">20</option>
+            </select>
+          </div>
 
           <div class="special-rune-row">
             <img src="./img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
@@ -7025,8 +7081,12 @@ function _getCharMainImage(c) {
     }
     function ensureSpecialRunesInitialized() {
       window.state = window.state || {};
-      const s = window.state;
-      if (!s.specialRunes || typeof s.specialRunes !== 'object') s.specialRunes = { gaho: 0, jihe: 0, waegok: 0 };
+            const s = window.state;
+      if (!s.specialRunes || typeof s.specialRunes !== 'object') {
+        s.specialRunes = { cooldown: 0, skillDmg: 0, gaho: 0, jihe: 0, waegok: 0 };
+      }
+      s.specialRunes.cooldown = Number(s.specialRunes.cooldown ?? 0) || 0;
+      s.specialRunes.skillDmg = Number(s.specialRunes.skillDmg ?? 0) || 0;
       s.specialRunes.gaho = Number(s.specialRunes.gaho ?? 0) || 0;
       s.specialRunes.jihe = Number(s.specialRunes.jihe ?? 0) || 0;
       s.specialRunes.waegok = Number(s.specialRunes.waegok ?? 0) || 0;
@@ -7040,8 +7100,12 @@ function _getCharMainImage(c) {
         const row = runes[c.key] || {};
         RUNE_LEVELS.forEach(lv => { n += Number(row[lv] || 0); });
       });
-      const sp = s.specialRunes || {};
-      n += Number(sp.gaho || 0) + Number(sp.jihe || 0) + Number(sp.waegok || 0);
+            const sp = s.specialRunes || {};
+      n += Number(sp.cooldown || 0)
+        + Number(sp.skillDmg || 0)
+        + Number(sp.gaho || 0)
+        + Number(sp.jihe || 0)
+        + Number(sp.waegok || 0);
       return n;
     }
 
@@ -7402,15 +7466,19 @@ function _getCharMainImage(c) {
 
 
 
-    function bindSpecialRuneSelectsMobile() {
+        function bindSpecialRuneSelectsMobile() {
+      const cooldown = document.getElementById('specialRune_cooldownM');
+      const skillDmg = document.getElementById('specialRune_skillDmgM');
       const gaho = document.getElementById('specialRune_gahoM');
       const jihe = document.getElementById('specialRune_jiheM');
       const waegok = document.getElementById('specialRune_waegokM');
-      if (!gaho || !jihe || !waegok) return;
+      if (!cooldown || !skillDmg || !gaho || !jihe || !waegok) return;
 
       ensureSpecialRunesInitialized();
 
       // 초기값 반영
+      cooldown.value = String(window.state.specialRunes.cooldown || 0);
+      skillDmg.value = String(window.state.specialRunes.skillDmg || 0);
       gaho.value = String(window.state.specialRunes.gaho || 0);
       jihe.value = String(window.state.specialRunes.jihe || 0);
       waegok.value = String(window.state.specialRunes.waegok || 0);
@@ -7435,6 +7503,8 @@ function _getCharMainImage(c) {
         }
       };
 
+      cooldown.addEventListener('change', () => onChange('cooldown', cooldown));
+      skillDmg.addEventListener('change', () => onChange('skillDmg', skillDmg));
       gaho.addEventListener('change', () => onChange('gaho', gaho));
       jihe.addEventListener('change', () => onChange('jihe', jihe));
       waegok.addEventListener('change', () => onChange('waegok', waegok));
@@ -13025,8 +13095,10 @@ const res = await apiJSON('skill_state_set', { ownerKey, skills, patchBefore });
       if (s3.runes && typeof s3.runes === 'object') {
         payload.runes = s3.runes;
       }
-      if (s3.specialRunes && typeof s3.specialRunes === 'object') {
+            if (s3.specialRunes && typeof s3.specialRunes === 'object') {
         payload.specialRunes = {
+          cooldown: Number(s3.specialRunes.cooldown || 0),
+          skillDmg: Number(s3.specialRunes.skillDmg || 0),
           gaho: Number(s3.specialRunes.gaho || 0),
           jihe: Number(s3.specialRunes.jihe || 0),
           waegok: Number(s3.specialRunes.waegok || 0),
