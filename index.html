@@ -5600,10 +5600,10 @@
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-                  <li>03.09 <span style="color: greenyellow;">[모바일]</span> 최종 데미지값 단순 비교 기능 추가 </li>
                   <li>03.21 <span style="color: greenyellow;">[PC]</span> 블레이드 와플 콤보 설정 추가 </li>
                   <li>03.26 쿨감룬/스증룬, 신규 오칭크아, 마부 추가 </li>
                   <li>03.27 260326 캐릭터 밸런스 패치 적용 </li>
+                  <li>03.30 장비 오브젝트 데미지 수치 개선 적용 </li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -7242,17 +7242,17 @@
 
 
   <!-- PC 계산기 로딩 후 안내 공지 모달 -->
-  <div id="noticeModal" class="modal" aria-hidden="true">
-    <div class="backdrop" data-close></div>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="noticeModalTitle"
-      style="width:min(740px,95vw);max-height:min(500px,85vh);">
-      <header>
-        <div style="width:32px;"></div>
-        <h2 id="noticeModalTitle">안내사항</h2>
-        <button type="button" class="btn" data-close>닫기</button>
-      </header>
+<div id="noticeModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-close></div>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="noticeModalTitle"
+    style="width:min(740px,95vw);height:min(810px,87vh);max-height:min(810px,87vh);display:flex;flex-direction:column;">
+    <header>
+      <div style="width:32px;"></div>
+      <h2 id="noticeModalTitle">안내사항</h2>
+      <button type="button" class="btn" data-close>닫기</button>
+    </header>
 
-      <div class="patch-log-body">
+    <div class="patch-log-body" style="flex:1;min-height:0;overflow-y:auto;">
         <ul class="patch-log-list notice-list">
           <li></li>
           <li>
@@ -7273,7 +7273,10 @@
             <s>캐릭터 밸런스 패치 업데이트</s><br>
             <strong style="color: #ff4444;">[03.27] 업데이트 완료</strong><br><br>
 
-            죽은 자의 성 에픽/익시드 장비 옵션 개선<br>
+            <s>죽은 자의 성 에픽/익시드 장비 오브젝트 데미지 개선</s><br>
+            <strong style="color: #ff4444;">[03.30] 업데이트 완료</strong><br><br>
+
+            죽은 자의 성 에픽/익시드 장비 시너지 옵션 개선<br>
             시로코 레이드 [침식] 무기 추가<br>
             <strong style="color: #ff4444;">업데이트 예정</strong><br><br>
 
@@ -7334,6 +7337,7 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
+          <li>26.03.30 <span style="color: yellow;">장비 오브젝트 데미지 </span><span style="color: #ff4444;">수치 개선</span> 적용 </li>
           <li>26.03.27 <span style="color: yellow;">260326</span><span style="color: #ff4444;"> 캐릭터 밸런스 패치</span> 적용 </li>
           <li>26.03.26 <span style="color: yellow;">쿨감룬/스증룬,</span><span style="color: #ff4444;"> 신규 오칭크아, 마부</span> 추가</li>
           <li>26.03.21 [PC] <span style="color: yellow;">블레이드</span><span style="color: #ff4444;"> 와플 콤보 설정</span> 추가</li>
