@@ -2578,28 +2578,50 @@
 #equipSealUList,
 #equipSealNList,
 #equipEnchantList,
-#equipEmblemList,
 #equipGrindList {
   height: 100%;
-  /* ✅ 추가: items 높이를 꽉 채움 */
   overflow: auto;
   overflow-x: hidden;
-  /* ✅ 가로 스크롤 방지 */
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   touch-action: pan-y;
-  /* ✅ 모바일에서 위/아래 드래그를 스크롤로 확실히 */
   overscroll-behavior: contain;
-  /* ✅ 바운스/배경 스크롤 간섭 줄이기 */
   box-sizing: border-box;
 }
 
-/* ✅ 엠블렘 개별 선택은 마지막 줄이 잘리지 않도록
-   하단 여유 공간을 별도로 더 준다 */
-#equipEmblemList {
-  padding: 8px 10px calc(28px + var(--safe-bottom));
+/* ✅ 엠블렘 모달은 구조가 다르므로 별도 처리
+   - equipEmblemTarget(상단 고정 영역)
+   - equipEmblemList(하단 실제 스크롤 영역)
+*/
+#equipEmblemModal .items {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  padding: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
+#equipEmblemTarget {
+  flex: 0 0 auto;
+}
+
+#equipEmblemList {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto; /* ✅ 기존 100% 제거 */
+  overflow: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+
+  padding: 0 0 calc(28px + var(--safe-bottom));
+}
     /* Chrome/Safari/Edge: 스크롤바 숨김 */
     #equipCatalog::-webkit-scrollbar,
     #equipEnhList::-webkit-scrollbar,
