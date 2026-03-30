@@ -7888,90 +7888,63 @@
         //악세
     //
 
-    // ✅ 특정 구글 계정만 전용 버튼을 보이게 하는 허용 리스트
-    //  👉 여기에 본인 구글 메일 주소를 넣으면 됨
-    const SPECIAL_USER_EMAILS = [
-      //'gametestlab0201@gmail.com',
-      //'gogo456654@gmail.com',
-      'gogo4566546@gmail.com',
-      'ionix4566541@gmail.com',
-      'ionix4566542@gmail.com',
-      'ionix4566543@gmail.com',
-      'ionix4566544@gmail.com',
-      //'gametestlab0201@gmail.com',
+    // ✅ special / research 권한은 프론트 이메일 배열이 아니라
+//    login_ping 응답값으로만 판정한다.
+function getCurrentUserEmailNorm_() {
+  const emailRaw =
+    (window.CORE && CORE.userEmail) ? CORE.userEmail
+      : (typeof getCurrentUserEmail === 'function' ? getCurrentUserEmail() : '');
 
-      // 'another.account@example.com',
-    ];
+  return String(emailRaw || '').trim().toLowerCase();
+}
 
-    // ✅ research_user 전용 리스트 추가
-    const RESEARCH_USER_EMAILS = [
-      'gametestlab0201@gmail.com',
-      // 'research1@gmail.com',
-      // 'research2@gmail.com',
-    ];
+function isSpecialUserNow_() {
+  const lp = window.__loginPingResult || {};
+  return !!lp.specialUser;
+}
 
-    function getCurrentUserEmailNorm_() {
-      const emailRaw =
-        (window.CORE && CORE.userEmail) ? CORE.userEmail
-          : (typeof getCurrentUserEmail === 'function' ? getCurrentUserEmail() : '');
+function isResearchUserNow_() {
+  const lp = window.__loginPingResult || {};
+  return !!lp.researchUser;
+}
 
-      return String(emailRaw || '').trim().toLowerCase();
-    }
+function updateSpecialUserButton() {
+  const isSpecialUser = isSpecialUserNow_();
+  const isResearchUser = isResearchUserNow_();
 
-    function isSpecialUserNow_() {
-      const email = getCurrentUserEmailNorm_();
-      if (!email) return false;
+  // research_user는 special_user의 모든 권한 포함
+  window.__IS_SPECIAL_USER__ = (isSpecialUser || isResearchUser);
+  window.__IS_RESEARCH_USER__ = isResearchUser;
 
-      const allow = (SPECIAL_USER_EMAILS || []).map(e => String(e || '').trim().toLowerCase());
-      return allow.includes(email);
-    }
+  const hasSpecialLike = !!window.__IS_SPECIAL_USER__;
 
-    function isResearchUserNow_() {
-      const email = getCurrentUserEmailNorm_();
-      if (!email) return false;
+  // ✅ [전체 공개] 상단 4개 버튼은 항상 노출
+  const publicBtnIds = ['btnSpecialPatch', 'btnSpecialAcc', 'btnSpecialSpec', 'btnUniqueBulk'];
+  for (const id of publicBtnIds) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    el.style.display = 'inline-flex';
+    el.disabled = false;
+  }
 
-      const allow = (RESEARCH_USER_EMAILS || []).map(e => String(e || '').trim().toLowerCase());
-      return allow.includes(email);
-    }
+  // ✅ [특정 유저 전용 유지] 아래 버튼들은 special_user / research_user 공통 허용
+  const btnSynergy = document.getElementById('btnSynergyEffect');
+  const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
+  const rowDmgOpt = document.getElementById('specialDamageOptRow');
+  const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
+  const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
+  const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
+  const rowUnique = document.getElementById('uniqueOnOffRow');
 
-
-    function updateSpecialUserButton() {
-      const isSpecialUser = isSpecialUserNow_();
-      const isResearchUser = isResearchUserNow_();
-
-      // research_user는 special_user의 모든 권한 포함
-      window.__IS_SPECIAL_USER__ = (isSpecialUser || isResearchUser);
-      window.__IS_RESEARCH_USER__ = isResearchUser;
-
-      const hasSpecialLike = !!window.__IS_SPECIAL_USER__;
-
-      // ✅ [전체 공개] 상단 4개 버튼은 항상 노출
-      const publicBtnIds = ['btnSpecialPatch', 'btnSpecialAcc', 'btnSpecialSpec', 'btnUniqueBulk'];
-      for (const id of publicBtnIds) {
-        const el = document.getElementById(id);
-        if (!el) continue;
-        el.style.display = 'inline-flex';
-        el.disabled = false;
-      }
-
-      // ✅ [특정 유저 전용 유지] 아래 버튼들은 special_user / research_user 공통 허용
-      const btnSynergy = document.getElementById('btnSynergyEffect');
-      const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
-      const rowDmgOpt = document.getElementById('specialDamageOptRow');
-      const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
-      const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
-      const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
-      const rowUnique = document.getElementById('uniqueOnOffRow');
-
-      if (btnSynergy) btnSynergy.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-      if (btnSkillDamage) btnSkillDamage.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-      // ✅ 크리100/투함포 체크박스는 전체 공개
-      if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
-      if (btnAutoSet) btnAutoSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-      if (btnAutoSetMissing) btnAutoSetMissing.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-      if (btnAutoWeapon) btnAutoWeapon.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-      if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
-    }
+  if (btnSynergy) btnSynergy.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+  if (btnSkillDamage) btnSkillDamage.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+  // ✅ 크리100/투함포 체크박스는 전체 공개
+  if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
+  if (btnAutoSet) btnAutoSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+  if (btnAutoSetMissing) btnAutoSetMissing.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+  if (btnAutoWeapon) btnAutoWeapon.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+  if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
+}
 
 
 
@@ -23046,23 +23019,24 @@ document.getElementById('btnSynergyPickWeapon2')?.addEventListener('click', () =
           }
 
           // ✅ 로그인 핑 결과로 허용 여부 판정
-          const ping = await loginPingOnce();
-          const allowed = !!(ping && ping.ok);
+const ping = await loginPingOnce();
+const allowed = !!(ping && ping.ok);
 
-                    // ✅ (추가) ping에서 email 확보 (백엔드가 토큰 검증 후 내려줌)
-          const loginEmail = String(ping?.email || '').trim().toLowerCase();
-          const isSpecial =
-            !!loginEmail &&
-            (
-              SPECIAL_USER_EMAILS.map(e => String(e || '').trim().toLowerCase()).includes(loginEmail) ||
-              RESEARCH_USER_EMAILS.map(e => String(e || '').trim().toLowerCase()).includes(loginEmail)
-            );
+// ✅ ping에서 email 확보
+const loginEmail = String(ping?.email || '').trim().toLowerCase();
 
-          // (선택) 기존 로직들과 같이 쓰고 싶으면 CORE.userEmail도 여기서 미리 채워둠
-          window.CORE = window.CORE || {};
-          if (loginEmail) CORE.userEmail = loginEmail;
+// ✅ 권한은 백엔드 login_ping 결과만 사용
+const isSpecial = !!(ping?.specialUser);
+const isResearch = !!(ping?.researchUser);
 
-          if (!allowed) console.warn("허용 안 됨:", ping);
+window.__IS_SPECIAL_USER__ = !!(isSpecial || isResearch);
+window.__IS_RESEARCH_USER__ = !!isResearch;
+
+// (선택) 기존 로직들과 같이 쓰고 싶으면 CORE.userEmail도 여기서 미리 채워둠
+window.CORE = window.CORE || {};
+if (loginEmail) CORE.userEmail = loginEmail;
+
+if (!allowed) console.warn("허용 안 됨:", ping);
 
           const card = document.querySelector(".login-card");
           if (card) {
