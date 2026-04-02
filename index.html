@@ -5600,10 +5600,10 @@
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-                  <li>03.21 <span style="color: greenyellow;">[PC]</span> 블레이드 와플 콤보 설정 추가 </li>
-                  <li>03.26 쿨감룬/스증룬, 신규 오칭크아, 마부 추가 </li>
                   <li>03.27 260326 캐릭터 밸런스 패치 적용 </li>
                   <li>03.30 장비 오브젝트 데미지 수치 개선 적용 </li>
+                  <li>04.01 스트라이커 본 크러셔 TP 버그 수정 </li>
+                  <li>04.02 <span style="color: greenyellow;">[모바일]</span> 블레이드 와플 콤보 설정 추가 </li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -7337,6 +7337,9 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
+          
+          <li>26.04.02 [모바일] <span style="color: yellow;">블레이드</span><span style="color: #ff4444;"> 와플 콤보 설정</span> 추가</li>
+          <li>26.04.01 <span style="color: yellow;">스트라이커 본 크러셔</span> <span style="color: #ff4444;">TP 버그</span> 수정 </li>
           <li>26.03.30 <span style="color: yellow;">장비 오브젝트 데미지 </span><span style="color: #ff4444;">수치 개선</span> 적용 </li>
           <li>26.03.27 <span style="color: yellow;">260326</span><span style="color: #ff4444;"> 캐릭터 밸런스 패치</span> 적용 </li>
           <li>26.03.26 <span style="color: yellow;">쿨감룬/스증룬,</span><span style="color: #ff4444;"> 신규 오칭크아, 마부</span> 추가</li>
@@ -10267,22 +10270,25 @@ const setSkill = (s, v) => {
       let boneCrusherSpanCur = null; // 본 크러셔 레벨 표시 span
 
       function syncBoneCrusherAutoFromLowKick() {
-        if (!lowKickSkill || !boneCrusherSkill) return;
+  if (!lowKickSkill || !boneCrusherSkill) return;
 
-        const curMap = state.skillLv || {};
-        const lowLv = Number(curMap[lowKickSkill.id] ?? 0) || 0;
+  const curMap = state.skillLv || {};
+  const lowLv = Number(curMap[lowKickSkill.id] ?? 0) || 0;
 
-        // 로킥 11 → 본 크러셔 1, 이후 1레벨당 +1
-        let autoLv = lowLv - 10;
-        if (autoLv < 0) autoLv = 0;
+  // 로킥 11 → 본 크러셔 1, 이후 1레벨당 +1
+  let autoLv = lowLv - 10;
+  if (autoLv < 0) autoLv = 0;
 
-        autoLv = clampSkill(boneCrusherSkill, autoLv);
-        state.skillLv[boneCrusherSkill.id] = autoLv;
+  autoLv = clampSkill(boneCrusherSkill, autoLv);
+  state.skillLv[boneCrusherSkill.id] = autoLv;
 
-        if (boneCrusherSpanCur) {
-          boneCrusherSpanCur.textContent = String(autoLv);
-        }
-      }
+  // ✅ 자동연동 스킬도 공용 저장 구조에 즉시 반영
+  syncSkillTreesFromLvMaps_pc();
+
+  if (boneCrusherSpanCur) {
+    boneCrusherSpanCur.textContent = String(autoLv);
+  }
+}
 
       // ===== 메카닉(여) 전용: 팔콘 4종 상호배제 =====
       let falconInsertSkill = null;      // '인서트 : 팔콘'

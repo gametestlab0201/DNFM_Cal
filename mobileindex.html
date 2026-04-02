@@ -324,19 +324,30 @@
     }
 
     .m-action-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text);
-      font-size: 12px;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
 
+/* ✅ hidden 속성이 있으면 무조건 숨김 */
+#mobileBladeWafflePreset[hidden] {
+  display: none !important;
+}
+
+#mobileBladeWafflePreset {
+  min-width: 88px;
+  max-width: 96px;
+  padding-right: 24px;
+  appearance: auto;
+}
     .m-action-btn:active {
       transform: translateY(1px);
     }
@@ -3043,14 +3054,20 @@
 
 
     /* ===== Page4 Skill ===== */
-    .skill-topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
+        .skill-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  margin-bottom: 10px;
+}
 
+.skill-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;   /* ✅ 오른쪽 정렬의 기준을 이 묶음에 줌 */
+}
     .skill-topbar-title {
       font-size: 15px;
       font-weight: 700;
@@ -5214,9 +5231,19 @@
           <div class="m-card">
             <div class="skill-sticky">
               <div class="skill-topbar">
-                <div class="skill-topbar-title">스킬</div>
-                <button id="btnSkillResetM" type="button" class="btn btn-mini">초기화</button>
-              </div>
+  <div class="skill-topbar-title">스킬</div>
+
+  <div class="skill-topbar-actions">
+    <select id="mobileBladeWafflePreset" class="m-action-btn" hidden>
+      <option value="24와플">24와플</option>
+      <option value="27와플">27와플</option>
+      <option value="30와플">30와플</option>
+      <option value="33와플">33와플</option>
+    </select>
+
+    <button id="btnSkillResetM" type="button" class="btn btn-mini">초기화</button>
+  </div>
+</div>
 
               <div id="skillRemainBarM" class="st-counters is-hidden">
                 <span class="c-sp"><i>SP</i> <b id="skillRemainSpM">-</b></span>
@@ -8118,31 +8145,34 @@ function bindWindshearTreeModalMobile() {
 
 
     function _calcUsedSpTp() {
-      const charKey = _getCurrentCharKey() || '__nochar__';
-      const store = window.state?.skillTrees?.[charKey] || {};
-      const isStriker = String(charKey || '').replace(/\s+/g, '') === '격투가스트라이커';
-      let usedSP = 0;
-      let usedTP = 0;
+  const s = (window.state || (window.state = {}));
+  const charKey = _getCurrentCharKey() || '__nochar__';
+  s.skillTrees = s.skillTrees || {};
+  const store = s.skillTrees[charKey] || {};
+  const isStriker = String(charKey || '').replace(/\s+/g, '') === '격투가스트라이커';
+  let usedSP = 0;
+  let usedTP = 0;
 
-      for (const k in store) {
-        const it = store[k];
-        if (!it) continue;
+  for (const k in store) {
+    const it = store[k];
+    if (!it) continue;
 
-        // ✅ 본 크러셔는 로킥 연동(무료) → 남은 SP 계산에서 제외
-        if (isStriker && String(k || '').replace(/\s+/g, '') === '본크러셔') continue;
+    const isBoneCrusher =
+      isStriker && String(k || '').replace(/\s+/g, '') === '본크러셔';
 
-        const spLv = _num(it.spLv, 0);
-        const spMin = _num(it.spMin, 0);
-        const tpLv = _num(it.tpLv, 0);
+    const spLv = _num(it.spLv, 0);
+    const spMin = _num(it.spMin, 0);
+    const tpLv = _num(it.tpLv, 0);
 
-        const spCost = _num(it.spCost ?? it.sp ?? 0, 0);
-        const tpCost = _num(it.tpCost ?? 1, 1);
+    // ✅ 본 크러셔는 SP만 무료 처리
+    const spCost = isBoneCrusher ? 0 : _num(it.spCost ?? it.sp ?? 0, 0);
+    const tpCost = _num(it.tpCost, 0);
 
-        usedSP += Math.max(0, spLv - spMin) * (spCost > 0 ? spCost : 0);
-        usedTP += Math.max(0, tpLv) * (tpCost > 0 ? tpCost : 0);
-      }
-      return { usedSP, usedTP };
-    }
+    usedSP += Math.max(0, spLv - spMin) * (spCost > 0 ? spCost : 0);
+    usedTP += Math.max(0, tpLv) * (tpCost > 0 ? tpCost : 0);
+  }
+  return { usedSP, usedTP };
+}
 
     function updateSkillRemainBar() {
   const bar = document.getElementById('skillRemainBarM');
@@ -8479,7 +8509,7 @@ const _blockIfExclusiveFalcon = (nextSp, storeObj) => {
       const { usedSP, usedTP } = _calcUsedSpTp();
 
       const spCost = _num(cur.spCost ?? cur.sp ?? 0, 0);
-      const tpCost = _num(cur.tpCost ?? 1, 1);
+      const tpCost = _num(cur.tpCost ?? 0, 0);
 
       const curSpentSP = Math.max(0, spLv - spMin) * (spCost > 0 ? spCost : 0);
       const curSpentTP = Math.max(0, tpLv) * (tpCost > 0 ? tpCost : 0);
@@ -8559,7 +8589,26 @@ const _blockIfExclusiveFalcon = (nextSp, storeObj) => {
     });
   }
 
-  // (2) 초기화 버튼
+           // (2) 블레이드 와플수 드롭다운
+  const bladePresetSel = document.getElementById('mobileBladeWafflePreset');
+
+  if (bladePresetSel) {
+    if (!bladePresetSel.dataset.bound) {
+      bladePresetSel.dataset.bound = '1';
+      bladePresetSel.addEventListener('change', (e) => {
+        const s = (window.state || (window.state = {}));
+        const v = String(e.target.value || '24와플').trim() || '24와플';
+
+        s.skillTreeBladePreset = v;
+        s.customSkills = s.customSkills || {};
+        s.customSkills.bladeWildFlowerPreset = v;
+
+        console.warn('[mobile-blade-wf-preset]', { v });
+      });
+    }
+  }
+
+  // (3) 초기화 버튼
   if (resetBtn && !resetBtn.dataset.bound) {
     resetBtn.dataset.bound = '1';
     resetBtn.addEventListener('click', () => {
@@ -8574,7 +8623,7 @@ const _blockIfExclusiveFalcon = (nextSp, storeObj) => {
     });
   }
 
-    // (3) 워리어 와일드베인: 스킬트리 선택 버튼/모달
+    // (4) 워리어 와일드베인: 스킬트리 선택 버튼/모달
   const wbBtn = document.getElementById('btnWildbaneTreeM');
   if (wbBtn && !wbBtn.dataset.bound) {
     wbBtn.dataset.bound = '1';
@@ -8584,7 +8633,7 @@ const _blockIfExclusiveFalcon = (nextSp, storeObj) => {
   }
   bindWildbaneTreeModalMobile();
 
-  // (4) 워리어 윈드시어: 스킬트리 선택 버튼/모달  ✅ 추가
+  // (5) 워리어 윈드시어: 스킬트리 선택 버튼/모달  ✅ 추가
   const wsBtn = document.getElementById('btnWindshearTreeM');
   if (wsBtn && !wsBtn.dataset.bound) {
     wsBtn.dataset.bound = '1';
@@ -8747,11 +8796,27 @@ function syncSkillTreesFromLvMaps_mobile(charObj) {
   const remainBar = document.getElementById('skillRemainBarM');
   const footnote = document.querySelector('#pageSkill .skill-footnote');
 
-  const ownerKeyNow = String(charKey || '').trim().replace(/\s+/g, '');
+    const ownerKeyNow = String(charKey || '').trim().replace(/\s+/g, '');
+  const isBlade   = (ownerKeyNow === '여귀검사블레이드');
   const isStriker = (ownerKeyNow === '격투가스트라이커');
   const isFMech   = (ownerKeyNow === '여거너메카닉');   // ✅ 추가
   const isWildbane = (ownerKeyNow === '워리어와일드베인');
   const isWindshear = (ownerKeyNow === '워리어윈드시어');
+
+  const bladePresetSel = document.getElementById('mobileBladeWafflePreset');
+  if (bladePresetSel) {
+    s.customSkills = s.customSkills || {};
+
+    const savedBladePreset =
+      String(s.customSkills.bladeWildFlowerPreset || s.skillTreeBladePreset || '24와플').trim() || '24와플';
+
+    s.skillTreeBladePreset = savedBladePreset;
+    s.customSkills.bladeWildFlowerPreset = savedBladePreset;
+    bladePresetSel.value = savedBladePreset;
+
+    // ✅ 여귀검사블레이드일 때만 노출
+    bladePresetSel.hidden = !isBlade;
+  }
 
   if (isWildbane) {
     wsBox?.classList.add('is-hidden');
@@ -8901,7 +8966,7 @@ const mine = rows.filter(r => {
     row.className = 'skill-row';
     row.dataset.skill = skillName;
     row.dataset.spcost = String(effSpCost ?? 0);
-    row.dataset.tpcost = String(tpCost ?? 1);
+    row.dataset.tpcost = String(tpCost ?? 0);
 
     // ✅ LEFT (402: 이미지 + 스킬명)
     const left = document.createElement('div');
@@ -8975,8 +9040,8 @@ const mine = rows.filter(r => {
     }, (isBoneCrusher || isGMagnetic)));
 
     right.appendChild(mkCtrl('TP', 'tp', {
-      min: 'tp-min', dec: 'tp-dec', inc: 'tp-inc', max: 'tp-max'
-    }, tpMax <= 0)); // tpCap=0이면 비활성
+  min: 'tp-min', dec: 'tp-dec', inc: 'tp-inc', max: 'tp-max'
+}, !(tpMax > 0 && tpCost > 0))); // TP 최대치와 TP 비용이 둘 다 있어야 활성
 
     row.appendChild(left);
     row.appendChild(right);
@@ -13108,7 +13173,7 @@ const res = await apiJSON('skill_state_set', { ownerKey, skills, patchBefore });
         }
       }
 
-      // ✅ 고유효과(커스텀옵) - PC처럼 calc_all payload에 실어 보내야 서버 세션에 반영됨
+            // ✅ 고유효과(커스텀옵) - PC처럼 calc_all payload에 실어 보내야 서버 세션에 반영됨
       // (state.customSkills 구조는 너가 모달에서 이미 채우고 있는 그대로 전달)
       if (s.customSkills && typeof s.customSkills === 'object') {
         // structuredClone이 없을 수 있으니 안전하게 처리
@@ -13127,9 +13192,12 @@ const res = await apiJSON('skill_state_set', { ownerKey, skills, patchBefore });
           cs.type = cs.weaponType;   // ← 이 1줄이 무기 고유효과 적용의 핵심
         }
 
+        // ✅ 블레이드 와플수도 함께 전달
+        cs.bladeWildFlowerPreset =
+          String(cs.bladeWildFlowerPreset || s.skillTreeBladePreset || '24와플').trim() || '24와플';
+
         payload.customSkills = cs;
       }
-
 
       // 스킬룬 (나중에 모달 붙이면 state에 채워질 구조 그대로 전달)
       if (s3.runes && typeof s3.runes === 'object') {
