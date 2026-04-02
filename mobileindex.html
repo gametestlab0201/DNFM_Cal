@@ -5709,7 +5709,7 @@
 
       <div class="wb-tree-grid" style="margin-top:12px;">
         <button type="button" class="wb-tree-btn" data-ws-tree="A">파파파파빨</button>
-        <button type="button" class="wb-tree-btn" data-ws-tree="B">초초초초파파빨</button>
+        <button type="button" class="wb-tree-btn" data-ws-tree="B">초초초초빨</button>
         <button type="button" class="wb-tree-btn" data-ws-tree="C">파파파초빨</button>
       </div>
 
@@ -7740,7 +7740,7 @@ function updateWindshearTreeSummaryMobile() {
   const preset = String(s.windshearTreePreset || 'A').trim() || 'A';
   const cycle = Number.isFinite(+s.windshearCycleCount) ? Math.max(0, Math.floor(+s.windshearCycleCount)) : 0;
 
-  const labelMap = { A: '파파파파빨', B: '초초초초파파빨', C: '파파파초빨' };
+  const labelMap = { A: '파파파파빨', B: '초초초초빨', C: '파파파초빨' };
   const pEl = document.getElementById('windshearTreePickM');
   const cEl = document.getElementById('windshearCyclePickM');
 
@@ -12957,11 +12957,19 @@ bindMobileDamageCompareUI();
       }
 
       // ✅ 핵심: byName이 아니라 skills 배열로 보낸다 (PC 동일)
-      const patchBefore = getPatchBeforeMobile();
+            const patchBefore = getPatchBeforeMobile();
 window.state = window.state || {};
 window.state.patchBefore = patchBefore; // state에도 캐시
 
-const res = await apiJSON('skill_state_set', { ownerKey, skills, patchBefore });
+      const payload = { ownerKey, skills, patchBefore };
+
+      // ✅ 워리어윈드시어는 트리 선택값도 같이 보낸다
+      if (ownerKey === '워리어윈드시어') {
+        const presetRaw = String(s.windshearTreePreset || 'A').trim() || 'A';
+        payload.windshearTreePreset = presetRaw; // A / B / C
+      }
+
+const res = await apiJSON('skill_state_set', payload);
       if (!res?.ok) throw new Error(res?.message || res?.error || 'skill_state_set_failed');
       return res;
     }
