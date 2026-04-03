@@ -6503,7 +6503,7 @@ if (s.currentCharacter && typeof s.currentCharacter === 'object') {
       subName  = pickName(cs3.subName)  || pickName(cs3.sub);
     }
 
-    // 3) 최종 반영: 모바일 표준 형태로 강제
+        // 3) 최종 반영: 모바일 표준 형태로 강제
     // (UI/계산 모두 mainName/subName을 기준으로 쓰게 만드는 게 핵심)
     if (mainName || subName) {
       s.castleSeal = { mainName, subName };
@@ -6518,6 +6518,41 @@ if (s.currentCharacter && typeof s.currentCharacter === 'object') {
     }
   } catch (e) {
     console.warn('[preset] castleSeal normalize fail', e);
+  }
+
+  // ✅ (추가) 예전 모바일 저장본 enh.level=0 자동 복구
+  try {
+    if (s.enh && typeof s.enh === 'object') {
+      for (const [slotKey, info] of Object.entries(s.enh)) {
+        if (!info || typeof info !== 'object') continue;
+
+        const name = String(info.name || '').trim();
+        const type = String(info.type || '').trim();
+
+        let lv = Number(info.level ?? info.level_num) || 0;
+
+        // 예전 저장본: name/type은 살아 있고 level만 0인 경우
+        if (lv <= 0 && name) {
+          const m = name.match(/(\d{1,2})/);
+          if (m) lv = Number(m[1]) || 0;
+        }
+
+        const levelVal =
+          String(info.levelVal ?? '').trim() ||
+          (lv > 0 ? String(lv) : '');
+
+        s.enh[slotKey] = {
+          ...info,
+          name,
+          type,
+          level: lv,
+          level_num: lv,
+          levelVal,
+        };
+      }
+    }
+  } catch (e) {
+    console.warn('[preset] enh normalize fail', e);
   }
 
   return s;
@@ -10411,9 +10446,16 @@ function _upgradeEquipByCore_(slot, it) {
         return;
       }
 
-      const list = _getLightEnhList_mobile()
-        .map(_normEnhItem_mobile)
-        .filter(x => x.name && x.type === type);
+            if (typeof _ensureDBEnhByType_mobile === 'function') _ensureDBEnhByType_mobile();
+
+      const list = (window.DBEnh?.byType?.[String(type).trim()] || []).map(it => ({
+        name: String(it?.name || '').trim(),
+        type: String(it?.type || '').trim(),
+        level: Number(it?.level_num ?? it?.level) || 0,
+        level_num: Number(it?.level_num ?? it?.level) || 0,
+        levelVal: String(it?.levelVal ?? '').trim(),
+        _raw: it?._raw || null,
+      }));
 
       if (!list.length) {
         toast(`강화 목록을 불러오지 못했습니다. (${type})`);
@@ -10421,7 +10463,10 @@ function _upgradeEquipByCore_(slot, it) {
       }
 
       // 레벨 오름차순 정렬(보기 편하게)
-      list.sort((a, b) => (a.level || 0) - (b.level || 0) || a.name.localeCompare(b.name, 'ko'));
+      list.sort((a, b) =>
+        (Number(a.level_num ?? a.level) || 0) - (Number(b.level_num ?? b.level) || 0) ||
+        a.name.localeCompare(b.name, 'ko')
+      );
 
       // ✅ (방법B) 강화 모달에 렌더
       const titleEl = document.getElementById('equipEnhModalTitle');
@@ -10439,15 +10484,33 @@ function _upgradeEquipByCore_(slot, it) {
         b.className = 'enh-option' + (curName && curName === it.name ? ' active' : '');
         b.textContent = it.name;
 
-        b.onclick = () => {
+                  b.onclick = () => {
           window.state = window.state || {};
           window.state.enh = window.state.enh || {};
-          // ✅ PC버전/백코드가 기대하는 형태로 저장(name/type/level)
-          const lv = Number.isFinite(Number(it.level)) ? Number(it.level) : _parseEnhLevel_mobile(it.name);
-          window.state.enh[slot] = { name: it.name, type: it.type, level: lv };
+
+          const lv =
+            Number(it?.level_num ?? it?.level) ||
+            _parseEnhLevel_mobile(it?.name || b.textContent || '');
+
+          window.state.enh[slot] = {
+            name: String(it.name || '').trim(),
+            type: String(it.type || '').trim(),
+            levelVal: String(it.levelVal ?? lv ?? '').trim(),
+            level: lv,
+            level_num: lv,
+            raw: it._raw || null,
+          };
+
+          console.warn('[MOBILE_MANUAL_ENH_PICK]', {
+            slot,
+            name: it?.name,
+            type: it?.type,
+            level: it?.level,
+            level_num: it?.level_num,
+            finalLv: lv
+          });
 
           _syncEnhLabelFromState_mobile(slot);
-          // ✅ 추가: 상단 '강화' 버튼 텍스트도 즉시 +수치로 변경
           syncEnhTopbarLabel_mobile(slot);
           closeEquipEnhModal(); // ✅ 장비 모달은 유지하고, 강화 모달만 닫기
         };
@@ -10709,9 +10772,9 @@ function _upgradeEquipByCore_(slot, it) {
 
 
         // 숫자 뱃지(이름에서 1~2자리 숫자)
-        let level_num = '';
+        let level_num = 0;
         const m = name.match(/(\d{1,2})/);
-        if (m) level_num = m[1];
+        if (m) level_num = Number(m[1]) || 0;
 
         const out = { name, type, img: img || PLACEHOLDER_IMG, levelVal, level_num, _raw: raw };
         (DBEnh.byType[type] = DBEnh.byType[type] || []).push(out);
@@ -11669,7 +11732,8 @@ state.selections[p.slot] = _buildSelectionFromEquip_(fullIt);
       }
       if (!Array.isArray(setRows)) setRows = [];
 
-      const norm = (v) => String(v ?? '').trim();
+            const norm = (v) => String(v ?? '').replace(/\s+/g, ' ').trim();
+      const keyNoSpace = (v) => String(v ?? '').replace(/\s+/g, '').trim();
       const toNum = (v) => {
         const n = Number(String(v ?? '').replace(/[^\d.-]/g, ''));
         return Number.isFinite(n) ? n : 0;
@@ -11768,24 +11832,36 @@ armorSetByType.set(type, prev);
 
           let row;
 
-          if (mode === 'epic') {
+                    if (mode === 'epic') {
             // ✅ 에픽 모드: 종류가 세트 type 이고, 레어리티가 '에픽' 인 장비 우선 선택
             row = rows.find(
               (r) =>
-                norm(r.type) === norm(typeKey) &&
+                keyNoSpace(r.type) === keyNoSpace(typeKey) &&
                 norm(r.rarity || r['레어리티']) === '에픽'
             );
 
             // 혹시 에픽 장비가 없으면(데이터 누락 등) 그냥 종류만 맞는 첫 장비로 fallback
             if (!row) {
-              row = rows.find((r) => norm(r.type) === norm(typeKey));
+              row =
+                rows.find((r) => keyNoSpace(r.type) === keyNoSpace(typeKey)) ||
+                rows.find((r) => {
+                  const rt = keyNoSpace(r.type);
+                  const tt = keyNoSpace(typeKey);
+                  return rt && tt && (rt.includes(tt) || tt.includes(rt));
+                });
             }
           } else {
             // ✅ 익시드 모드: 기존과 동일 (종류만 맞으면 사용)
-            row = rows.find((r) => norm(r.type) === norm(typeKey));
+            row =
+              rows.find((r) => keyNoSpace(r.type) === keyNoSpace(typeKey)) ||
+              rows.find((r) => {
+                const rt = keyNoSpace(r.type);
+                const tt = keyNoSpace(typeKey);
+                return rt && tt && (rt.includes(tt) || tt.includes(rt));
+              });
           }
 
-          if (row) {
+                    if (row) {
             pieces.push({
               slot: slotKey,
               name: row.name,
@@ -11795,6 +11871,17 @@ armorSetByType.set(type, prev);
               item: row,              // ★ 실제 장비 객체 저장
             });
           } else {
+            console.warn('[MOBILE_SPEC_SET_MATCH_FAIL]', {
+              slotKey,
+              typeKey,
+              mode,
+              rows: rows.map(r => ({
+                name: r?.name,
+                type: r?.type,
+                rarity: r?.rarity || r?.['레어리티']
+              }))
+            });
+
             pieces.push({
               slot: slotKey,
               name: '',
@@ -13602,7 +13689,7 @@ window.state.selections[slot] = {
       // 3) 마지막 폴백
       return list[list.length - 1] || null;
     }
-    async function autoEnhanceApply_mobile(level) {
+        async function autoEnhanceApply_mobile(level) {
       if (typeof _ensureDBEnhByType_mobile === 'function') _ensureDBEnhByType_mobile();
 
       window.state = window.state || {};
@@ -13617,7 +13704,17 @@ window.state.selections[slot] = {
         const opt = _findEnhOptByLevel_mobile(typeKey, level);
         if (!opt) continue;
 
-        state.enh[slot] = { name: String(opt.name || '').trim(), type: String(opt.type || typeKey).trim(), level: Number(level) || 0 };
+        const lv = Number(level) || Number(opt?.level_num ?? opt?.level) || 0;
+
+        // ✅ PC와 동일한 스냅샷 형태로 저장
+        state.enh[slot] = {
+          name: String(opt.name || '').trim(),
+          type: String(opt.type || typeKey).trim(),
+          levelVal: String(opt.levelVal ?? lv ?? '').trim(),
+          level: lv,
+          level_num: lv,
+          raw: opt._raw || opt.raw || null,
+        };
 
         // UI sync
         if (typeof _syncEnhLabelFromState_mobile === 'function') _syncEnhLabelFromState_mobile(slot);
