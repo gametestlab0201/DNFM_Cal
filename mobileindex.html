@@ -1003,6 +1003,96 @@
       transform: translateY(1px);
     }
 
+    /* ✅ 모바일 캐릭터선택 박스 안 우측상단 솔플/파티 토글 */
+.mobile-solo-party-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.mobile-solo-party-overlay #mobileSoloPartyToggle {
+  pointer-events: auto;
+  width: 108px;
+  height: 30px;
+  font-size: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(4px);
+}
+
+/* PC와 동일한 토글 공용 스타일 */
+.armor-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+  width: 108px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+  transition: background .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.armor-toggle-label {
+  position: relative;
+  z-index: 2;
+  font-weight: 700;
+  line-height: 1;
+  transition: color .18s ease;
+}
+
+.armor-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: calc(50% - 2px);
+  height: calc(100% - 4px);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.78);
+  z-index: 1;
+  transition: transform .18s ease;
+}
+
+.armor-toggle.mode-solo {
+  background: linear-gradient(135deg, #60a5fa, #93c5fd);
+}
+
+.armor-toggle.mode-party {
+  background: linear-gradient(135deg, #c084fc, #e9d5ff);
+}
+
+.armor-toggle.mode-solo .armor-toggle-thumb {
+  transform: translateX(0%);
+}
+
+.armor-toggle.mode-party .armor-toggle-thumb {
+  transform: translateX(100%);
+}
+
+.armor-toggle.mode-solo .armor-toggle-label-solo {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.armor-toggle.mode-solo .armor-toggle-label-party {
+  color: rgba(15, 23, 42, 0.45);
+}
+
+.armor-toggle.mode-party .armor-toggle-label-solo {
+  color: rgba(15, 23, 42, 0.45);
+}
+
+.armor-toggle.mode-party .armor-toggle-label-party {
+  color: #0f172a;
+  font-weight: 600;
+}
+
     /* ✅ 선택된 캐릭 이미지 표시 */
     #pickedCharImg.picked-char-img {
       display: none;
@@ -4283,17 +4373,26 @@
 
         <!-- Page 1: 캐릭터 -->
         <section class="m-page" id="pageChar">
-          <div class="m-card">
-            <div class="page-title">1 / 4</div>
-            <div class="big-pick">
-              <button id="btnPickChar" type="button">캐릭터 선택하기</button>
-              <!-- ✅ 선택 후 표시될 캐릭터 이미지 -->
-              <img id="pickedCharImg" class="picked-char-img" alt="" />
-            </div>
-            <div class="hint">
-            </div>
-          </div>
-        </section>
+  <div class="m-card">
+    <div class="page-title">1 / 4</div>
+    <div class="big-pick">
+      <div class="mobile-solo-party-overlay">
+        <div id="mobileSoloPartyToggle" class="armor-toggle mode-party" role="button" tabindex="0"
+          aria-label="솔플 / 파티 전환">
+          <span class="armor-toggle-label armor-toggle-label-solo">솔플</span>
+          <span class="armor-toggle-label armor-toggle-label-party">파티</span>
+          <div class="armor-toggle-thumb"></div>
+        </div>
+      </div>
+
+      <button id="btnPickChar" type="button">캐릭터 선택하기</button>
+      <!-- ✅ 선택 후 표시될 캐릭터 이미지 -->
+      <img id="pickedCharImg" class="picked-char-img" alt="" />
+    </div>
+    <div class="hint">
+    </div>
+  </div>
+</section>
         <!-- 캐릭터 선택 모달 (PC와 동일 id) -->
         <div id="charModal" class="modal" aria-hidden="true">
           <div class="backdrop" data-char-close></div>
@@ -5489,7 +5588,9 @@
             <s>죽은 자의 성 에픽/익시드 장비 오브젝트 데미지 개선</s><br>
             <strong style="color: #ff4444;">[03.30] 업데이트 완료</strong><br><br>
 
-            죽은 자의 성 에픽/익시드 장비 시너지 옵션 개선<br>
+            <s>죽은 자의 성 에픽/익시드 장비 시너지 옵션 개선</s><br>
+            <strong style="color: #ff4444;">[04.06] 업데이트 완료</strong><br><br>
+
             시로코 레이드 [침식] 무기 추가<br>
             <strong style="color: #ff4444;">업데이트 예정</strong><br><br>
 
@@ -13222,7 +13323,7 @@ const res = await apiJSON('skill_state_set', payload);
         };
       }
 
-      // 최종 payload (PC 방식 그대로)
+            // 최종 payload (PC 방식 그대로)
       const payload = { char: charPayload };
       if (Object.keys(equipPayload).length) payload.equip = equipPayload;
       if (Object.keys(enhPayload).length) payload.enh = enhPayload;
@@ -13230,6 +13331,10 @@ const res = await apiJSON('skill_state_set', payload);
       if (Object.keys(enchantPayload).length) payload.enchants = enchantPayload;
       if (Object.keys(emblemPayload).length) payload.emblems = emblemPayload;
       if (Object.keys(refinePayload).length) payload.refines = refinePayload;
+
+      // ✅ 솔플 / 파티 모드
+      payload.soloPartyMode = String((window.state && window.state.soloPartyMode) || 'party');
+      payload.isPartyMode = (payload.soloPartyMode === 'party');
 
       // ✅ 7) Page3 옵션들(아바타/무기압, 시간/몬스터, 룬각인, 성안의 봉인, 스킬룬)
       const s3 = window.state || {};
@@ -14644,7 +14749,7 @@ function bindMobileDamageCompareUI() {
     }
 
     // 저장된 state를 window.state에 반영하고, 화면을 state 기준으로 갱신
-    function applyFrontPresetState_mobile(presetState) {
+        function applyFrontPresetState_mobile(presetState) {
   const next = _clonePlain(presetState || {});
 
   // ✅ window.state 객체를 교체하지 말고, 같은 참조를 유지한 채 내용만 갱신
@@ -14652,6 +14757,18 @@ function bindMobileDamageCompareUI() {
   const s = window.state;
   for (const k of Object.keys(s)) delete s[k];
   Object.assign(s, next);
+
+  // ✅ 구형 프리셋 호환:
+  //    soloPartyMode / isPartyMode 가 없으면 기본은 'party'
+  mobileSoloPartyMode =
+    String(s.soloPartyMode || 'party').trim().toLowerCase() === 'solo'
+      ? 'solo'
+      : 'party';
+
+  s.soloPartyMode = mobileSoloPartyMode;
+  s.isPartyMode = (mobileSoloPartyMode === 'party');
+
+  updateMobileSoloPartyUI();
 
       // 1) 캐릭터 UI
       if (s.currentCharacter) {
@@ -14853,6 +14970,57 @@ function _getPickedCharThumbSrcForPreset(st) {
     return '';
   }
 }
+
+const $mobileSoloPartyToggle = document.getElementById('mobileSoloPartyToggle');
+let mobileSoloPartyMode = 'party'; // 기본은 파티
+
+function updateMobileSoloPartyUI() {
+  if (!$mobileSoloPartyToggle) return;
+
+  if (mobileSoloPartyMode === 'party') {
+    $mobileSoloPartyToggle.classList.add('mode-party');
+    $mobileSoloPartyToggle.classList.remove('mode-solo');
+  } else {
+    $mobileSoloPartyToggle.classList.add('mode-solo');
+    $mobileSoloPartyToggle.classList.remove('mode-party');
+  }
+}
+
+function syncMobileSoloPartyState() {
+  if (!window.state) window.state = {};
+  window.state.soloPartyMode = mobileSoloPartyMode;
+  window.state.isPartyMode = (mobileSoloPartyMode === 'party');
+}
+
+if ($mobileSoloPartyToggle) {
+  const toggleMobileSoloParty = () => {
+    mobileSoloPartyMode = (mobileSoloPartyMode === 'solo') ? 'party' : 'solo';
+    syncMobileSoloPartyState();
+    updateMobileSoloPartyUI();
+  };
+
+  $mobileSoloPartyToggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleMobileSoloParty();
+  });
+
+  $mobileSoloPartyToggle.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+  });
+
+  $mobileSoloPartyToggle.addEventListener('keydown', (e) => {
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleMobileSoloParty();
+    }
+  });
+}
+
+// ✅ 초기값 동기화
+syncMobileSoloPartyState();
+updateMobileSoloPartyUI();
 
 async function saveToFpresetSlot_mobile(slotNum, label) {
   const st = buildFrontPresetState_mobile();
