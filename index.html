@@ -1685,56 +1685,57 @@
     }
 
     .synergy-set-box {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 10px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01));
-}
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 10px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01));
+    }
 
-.synergy-set-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px; /* ← 제목과 아래칸 사이 간격 */
-}
+    .synergy-set-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      /* ← 제목과 아래칸 사이 간격 */
+    }
 
-.synergy-set-head-left {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
+    .synergy-set-head-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
 
-.synergy-enable-check {
-  width: 16px;
-  height: 16px;
-  accent-color: #cfa24f;
-  cursor: pointer;
-  flex: 0 0 auto;
-}
+    .synergy-enable-check {
+      width: 16px;
+      height: 16px;
+      accent-color: #cfa24f;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
 
-.synergy-reset-btn {
-  height: 30px;
-  padding: 0 12px;
-  border-radius: 999px;
-  border: 1px solid #3a2c21;
-  background: #1a130f;
-  color: #f0e6d2;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-}
+    .synergy-reset-btn {
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid #3a2c21;
+      background: #1a130f;
+      color: #f0e6d2;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
 
-.synergy-reset-btn:hover {
-  border-color: #cfa24f;
-  box-shadow: 0 0 0 2px rgba(207, 162, 79, .18) inset;
-}
+    .synergy-reset-btn:hover {
+      border-color: #cfa24f;
+      box-shadow: 0 0 0 2px rgba(207, 162, 79, .18) inset;
+    }
 
-.synergy-reset-btn:active {
-  transform: translateY(1px);
-}
+    .synergy-reset-btn:active {
+      transform: translateY(1px);
+    }
 
     .synergy-top-row {
       display: grid;
@@ -1750,17 +1751,23 @@
       align-items: stretch;
     }
 
-    .synergy-char-box > .btnetc,
-.synergy-weapon-box > .btnetc,
-.synergy-equip-box > .btnetc { transform: translateY(10px); }
+    .synergy-char-box>.btnetc,
+    .synergy-weapon-box>.btnetc,
+    .synergy-equip-box>.btnetc {
+      transform: translateY(10px);
+    }
 
-.synergy-char-box > .synergy-picked-char-wrap,
-.synergy-weapon-box > .synergy-picked-weapon-wrap,
-.synergy-equip-box > .synergy-picked-set-wrap { transform: translateY(10px); }
+    .synergy-char-box>.synergy-picked-char-wrap,
+    .synergy-weapon-box>.synergy-picked-weapon-wrap,
+    .synergy-equip-box>.synergy-picked-set-wrap {
+      transform: translateY(10px);
+    }
 
-.synergy-char-box,
-.synergy-weapon-box,
-.synergy-equip-box { padding-bottom: 10px; }
+    .synergy-char-box,
+    .synergy-weapon-box,
+    .synergy-equip-box {
+      padding-bottom: 10px;
+    }
 
     .synergy-picked-text {
       font-size: 13px;
@@ -1785,53 +1792,55 @@
       border: 1px solid rgba(207, 162, 79, 0.35);
       background: #0c0a08;
     }
+
     .synergy-picked-char-wrap,
-.synergy-picked-set-wrap {
-  cursor: pointer;
-}
-
-.synergy-picked-char-wrap:hover,
-.synergy-picked-set-wrap:hover {
-  filter: brightness(1.06);
-}
     .synergy-picked-set-wrap {
-  width: 100%;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 2px;
-}
+      cursor: pointer;
+    }
 
-.synergy-picked-set-item {
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(207, 162, 79, 0.35);
-  background: #0c0a08;
-  position: relative;
-  flex: 0 0 auto;
-}
+    .synergy-picked-char-wrap:hover,
+    .synergy-picked-set-wrap:hover {
+      filter: brightness(1.06);
+    }
 
-.synergy-picked-set-item .icon {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
+    .synergy-picked-set-wrap {
+      width: 100%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
 
-.synergy-picked-set-item .set-badge-icon {
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
-  pointer-events: none;
-  z-index: 1;
-}
+    .synergy-picked-set-item {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(207, 162, 79, 0.35);
+      background: #0c0a08;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .synergy-picked-set-item .icon {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .synergy-picked-set-item .set-badge-icon {
+      position: absolute;
+      left: 0px;
+      bottom: 0px;
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      pointer-events: none;
+      z-index: 1;
+    }
 
     .synergy-select-grid {
       display: grid;
@@ -1839,53 +1848,55 @@
       gap: 10px;
       align-items: center;
     }
-.synergy-calc-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin-top: 6px;
-  padding: 12px 4px 2px;
-}
 
-.synergy-compute-btn {
-  min-width: 220px;
-  height: 40px;
-  border-radius: 12px;
-  font-weight: 800;
-}
+    .synergy-calc-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 6px;
+      padding: 12px 4px 2px;
+    }
 
-.synergy-final-box {
-  flex: 1;
-  min-height: 40px;
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 12px;
-  background: rgba(255,255,255,.03);
-  padding: 8px 12px;
-}
+    .synergy-compute-btn {
+      min-width: 220px;
+      height: 40px;
+      border-radius: 12px;
+      font-weight: 800;
+    }
 
-.synergy-final-value {
-  font-size: 22px;
-  font-weight: 900;
-  color: #ffd36b;
-  line-height: 1.15;
-}
+    .synergy-final-box {
+      flex: 1;
+      min-height: 40px;
+      border: 1px solid rgba(255, 255, 255, .10);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .03);
+      padding: 8px 12px;
+    }
 
-.synergy-final-value.loading {
-  color: #e6e9ef;
-}
+    .synergy-final-value {
+      font-size: 22px;
+      font-weight: 900;
+      color: #ffd36b;
+      line-height: 1.15;
+    }
+
+    .synergy-final-value.loading {
+      color: #e6e9ef;
+    }
+
     #synergyPickerList .items {
-  overflow: auto;
-  padding: 10px 6px 14px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  align-content: start;
-}
+      overflow: auto;
+      padding: 10px 6px 14px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      align-content: start;
+    }
 
-#synergyPickerList .items > .item-list {
-  grid-column: 1 / -1;
-}
+    #synergyPickerList .items>.item-list {
+      grid-column: 1 / -1;
+    }
 
     #synergyPickerList .set-group-title {
       grid-column: 1 / -1;
@@ -1970,39 +1981,39 @@
     }
 
     .synergy-weapon-box {
-  min-width: 0;
-}
+      min-width: 0;
+    }
 
-.synergy-picked-weapon-wrap {
-  width: 100%;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  margin-top: 2px;
-  cursor: pointer;
-}
+    .synergy-picked-weapon-wrap {
+      width: 100%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      margin-top: 2px;
+      cursor: pointer;
+    }
 
-.synergy-picked-weapon-wrap:hover {
-  filter: brightness(1.06);
-}
+    .synergy-picked-weapon-wrap:hover {
+      filter: brightness(1.06);
+    }
 
-.synergy-picked-weapon-item {
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(207, 162, 79, 0.35);
-  background: #0c0a08;
-  position: relative;
-  flex: 0 0 auto;
-}
+    .synergy-picked-weapon-item {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(207, 162, 79, 0.35);
+      background: #0c0a08;
+      position: relative;
+      flex: 0 0 auto;
+    }
 
-.synergy-picked-weapon-item .icon {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
+    .synergy-picked-weapon-item .icon {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
 
     @media (max-width: 980px) {
       .synergy-top-row {
@@ -4030,7 +4041,7 @@
       justify-content: flex-start;
     }
 
-    /* ✅ ON/OFF 전용 색상 (에픽/익시드와 비슷한 느낌) */
+        /* ✅ ON/OFF 전용 색상 (에픽/익시드와 비슷한 느낌) */
     .armor-toggle.mode-off {
       background: linear-gradient(135deg, #111827, #1f2937);
       /* 어두운 회색 */
@@ -4065,6 +4076,75 @@
     }
 
     .armor-toggle.mode-on .armor-toggle-label-on {
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+        /* ✅ 캐릭터 카드 안 우측 상단 솔플/파티 토글 */
+    .character-card {
+      position: relative;
+    }
+
+    .solo-party-overlay {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .solo-party-overlay #soloPartyToggle {
+      pointer-events: auto;
+      width: 108px;
+      height: 30px;
+      font-size: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(4px);
+    }
+
+    .armor-toggle.mode-solo {
+      background: linear-gradient(135deg, #60a5fa, #93c5fd);
+    }
+
+    .armor-toggle.mode-party {
+      background: linear-gradient(135deg, #c084fc, #e9d5ff);
+    }
+
+    .armor-toggle.mode-solo .armor-toggle-thumb {
+      transform: translateX(0%);
+    }
+
+    .armor-toggle.mode-party .armor-toggle-thumb {
+      transform: translateX(100%);
+    }
+
+    .armor-toggle.mode-solo .armor-toggle-label-solo {
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    .armor-toggle.mode-solo .armor-toggle-label-party {
+      color: rgba(15, 23, 42, 0.45);
+    }
+
+    .armor-toggle.mode-party .armor-toggle-label-solo {
+      color: rgba(15, 23, 42, 0.45);
+    }
+
+    .armor-toggle.mode-party .armor-toggle-label-party {
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    .armor-toggle.mode-solo .armor-toggle-label-party {
+      color: rgba(15, 23, 42, 0.45);
+    }
+
+    .armor-toggle.mode-party .armor-toggle-label-solo {
+      color: rgba(15, 23, 42, 0.45);
+    }
+
+    .armor-toggle.mode-party .armor-toggle-label-party {
       color: #0f172a;
       font-weight: 600;
     }
@@ -4469,38 +4549,38 @@
 
     /* 드롭다운 크기 적당히 고정 */
     .special-rune-row .rune-select,
-#specialRune_cooldown,
-#specialRune_skillDmg,
-#specialRune_gaho,
-#specialRune_jihe,
-#specialRune_waegok {
-  min-width: 70px;
-  max-width: 90px;
-}
+    #specialRune_cooldown,
+    #specialRune_skillDmg,
+    #specialRune_gaho,
+    #specialRune_jihe,
+    #specialRune_waegok {
+      min-width: 70px;
+      max-width: 90px;
+    }
 
-.special-runes-grid {
-  display: inline-grid;
-  grid-template-columns: auto auto;
-  column-gap: 14px;
-  row-gap: 0;
-  align-items: start;
-}
+    .special-runes-grid {
+      display: inline-grid;
+      grid-template-columns: auto auto;
+      column-gap: 14px;
+      row-gap: 0;
+      align-items: start;
+    }
 
-.special-runes-col {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+    .special-runes-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-.special-runes-col-left {
-  margin-top: 20px;
-}
+    .special-runes-col-left {
+      margin-top: 20px;
+    }
 
-.special-rune-row label {
-  margin: 0;
-  font-size: 13px;
-  white-space: nowrap;
-}
+    .special-rune-row label {
+      margin: 0;
+      font-size: 13px;
+      white-space: nowrap;
+    }
 
     /* 룬 각인 UI */
     .rune-engrave-row {
@@ -4703,96 +4783,96 @@
       color: var(--tp-red);
     }
 
-   /* ✅ 스킬트리 모달 헤더만 5칸으로:
+    /* ✅ 스킬트리 모달 헤더만 5칸으로:
 제목 | 빈공간 | 블레이드 드롭다운 | reset | counters */
-#skillTreeModal .dialog>header {
-  grid-template-columns: auto 1fr auto auto auto;
-  align-items: center;
-  column-gap: 10px;
-}
+    #skillTreeModal .dialog>header {
+      grid-template-columns: auto 1fr auto auto auto;
+      align-items: center;
+      column-gap: 10px;
+    }
 
-/* 블레이드 와플 프리셋 드롭다운 */
-#skillTreeBladePreset {
-  grid-column: 3;
-  justify-self: end;
+    /* 블레이드 와플 프리셋 드롭다운 */
+    #skillTreeBladePreset {
+      grid-column: 3;
+      justify-self: end;
 
-  min-width: 110px;
-  height: 42px;
-  padding: 0 12px;
+      min-width: 110px;
+      height: 42px;
+      padding: 0 12px;
 
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
-  color: #e6e9ef;
-  font-weight: 700;
-  font-size: 14px;
-  outline: none;
-  cursor: pointer;
-}
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.06);
+      color: #e6e9ef;
+      font-weight: 700;
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+    }
 
-/* 펼쳤을 때 보이는 목록 색상 */
-#skillTreeBladePreset option {
-  background: #1b1f2a;
-  color: #f3f5f8;
-}
+    /* 펼쳤을 때 보이는 목록 색상 */
+    #skillTreeBladePreset option {
+      background: #1b1f2a;
+      color: #f3f5f8;
+    }
 
-/* 선택된 항목 강조 */
-#skillTreeBladePreset option:checked {
-  background: #2a3142;
-  color: #ffffff;
-}
+    /* 선택된 항목 강조 */
+    #skillTreeBladePreset option:checked {
+      background: #2a3142;
+      color: #ffffff;
+    }
 
-#skillTreeBladePreset:hover,
-#skillTreeBladePreset:focus {
-  background: rgba(255, 255, 255, 0.10);
-  border-color: rgba(255, 255, 255, 0.22);
-}
+    #skillTreeBladePreset:hover,
+    #skillTreeBladePreset:focus {
+      background: rgba(255, 255, 255, 0.10);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
 
-#skillTreeBladePreset[hidden] {
-  display: none !important;
-}
+    #skillTreeBladePreset[hidden] {
+      display: none !important;
+    }
 
-/* ===== Modal-only: big counters aligned to the right ===== */
-#skillTreeModal .st-counters {
-  grid-column: 5;
-  justify-self: end;
-  margin-left: 0;
-  font-size: 20pt;
-}
+    /* ===== Modal-only: big counters aligned to the right ===== */
+    #skillTreeModal .st-counters {
+      grid-column: 5;
+      justify-self: end;
+      margin-left: 0;
+      font-size: 20pt;
+    }
 
-#skillTreeModal .st-counter,
-#skillTreeModal .st-counter .label,
-#skillTreeModal .st-counter .val {
-  font-size: 20pt;
-}
+    #skillTreeModal .st-counter,
+    #skillTreeModal .st-counter .label,
+    #skillTreeModal .st-counter .val {
+      font-size: 20pt;
+    }
 
-/* ✅ PC 스킬 초기화 버튼 */
-#btnSkillTreeReset {
-  grid-column: 4;
-  justify-self: end;
+    /* ✅ PC 스킬 초기화 버튼 */
+    #btnSkillTreeReset {
+      grid-column: 4;
+      justify-self: end;
 
-  /* ✅ counters 쪽에서 살짝 떼고, 조금 더 왼쪽에 오게 */
-  margin-right: 18px;
+      /* ✅ counters 쪽에서 살짝 떼고, 조금 더 왼쪽에 오게 */
+      margin-right: 18px;
 
-  /* ✅ 버튼 크기 소폭 확대 */
-  padding: 10px 16px;
-  min-height: 42px;
-  font-size: 14px;
-  line-height: 1;
+      /* ✅ 버튼 크기 소폭 확대 */
+      padding: 10px 16px;
+      min-height: 42px;
+      font-size: 14px;
+      line-height: 1;
 
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffd6d6;
-  font-weight: 800;
-  cursor: pointer;
-  white-space: nowrap;
-}
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffd6d6;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
 
-#btnSkillTreeReset:hover {
-  background: rgba(255, 255, 255, 0.10);
-  border-color: rgba(255, 255, 255, 0.22);
-}
+    #btnSkillTreeReset:hover {
+      background: rgba(255, 255, 255, 0.10);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
 
     /* Modal size */
     #skillTreeModal .dialog {
@@ -5782,6 +5862,15 @@
 
           <!-- 오른쪽: 캐릭터 카드 -->
           <div id="characterCard" class="character-card">
+            <div class="solo-party-overlay">
+              <div id="soloPartyToggle" class="armor-toggle mode-solo" role="button" tabindex="0"
+                aria-label="솔플 / 파티 전환">
+                <span class="armor-toggle-label armor-toggle-label-solo">솔플</span>
+                <span class="armor-toggle-label armor-toggle-label-party">파티</span>
+                <div class="armor-toggle-thumb"></div>
+              </div>
+            </div>
+
             <img id="characterImg" class="character-img" alt="캐릭터" />
             <div id="characterGhost" class="character-ghost">클릭하여 캐릭터 선택</div>
           </div>
@@ -6219,15 +6308,15 @@
         <!-- ===== 1번 세트 ===== -->
         <section class="synergy-set-box">
           <div class="synergy-set-head">
-  <div class="synergy-set-head-left">
-    <input id="synergyEnabled1" class="synergy-enable-check" type="checkbox" />
-    <div class="opt-title">시너지 1</div>
-  </div>
+            <div class="synergy-set-head-left">
+              <input id="synergyEnabled1" class="synergy-enable-check" type="checkbox" />
+              <div class="opt-title">시너지 1</div>
+            </div>
 
-  <button id="btnSynergyReset1" class="synergy-reset-btn" type="button">
-    초기화
-  </button>
-</div>
+            <button id="btnSynergyReset1" class="synergy-reset-btn" type="button">
+              초기화
+            </button>
+          </div>
 
           <!-- 윗줄: 캐릭터 + 드롭다운들 -->
           <div class="synergy-top-row">
@@ -6244,203 +6333,203 @@
             </section>
 
             <section class="opt-box synergy-extra-box">
-  <div class="synergy-select-grid">
-    <label class="synergy-field">
-      <div class="muted" style="margin-bottom:4px;">착용아바타</div>
-      <select id="synergyAvatar1" class="input synergy-select">
-        <option value="없음">없음</option>
-        <option value="레어" selected>레어</option>
-        <option value="상급">상급</option>
-      </select>
-    </label>
+              <div class="synergy-select-grid">
+                <label class="synergy-field">
+                  <div class="muted" style="margin-bottom:4px;">착용아바타</div>
+                  <select id="synergyAvatar1" class="input synergy-select">
+                    <option value="없음">없음</option>
+                    <option value="레어" selected>레어</option>
+                    <option value="상급">상급</option>
+                  </select>
+                </label>
 
-    <label class="synergy-field">
-      <div class="muted" style="margin-bottom:4px;">칭호설정</div>
-      <select id="synergyTitle1" class="input synergy-select">
-        <option value="없음">없음</option>
-        <option value="일반">일반</option>
-        <option value="종결" selected>종결</option>
-      </select>
-    </label>
+                <label class="synergy-field">
+                  <div class="muted" style="margin-bottom:4px;">칭호설정</div>
+                  <select id="synergyTitle1" class="input synergy-select">
+                    <option value="없음">없음</option>
+                    <option value="일반">일반</option>
+                    <option value="종결" selected>종결</option>
+                  </select>
+                </label>
 
-    <label class="synergy-field synergy-field-full">
-      <div class="muted" style="margin-bottom:4px;">마을지능</div>
-      <select id="synergyDetail1" class="input synergy-select">
-        <option value="6000">6,000</option>
-        <option value="6500">6,500</option>
-        <option value="7000">7,000</option>
-        <option value="7500">7,500</option>
-        <option value="8000" selected>8,000</option>
-        <option value="8500">8,500</option>
-        <option value="9000">9,000</option>
-      </select>
-    </label>
-  </div>
-</section>
+                <label class="synergy-field synergy-field-full">
+                  <div class="muted" style="margin-bottom:4px;">마을지능</div>
+                  <select id="synergyDetail1" class="input synergy-select">
+                    <option value="6000">6,000</option>
+                    <option value="6500">6,500</option>
+                    <option value="7000">7,000</option>
+                    <option value="7500">7,500</option>
+                    <option value="8000" selected>8,000</option>
+                    <option value="8500">8,500</option>
+                    <option value="9000">9,000</option>
+                  </select>
+                </label>
+              </div>
+            </section>
           </div>
 
           <!-- 아랫줄: 방어구 / 악세 / 특수 -->
           <div class="synergy-bottom-row">
-  <section class="opt-box synergy-weapon-box">
-    <button id="btnSynergyPickWeapon" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-      무기 선택
-    </button>
+            <section class="opt-box synergy-weapon-box">
+              <button id="btnSynergyPickWeapon" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+                무기 선택
+              </button>
 
-    <div id="synergyPickedWeaponWrap" class="synergy-picked-weapon-wrap" style="display:none;">
-      <div class="synergy-picked-weapon-item">
-        <img id="synergyPickedWeaponImg" class="icon" alt="선택 무기">
-      </div>
-    </div>
+              <div id="synergyPickedWeaponWrap" class="synergy-picked-weapon-wrap" style="display:none;">
+                <div class="synergy-picked-weapon-item">
+                  <img id="synergyPickedWeaponImg" class="icon" alt="선택 무기">
+                </div>
+              </div>
 
-    <div id="synergyPickedWeapon" class="muted synergy-picked-text" style="display:none;"></div>
-  </section>
+              <div id="synergyPickedWeapon" class="muted synergy-picked-text" style="display:none;"></div>
+            </section>
 
-  <section class="opt-box synergy-equip-box">
-    <button id="btnSynergyPickArmorSet" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-      방어구셋 선택
-    </button>
+            <section class="opt-box synergy-equip-box">
+              <button id="btnSynergyPickArmorSet" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+                방어구셋 선택
+              </button>
 
-    <div id="synergyPickedArmorSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
-    <div id="synergyPickedArmorSet" class="muted synergy-picked-text" style="display:none;"></div>
-  </section>
+              <div id="synergyPickedArmorSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
+              <div id="synergyPickedArmorSet" class="muted synergy-picked-text" style="display:none;"></div>
+            </section>
 
-  <section class="opt-box synergy-equip-box">
-    <button id="btnSynergyPickAccSet" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-      악세사리셋 선택
-    </button>
+            <section class="opt-box synergy-equip-box">
+              <button id="btnSynergyPickAccSet" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+                악세사리셋 선택
+              </button>
 
-    <div id="synergyPickedAccSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
-    <div id="synergyPickedAccSet" class="muted synergy-picked-text" style="display:none;"></div>
-  </section>
+              <div id="synergyPickedAccSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
+              <div id="synergyPickedAccSet" class="muted synergy-picked-text" style="display:none;"></div>
+            </section>
 
-  <section class="opt-box synergy-equip-box">
-    <button id="btnSynergyPickSpecSet" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-      특수장비셋 선택
-    </button>
+            <section class="opt-box synergy-equip-box">
+              <button id="btnSynergyPickSpecSet" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+                특수장비셋 선택
+              </button>
 
-    <div id="synergyPickedSpecSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
-    <div id="synergyPickedSpecSet" class="muted synergy-picked-text" style="display:none;"></div>
-  </section>
-</div>
+              <div id="synergyPickedSpecSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
+              <div id="synergyPickedSpecSet" class="muted synergy-picked-text" style="display:none;"></div>
+            </section>
+          </div>
         </section>
 
         <!-- ===== 2번 세트 ===== -->
         <section class="synergy-set-box">
           <div class="synergy-set-head">
-  <div class="synergy-set-head-left">
-    <input id="synergyEnabled2" class="synergy-enable-check" type="checkbox" />
-    <div class="opt-title">시너지 2</div>
-  </div>
+            <div class="synergy-set-head-left">
+              <input id="synergyEnabled2" class="synergy-enable-check" type="checkbox" />
+              <div class="opt-title">시너지 2</div>
+            </div>
 
-  <button id="btnSynergyReset2" class="synergy-reset-btn" type="button">
-    초기화
-  </button>
-</div>
+            <button id="btnSynergyReset2" class="synergy-reset-btn" type="button">
+              초기화
+            </button>
+          </div>
 
           <!-- 윗줄: 캐릭터 + 드롭다운들 -->
           <div class="synergy-top-row">
             <section class="opt-box synergy-char-box">
-  <button id="btnSynergyPickChar2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-    캐릭터 선택
-  </button>
+              <button id="btnSynergyPickChar2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+                캐릭터 선택
+              </button>
 
-  <div id="synergyPickedCharWrap2" class="synergy-picked-char-wrap" style="display:none;">
-    <img id="synergyPickedCharImg2" class="synergy-picked-char-img" alt="선택 캐릭터">
-  </div>
+              <div id="synergyPickedCharWrap2" class="synergy-picked-char-wrap" style="display:none;">
+                <img id="synergyPickedCharImg2" class="synergy-picked-char-img" alt="선택 캐릭터">
+              </div>
 
-  <div id="synergyPickedChar2" class="muted synergy-picked-text" style="display:none;"></div>
-</section>
+              <div id="synergyPickedChar2" class="muted synergy-picked-text" style="display:none;"></div>
+            </section>
 
             <section class="opt-box synergy-extra-box">
-  <div class="synergy-select-grid">
-    <label class="synergy-field">
-      <div class="muted" style="margin-bottom:4px;">착용아바타</div>
-      <select id="synergyAvatar2" class="input synergy-select">
-        <option value="없음">없음</option>
-        <option value="레어" selected>레어</option>
-        <option value="상급">상급</option>
-      </select>
-    </label>
+              <div class="synergy-select-grid">
+                <label class="synergy-field">
+                  <div class="muted" style="margin-bottom:4px;">착용아바타</div>
+                  <select id="synergyAvatar2" class="input synergy-select">
+                    <option value="없음">없음</option>
+                    <option value="레어" selected>레어</option>
+                    <option value="상급">상급</option>
+                  </select>
+                </label>
 
-    <label class="synergy-field">
-      <div class="muted" style="margin-bottom:4px;">칭호설정</div>
-      <select id="synergyTitle2" class="input synergy-select">
-        <option value="없음">없음</option>
-        <option value="일반">일반</option>
-        <option value="종결" selected>종결</option>
-      </select>
-    </label>
+                <label class="synergy-field">
+                  <div class="muted" style="margin-bottom:4px;">칭호설정</div>
+                  <select id="synergyTitle2" class="input synergy-select">
+                    <option value="없음">없음</option>
+                    <option value="일반">일반</option>
+                    <option value="종결" selected>종결</option>
+                  </select>
+                </label>
 
-    <label class="synergy-field synergy-field-full">
-      <div class="muted" style="margin-bottom:4px;">마을지능</div>
-      <select id="synergyDetail2" class="input synergy-select">
-        <option value="6000">6,000</option>
-        <option value="6500">6,500</option>
-        <option value="7000">7,000</option>
-        <option value="7500">7,500</option>
-        <option value="8000" selected>8,000</option>
-        <option value="8500">8,500</option>
-        <option value="9000">9,000</option>
-      </select>
-    </label>
-  </div>
-</section>
+                <label class="synergy-field synergy-field-full">
+                  <div class="muted" style="margin-bottom:4px;">마을지능</div>
+                  <select id="synergyDetail2" class="input synergy-select">
+                    <option value="6000">6,000</option>
+                    <option value="6500">6,500</option>
+                    <option value="7000">7,000</option>
+                    <option value="7500">7,500</option>
+                    <option value="8000" selected>8,000</option>
+                    <option value="8500">8,500</option>
+                    <option value="9000">9,000</option>
+                  </select>
+                </label>
+              </div>
+            </section>
           </div>
 
           <!-- 아랫줄: 방어구 / 악세 / 특수 -->
           <div class="synergy-bottom-row">
-  <section class="opt-box synergy-weapon-box">
-    <button id="btnSynergyPickWeapon2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-      무기 선택
-    </button>
+            <section class="opt-box synergy-weapon-box">
+              <button id="btnSynergyPickWeapon2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+                무기 선택
+              </button>
 
-    <div id="synergyPickedWeaponWrap2" class="synergy-picked-weapon-wrap" style="display:none;">
-      <div class="synergy-picked-weapon-item">
-        <img id="synergyPickedWeaponImg2" class="icon" alt="선택 무기">
-      </div>
-    </div>
+              <div id="synergyPickedWeaponWrap2" class="synergy-picked-weapon-wrap" style="display:none;">
+                <div class="synergy-picked-weapon-item">
+                  <img id="synergyPickedWeaponImg2" class="icon" alt="선택 무기">
+                </div>
+              </div>
 
-    <div id="synergyPickedWeapon2" class="muted synergy-picked-text" style="display:none;"></div>
-  </section>
+              <div id="synergyPickedWeapon2" class="muted synergy-picked-text" style="display:none;"></div>
+            </section>
 
-  <section class="opt-box synergy-equip-box">
-    <button id="btnSynergyPickArmorSet2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-      방어구셋 선택
-    </button>
+            <section class="opt-box synergy-equip-box">
+              <button id="btnSynergyPickArmorSet2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+                방어구셋 선택
+              </button>
 
-    <div id="synergyPickedArmorSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
-    <div id="synergyPickedArmorSet2" class="muted synergy-picked-text" style="display:none;"></div>
-  </section>
+              <div id="synergyPickedArmorSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
+              <div id="synergyPickedArmorSet2" class="muted synergy-picked-text" style="display:none;"></div>
+            </section>
 
-  <section class="opt-box synergy-equip-box">
-    <button id="btnSynergyPickAccSet2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-      악세사리셋 선택
-    </button>
+            <section class="opt-box synergy-equip-box">
+              <button id="btnSynergyPickAccSet2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+                악세사리셋 선택
+              </button>
 
-    <div id="synergyPickedAccSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
-    <div id="synergyPickedAccSet2" class="muted synergy-picked-text" style="display:none;"></div>
-  </section>
+              <div id="synergyPickedAccSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
+              <div id="synergyPickedAccSet2" class="muted synergy-picked-text" style="display:none;"></div>
+            </section>
 
-  <section class="opt-box synergy-equip-box">
-    <button id="btnSynergyPickSpecSet2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-      특수장비셋 선택
-    </button>
+            <section class="opt-box synergy-equip-box">
+              <button id="btnSynergyPickSpecSet2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
+                특수장비셋 선택
+              </button>
 
-    <div id="synergyPickedSpecSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
-    <div id="synergyPickedSpecSet2" class="muted synergy-picked-text" style="display:none;"></div>
-  </section>
-</div>
+              <div id="synergyPickedSpecSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
+              <div id="synergyPickedSpecSet2" class="muted synergy-picked-text" style="display:none;"></div>
+            </section>
+          </div>
         </section>
-<div class="synergy-calc-footer">
-  <button id="btnSynergyCompute" class="btnetc synergy-compute-btn" type="button" data-compute-btn>
-    시너지효과 포함 계산하기
-  </button>
+        <div class="synergy-calc-footer">
+          <button id="btnSynergyCompute" class="btnetc synergy-compute-btn" type="button" data-compute-btn>
+            시너지효과 포함 계산하기
+          </button>
 
-  <div class="synergy-final-box">
-    <div class="muted" style="font-size:12px; margin-bottom:4px;">최종데미지</div>
-    <div id="synergyFinalDamageValue" class="synergy-final-value">-</div>
-  </div>
-</div>
+          <div class="synergy-final-box">
+            <div class="muted" style="font-size:12px; margin-bottom:4px;">최종데미지</div>
+            <div id="synergyFinalDamageValue" class="synergy-final-value">-</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -6716,103 +6805,103 @@
         <div id="runeGrid" class="rune-grid"></div>
 
         <!-- 특수 스킬룬 -->
-<div class="special-runes">
-  <div class="special-runes-title">특수 스킬룬</div>
+        <div class="special-runes">
+          <div class="special-runes-title">특수 스킬룬</div>
 
-  <div class="special-runes-grid">
-    <!-- 1열 : 쿨감 / 스증 -->
-    <div class="special-runes-col special-runes-col-left">
-      <div class="special-rune-row">
-  <img src="/img/etc/skillrune/쿨감.png" alt="쿨감룬" class="special-rune-icon">
-  <label for="specialRune_cooldown">쿨감룬</label>
-  <select id="specialRune_cooldown" class="rune-select">
-    <option value="0">0</option>
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-    <option value="6">6</option>
-    <option value="7">7</option>
-    <option value="8">8</option>
-    <option value="9">9</option>
-    <option value="10">10</option>
-    <option value="11">11</option>
-    <option value="12">12</option>
-    <option value="13">13</option>
-    <option value="14">14</option>
-    <option value="15">15</option>
-    <option value="16">16</option>
-    <option value="17">17</option>
-    <option value="18">18</option>
-    <option value="19">19</option>
-    <option value="20">20</option>
-  </select>
-</div>
+          <div class="special-runes-grid">
+            <!-- 1열 : 쿨감 / 스증 -->
+            <div class="special-runes-col special-runes-col-left">
+              <div class="special-rune-row">
+                <img src="/img/etc/skillrune/쿨감.png" alt="쿨감룬" class="special-rune-icon">
+                <label for="specialRune_cooldown">쿨감룬</label>
+                <select id="specialRune_cooldown" class="rune-select">
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                  <option value="11">11</option>
+                  <option value="12">12</option>
+                  <option value="13">13</option>
+                  <option value="14">14</option>
+                  <option value="15">15</option>
+                  <option value="16">16</option>
+                  <option value="17">17</option>
+                  <option value="18">18</option>
+                  <option value="19">19</option>
+                  <option value="20">20</option>
+                </select>
+              </div>
 
-      <div class="special-rune-row">
-  <img src="/img/etc/skillrune/스증.png" alt="스증룬" class="special-rune-icon">
-  <label for="specialRune_skillDmg">스증룬</label>
-  <select id="specialRune_skillDmg" class="rune-select">
-    <option value="0">0</option>
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-    <option value="6">6</option>
-    <option value="7">7</option>
-    <option value="8">8</option>
-    <option value="9">9</option>
-    <option value="10">10</option>
-    <option value="11">11</option>
-    <option value="12">12</option>
-    <option value="13">13</option>
-    <option value="14">14</option>
-    <option value="15">15</option>
-    <option value="16">16</option>
-    <option value="17">17</option>
-    <option value="18">18</option>
-    <option value="19">19</option>
-    <option value="20">20</option>
-  </select>
-</div>
-    </div>
+              <div class="special-rune-row">
+                <img src="/img/etc/skillrune/스증.png" alt="스증룬" class="special-rune-icon">
+                <label for="specialRune_skillDmg">스증룬</label>
+                <select id="specialRune_skillDmg" class="rune-select">
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                  <option value="11">11</option>
+                  <option value="12">12</option>
+                  <option value="13">13</option>
+                  <option value="14">14</option>
+                  <option value="15">15</option>
+                  <option value="16">16</option>
+                  <option value="17">17</option>
+                  <option value="18">18</option>
+                  <option value="19">19</option>
+                  <option value="20">20</option>
+                </select>
+              </div>
+            </div>
 
-    <!-- 2열 : 가호 / 지혜 / 왜곡 -->
-    <div class="special-runes-col">
-      <div class="special-rune-row">
-        <img src="/img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
-        <label for="specialRune_gaho">가호</label>
-        <select id="specialRune_gaho" class="rune-select">
-          <option value="0">0</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-        </select>
-      </div>
+            <!-- 2열 : 가호 / 지혜 / 왜곡 -->
+            <div class="special-runes-col">
+              <div class="special-rune-row">
+                <img src="/img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
+                <label for="specialRune_gaho">가호</label>
+                <select id="specialRune_gaho" class="rune-select">
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                </select>
+              </div>
 
-      <div class="special-rune-row">
-        <img src="/img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
-        <label for="specialRune_jihe">지혜</label>
-        <select id="specialRune_jihe" class="rune-select">
-          <option value="0">0</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-        </select>
-      </div>
+              <div class="special-rune-row">
+                <img src="/img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
+                <label for="specialRune_jihe">지혜</label>
+                <select id="specialRune_jihe" class="rune-select">
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                </select>
+              </div>
 
-      <div class="special-rune-row">
-        <img src="/img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
-        <label for="specialRune_waegok">왜곡</label>
-        <select id="specialRune_waegok" class="rune-select">
-          <option value="0">0</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-        </select>
-      </div>
-    </div>
-  </div>
-</div>
+              <div class="special-rune-row">
+                <img src="/img/etc/skillrune/왜가지.png" alt="왜가지" class="special-rune-icon">
+                <label for="specialRune_waegok">왜곡</label>
+                <select id="specialRune_waegok" class="rune-select">
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal-foot">
         <button id="runeCommit" class="ui-btnetc">설정 하기</button>
@@ -7242,17 +7331,17 @@
 
 
   <!-- PC 계산기 로딩 후 안내 공지 모달 -->
-<div id="noticeModal" class="modal" aria-hidden="true">
-  <div class="backdrop" data-close></div>
-  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="noticeModalTitle"
-    style="width:min(740px,95vw);height:min(810px,87vh);max-height:min(810px,87vh);display:flex;flex-direction:column;">
-    <header>
-      <div style="width:32px;"></div>
-      <h2 id="noticeModalTitle">안내사항</h2>
-      <button type="button" class="btn" data-close>닫기</button>
-    </header>
+  <div id="noticeModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-close></div>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="noticeModalTitle"
+      style="width:min(740px,95vw);height:min(810px,87vh);max-height:min(810px,87vh);display:flex;flex-direction:column;">
+      <header>
+        <div style="width:32px;"></div>
+        <h2 id="noticeModalTitle">안내사항</h2>
+        <button type="button" class="btn" data-close>닫기</button>
+      </header>
 
-    <div class="patch-log-body" style="flex:1;min-height:0;overflow-y:auto;">
+      <div class="patch-log-body" style="flex:1;min-height:0;overflow-y:auto;">
         <ul class="patch-log-list notice-list">
           <li></li>
           <li>
@@ -7337,15 +7426,24 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
-          <li>26.04.04 [모바일] <span style="color: yellow;">결의: 허영 속 어둠의 피조물 세트</span><span style="color: #ff4444;"> 조건부 모든 타입 피해 증가 미적용 버그</span> 수정</li>
-          <li>26.04.03 <span style="color: yellow;">윈드시어</span><span style="color: #ff4444;"> '초초초초파파빨'</span> 삭제, <span style="color: #ff4444;">'초초초초빨'</span> 추가</li>
-          <li>26.04.03 <span style="color: yellow;">버서커</span><span style="color: #ff4444;"> '블러드 임팩트' 미사용 버그</span> 수정</li>
-          <li>26.04.02 [모바일] <span style="color: yellow;">블레이드</span><span style="color: #ff4444;"> 와플 콤보 설정</span> 추가</li>
-          <li>26.04.01 <span style="color: yellow;">스트라이커 본 크러셔</span> <span style="color: #ff4444;">TP 버그</span> 수정 </li>
-          <li>26.03.30 <span style="color: yellow;">장비 오브젝트 데미지 </span><span style="color: #ff4444;">수치 개선</span> 적용 </li>
-          <li>26.03.27 <span style="color: yellow;">260326</span><span style="color: #ff4444;"> 캐릭터 밸런스 패치</span> 적용 </li>
-          <li>26.03.26 <span style="color: yellow;">쿨감룬/스증룬,</span><span style="color: #ff4444;"> 신규 오칭크아, 마부</span> 추가</li>
-          <li>26.03.21 [PC] <span style="color: yellow;">블레이드</span><span style="color: #ff4444;"> 와플 콤보 설정</span> 추가</li>
+          <li>26.04.04 [모바일] <span style="color: yellow;">결의: 허영 속 어둠의 피조물 세트</span><span style="color: #ff4444;"> 조건부
+              모든 타입 피해 증가 미적용 버그</span> 수정</li>
+          <li>26.04.03 <span style="color: yellow;">윈드시어</span><span style="color: #ff4444;"> '초초초초파파빨'</span> 삭제, <span
+              style="color: #ff4444;">'초초초초빨'</span> 추가</li>
+          <li>26.04.03 <span style="color: yellow;">버서커</span><span style="color: #ff4444;"> '블러드 임팩트' 미사용 버그</span> 수정
+          </li>
+          <li>26.04.02 [모바일] <span style="color: yellow;">블레이드</span><span style="color: #ff4444;"> 와플 콤보 설정</span> 추가
+          </li>
+          <li>26.04.01 <span style="color: yellow;">스트라이커 본 크러셔</span> <span style="color: #ff4444;">TP 버그</span> 수정
+          </li>
+          <li>26.03.30 <span style="color: yellow;">장비 오브젝트 데미지 </span><span style="color: #ff4444;">수치 개선</span> 적용
+          </li>
+          <li>26.03.27 <span style="color: yellow;">260326</span><span style="color: #ff4444;"> 캐릭터 밸런스 패치</span> 적용
+          </li>
+          <li>26.03.26 <span style="color: yellow;">쿨감룬/스증룬,</span><span style="color: #ff4444;"> 신규 오칭크아, 마부</span> 추가
+          </li>
+          <li>26.03.21 [PC] <span style="color: yellow;">블레이드</span><span style="color: #ff4444;"> 와플 콤보 설정</span> 추가
+          </li>
           <li>26.03.09 [모바일] <span style="color: yellow;">최종 데미지 계산값</span><span style="color: #ff4444;"> 단순 비교
               기능</span> 추가</li>
           <li>26.03.08 <span style="color: yellow;">접두사 장비</span><span style="color: #ff4444;"> 배지 아이콘</span> 추가</li>
@@ -7894,70 +7992,70 @@
     //악세
     //
 
-        //악세
+    //악세
     //
 
     // ✅ special / research 권한은 프론트 이메일 배열이 아니라
-//    login_ping 응답값으로만 판정한다.
-function getCurrentUserEmailNorm_() {
-  const emailRaw =
-    (window.CORE && CORE.userEmail) ? CORE.userEmail
-      : (typeof getCurrentUserEmail === 'function' ? getCurrentUserEmail() : '');
+    //    login_ping 응답값으로만 판정한다.
+    function getCurrentUserEmailNorm_() {
+      const emailRaw =
+        (window.CORE && CORE.userEmail) ? CORE.userEmail
+          : (typeof getCurrentUserEmail === 'function' ? getCurrentUserEmail() : '');
 
-  return String(emailRaw || '').trim().toLowerCase();
-}
+      return String(emailRaw || '').trim().toLowerCase();
+    }
 
-function isSpecialUserNow_() {
-  const lp = window.__loginPingResult || {};
-  return !!lp.specialUser;
-}
+    function isSpecialUserNow_() {
+      const lp = window.__loginPingResult || {};
+      return !!lp.specialUser;
+    }
 
-function isResearchUserNow_() {
-  const lp = window.__loginPingResult || {};
-  return !!lp.researchUser;
-}
+    function isResearchUserNow_() {
+      const lp = window.__loginPingResult || {};
+      return !!lp.researchUser;
+    }
 
-function updateSpecialUserButton() {
-  const isSpecialUser = isSpecialUserNow_();
-  const isResearchUser = isResearchUserNow_();
+    function updateSpecialUserButton() {
+      const isSpecialUser = isSpecialUserNow_();
+      const isResearchUser = isResearchUserNow_();
 
-  // research_user는 special_user의 모든 권한 포함
-  window.__IS_SPECIAL_USER__ = (isSpecialUser || isResearchUser);
-  window.__IS_RESEARCH_USER__ = isResearchUser;
+      // research_user는 special_user의 모든 권한 포함
+      window.__IS_SPECIAL_USER__ = (isSpecialUser || isResearchUser);
+      window.__IS_RESEARCH_USER__ = isResearchUser;
 
-  const hasSpecialLike = !!window.__IS_SPECIAL_USER__;
+      const hasSpecialLike = !!window.__IS_SPECIAL_USER__;
 
-  // ✅ [전체 공개] 상단 4개 버튼은 항상 노출
-  const publicBtnIds = ['btnSpecialPatch', 'btnSpecialAcc', 'btnSpecialSpec', 'btnUniqueBulk'];
-  for (const id of publicBtnIds) {
-    const el = document.getElementById(id);
-    if (!el) continue;
-    el.style.display = 'inline-flex';
-    el.disabled = false;
-  }
+      // ✅ [전체 공개] 상단 4개 버튼은 항상 노출
+      const publicBtnIds = ['btnSpecialPatch', 'btnSpecialAcc', 'btnSpecialSpec', 'btnUniqueBulk'];
+      for (const id of publicBtnIds) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        el.style.display = 'inline-flex';
+        el.disabled = false;
+      }
 
-  // ✅ [특정 유저 전용 유지] 아래 버튼들은 special_user / research_user 공통 허용
-  const btnSynergy = document.getElementById('btnSynergyEffect');
-  const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
-  const rowDmgOpt = document.getElementById('specialDamageOptRow');
-  const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
-  const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
-  const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
-  const rowUnique = document.getElementById('uniqueOnOffRow');
+      // ✅ [특정 유저 전용 유지] 아래 버튼들은 special_user / research_user 공통 허용
+      const btnSynergy = document.getElementById('btnSynergyEffect');
+      const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
+      const rowDmgOpt = document.getElementById('specialDamageOptRow');
+      const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
+      const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
+      const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
+      const rowUnique = document.getElementById('uniqueOnOffRow');
 
-  if (btnSynergy) btnSynergy.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-  if (btnSkillDamage) btnSkillDamage.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-  // ✅ 크리100/투함포 체크박스는 전체 공개
-  if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
-  if (btnAutoSet) btnAutoSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-  if (btnAutoSetMissing) btnAutoSetMissing.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-  if (btnAutoWeapon) btnAutoWeapon.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-  if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
-}
+      if (btnSynergy) btnSynergy.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (btnSkillDamage) btnSkillDamage.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      // ✅ 크리100/투함포 체크박스는 전체 공개
+      if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
+      if (btnAutoSet) btnAutoSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (btnAutoSetMissing) btnAutoSetMissing.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (btnAutoWeapon) btnAutoWeapon.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
+    }
 
 
 
-        // (원하면 콘솔에서 직접 호출할 수 있게 전역에 노출)
+    // (원하면 콘솔에서 직접 호출할 수 있게 전역에 노출)
     window.updateSpecialUserButton = updateSpecialUserButton;
 
     // ✅ research_user: 캐릭터 선택 즉시 SP 스킬을 전부 최대레벨로 채움 (TP 제외)
@@ -8030,23 +8128,23 @@ function updateSpecialUserButton() {
     window.state = state;
 
     state.synergy = state.synergy || {
-  enabled1: false,
-  enabled2: false,
+      enabled1: false,
+      enabled2: false,
 
-  char: null,
-  char2: null,
+      char: null,
+      char2: null,
 
-  weapon: null,
-  weapon2: null,
+      weapon: null,
+      weapon2: null,
 
-  armorSet: null,
-  accSet: null,
-  specSet: null,
+      armorSet: null,
+      accSet: null,
+      specSet: null,
 
-  armorSet2: null,
-  accSet2: null,
-  specSet2: null,
-};
+      armorSet2: null,
+      accSet2: null,
+      specSet2: null,
+    };
 
     state.ui = state.ui || {};
     state.ui.synergySetPickTarget = null; // 'armor1' | 'acc1' | 'spec1' | 'armor2' | 'acc2' | 'spec2' | null
@@ -8132,13 +8230,13 @@ function updateSpecialUserButton() {
       level: null,
     };
     // 특수 스킬룬 값
-state.specialRunes = state.specialRunes || {
-  cooldown: 0,   // 쿨감룬
-  skillDmg: 0,   // 스증룬
-  gaho: 0,
-  jihe: 0,
-  waegok: 0,
-};
+    state.specialRunes = state.specialRunes || {
+      cooldown: 0,   // 쿨감룬
+      skillDmg: 0,   // 스증룬
+      gaho: 0,
+      jihe: 0,
+      waegok: 0,
+    };
 
     let __progressPct = 0;
 
@@ -8460,6 +8558,7 @@ state.specialRunes = state.specialRunes || {
     const $btnUniqueApply = document.getElementById('btnUniqueApply');
     const $btnUniqueBulk = document.getElementById('btnUniqueBulk');
     const $uniqueOnOffToggle = document.getElementById('uniqueOnOffToggle');
+    const $soloPartyToggle = document.getElementById('soloPartyToggle');
 
     function updateUniqueEffectDescriptions() {
       if (!$uniqueEffectModal) return;
@@ -8779,6 +8878,7 @@ state.specialRunes = state.specialRunes || {
     //   - 지금은 모양만 바꾸고, 나중에 이 값 보고 필터링에 활용 가능
     let armorSetMode = 'exceed'; // 'exceed' = 익시드, 'epic' = 에픽
     let uniqueToggleMode = 'off'; // 'off' | 'on' : 고유효과 ON/OFF 토글 상태
+    let soloPartyMode = 'party'; // 'solo' | 'party'
 
     function updateArmorToggleUI() {
       // 방어구 토글
@@ -8815,7 +8915,7 @@ state.specialRunes = state.specialRunes || {
       }
     }
 
-    // ✅ 고유효과 ON/OFF 토글 UI 반영
+        // ✅ 고유효과 ON/OFF 토글 UI 반영
     function updateUniqueOnOffUI() {
       if (!$uniqueOnOffToggle) return;
 
@@ -8825,6 +8925,19 @@ state.specialRunes = state.specialRunes || {
       } else {
         $uniqueOnOffToggle.classList.add('mode-off');
         $uniqueOnOffToggle.classList.remove('mode-on');
+      }
+    }
+
+    // ✅ 솔플/파티 토글 UI 반영
+    function updateSoloPartyUI() {
+      if (!$soloPartyToggle) return;
+
+      if (soloPartyMode === 'party') {
+        $soloPartyToggle.classList.add('mode-party');
+        $soloPartyToggle.classList.remove('mode-solo');
+      } else {
+        $soloPartyToggle.classList.add('mode-solo');
+        $soloPartyToggle.classList.remove('mode-party');
       }
     }
 
@@ -8878,7 +8991,7 @@ state.specialRunes = state.specialRunes || {
       });
     }
 
-    if ($uniqueOnOffToggle) {
+       if ($uniqueOnOffToggle) {
       const toggleUnique = () => {
         uniqueToggleMode = (uniqueToggleMode === 'on') ? 'off' : 'on';
 
@@ -8903,11 +9016,47 @@ state.specialRunes = state.specialRunes || {
       });
     }
 
+            if ($soloPartyToggle) {
+      const toggleSoloParty = () => {
+        soloPartyMode = (soloPartyMode === 'solo') ? 'party' : 'solo';
 
+        if (!window.state) window.state = {};
+        window.state.soloPartyMode = soloPartyMode;
+        window.state.isPartyMode = (soloPartyMode === 'party');
+
+        updateSoloPartyUI();
+      };
+
+      // ✅ 카드 클릭으로 버블링되는 것 차단
+      $soloPartyToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSoloParty();
+      });
+
+      // ✅ 마우스 누르는 순간도 부모 카드로 안 번지게 차단
+      $soloPartyToggle.addEventListener('mousedown', (e) => {
+        e.stopPropagation();
+      });
+
+      $soloPartyToggle.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleSoloParty();
+        }
+      });
+    }
+
+    // ✅ 솔플/파티 초기 상태를 state에도 동기화
+    if (!window.state) window.state = {};
+    window.state.soloPartyMode = soloPartyMode;
+    window.state.isPartyMode = (soloPartyMode === 'party');
 
     // 초기 상태 반영
     updateArmorToggleUI();
     updateUniqueOnOffUI();
+    updateSoloPartyUI();
 
 
     // ✅ 방어구 세트 모달 렌더링 (실제 시트 데이터 사용)
@@ -10084,164 +10233,164 @@ state.specialRunes = state.specialRunes || {
       };
 
       const clampSkill = (s, v) => Math.max(s.minLv ?? 0, Math.min(s.maxLv ?? 0, Number(v) || 0));
-const clampTp = v => Math.max(TP_MIN, Math.min(TP_MAX, Number(v) || 0));
+      const clampTp = v => Math.max(TP_MIN, Math.min(TP_MAX, Number(v) || 0));
 
-// ✅ PC에서 바뀐 skillLv / skillTpLv 를 모바일 호환 skillTrees에도 즉시 반영
-const syncSkillTreesFromLvMaps_pc = () => {
-  try {
-    let ownerKey2 = '';
+      // ✅ PC에서 바뀐 skillLv / skillTpLv 를 모바일 호환 skillTrees에도 즉시 반영
+      const syncSkillTreesFromLvMaps_pc = () => {
+        try {
+          let ownerKey2 = '';
 
-    if (state.currentCharacter) {
-      const jg = String(state.currentCharacter.jobGroupLabel || state.currentCharacter.jobGroup || '').trim();
-      const nm = String(state.currentCharacter.name || '').trim();
-      if (jg || nm) ownerKey2 = (jg + nm).replace(/\s+/g, '');
-    }
-    if (!ownerKey2) {
-      ownerKey2 = String(state?.CurrentSumStats?.ownerKey || state?.ownerKey || '').trim().replace(/\s+/g, '');
-    }
-    if (!ownerKey2) return;
+          if (state.currentCharacter) {
+            const jg = String(state.currentCharacter.jobGroupLabel || state.currentCharacter.jobGroup || '').trim();
+            const nm = String(state.currentCharacter.name || '').trim();
+            if (jg || nm) ownerKey2 = (jg + nm).replace(/\s+/g, '');
+          }
+          if (!ownerKey2) {
+            ownerKey2 = String(state?.CurrentSumStats?.ownerKey || state?.ownerKey || '').trim().replace(/\s+/g, '');
+          }
+          if (!ownerKey2) return;
 
-    state.skillTrees = state.skillTrees || {};
-    state.skillTrees[ownerKey2] = state.skillTrees[ownerKey2] || {};
-    const store = state.skillTrees[ownerKey2];
+          state.skillTrees = state.skillTrees || {};
+          state.skillTrees[ownerKey2] = state.skillTrees[ownerKey2] || {};
+          const store = state.skillTrees[ownerKey2];
 
-    const rows = Array.isArray(ST2?.rows) ? ST2.rows : [];
-    if (!rows.length) return;
+          const rows = Array.isArray(ST2?.rows) ? ST2.rows : [];
+          if (!rows.length) return;
 
-    const normKey = (v) => String(v ?? '').trim().replace(/\s+/g, '').normalize('NFC');
+          const normKey = (v) => String(v ?? '').trim().replace(/\s+/g, '').normalize('NFC');
 
-    for (const r of rows) {
-      if (!r || !r.id) continue;
+          for (const r of rows) {
+            if (!r || !r.id) continue;
 
-      const skillName = String(r.name || '').trim();
-      if (!skillName) continue;
+            const skillName = String(r.name || '').trim();
+            if (!skillName) continue;
 
-      const lv = Number(state.skillLv?.[r.id] || 0) || 0;
-      const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
-      const minLv = Number(r.minLv ?? 0) || 0;
+            const lv = Number(state.skillLv?.[r.id] || 0) || 0;
+            const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
+            const minLv = Number(r.minLv ?? 0) || 0;
 
-      // ✅ 모바일 저장 형식과 맞추기
-      //    기본 minLv만 있는 스킬도 store에는 남겨두면 다음 렌더에서 안정적이다.
-      if (lv > 0 || tp > 0 || minLv > 0) {
-        const prev = store[skillName] || {};
-        store[skillName] = {
-          ...prev,
-          spLv: Math.max(minLv, lv),
-          tpLv: tp
-        };
-      } else {
-        delete store[skillName];
-      }
-    }
+            // ✅ 모바일 저장 형식과 맞추기
+            //    기본 minLv만 있는 스킬도 store에는 남겨두면 다음 렌더에서 안정적이다.
+            if (lv > 0 || tp > 0 || minLv > 0) {
+              const prev = store[skillName] || {};
+              store[skillName] = {
+                ...prev,
+                spLv: Math.max(minLv, lv),
+                tpLv: tp
+              };
+            } else {
+              delete store[skillName];
+            }
+          }
 
-    // ✅ 이번 캐릭터는 이미 PC값 기준으로 동기화 완료 표시
-    state._skillTreesConvertedFor = ownerKey2;
-  } catch (e) {
-    console.warn('[skill sync] PC skillLv/skillTpLv → skillTrees 동기화 실패:', e);
-  }
-};
+          // ✅ 이번 캐릭터는 이미 PC값 기준으로 동기화 완료 표시
+          state._skillTreesConvertedFor = ownerKey2;
+        } catch (e) {
+          console.warn('[skill sync] PC skillLv/skillTpLv → skillTrees 동기화 실패:', e);
+        }
+      };
 
-const getSkill = s => {
-  if (state.skillLv[s.id] === undefined) state.skillLv[s.id] = clampSkill(s, s.minLv ?? 0);
-  return clampSkill(s, state.skillLv[s.id]);
-};
-const setSkill = (s, v) => {
-  const target = clampSkill(s, v);
-  const cur = getSkill(s);
-  const delta = target - cur;
-  const perSp = Number(s.sp || 0);
-  if (delta > 0) {
-    // ★ 팔콘 4종 상호배제: 이미 다른 팔콘이 찍혀 있으면 증가 차단
-    if (isFalconGroupedSkill(s)) {
-      const other = pickedOtherFalconExcept(s);
-      if (other) {
-        alert(`
+      const getSkill = s => {
+        if (state.skillLv[s.id] === undefined) state.skillLv[s.id] = clampSkill(s, s.minLv ?? 0);
+        return clampSkill(s, state.skillLv[s.id]);
+      };
+      const setSkill = (s, v) => {
+        const target = clampSkill(s, v);
+        const cur = getSkill(s);
+        const delta = target - cur;
+        const perSp = Number(s.sp || 0);
+        if (delta > 0) {
+          // ★ 팔콘 4종 상호배제: 이미 다른 팔콘이 찍혀 있으면 증가 차단
+          if (isFalconGroupedSkill(s)) {
+            const other = pickedOtherFalconExcept(s);
+            if (other) {
+              alert(`
   팔콘 계열은 동시에 둘 이상 찍을 수 없습니다.\n
   [인서트 : 팔콘], [G-SP 팔콘(코로나 폼)], \n
   [G-SP 팔콘(롤링 썬더 폼)], [G-SP 팔콘(랩터 폼)] \n
   중에 사용하실 하나의 스킬만 선택해서 올려주세요.\n\n
   현재 [${other.name}]이(가) 선택되어 있습니다.`);
-        return;
-      }
-    }
+              return;
+            }
+          }
 
-    // ★ G-2 롤링썬더 ↔ G-3 랩터 상호배제: 이미 다른 쪽에 SP/TP가 투자되어 있으면 증가 차단
-    if (isRollingRaptorGroupedSkill(s)) {
-      const other = pickedOtherRollingRaptorExcept(s);
-      if (other) {
-        alert(`G-2 롤링썬더와 G-3 랩터는 동시에 사용할 수 없습니다.\n\n현재 [${other.name}]에 SP 또는 TP가 투자되어 있습니다.`);
-        return;
-      }
-    }
+          // ★ G-2 롤링썬더 ↔ G-3 랩터 상호배제: 이미 다른 쪽에 SP/TP가 투자되어 있으면 증가 차단
+          if (isRollingRaptorGroupedSkill(s)) {
+            const other = pickedOtherRollingRaptorExcept(s);
+            if (other) {
+              alert(`G-2 롤링썬더와 G-3 랩터는 동시에 사용할 수 없습니다.\n\n현재 [${other.name}]에 SP 또는 TP가 투자되어 있습니다.`);
+              return;
+            }
+          }
 
-    const need = perSp * delta;
-    if (!canSpendSp(need)) return;
-    state.skillLv[s.id] = target;
-    syncSkillTreesFromLvMaps_pc();   // ✅ 추가
-    spendSp(need);
-  } else if (delta < 0) {
-    state.skillLv[s.id] = target;
-    syncSkillTreesFromLvMaps_pc();   // ✅ 추가
-    refundSp(perSp * (-delta));
-  } else {
-    state.skillLv[s.id] = target;
-    syncSkillTreesFromLvMaps_pc();   // ✅ 추가
-    //onSkillTreeChanged();
-  }
-  // ★ 메카닉(여) 전용: G 마그네틱 ↔ 싱크로 : 코로나 SP 연동
-  if (isMagneticCoronaLinkedSkill(s)) {
-    syncMagneticCoronaSpFrom(s);
-    syncSkillTreesFromLvMaps_pc();   // ✅ 연동 후 한번 더 보정
-  }
-};
+          const need = perSp * delta;
+          if (!canSpendSp(need)) return;
+          state.skillLv[s.id] = target;
+          syncSkillTreesFromLvMaps_pc();   // ✅ 추가
+          spendSp(need);
+        } else if (delta < 0) {
+          state.skillLv[s.id] = target;
+          syncSkillTreesFromLvMaps_pc();   // ✅ 추가
+          refundSp(perSp * (-delta));
+        } else {
+          state.skillLv[s.id] = target;
+          syncSkillTreesFromLvMaps_pc();   // ✅ 추가
+          //onSkillTreeChanged();
+        }
+        // ★ 메카닉(여) 전용: G 마그네틱 ↔ 싱크로 : 코로나 SP 연동
+        if (isMagneticCoronaLinkedSkill(s)) {
+          syncMagneticCoronaSpFrom(s);
+          syncSkillTreesFromLvMaps_pc();   // ✅ 연동 후 한번 더 보정
+        }
+      };
       const getTp = s => {
         if (state.skillTpLv[s.id] === undefined) state.skillTpLv[s.id] = TP_MIN;
         return clampTp(state.skillTpLv[s.id]);
       };
       const setTp = (s, v) => {
-  const unit = Number(s.tpCost || 0);
-  if (!(unit > 0)) return;
-  const target = clampTp(v);
-  const cur = getTp(s);
-  if (target > cur) {
-    // ★ 팔콘 4종 상호배제: SP 미습득 상태에서 다른 팔콘이 이미 찍혀 있으면 TP 증가 차단
-    if (isFalconGroupedSkill(s)) {
-      const baseLv = Number(state.skillLv?.[s.id] ?? 0) || 0;
-      const other = pickedOtherFalconExcept(s);
-      if (baseLv <= 0 && other) {
-        alert(`팔콘 계열은 동시에 둘 이상 사용할 수 없습니다.\n현재 [${other.name}]이(가) 선택되어 있습니다.`);
-        return;
-      }
-    }
+        const unit = Number(s.tpCost || 0);
+        if (!(unit > 0)) return;
+        const target = clampTp(v);
+        const cur = getTp(s);
+        if (target > cur) {
+          // ★ 팔콘 4종 상호배제: SP 미습득 상태에서 다른 팔콘이 이미 찍혀 있으면 TP 증가 차단
+          if (isFalconGroupedSkill(s)) {
+            const baseLv = Number(state.skillLv?.[s.id] ?? 0) || 0;
+            const other = pickedOtherFalconExcept(s);
+            if (baseLv <= 0 && other) {
+              alert(`팔콘 계열은 동시에 둘 이상 사용할 수 없습니다.\n현재 [${other.name}]이(가) 선택되어 있습니다.`);
+              return;
+            }
+          }
 
-    // ★ G-2 롤링썬더 ↔ G-3 랩터 상호배제: 다른 쪽에 SP/TP가 투자되어 있으면 TP 증가 차단
-    if (isRollingRaptorGroupedSkill(s)) {
-      const other = pickedOtherRollingRaptorExcept(s);
-      if (other) {
-        alert(`G-2 롤링썬더와 G-3 랩터는 동시에 사용할 수 없습니다.\n현재 [${other.name}]에 SP 또는 TP가 투자되어 있습니다.`);
-        return;
-      }
-    }
+          // ★ G-2 롤링썬더 ↔ G-3 랩터 상호배제: 다른 쪽에 SP/TP가 투자되어 있으면 TP 증가 차단
+          if (isRollingRaptorGroupedSkill(s)) {
+            const other = pickedOtherRollingRaptorExcept(s);
+            if (other) {
+              alert(`G-2 롤링썬더와 G-3 랩터는 동시에 사용할 수 없습니다.\n현재 [${other.name}]에 SP 또는 TP가 투자되어 있습니다.`);
+              return;
+            }
+          }
 
-    const need = (target - cur) * unit;
-    if (!canSpendTp(need)) return;
-    state.skillTpLv[s.id] = target;
-    syncSkillTreesFromLvMaps_pc();   // ✅ 추가
-    spendTp(need);
-  } else if (target < cur) {
-    state.skillTpLv[s.id] = target;
-    syncSkillTreesFromLvMaps_pc();   // ✅ 추가
-    refundTp((cur - target) * unit);
-  } else {
-    state.skillTpLv[s.id] = target;
-    syncSkillTreesFromLvMaps_pc();   // ✅ 추가
-  }
-  // ★ 메카닉(여) 전용: G 마그네틱 ↔ 싱크로 : 코로나 TP 연동
-  if (isMagneticCoronaLinkedSkill(s)) {
-    syncMagneticCoronaTpFrom(s);
-    syncSkillTreesFromLvMaps_pc();   // ✅ 연동 후 한번 더 보정
-  }
-};
+          const need = (target - cur) * unit;
+          if (!canSpendTp(need)) return;
+          state.skillTpLv[s.id] = target;
+          syncSkillTreesFromLvMaps_pc();   // ✅ 추가
+          spendTp(need);
+        } else if (target < cur) {
+          state.skillTpLv[s.id] = target;
+          syncSkillTreesFromLvMaps_pc();   // ✅ 추가
+          refundTp((cur - target) * unit);
+        } else {
+          state.skillTpLv[s.id] = target;
+          syncSkillTreesFromLvMaps_pc();   // ✅ 추가
+        }
+        // ★ 메카닉(여) 전용: G 마그네틱 ↔ 싱크로 : 코로나 TP 연동
+        if (isMagneticCoronaLinkedSkill(s)) {
+          syncMagneticCoronaTpFrom(s);
+          syncSkillTreesFromLvMaps_pc();   // ✅ 연동 후 한번 더 보정
+        }
+      };
 
       // ===== 메카닉(여) 전용: G-4 호넷 → G 풀 블룸 자동 연동 =====
       let hornetSkill = null;
@@ -10272,25 +10421,25 @@ const setSkill = (s, v) => {
       let boneCrusherSpanCur = null; // 본 크러셔 레벨 표시 span
 
       function syncBoneCrusherAutoFromLowKick() {
-  if (!lowKickSkill || !boneCrusherSkill) return;
+        if (!lowKickSkill || !boneCrusherSkill) return;
 
-  const curMap = state.skillLv || {};
-  const lowLv = Number(curMap[lowKickSkill.id] ?? 0) || 0;
+        const curMap = state.skillLv || {};
+        const lowLv = Number(curMap[lowKickSkill.id] ?? 0) || 0;
 
-  // 로킥 11 → 본 크러셔 1, 이후 1레벨당 +1
-  let autoLv = lowLv - 10;
-  if (autoLv < 0) autoLv = 0;
+        // 로킥 11 → 본 크러셔 1, 이후 1레벨당 +1
+        let autoLv = lowLv - 10;
+        if (autoLv < 0) autoLv = 0;
 
-  autoLv = clampSkill(boneCrusherSkill, autoLv);
-  state.skillLv[boneCrusherSkill.id] = autoLv;
+        autoLv = clampSkill(boneCrusherSkill, autoLv);
+        state.skillLv[boneCrusherSkill.id] = autoLv;
 
-  // ✅ 자동연동 스킬도 공용 저장 구조에 즉시 반영
-  syncSkillTreesFromLvMaps_pc();
+        // ✅ 자동연동 스킬도 공용 저장 구조에 즉시 반영
+        syncSkillTreesFromLvMaps_pc();
 
-  if (boneCrusherSpanCur) {
-    boneCrusherSpanCur.textContent = String(autoLv);
-  }
-}
+        if (boneCrusherSpanCur) {
+          boneCrusherSpanCur.textContent = String(autoLv);
+        }
+      }
 
       // ===== 메카닉(여) 전용: 팔콘 4종 상호배제 =====
       let falconInsertSkill = null;      // '인서트 : 팔콘'
@@ -11021,7 +11170,7 @@ const setSkill = (s, v) => {
         }
       }
 
-            // ✅ PC용 스킬 초기화 버튼 + 블레이드 전용 드롭다운 동적 생성
+      // ✅ PC용 스킬 초기화 버튼 + 블레이드 전용 드롭다운 동적 생성
       if (stModal) {
         let resetBtn = document.getElementById('btnSkillTreeReset');
         let bladePresetSel = document.getElementById('skillTreeBladePreset');
@@ -11054,7 +11203,7 @@ const setSkill = (s, v) => {
           `;
         }
 
-                // 현재 선택값 유지용
+        // 현재 선택값 유지용
         if (!window.state) window.state = {};
         if (!state.customSkills) state.customSkills = {};
 
@@ -11066,18 +11215,18 @@ const setSkill = (s, v) => {
         bladePresetSel.value = savedBladePreset;
 
         if (!bladePresetSel.dataset.bound) {
-  bladePresetSel.dataset.bound = '1';
-  bladePresetSel.addEventListener('change', (e) => {
-    const v = String(e.target.value || '24와플').trim() || '24와플';
+          bladePresetSel.dataset.bound = '1';
+          bladePresetSel.addEventListener('change', (e) => {
+            const v = String(e.target.value || '24와플').trim() || '24와플';
 
-    state.skillTreeBladePreset = v;
-    if (!state.customSkills) state.customSkills = {};
-    state.customSkills.bladeWildFlowerPreset = v;
+            state.skillTreeBladePreset = v;
+            if (!state.customSkills) state.customSkills = {};
+            state.customSkills.bladeWildFlowerPreset = v;
 
-    // ✅ 여기서는 값만 저장
-    // 실제 반영은 사용자가 "계산하기"를 눌렀을 때 calc_all/skill_uses 흐름에서 처리
-  });
-}
+            // ✅ 여기서는 값만 저장
+            // 실제 반영은 사용자가 "계산하기"를 눌렀을 때 calc_all/skill_uses 흐름에서 처리
+          });
+        }
 
         // 블레이드일 때만 표시, 아니면 숨김
         bladePresetSel.hidden = !isBlade;
@@ -11215,7 +11364,7 @@ const setSkill = (s, v) => {
           ownerKey = String(raw.ownerKey || '').trim();
         }
 
-               // ★ skill_state_set 호출 (이미 JSON 객체 반환)
+        // ★ skill_state_set 호출 (이미 JSON 객체 반환)
         const patchBefore = !!document.getElementById('chkUsePrePatchSkills')?.checked;
 
         const payload = { ownerKey, skills: arr, patchBefore };
@@ -11374,11 +11523,11 @@ const setSkill = (s, v) => {
       );
 
       // 2) 특수 스킬룬 합산
-const sr = state.specialRunes || {};
-['cooldown', 'skillDmg', 'gaho', 'jihe', 'waegok'].forEach(k => {
-  const v = Number(sr[k] || 0);
-  if (Number.isFinite(v)) sum += v;
-});
+      const sr = state.specialRunes || {};
+      ['cooldown', 'skillDmg', 'gaho', 'jihe', 'waegok'].forEach(k => {
+        const v = Number(sr[k] || 0);
+        if (Number.isFinite(v)) sum += v;
+      });
 
       return sum;
     }
@@ -16892,32 +17041,32 @@ const sr = state.specialRunes || {};
     const runeGridEl = document.getElementById('runeGrid');
 
     // 특수 룬 정의
-const specialRuneDefs = [
-  { key: 'cooldown', label: '쿨감룬' },
-  { key: 'skillDmg', label: '스증룬' },
-  { key: 'gaho', label: '가호' },
-  { key: 'jihe', label: '지혜' },
-  { key: 'waegok', label: '왜곡' },
-];
+    const specialRuneDefs = [
+      { key: 'cooldown', label: '쿨감룬' },
+      { key: 'skillDmg', label: '스증룬' },
+      { key: 'gaho', label: '가호' },
+      { key: 'jihe', label: '지혜' },
+      { key: 'waegok', label: '왜곡' },
+    ];
 
     function ensureSpecialRunesInitialized() {
-  if (!state.specialRunes) {
-    state.specialRunes = {
-      cooldown: 0,
-      skillDmg: 0,
-      gaho: 0,
-      jihe: 0,
-      waegok: 0
-    };
-  } else {
-    ['cooldown', 'skillDmg', 'gaho', 'jihe', 'waegok'].forEach(k => {
-      if (typeof state.specialRunes[k] !== 'number') {
-        const v = Number(state.specialRunes[k] || 0);
-        state.specialRunes[k] = Number.isFinite(v) ? v : 0;
+      if (!state.specialRunes) {
+        state.specialRunes = {
+          cooldown: 0,
+          skillDmg: 0,
+          gaho: 0,
+          jihe: 0,
+          waegok: 0
+        };
+      } else {
+        ['cooldown', 'skillDmg', 'gaho', 'jihe', 'waegok'].forEach(k => {
+          if (typeof state.specialRunes[k] !== 'number') {
+            const v = Number(state.specialRunes[k] || 0);
+            state.specialRunes[k] = Number.isFinite(v) ? v : 0;
+          }
+        });
       }
-    });
-  }
-}
+    }
 
     function bindSpecialRuneSelects() {
       ensureSpecialRunesInitialized();
@@ -19267,12 +19416,10 @@ const specialRuneDefs = [
       const snap = {};
 
       // 필요한 키들만 골라서 저장 (모자라면 여기 키를 더 추가해)
-      const keys = [
+            const keys = [
         'currentCharacter',
         'charRow',
-
-        // 장비/강화/마부/연마/엠블렘/룬/아바타/버프
-        'selections',
+        'equip',
         'enh',
         'enchants',
         'seals',
@@ -19301,7 +19448,11 @@ const specialRuneDefs = [
 
         // ★ 커스텀옵
         'customSkills',
-        'specialRunes',  // ← 이 줄 추가하면 프리셋에 특수룬도 같이 저장
+        'specialRunes',
+
+        // ✅ 솔플 / 파티
+        'soloPartyMode',
+        'isPartyMode',
 
         'synergy',
       ];
@@ -19316,7 +19467,7 @@ const specialRuneDefs = [
     }
 
     // 프리셋에서 불러온 state 스냅샷을 현재 state에 적용 + 슬롯 UI/캐릭터 UI 갱신
-    function applyFrontPresetState(snap) {
+        function applyFrontPresetState(snap) {
       if (!snap || typeof snap !== 'object') return;
 
       // 🔹 항상 window.state 기준으로만 처리
@@ -19344,24 +19495,36 @@ const specialRuneDefs = [
         target[k] = v;
       });
 
+      // ✅ 구형 프리셋 호환:
+      //    soloPartyMode / isPartyMode 가 없으면 기본은 'party'
+      target.soloPartyMode =
+        String(target.soloPartyMode || 'party').trim().toLowerCase() === 'solo'
+          ? 'solo'
+          : 'party';
+      target.isPartyMode = (target.soloPartyMode === 'party');
+
+      // ✅ 토글 UI가 참조하는 로컬 변수도 같이 동기화
+      soloPartyMode = target.soloPartyMode;
+      updateSoloPartyUI();
+
       target.synergy = target.synergy || {
-  enabled1: false,
-  enabled2: false,
+        enabled1: false,
+        enabled2: false,
 
-  char: null,
-  char2: null,
+        char: null,
+        char2: null,
 
-  weapon: null,
-  weapon2: null,
+        weapon: null,
+        weapon2: null,
 
-  armorSet: null,
-  accSet: null,
-  specSet: null,
+        armorSet: null,
+        accSet: null,
+        specSet: null,
 
-  armorSet2: null,
-  accSet2: null,
-  specSet2: null,
-};
+        armorSet2: null,
+        accSet2: null,
+        specSet2: null,
+      };
 
       // ✅ 모바일→PC 프리셋 호환: 엠블렘 스냅샷 정규화
       // - level_num: "10" → 10 (숫자)
@@ -20609,41 +20772,41 @@ const specialRuneDefs = [
 
     // 전역 1줄(파일 어딘가 상단): 최신 호출만 반영하기 위한 시퀀스
     window.__computeReqSeq = 0;
-function buildSynergyPayload() {
-  const sy = state.synergy || {};
+    function buildSynergyPayload() {
+      const sy = state.synergy || {};
 
-  const makeOne = (idx) => {
-    const suffix = idx === 1 ? '' : '2';
-    return {
-      enabled: !!sy[`enabled${idx}`],
-      char: sy[`char${suffix}`] || null,
-      weapon: sy[`weapon${suffix}`] || null,
-      armorSet: sy[`armorSet${suffix}`] || null,
-      accSet: sy[`accSet${suffix}`] || null,
-      specSet: sy[`specSet${suffix}`] || null,
-      avatar: String(document.getElementById(`synergyAvatar${idx}`)?.value || '').trim(),
-      title: String(document.getElementById(`synergyTitle${idx}`)?.value || '').trim(),
-      detail: String(document.getElementById(`synergyDetail${idx}`)?.value || '').trim(),
-    };
-  };
+      const makeOne = (idx) => {
+        const suffix = idx === 1 ? '' : '2';
+        return {
+          enabled: !!sy[`enabled${idx}`],
+          char: sy[`char${suffix}`] || null,
+          weapon: sy[`weapon${suffix}`] || null,
+          armorSet: sy[`armorSet${suffix}`] || null,
+          accSet: sy[`accSet${suffix}`] || null,
+          specSet: sy[`specSet${suffix}`] || null,
+          avatar: String(document.getElementById(`synergyAvatar${idx}`)?.value || '').trim(),
+          title: String(document.getElementById(`synergyTitle${idx}`)?.value || '').trim(),
+          detail: String(document.getElementById(`synergyDetail${idx}`)?.value || '').trim(),
+        };
+      };
 
-  const s1 = makeOne(1);
-  const s2 = makeOne(2);
+      const s1 = makeOne(1);
+      const s2 = makeOne(2);
 
-  console.log('[synergy payload built]', {
-  enabled1: !!s1.enabled,
-  enabled2: !!s2.enabled,
-  s1,
-  s2,
-});
+      console.log('[synergy payload built]', {
+        enabled1: !!s1.enabled,
+        enabled2: !!s2.enabled,
+        s1,
+        s2,
+      });
 
-  return {
-    enabled1: !!s1.enabled,
-    enabled2: !!s2.enabled,
-    s1,
-    s2,
-  };
-}
+      return {
+        enabled1: !!s1.enabled,
+        enabled2: !!s2.enabled,
+        s1,
+        s2,
+      };
+    }
     // ★ calc_all + compute 기반 최종 계산
     async function computeViaBackend(targetId, p /* 'phys' | 'mag' 생략 가능 */, opts = {}) {
       const box = document.getElementById(targetId);
@@ -20853,28 +21016,32 @@ function buildSynergyPayload() {
           payload.customSkills = customSkillsPayload;
         }
 
-        // ✅ 패치전 스킬/커스텀 시트 사용 여부
+                // ✅ 패치전 스킬/커스텀 시트 사용 여부
         payload.patchBefore = !!document.getElementById('chkUsePrePatchSkills')?.checked;
 
-        // ★ 특수 스킬룬 카운트 전송
-if (specialRunesPayload) {
-  const c = Number(specialRunesPayload.cooldown || 0) || 0;
-  const s = Number(specialRunesPayload.skillDmg || 0) || 0;
-  const g = Number(specialRunesPayload.gaho || 0) || 0;
-  const j = Number(specialRunesPayload.jihe || 0) || 0;
-  const w = Number(specialRunesPayload.waegok || 0) || 0;
+        // ✅ 솔플 / 파티 모드
+        payload.soloPartyMode = String(state?.soloPartyMode || 'solo');
+        payload.isPartyMode = (payload.soloPartyMode === 'party');
 
-  // 전부 0이면 굳이 안 보냄
-  if (c || s || g || j || w) {
-    payload.specialRunes = {
-      cooldown: c,
-      skillDmg: s,
-      gaho: g,
-      jihe: j,
-      waegok: w
-    };
-  }
-}
+        // ★ 특수 스킬룬 카운트 전송
+        if (specialRunesPayload) {
+          const c = Number(specialRunesPayload.cooldown || 0) || 0;
+          const s = Number(specialRunesPayload.skillDmg || 0) || 0;
+          const g = Number(specialRunesPayload.gaho || 0) || 0;
+          const j = Number(specialRunesPayload.jihe || 0) || 0;
+          const w = Number(specialRunesPayload.waegok || 0) || 0;
+
+          // 전부 0이면 굳이 안 보냄
+          if (c || s || g || j || w) {
+            payload.specialRunes = {
+              cooldown: c,
+              skillDmg: s,
+              gaho: g,
+              jihe: j,
+              waegok: w
+            };
+          }
+        }
         // ★ 성안의 봉인 선택 사항
         if (castleSealPayload) {
           payload.castleSeal = castleSealPayload;
@@ -20891,11 +21058,11 @@ if (specialRunesPayload) {
         }
         const useSynergy = !!opts.useSynergy;
 
-if (useSynergy) {
-  payload.synergy = buildSynergyPayload();
-  console.log('[computeViaBackend] useSynergy=', useSynergy);
-console.log('[computeViaBackend] payload.synergy=', payload.synergy);
-}
+        if (useSynergy) {
+          payload.synergy = buildSynergyPayload();
+          console.log('[computeViaBackend] useSynergy=', useSynergy);
+          console.log('[computeViaBackend] payload.synergy=', payload.synergy);
+        }
 
         // 3) calc_all: 캐릭터 + 장비를 세션에 반영
         async function callCalcAllOnce(token) {
@@ -21980,7 +22147,7 @@ console.log('[computeViaBackend] payload.synergy=', payload.synergy);
         '스매쉬'
 
       ]);
-            const hideSkillImageForResearch = !!window.__IS_RESEARCH_USER__;
+      const hideSkillImageForResearch = !!window.__IS_RESEARCH_USER__;
 
       // ===== 표 렌더링 (스킬만) =====
       tbody.innerHTML = mergedRows.map(r => {
@@ -22060,343 +22227,343 @@ console.log('[computeViaBackend] payload.synergy=', payload.synergy);
     }
 
     function bindSynergyReselect(targetEl, mode) {
-  if (!targetEl) return;
-  if (targetEl.__synergyReselectBound) return;
+      if (!targetEl) return;
+      if (targetEl.__synergyReselectBound) return;
 
-  targetEl.__synergyReselectBound = true;
-  targetEl.addEventListener('click', () => {
-    openSynergyPicker(mode);
-  });
-}
+      targetEl.__synergyReselectBound = true;
+      targetEl.addEventListener('click', () => {
+        openSynergyPicker(mode);
+      });
+    }
 
-function bindSynergyWeaponReselect(targetEl, mode) {
-  if (!targetEl) return;
-  if (targetEl.__synergyWeaponReselectBound) return;
+    function bindSynergyWeaponReselect(targetEl, mode) {
+      if (!targetEl) return;
+      if (targetEl.__synergyWeaponReselectBound) return;
 
-  targetEl.__synergyWeaponReselectBound = true;
-  targetEl.addEventListener('click', () => {
-    openSynergyPicker(mode);
-  });
-}
+      targetEl.__synergyWeaponReselectBound = true;
+      targetEl.addEventListener('click', () => {
+        openSynergyPicker(mode);
+      });
+    }
 
     function renderSynergyPickedSetPreview({
-  picked,
-  buttonId,
-  wrapId,
-  textId,
-  mode
-}) {
-  const btn = document.getElementById(buttonId);
-  const wrap = document.getElementById(wrapId);
-  const text = document.getElementById(textId);
+      picked,
+      buttonId,
+      wrapId,
+      textId,
+      mode
+    }) {
+      const btn = document.getElementById(buttonId);
+      const wrap = document.getElementById(wrapId);
+      const text = document.getElementById(textId);
 
-  const pieces = Array.isArray(picked?.pieces) ? picked.pieces : [];
-  const hasPieces = pieces.length > 0;
-  const pickedName = String(picked?.name || '').trim();
+      const pieces = Array.isArray(picked?.pieces) ? picked.pieces : [];
+      const hasPieces = pieces.length > 0;
+      const pickedName = String(picked?.name || '').trim();
 
-  if (!wrap || !text || !btn) return;
+      if (!wrap || !text || !btn) return;
 
-  if (hasPieces) {
-    wrap.innerHTML = '';
+      if (hasPieces) {
+        wrap.innerHTML = '';
 
-    pieces.forEach((piece) => {
-      const item = document.createElement('div');
-      item.className = 'synergy-picked-set-item';
-      item.title = piece?.slotLabel || piece?.name || '';
+        pieces.forEach((piece) => {
+          const item = document.createElement('div');
+          item.className = 'synergy-picked-set-item';
+          item.title = piece?.slotLabel || piece?.name || '';
 
-      const img = document.createElement('img');
-      img.className = 'icon';
-      img.src = piece?.img || PLACEHOLDER_IMG;
-      img.alt = piece?.slotLabel || piece?.name || '';
-      item.appendChild(img);
+          const img = document.createElement('img');
+          img.className = 'icon';
+          img.src = piece?.img || PLACEHOLDER_IMG;
+          img.alt = piece?.slotLabel || piece?.name || '';
+          item.appendChild(img);
 
-      const setBadgeSrc = getSetBadgeSrc(piece?.item || piece, piece?.slot || '');
-      if (setBadgeSrc) {
-        const badge = document.createElement('img');
-        badge.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
-        badge.src = setBadgeSrc;
-        badge.alt = '';
-        item.appendChild(badge);
+          const setBadgeSrc = getSetBadgeSrc(piece?.item || piece, piece?.slot || '');
+          if (setBadgeSrc) {
+            const badge = document.createElement('img');
+            badge.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
+            badge.src = setBadgeSrc;
+            badge.alt = '';
+            item.appendChild(badge);
+          }
+
+          wrap.appendChild(item);
+        });
+
+        wrap.style.display = 'flex';
+        btn.style.display = 'none';
+        text.textContent = '';
+        text.style.display = 'none';
+
+        bindSynergyReselect(wrap, mode);
+        return;
       }
 
-      wrap.appendChild(item);
-    });
+      wrap.innerHTML = '';
+      wrap.style.display = 'none';
+      btn.style.display = '';
+      text.textContent = '';
+      text.style.display = 'none';
+    }
 
-    wrap.style.display = 'flex';
-btn.style.display = 'none';
-text.textContent = '';
-text.style.display = 'none';
+    function renderSynergyPickedWeaponPreview({
+      picked,
+      buttonId,
+      wrapId,
+      imgId,
+      textId,
+      mode
+    }) {
+      const btn = document.getElementById(buttonId);
+      const wrap = document.getElementById(wrapId);
+      const img = document.getElementById(imgId);
+      const text = document.getElementById(textId);
 
-bindSynergyReselect(wrap, mode);
-return;
-  }
+      const hasImg = !!String(picked?.img || '').trim();
 
-  wrap.innerHTML = '';
-wrap.style.display = 'none';
-btn.style.display = '';
-text.textContent = '';
-text.style.display = 'none';
-}
+      if (!btn || !wrap || !img || !text) return;
 
-function renderSynergyPickedWeaponPreview({
-  picked,
-  buttonId,
-  wrapId,
-  imgId,
-  textId,
-  mode
-}) {
-  const btn = document.getElementById(buttonId);
-  const wrap = document.getElementById(wrapId);
-  const img = document.getElementById(imgId);
-  const text = document.getElementById(textId);
+      if (hasImg) {
+        img.src = String(picked.img || '');
+        img.alt = picked?.name || '선택 무기';
 
-  const hasImg = !!String(picked?.img || '').trim();
+        wrap.style.display = 'flex';
+        btn.style.display = 'none';
 
-  if (!btn || !wrap || !img || !text) return;
+        text.textContent = '';
+        text.style.display = 'none';
 
-  if (hasImg) {
-    img.src = String(picked.img || '');
-    img.alt = picked?.name || '선택 무기';
+        bindSynergyWeaponReselect(wrap, mode);
+        return;
+      }
 
-    wrap.style.display = 'flex';
-    btn.style.display = 'none';
+      img.removeAttribute('src');
+      img.alt = '선택 무기';
+      wrap.style.display = 'none';
+      btn.style.display = '';
 
-    text.textContent = '';
-    text.style.display = 'none';
+      text.textContent = '';
+      text.style.display = 'none';
+    }
 
-    bindSynergyWeaponReselect(wrap, mode);
-    return;
-  }
+    function renderSynergyPickedTexts() {
+      const pickedCharText = document.getElementById('synergyPickedChar');
+      const pickedCharWrap = document.getElementById('synergyPickedCharWrap');
+      const pickedCharImg = document.getElementById('synergyPickedCharImg');
+      const pickCharBtn = document.getElementById('btnSynergyPickChar');
 
-  img.removeAttribute('src');
-  img.alt = '선택 무기';
-  wrap.style.display = 'none';
-  btn.style.display = '';
+      const pickedCharText2 = document.getElementById('synergyPickedChar2');
+      const pickedCharWrap2 = document.getElementById('synergyPickedCharWrap2');
+      const pickedCharImg2 = document.getElementById('synergyPickedCharImg2');
+      const pickCharBtn2 = document.getElementById('btnSynergyPickChar2');
 
-  text.textContent = '';
-  text.style.display = 'none';
-}
+      const charImg = String(state.synergy?.char?.img || '').trim();
+      const charImg2 = String(state.synergy?.char2?.img || '').trim();
 
-function renderSynergyPickedTexts() {
-  const pickedCharText = document.getElementById('synergyPickedChar');
-  const pickedCharWrap = document.getElementById('synergyPickedCharWrap');
-  const pickedCharImg = document.getElementById('synergyPickedCharImg');
-  const pickCharBtn = document.getElementById('btnSynergyPickChar');
+      // ===== 시너지 1 캐릭터 =====
+      if (charImg) {
+        if (pickedCharImg) pickedCharImg.src = charImg;
+        if (pickedCharImg) pickedCharImg.alt = state.synergy?.char?.name || '선택 캐릭터';
+        if (pickedCharWrap) pickedCharWrap.style.display = 'flex';
+        if (pickCharBtn) pickCharBtn.style.display = 'none';
+        if (pickedCharText) {
+          pickedCharText.textContent = '';
+          pickedCharText.style.display = 'none';
+        }
+        bindSynergyReselect(pickedCharWrap, 'char');
+      } else {
+        if (pickedCharWrap) pickedCharWrap.style.display = 'none';
+        if (pickCharBtn) pickCharBtn.style.display = '';
+        if (pickedCharText) {
+          pickedCharText.textContent = '';
+          pickedCharText.style.display = 'none';
+        }
+      }
 
-  const pickedCharText2 = document.getElementById('synergyPickedChar2');
-  const pickedCharWrap2 = document.getElementById('synergyPickedCharWrap2');
-  const pickedCharImg2 = document.getElementById('synergyPickedCharImg2');
-  const pickCharBtn2 = document.getElementById('btnSynergyPickChar2');
+      // ===== 시너지 2 캐릭터 =====
+      if (charImg2) {
+        if (pickedCharImg2) pickedCharImg2.src = charImg2;
+        if (pickedCharImg2) pickedCharImg2.alt = state.synergy?.char2?.name || '선택 캐릭터';
+        if (pickedCharWrap2) pickedCharWrap2.style.display = 'flex';
+        if (pickCharBtn2) pickCharBtn2.style.display = 'none';
+        if (pickedCharText2) {
+          pickedCharText2.textContent = '';
+          pickedCharText2.style.display = 'none';
+        }
+        bindSynergyReselect(pickedCharWrap2, 'char2');
+      } else {
+        if (pickedCharWrap2) pickedCharWrap2.style.display = 'none';
+        if (pickCharBtn2) pickCharBtn2.style.display = '';
+        if (pickedCharText2) {
+          pickedCharText2.textContent = '';
+          pickedCharText2.style.display = 'none';
+        }
+      }
 
-  const charImg = String(state.synergy?.char?.img || '').trim();
-  const charImg2 = String(state.synergy?.char2?.img || '').trim();
+      renderSynergyPickedSetPreview({
+        picked: state.synergy?.armorSet,
+        buttonId: 'btnSynergyPickArmorSet',
+        wrapId: 'synergyPickedArmorSetWrap',
+        textId: 'synergyPickedArmorSet',
+        mode: 'armor'
+      });
 
-  // ===== 시너지 1 캐릭터 =====
-  if (charImg) {
-  if (pickedCharImg) pickedCharImg.src = charImg;
-  if (pickedCharImg) pickedCharImg.alt = state.synergy?.char?.name || '선택 캐릭터';
-  if (pickedCharWrap) pickedCharWrap.style.display = 'flex';
-  if (pickCharBtn) pickCharBtn.style.display = 'none';
-  if (pickedCharText) {
-    pickedCharText.textContent = '';
-    pickedCharText.style.display = 'none';
-  }
-  bindSynergyReselect(pickedCharWrap, 'char');
-} else {
-  if (pickedCharWrap) pickedCharWrap.style.display = 'none';
-  if (pickCharBtn) pickCharBtn.style.display = '';
-  if (pickedCharText) {
-    pickedCharText.textContent = '';
-    pickedCharText.style.display = 'none';
-  }
-}
+      renderSynergyPickedSetPreview({
+        picked: state.synergy?.accSet,
+        buttonId: 'btnSynergyPickAccSet',
+        wrapId: 'synergyPickedAccSetWrap',
+        textId: 'synergyPickedAccSet',
+        mode: 'acc'
+      });
 
-  // ===== 시너지 2 캐릭터 =====
-  if (charImg2) {
-  if (pickedCharImg2) pickedCharImg2.src = charImg2;
-  if (pickedCharImg2) pickedCharImg2.alt = state.synergy?.char2?.name || '선택 캐릭터';
-  if (pickedCharWrap2) pickedCharWrap2.style.display = 'flex';
-  if (pickCharBtn2) pickCharBtn2.style.display = 'none';
-  if (pickedCharText2) {
-    pickedCharText2.textContent = '';
-    pickedCharText2.style.display = 'none';
-  }
-  bindSynergyReselect(pickedCharWrap2, 'char2');
-} else {
-  if (pickedCharWrap2) pickedCharWrap2.style.display = 'none';
-  if (pickCharBtn2) pickCharBtn2.style.display = '';
-  if (pickedCharText2) {
-    pickedCharText2.textContent = '';
-    pickedCharText2.style.display = 'none';
-  }
-}
+      renderSynergyPickedSetPreview({
+        picked: state.synergy?.specSet,
+        buttonId: 'btnSynergyPickSpecSet',
+        wrapId: 'synergyPickedSpecSetWrap',
+        textId: 'synergyPickedSpecSet',
+        mode: 'spec'
+      });
 
-  renderSynergyPickedSetPreview({
-    picked: state.synergy?.armorSet,
-    buttonId: 'btnSynergyPickArmorSet',
-    wrapId: 'synergyPickedArmorSetWrap',
-    textId: 'synergyPickedArmorSet',
-    mode: 'armor'
-  });
+      renderSynergyPickedSetPreview({
+        picked: state.synergy?.armorSet2,
+        buttonId: 'btnSynergyPickArmorSet2',
+        wrapId: 'synergyPickedArmorSetWrap2',
+        textId: 'synergyPickedArmorSet2',
+        mode: 'armor2'
+      });
 
-  renderSynergyPickedSetPreview({
-    picked: state.synergy?.accSet,
-    buttonId: 'btnSynergyPickAccSet',
-    wrapId: 'synergyPickedAccSetWrap',
-    textId: 'synergyPickedAccSet',
-    mode: 'acc'
-  });
+      renderSynergyPickedSetPreview({
+        picked: state.synergy?.accSet2,
+        buttonId: 'btnSynergyPickAccSet2',
+        wrapId: 'synergyPickedAccSetWrap2',
+        textId: 'synergyPickedAccSet2',
+        mode: 'acc2'
+      });
 
-  renderSynergyPickedSetPreview({
-    picked: state.synergy?.specSet,
-    buttonId: 'btnSynergyPickSpecSet',
-    wrapId: 'synergyPickedSpecSetWrap',
-    textId: 'synergyPickedSpecSet',
-    mode: 'spec'
-  });
+      renderSynergyPickedSetPreview({
+        picked: state.synergy?.specSet2,
+        buttonId: 'btnSynergyPickSpecSet2',
+        wrapId: 'synergyPickedSpecSetWrap2',
+        textId: 'synergyPickedSpecSet2',
+        mode: 'spec2'
+      });
 
-  renderSynergyPickedSetPreview({
-    picked: state.synergy?.armorSet2,
-    buttonId: 'btnSynergyPickArmorSet2',
-    wrapId: 'synergyPickedArmorSetWrap2',
-    textId: 'synergyPickedArmorSet2',
-    mode: 'armor2'
-  });
+      renderSynergyPickedWeaponPreview({
+        picked: state.synergy?.weapon,
+        buttonId: 'btnSynergyPickWeapon',
+        wrapId: 'synergyPickedWeaponWrap',
+        imgId: 'synergyPickedWeaponImg',
+        textId: 'synergyPickedWeapon',
+        mode: 'weapon'
+      });
 
-  renderSynergyPickedSetPreview({
-    picked: state.synergy?.accSet2,
-    buttonId: 'btnSynergyPickAccSet2',
-    wrapId: 'synergyPickedAccSetWrap2',
-    textId: 'synergyPickedAccSet2',
-    mode: 'acc2'
-  });
+      renderSynergyPickedWeaponPreview({
+        picked: state.synergy?.weapon2,
+        buttonId: 'btnSynergyPickWeapon2',
+        wrapId: 'synergyPickedWeaponWrap2',
+        imgId: 'synergyPickedWeaponImg2',
+        textId: 'synergyPickedWeapon2',
+        mode: 'weapon2'
+      });
+    }
 
-  renderSynergyPickedSetPreview({
-    picked: state.synergy?.specSet2,
-    buttonId: 'btnSynergyPickSpecSet2',
-    wrapId: 'synergyPickedSpecSetWrap2',
-    textId: 'synergyPickedSpecSet2',
-    mode: 'spec2'
-  });
+    function resetSynergy1Selections() {
+      state.synergy = state.synergy || {};
 
-    renderSynergyPickedWeaponPreview({
-    picked: state.synergy?.weapon,
-    buttonId: 'btnSynergyPickWeapon',
-    wrapId: 'synergyPickedWeaponWrap',
-    imgId: 'synergyPickedWeaponImg',
-    textId: 'synergyPickedWeapon',
-    mode: 'weapon'
-  });
+      state.synergy.char = null;
+      state.synergy.weapon = null;
+      state.synergy.armorSet = null;
+      state.synergy.accSet = null;
+      state.synergy.specSet = null;
 
-  renderSynergyPickedWeaponPreview({
-    picked: state.synergy?.weapon2,
-    buttonId: 'btnSynergyPickWeapon2',
-    wrapId: 'synergyPickedWeaponWrap2',
-    imgId: 'synergyPickedWeaponImg2',
-    textId: 'synergyPickedWeapon2',
-    mode: 'weapon2'
-  });
-}
+      const avatarEl = document.getElementById('synergyAvatar1');
+      const titleEl = document.getElementById('synergyTitle1');
+      const detailEl = document.getElementById('synergyDetail1');
 
-function resetSynergy1Selections() {
-  state.synergy = state.synergy || {};
+      if (avatarEl) avatarEl.value = '레어';
+      if (titleEl) titleEl.value = '종결';
+      if (detailEl) detailEl.value = '8000';
 
-  state.synergy.char = null;
-  state.synergy.weapon = null;
-  state.synergy.armorSet = null;
-  state.synergy.accSet = null;
-  state.synergy.specSet = null;
+      renderSynergyPickedTexts();
+    }
 
-  const avatarEl = document.getElementById('synergyAvatar1');
-  const titleEl = document.getElementById('synergyTitle1');
-  const detailEl = document.getElementById('synergyDetail1');
+    function resetSynergy2Selections() {
+      state.synergy = state.synergy || {};
 
-  if (avatarEl) avatarEl.value = '레어';
-  if (titleEl) titleEl.value = '종결';
-  if (detailEl) detailEl.value = '8000';
+      state.synergy.char2 = null;
+      state.synergy.weapon2 = null;
+      state.synergy.armorSet2 = null;
+      state.synergy.accSet2 = null;
+      state.synergy.specSet2 = null;
 
-  renderSynergyPickedTexts();
-}
+      const avatarEl = document.getElementById('synergyAvatar2');
+      const titleEl = document.getElementById('synergyTitle2');
+      const detailEl = document.getElementById('synergyDetail2');
 
-function resetSynergy2Selections() {
-  state.synergy = state.synergy || {};
+      if (avatarEl) avatarEl.value = '레어';
+      if (titleEl) titleEl.value = '종결';
+      if (detailEl) detailEl.value = '8000';
 
-  state.synergy.char2 = null;
-  state.synergy.weapon2 = null;
-  state.synergy.armorSet2 = null;
-  state.synergy.accSet2 = null;
-  state.synergy.specSet2 = null;
-
-  const avatarEl = document.getElementById('synergyAvatar2');
-  const titleEl = document.getElementById('synergyTitle2');
-  const detailEl = document.getElementById('synergyDetail2');
-
-  if (avatarEl) avatarEl.value = '레어';
-  if (titleEl) titleEl.value = '종결';
-  if (detailEl) detailEl.value = '8000';
-
-  renderSynergyPickedTexts();
-}
+      renderSynergyPickedTexts();
+    }
 
     function openSynergyEffectModal() {
-  bindSynergyModalCloseOnce();
+      bindSynergyModalCloseOnce();
 
-  const enabled1El = document.getElementById('synergyEnabled1');
-  if (enabled1El) {
-    enabled1El.checked = !!state.synergy?.enabled1;
-  }
+      const enabled1El = document.getElementById('synergyEnabled1');
+      if (enabled1El) {
+        enabled1El.checked = !!state.synergy?.enabled1;
+      }
 
-  const enabled2El = document.getElementById('synergyEnabled2');
-  if (enabled2El) {
-    enabled2El.checked = !!state.synergy?.enabled2;
-  }
+      const enabled2El = document.getElementById('synergyEnabled2');
+      if (enabled2El) {
+        enabled2El.checked = !!state.synergy?.enabled2;
+      }
 
-  renderSynergyPickedTexts();
-  showModal(document.getElementById('synergyEffectModal'), true);
-}
+      renderSynergyPickedTexts();
+      showModal(document.getElementById('synergyEffectModal'), true);
+    }
 
     function getSynergyWeaponJobGroup(mode) {
-  if (mode === 'weapon') {
-    return String(
-      state?.synergy?.char?.jobGroup ||
-      state?.synergy?.char?.jobGroupLabel ||
-      ''
-    ).trim();
-  }
+      if (mode === 'weapon') {
+        return String(
+          state?.synergy?.char?.jobGroup ||
+          state?.synergy?.char?.jobGroupLabel ||
+          ''
+        ).trim();
+      }
 
-  if (mode === 'weapon2') {
-    return String(
-      state?.synergy?.char2?.jobGroup ||
-      state?.synergy?.char2?.jobGroupLabel ||
-      ''
-    ).trim();
-  }
+      if (mode === 'weapon2') {
+        return String(
+          state?.synergy?.char2?.jobGroup ||
+          state?.synergy?.char2?.jobGroupLabel ||
+          ''
+        ).trim();
+      }
 
-  return '';
-}
+      return '';
+    }
 
-function getSynergyWeaponItems(mode) {
-  const job = getSynergyWeaponJobGroup(mode);
-  if (!job) return [];
+    function getSynergyWeaponItems(mode) {
+      const job = getSynergyWeaponJobGroup(mode);
+      if (!job) return [];
 
-  const AWT = (window.ALLOWED_WEAPON_TYPES || {});
-  const allowedSet = new Set(AWT[job] || AWT[_baseJG?.(job)] || []);
+      const AWT = (window.ALLOWED_WEAPON_TYPES || {});
+      const allowedSet = new Set(AWT[job] || AWT[_baseJG?.(job)] || []);
 
-  const all = Array.isArray(DBSynergy.sets) ? DBSynergy.sets.slice() : [];
+      const all = Array.isArray(DBSynergy.sets) ? DBSynergy.sets.slice() : [];
 
-  return all.filter(row => {
-    const category = String(row?.category || '').trim();
-    const rowJob = String(row?.jobGroup || '').trim();
-    const rowType = String(row?.type || '').trim();
+      return all.filter(row => {
+        const category = String(row?.category || '').trim();
+        const rowJob = String(row?.jobGroup || '').trim();
+        const rowType = String(row?.type || '').trim();
 
-    if (category !== '무기') return false;
-    if (rowJob && !jgMatches(rowJob, job)) return false;
-    if (allowedSet.size && rowType && !allowedSet.has(rowType)) return false;
+        if (category !== '무기') return false;
+        if (rowJob && !jgMatches(rowJob, job)) return false;
+        if (allowedSet.size && rowType && !allowedSet.has(rowType)) return false;
 
-    return true;
-  });
-}
+        return true;
+      });
+    }
 
     function _synergySetCategoryOf(row) {
       const cat = String(row?.category || '').trim();
@@ -22404,42 +22571,42 @@ function getSynergyWeaponItems(mode) {
     }
 
     function _synergyFilterSets(mode, list) {
-  if (mode === 'weapon' || mode === 'weapon2') {
-    return list.filter(r => _synergySetCategoryOf(r) === '무기');
-  }
-  if (mode === 'armor' || mode === 'armor2') {
-    return list.filter(r => _synergySetCategoryOf(r) === '방어구');
-  }
-  if (mode === 'acc' || mode === 'acc2') {
-    return list.filter(r => _synergySetCategoryOf(r) === '악세');
-  }
-  if (mode === 'spec' || mode === 'spec2') {
-    return list.filter(r => _synergySetCategoryOf(r) === '특수');
-  }
-  return list;
-}
+      if (mode === 'weapon' || mode === 'weapon2') {
+        return list.filter(r => _synergySetCategoryOf(r) === '무기');
+      }
+      if (mode === 'armor' || mode === 'armor2') {
+        return list.filter(r => _synergySetCategoryOf(r) === '방어구');
+      }
+      if (mode === 'acc' || mode === 'acc2') {
+        return list.filter(r => _synergySetCategoryOf(r) === '악세');
+      }
+      if (mode === 'spec' || mode === 'spec2') {
+        return list.filter(r => _synergySetCategoryOf(r) === '특수');
+      }
+      return list;
+    }
 
     async function renderSynergyPickerCards() {
-  const wrap = document.getElementById('synergyPickerList');
-  if (!wrap) return;
+      const wrap = document.getElementById('synergyPickerList');
+      if (!wrap) return;
 
-  let list = [];
+      let list = [];
 
-  if (DBSynergy.pickerMode === 'char' || DBSynergy.pickerMode === 'char2') {
-    list = Array.isArray(DBSynergy.chars) ? DBSynergy.chars.slice() : [];
-    list = list.filter(r => String(r?.enabled ?? true) !== 'false');
-    list = list.filter(r => String(r?.synergy || '').trim() === '시너지');
-  } else {
-    list = _synergyFilterSets(
-      DBSynergy.pickerMode,
-      Array.isArray(DBSynergy.sets) ? DBSynergy.sets.slice() : []
-    );
-  }
+      if (DBSynergy.pickerMode === 'char' || DBSynergy.pickerMode === 'char2') {
+        list = Array.isArray(DBSynergy.chars) ? DBSynergy.chars.slice() : [];
+        list = list.filter(r => String(r?.enabled ?? true) !== 'false');
+        list = list.filter(r => String(r?.synergy || '').trim() === '시너지');
+      } else {
+        list = _synergyFilterSets(
+          DBSynergy.pickerMode,
+          Array.isArray(DBSynergy.sets) ? DBSynergy.sets.slice() : []
+        );
+      }
 
-  // =========================
-  // 캐릭터 모드: 메인 캐릭터 선택 모달과 같은 구조
-  // =========================
-  if (DBSynergy.pickerMode === 'char' || DBSynergy.pickerMode === 'char2') {
+      // =========================
+      // 캐릭터 모드: 메인 캐릭터 선택 모달과 같은 구조
+      // =========================
+      if (DBSynergy.pickerMode === 'char' || DBSynergy.pickerMode === 'char2') {
         const groups = new Map();
 
         list.forEach(r => {
@@ -22485,125 +22652,125 @@ function getSynergyWeaponItems(mode) {
         wrap.innerHTML = html;
 
         wrap.querySelectorAll('[data-synergy-pick]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (btn.classList.contains('disabled')) return;
+          btn.addEventListener('click', () => {
+            if (btn.classList.contains('disabled')) return;
 
-    const picked = {
-      name: btn.dataset.name || '',
-      img: btn.dataset.img || '',
-      jobGroup: btn.dataset.jobgroup || '',
-      category: '캐릭터',
-    };
+            const picked = {
+              name: btn.dataset.name || '',
+              img: btn.dataset.img || '',
+              jobGroup: btn.dataset.jobgroup || '',
+              category: '캐릭터',
+            };
 
-state.synergy = state.synergy || {
-  enabled1: false,
-  enabled2: false,
-  char: null,
-  char2: null,
-  weapon: null,
-  weapon2: null,
-  armorSet: null,
-  accSet: null,
-  specSet: null,
-  armorSet2: null,
-  accSet2: null,
-  specSet2: null,
-};
-    if (DBSynergy.pickerMode === 'char') {
-      state.synergy.char = picked;
-    }
-    if (DBSynergy.pickerMode === 'char2') {
-      state.synergy.char2 = picked;
-    }
+            state.synergy = state.synergy || {
+              enabled1: false,
+              enabled2: false,
+              char: null,
+              char2: null,
+              weapon: null,
+              weapon2: null,
+              armorSet: null,
+              accSet: null,
+              specSet: null,
+              armorSet2: null,
+              accSet2: null,
+              specSet2: null,
+            };
+            if (DBSynergy.pickerMode === 'char') {
+              state.synergy.char = picked;
+            }
+            if (DBSynergy.pickerMode === 'char2') {
+              state.synergy.char2 = picked;
+            }
 
-    renderSynergyPickedTexts();
-    showModal(document.getElementById('synergyPickerModal'), false);
-  });
-});
+            renderSynergyPickedTexts();
+            showModal(document.getElementById('synergyPickerModal'), false);
+          });
+        });
 
         return;
       }
 
-         // =========================
-// 무기 모드
-// =========================
-if (DBSynergy.pickerMode === 'weapon' || DBSynergy.pickerMode === 'weapon2') {
-  wrap.innerHTML = '';
+      // =========================
+      // 무기 모드
+      // =========================
+      if (DBSynergy.pickerMode === 'weapon' || DBSynergy.pickerMode === 'weapon2') {
+        wrap.innerHTML = '';
 
-  const listBox = document.createElement('div');
-  listBox.className = 'items';
-  wrap.appendChild(listBox);
+        const listBox = document.createElement('div');
+        listBox.className = 'items';
+        wrap.appendChild(listBox);
 
-  const job = getSynergyWeaponJobGroup(DBSynergy.pickerMode);
-  const weaponList = getSynergyWeaponItems(DBSynergy.pickerMode);
+        const job = getSynergyWeaponJobGroup(DBSynergy.pickerMode);
+        const weaponList = getSynergyWeaponItems(DBSynergy.pickerMode);
 
-  if (!job) {
-    listBox.innerHTML = `
+        if (!job) {
+          listBox.innerHTML = `
       <div style="padding:16px; color:#c7b589; font-size:14px;">
         먼저 시너지 캐릭터를 선택해주세요.
       </div>
     `;
-    return;
-  }
+          return;
+        }
 
-  if (!weaponList.length) {
-    listBox.innerHTML = `
+        if (!weaponList.length) {
+          listBox.innerHTML = `
       <div style="padding:16px; color:#c7b589; font-size:14px;">
         표시할 수 있는 무기가 없습니다.
       </div>
     `;
-    return;
-  }
+          return;
+        }
 
-  const cards = weaponList.map(it => {
-    const name = String(it?.name || '').trim();
-    const img = String(
-      it?.image ||
-      it?.img ||
-      it?.pieces?.[0]?.image ||
-      it?.pieces?.[0]?.img ||
-      it?.item?.image ||
-      it?.item?.img ||
-      ''
-    ).trim();
+        const cards = weaponList.map(it => {
+          const name = String(it?.name || '').trim();
+          const img = String(
+            it?.image ||
+            it?.img ||
+            it?.pieces?.[0]?.image ||
+            it?.pieces?.[0]?.img ||
+            it?.item?.image ||
+            it?.item?.img ||
+            ''
+          ).trim();
 
-    const rowType = String(it?.type || '').trim();
-    const rowJob = String(it?.jobGroup || '').trim();
+          const rowType = String(it?.type || '').trim();
+          const rowJob = String(it?.jobGroup || '').trim();
 
-    const levelNum = Number(it?.level ?? it?._raw?.level ?? 65) || 65;
-    const badge = `Lv.${levelNum}`;
-    const lvlLabel = `${levelNum}레벨`;
+          const levelNum = Number(it?.level ?? it?._raw?.level ?? 65) || 65;
+          const badge = `Lv.${levelNum}`;
+          const lvlLabel = `${levelNum}레벨`;
 
-    const rawRarity = String(
-      (it?.rarity ?? '') ||
-      (it?._raw && (it._raw.rarity || it._raw['레어리티'] || it._raw['희귀도'] || it._raw['등급'])) ||
-      ''
-    ).trim();
+          const rawRarity = String(
+            (it?.rarity ?? '') ||
+            (it?._raw && (it._raw.rarity || it._raw['레어리티'] || it._raw['희귀도'] || it._raw['등급'])) ||
+            ''
+          ).trim();
 
-    let rarityLabel = rawRarity;
-    let rarityClass = '';
-    const lower = rarityLabel.toLowerCase();
+          let rarityLabel = rawRarity;
+          let rarityClass = '';
+          const lower = rarityLabel.toLowerCase();
 
-    if (!rarityLabel) {
-      rarityLabel = '에픽';
-      rarityClass = 'rarity-epic';
-    } else if (rarityLabel === '에픽' || lower === 'epic') {
-      rarityLabel = '에픽';
-      rarityClass = 'rarity-epic';
-    } else if (rarityLabel === '익시드' || lower === 'exceed') {
-      rarityLabel = '익시드';
-      rarityClass = 'rarity-exceed';
-    } else if (rarityLabel === '레어' || lower === 'rare') {
-      rarityLabel = '레어';
-      rarityClass = 'rarity-rare';
-    } else if (rarityLabel === '유니크' || lower === 'unique') {
-      rarityLabel = '유니크';
-      rarityClass = 'rarity-unique';
-    } else {
-      rarityClass = 'rarity-epic';
-    }
+          if (!rarityLabel) {
+            rarityLabel = '에픽';
+            rarityClass = 'rarity-epic';
+          } else if (rarityLabel === '에픽' || lower === 'epic') {
+            rarityLabel = '에픽';
+            rarityClass = 'rarity-epic';
+          } else if (rarityLabel === '익시드' || lower === 'exceed') {
+            rarityLabel = '익시드';
+            rarityClass = 'rarity-exceed';
+          } else if (rarityLabel === '레어' || lower === 'rare') {
+            rarityLabel = '레어';
+            rarityClass = 'rarity-rare';
+          } else if (rarityLabel === '유니크' || lower === 'unique') {
+            rarityLabel = '유니크';
+            rarityClass = 'rarity-unique';
+          } else {
+            rarityClass = 'rarity-epic';
+          }
 
-    return `
+          return `
       <button type="button"
               class="item-row"
               data-synergy-weapon-pick="1"
@@ -22627,38 +22794,38 @@ if (DBSynergy.pickerMode === 'weapon' || DBSynergy.pickerMode === 'weapon2') {
         </div>
       </button>
     `;
-  }).join('');
+        }).join('');
 
-  listBox.innerHTML = `<div class="item-list">${cards}</div>`;
+        listBox.innerHTML = `<div class="item-list">${cards}</div>`;
 
-  wrap.querySelectorAll('[data-synergy-weapon-pick]').forEach(card => {
-    card.addEventListener('click', () => {
-      const picked = {
-        name: card.dataset.name || '',
-        img: card.dataset.img || '',
-        type: card.dataset.type || '',
-        jobGroup: card.dataset.jobgroup || '',
-        category: '무기'
-      };
+        wrap.querySelectorAll('[data-synergy-weapon-pick]').forEach(card => {
+          card.addEventListener('click', () => {
+            const picked = {
+              name: card.dataset.name || '',
+              img: card.dataset.img || '',
+              type: card.dataset.type || '',
+              jobGroup: card.dataset.jobgroup || '',
+              category: '무기'
+            };
 
-      if (DBSynergy.pickerMode === 'weapon') {
-        state.synergy.weapon = picked;
+            if (DBSynergy.pickerMode === 'weapon') {
+              state.synergy.weapon = picked;
+            }
+            if (DBSynergy.pickerMode === 'weapon2') {
+              state.synergy.weapon2 = picked;
+            }
+
+            renderSynergyPickedTexts();
+            showModal(document.getElementById('synergyPickerModal'), false);
+          });
+        });
+
+        listBox.querySelectorAll('.icon').forEach(icon => {
+          icon.onerror = () => { icon.src = PLACEHOLDER_IMG; };
+        });
+
+        return;
       }
-      if (DBSynergy.pickerMode === 'weapon2') {
-        state.synergy.weapon2 = picked;
-      }
-
-      renderSynergyPickedTexts();
-      showModal(document.getElementById('synergyPickerModal'), false);
-    });
-  });
-
-  listBox.querySelectorAll('.icon').forEach(icon => {
-    icon.onerror = () => { icon.src = PLACEHOLDER_IMG; };
-  });
-
-  return;
-}
 
       // =========================
       // 세트 모드: synergyset:list만 사용
@@ -22830,66 +22997,66 @@ if (DBSynergy.pickerMode === 'weapon' || DBSynergy.pickerMode === 'weapon2') {
           const pieces = Array.isArray(set?.pieces) ? set.pieces : [];
 
           pieces.forEach((piece) => {
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'armor-set-item';
-  btn.title = piece?.slotLabel || piece?.name || '';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'armor-set-item';
+            btn.title = piece?.slotLabel || piece?.name || '';
 
-  const box = document.createElement('div');
-  box.className = 'iconbox';
+            const box = document.createElement('div');
+            box.className = 'iconbox';
 
-  const img = document.createElement('img');
-  img.className = 'icon';
-  img.src = piece?.img || PLACEHOLDER_IMG;
-  img.alt = piece?.slotLabel || piece?.name || '';
+            const img = document.createElement('img');
+            img.className = 'icon';
+            img.src = piece?.img || PLACEHOLDER_IMG;
+            img.alt = piece?.slotLabel || piece?.name || '';
 
-  const setBadgeSrc = getSetBadgeSrc(piece?.item || piece, piece?.slot || '');
-  if (setBadgeSrc) {
-    const setBadgeImg = document.createElement('img');
-    setBadgeImg.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
-    setBadgeImg.src = setBadgeSrc;
-    setBadgeImg.alt = '';
-    box.appendChild(setBadgeImg);
-  }
+            const setBadgeSrc = getSetBadgeSrc(piece?.item || piece, piece?.slot || '');
+            if (setBadgeSrc) {
+              const setBadgeImg = document.createElement('img');
+              setBadgeImg.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
+              setBadgeImg.src = setBadgeSrc;
+              setBadgeImg.alt = '';
+              box.appendChild(setBadgeImg);
+            }
 
-  box.appendChild(img);
-  btn.appendChild(box);
-  itemsRow.appendChild(btn);
-});
+            box.appendChild(img);
+            btn.appendChild(box);
+            itemsRow.appendChild(btn);
+          });
 
           card.appendChild(itemsRow);
 
           card.addEventListener('click', () => {
-  const picked = {
-    name: String(set?.name || ''),
-    img: String(set?.pieces?.[0]?.img || ''),
-    jobGroup: '',
-    category:
-      (DBSynergy.pickerMode === 'armor' || DBSynergy.pickerMode === 'armor2') ? '방어구' :
-        (DBSynergy.pickerMode === 'acc' || DBSynergy.pickerMode === 'acc2') ? '악세' :
-          '특수',
-    type: String(set?.type || ''),
-    pieces: Array.isArray(set?.pieces)
-      ? set.pieces.map(piece => ({
-          slot: piece?.slot || '',
-          slotLabel: piece?.slotLabel || '',
-          name: piece?.name || '',
-          img: piece?.img || '',
-          item: piece?.item || null
-        }))
-      : []
-  };
+            const picked = {
+              name: String(set?.name || ''),
+              img: String(set?.pieces?.[0]?.img || ''),
+              jobGroup: '',
+              category:
+                (DBSynergy.pickerMode === 'armor' || DBSynergy.pickerMode === 'armor2') ? '방어구' :
+                  (DBSynergy.pickerMode === 'acc' || DBSynergy.pickerMode === 'acc2') ? '악세' :
+                    '특수',
+              type: String(set?.type || ''),
+              pieces: Array.isArray(set?.pieces)
+                ? set.pieces.map(piece => ({
+                  slot: piece?.slot || '',
+                  slotLabel: piece?.slotLabel || '',
+                  name: piece?.name || '',
+                  img: piece?.img || '',
+                  item: piece?.item || null
+                }))
+                : []
+            };
 
-  if (DBSynergy.pickerMode === 'armor') state.synergy.armorSet = picked;
-  if (DBSynergy.pickerMode === 'acc') state.synergy.accSet = picked;
-  if (DBSynergy.pickerMode === 'spec') state.synergy.specSet = picked;
-  if (DBSynergy.pickerMode === 'armor2') state.synergy.armorSet2 = picked;
-  if (DBSynergy.pickerMode === 'acc2') state.synergy.accSet2 = picked;
-  if (DBSynergy.pickerMode === 'spec2') state.synergy.specSet2 = picked;
+            if (DBSynergy.pickerMode === 'armor') state.synergy.armorSet = picked;
+            if (DBSynergy.pickerMode === 'acc') state.synergy.accSet = picked;
+            if (DBSynergy.pickerMode === 'spec') state.synergy.specSet = picked;
+            if (DBSynergy.pickerMode === 'armor2') state.synergy.armorSet2 = picked;
+            if (DBSynergy.pickerMode === 'acc2') state.synergy.accSet2 = picked;
+            if (DBSynergy.pickerMode === 'spec2') state.synergy.specSet2 = picked;
 
-  renderSynergyPickedTexts();
-  showModal(document.getElementById('synergyPickerModal'), false);
-});
+            renderSynergyPickedTexts();
+            showModal(document.getElementById('synergyPickerModal'), false);
+          });
 
           listBox.appendChild(card);
         });
@@ -22903,17 +23070,17 @@ if (DBSynergy.pickerMode === 'weapon' || DBSynergy.pickerMode === 'weapon2') {
       DBSynergy.pickerMode = mode;
 
       const titleMap = {
-  char: '캐릭터 선택',
-  char2: '2번 캐릭터 선택',
-  weapon: '무기 선택',
-  weapon2: '2번 무기 선택',
-  armor: '방어구셋 선택',
-  acc: '악세사리셋 선택',
-  spec: '특수장비셋 선택',
-  armor2: '2번 방어구셋 선택',
-  acc2: '2번 악세사리셋 선택',
-  spec2: '2번 특수장비셋 선택',
-};
+        char: '캐릭터 선택',
+        char2: '2번 캐릭터 선택',
+        weapon: '무기 선택',
+        weapon2: '2번 무기 선택',
+        armor: '방어구셋 선택',
+        acc: '악세사리셋 선택',
+        spec: '특수장비셋 선택',
+        armor2: '2번 방어구셋 선택',
+        acc2: '2번 악세사리셋 선택',
+        spec2: '2번 특수장비셋 선택',
+      };
 
       const titleEl = document.getElementById('synergyPickerTitle');
       if (titleEl) titleEl.textContent = titleMap[mode] || '선택';
@@ -22924,34 +23091,34 @@ if (DBSynergy.pickerMode === 'weapon' || DBSynergy.pickerMode === 'weapon2') {
 
     // ✅ 버튼 이벤트
     document.getElementById('btnSynergyCompute')?.addEventListener('click', () => {
-  computeViaBackend('synergyFinalDamageValue', null, { useSynergy: true });
-});
+      computeViaBackend('synergyFinalDamageValue', null, { useSynergy: true });
+    });
 
     document.getElementById('btnSynergyReset2')?.addEventListener('click', () => {
-  resetSynergy2Selections();
-});
+      resetSynergy2Selections();
+    });
 
-document.getElementById('synergyEnabled2')?.addEventListener('change', (e) => {
-  state.synergy = state.synergy || {};
-  state.synergy.enabled2 = !!e.target.checked;
-});
+    document.getElementById('synergyEnabled2')?.addEventListener('change', (e) => {
+      state.synergy = state.synergy || {};
+      state.synergy.enabled2 = !!e.target.checked;
+    });
 
     document.getElementById('btnSynergyReset1')?.addEventListener('click', () => {
-  resetSynergy1Selections();
-});
+      resetSynergy1Selections();
+    });
 
-document.getElementById('synergyEnabled1')?.addEventListener('change', (e) => {
-  state.synergy = state.synergy || {};
-  state.synergy.enabled1 = !!e.target.checked;
-});
+    document.getElementById('synergyEnabled1')?.addEventListener('change', (e) => {
+      state.synergy = state.synergy || {};
+      state.synergy.enabled1 = !!e.target.checked;
+    });
 
     document.getElementById('btnSynergyPickWeapon')?.addEventListener('click', () => {
-  openSynergyPicker('weapon');
-});
+      openSynergyPicker('weapon');
+    });
 
-document.getElementById('btnSynergyPickWeapon2')?.addEventListener('click', () => {
-  openSynergyPicker('weapon2');
-});
+    document.getElementById('btnSynergyPickWeapon2')?.addEventListener('click', () => {
+      openSynergyPicker('weapon2');
+    });
 
     document.getElementById('btnSynergyEffect')?.addEventListener('click', () => {
       openSynergyEffectModal();
@@ -22962,8 +23129,8 @@ document.getElementById('btnSynergyPickWeapon2')?.addEventListener('click', () =
     });
 
     document.getElementById('btnSynergyPickChar2')?.addEventListener('click', () => {
-  openSynergyPicker('char2');
-});
+      openSynergyPicker('char2');
+    });
 
     document.getElementById('btnSynergyPickArmorSet')?.addEventListener('click', () => {
       openSynergyPicker('armor');
@@ -23046,24 +23213,24 @@ document.getElementById('btnSynergyPickWeapon2')?.addEventListener('click', () =
           }
 
           // ✅ 로그인 핑 결과로 허용 여부 판정
-const ping = await loginPingOnce();
-const allowed = !!(ping && ping.ok);
+          const ping = await loginPingOnce();
+          const allowed = !!(ping && ping.ok);
 
-// ✅ ping에서 email 확보
-const loginEmail = String(ping?.email || '').trim().toLowerCase();
+          // ✅ ping에서 email 확보
+          const loginEmail = String(ping?.email || '').trim().toLowerCase();
 
-// ✅ 권한은 백엔드 login_ping 결과만 사용
-const isSpecial = !!(ping?.specialUser);
-const isResearch = !!(ping?.researchUser);
+          // ✅ 권한은 백엔드 login_ping 결과만 사용
+          const isSpecial = !!(ping?.specialUser);
+          const isResearch = !!(ping?.researchUser);
 
-window.__IS_SPECIAL_USER__ = !!(isSpecial || isResearch);
-window.__IS_RESEARCH_USER__ = !!isResearch;
+          window.__IS_SPECIAL_USER__ = !!(isSpecial || isResearch);
+          window.__IS_RESEARCH_USER__ = !!isResearch;
 
-// (선택) 기존 로직들과 같이 쓰고 싶으면 CORE.userEmail도 여기서 미리 채워둠
-window.CORE = window.CORE || {};
-if (loginEmail) CORE.userEmail = loginEmail;
+          // (선택) 기존 로직들과 같이 쓰고 싶으면 CORE.userEmail도 여기서 미리 채워둠
+          window.CORE = window.CORE || {};
+          if (loginEmail) CORE.userEmail = loginEmail;
 
-if (!allowed) console.warn("허용 안 됨:", ping);
+          if (!allowed) console.warn("허용 안 됨:", ping);
 
           const card = document.querySelector(".login-card");
           if (card) {
