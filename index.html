@@ -19416,59 +19416,75 @@
 
     // 현재 프론트 state 전체를 스냅샷으로 만들어서 서버에 보낼 객체로 반환
     function buildFrontPresetState() {
-      const raw = window.state || {};
-      const snap = {};
+  const raw = window.state || {};
+  const snap = {};
 
-      // 필요한 키들만 골라서 저장 (모자라면 여기 키를 더 추가해)
-            const keys = [
-        'currentCharacter',
-        'charRow',
-        'equip',
-        'enh',
-        'enchants',
-        'seals',
-        'emblems',
-        'refines',
-        'skillrune',
-        'runeEngrave',
-        'castleSeal',
-        'CastleSeal',
-        'avatar',
-        'buff',
+  // 필요한 키들만 골라서 저장 (모자라면 여기 키를 더 추가해)
+  const keys = [
+    'currentCharacter',
+    'charRow',
 
-        // ★ 스킬/스킬트리 관련
-        'sp',
-        'tp',
-        'stUsedSP',
-        'stUsedTP',
-        'skillLv',
-        'skillTpLv',
-        'skillDmg',
-        'skillUseOpts',
+    // ✅ 장비 프리셋 호환 저장
+    'equip',
+    'equips',
+    'selections',
 
-        // 기타 옵션/몬스터 등
-        'monster',
-        'options',
+    'enh',
+    'enchants',
+    'seals',
+    'emblems',
+    'refines',
+    'skillrune',
+    'runeEngrave',
+    'castleSeal',
+    'CastleSeal',
+    'avatar',
+    'buff',
 
-        // ★ 커스텀옵
-        'customSkills',
-        'specialRunes',
+    // ★ 스킬/스킬트리 관련
+    'sp',
+    'tp',
+    'stUsedSP',
+    'stUsedTP',
+    'skillLv',
+    'skillTpLv',
+    'skillDmg',
+    'skillUseOpts',
 
-        // ✅ 솔플 / 파티
-        'soloPartyMode',
-        'isPartyMode',
+    // 기타 옵션/몬스터 등
+    'monster',
+    'options',
 
-        'synergy',
-      ];
+    // ★ 커스텀옵
+    'customSkills',
+    'specialRunes',
 
-      for (const k of keys) {
-        if (raw[k] !== undefined) {
-          snap[k] = raw[k];
-        }
-      }
+    // ✅ 솔플 / 파티
+    'soloPartyMode',
+    'isPartyMode',
 
-      return snap;
+    'synergy',
+  ];
+
+  for (const k of keys) {
+    if (raw[k] !== undefined) {
+      snap[k] = raw[k];
     }
+  }
+
+  // ✅ 구형/신형 장비 구조를 모두 저장되게 보정
+  if (!snap.selections && raw.equip && typeof raw.equip === 'object') {
+    snap.selections = raw.equip;
+  }
+  if (!snap.equips && raw.equip && typeof raw.equip === 'object') {
+    snap.equips = raw.equip;
+  }
+  if (!snap.equip && raw.selections && typeof raw.selections === 'object') {
+    snap.equip = raw.selections;
+  }
+
+  return snap;
+}
 
     // 프리셋에서 불러온 state 스냅샷을 현재 state에 적용 + 슬롯 UI/캐릭터 UI 갱신
         function applyFrontPresetState(snap) {
@@ -19492,20 +19508,33 @@
         src = snap;
       }
 
-      // 2) 기존 state 내용을 싹 비우고
-      Object.keys(target).forEach((k) => { delete target[k]; });
-      // 3) 새 스냅샷 내용으로 채움
-      Object.entries(src).forEach(([k, v]) => {
-        target[k] = v;
-      });
+       // 2) 기존 state 내용을 싹 비우고
+  Object.keys(target).forEach((k) => { delete target[k]; });
+  // 3) 새 스냅샷 내용으로 채움
+  Object.entries(src).forEach(([k, v]) => {
+    target[k] = v;
+  });
 
-      // ✅ 구형 프리셋 호환:
-      //    soloPartyMode / isPartyMode 가 없으면 기본은 'party'
-      target.soloPartyMode =
-        String(target.soloPartyMode || 'party').trim().toLowerCase() === 'solo'
-          ? 'solo'
-          : 'party';
-      target.isPartyMode = (target.soloPartyMode === 'party');
+  // ✅ 장비 프리셋 호환
+  // 구형 저장본: equip
+  // 신형 UI 복원: selections / equips
+  if (!target.selections && target.equip && typeof target.equip === 'object') {
+    target.selections = target.equip;
+  }
+  if (!target.equips && target.equip && typeof target.equip === 'object') {
+    target.equips = target.equip;
+  }
+  if (!target.equip && target.selections && typeof target.selections === 'object') {
+    target.equip = target.selections;
+  }
+
+  // ✅ 구형 프리셋 호환:
+  //    soloPartyMode / isPartyMode 가 없으면 기본은 'party'
+  target.soloPartyMode =
+    String(target.soloPartyMode || 'party').trim().toLowerCase() === 'solo'
+      ? 'solo'
+      : 'party';
+  target.isPartyMode = (target.soloPartyMode === 'party');
 
       // ✅ 토글 UI가 참조하는 로컬 변수도 같이 동기화
       soloPartyMode = target.soloPartyMode;
