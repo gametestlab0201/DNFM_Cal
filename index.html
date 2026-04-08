@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -8168,62 +8169,66 @@
     // 모바일은 skillTrees[charKey][skillName] = { spLv, tpLv } 형태로 저장하는 경우가 있음.
     // PC는 skillLv/skillTpLv (id→레벨 맵) 형태를 사용하므로, 여기서 변환한다.
     try {
-      const hasTrees = (state.skillTrees && typeof state.skillTrees === 'object');
-      const hasLvMap = (state.skillLv && Object.keys(state.skillLv).length > 0);
+  const hasTrees = (state.skillTrees && typeof state.skillTrees === 'object');
 
-      // ownerKey(=charKey) 우선, 없으면 currentCharacter.ownerKey 보조
-      const _ok = String(ownerKey || '').replace(/\s+/g, '');
-      const _ck = String(state?.currentCharacter?.ownerKey || '').replace(/\s+/g, '');
-      const treeStore = hasTrees ? (state.skillTrees[_ok] || state.skillTrees[_ck]) : null;
+  // ownerKey(=charKey) 우선, 없으면 currentCharacter.ownerKey 보조
+  const _ok = String(ownerKey || '').replace(/\s+/g, '');
+  const _ck = String(state?.currentCharacter?.ownerKey || '').replace(/\s+/g, '');
+  const treeStore = hasTrees ? (state.skillTrees[_ok] || state.skillTrees[_ck]) : null;
 
-      if (!hasLvMap && treeStore && typeof treeStore === 'object') {
-        // 스킬명 → row 매핑
-        const idxByName = {};
-        for (const r of (ST2.rows || [])) {
-          const k = normKey(r?.name || '');
-          if (k && !idxByName[k]) idxByName[k] = r;
-        }
+  // ✅ 핵심: 현재 캐릭터용 skillTrees가 있으면,
+  //    기존 stale skillLv / skillTpLv 를 버리고 treeStore 기준으로 다시 만든다.
+  if (treeStore && typeof treeStore === 'object') {
+    state.skillLv = {};
+    state.skillTpLv = {};
 
-        // 변환: skillTrees(name) → skillLv(id)
-        for (const k in treeStore) {
-          const node = treeStore[k] || {};
-          const spLv = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
-          const tpLv = Number(node.tpLv ?? node.tp ?? 0) || 0;
-          const row = idxByName[normKey(k)];
-          if (!row) continue;
-
-          const maxLv = Number(row.maxLv || 0) || 0;
-          const cappedSp = Math.max(0, maxLv ? Math.min(spLv, maxLv) : spLv);
-          const cappedTp = Math.max(0, Math.min(tpLv, 5));
-
-          if (cappedSp) state.skillLv[row.id] = cappedSp;
-          if (cappedTp) state.skillTpLv[row.id] = cappedTp;
-        }
-
-        // SP/TP 재계산 (총량은 캐릭터 시트 값을 우선)
-        const totalSp = Number(state?.currentCharacter?.sp || state?.sp?.total || 0) || 0;
-        const totalTp = Number(state?.currentCharacter?.tp || state?.tp?.total || 0) || 0;
-        let usedSp = 0, usedTp = 0;
-
-        for (const r of (ST2.rows || [])) {
-          const lv = Number(state.skillLv?.[r.id] || 0) || 0;
-          const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
-          usedSp += lv * Number(r.sp || 0);
-          usedTp += tp * Number(r.tpCost || 0);
-        }
-
-        state.sp.total = totalSp;
-        state.sp.left = Math.max(0, totalSp - usedSp);
-        state.tp.total = totalTp;
-        state.tp.left = Math.max(0, totalTp - usedTp);
-        state.stUsedSP = usedSp;
-        state.stUsedTP = usedTp;
-
-        if (typeof renderSpTp === 'function') renderSpTp();
-      }
-    } catch (e) {
-      console.warn('[renderSkillTreeBands] mobile preset skillTrees 변환 실패:', e);
+    // 스킬명 → row 매핑
+    const idxByName = {};
+    for (const r of (ST2.rows || [])) {
+      const k = normKey(r?.name || '');
+      if (k && !idxByName[k]) idxByName[k] = r;
     }
+
+    // 변환: skillTrees(name) → skillLv(id)
+    for (const k in treeStore) {
+      const node = treeStore[k] || {};
+      const spLv = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
+      const tpLv = Number(node.tpLv ?? node.tp ?? 0) || 0;
+      const row = idxByName[normKey(k)];
+      if (!row) continue;
+
+      const maxLv = Number(row.maxLv || 0) || 0;
+      const cappedSp = Math.max(0, maxLv ? Math.min(spLv, maxLv) : spLv);
+      const cappedTp = Math.max(0, Math.min(tpLv, 5));
+
+      if (cappedSp) state.skillLv[row.id] = cappedSp;
+      if (cappedTp) state.skillTpLv[row.id] = cappedTp;
+    }
+
+    // SP/TP 재계산 (총량은 캐릭터 시트 값을 우선)
+    const totalSp = Number(state?.currentCharacter?.sp || state?.sp?.total || 0) || 0;
+    const totalTp = Number(state?.currentCharacter?.tp || state?.tp?.total || 0) || 0;
+    let usedSp = 0, usedTp = 0;
+
+    for (const r of (ST2.rows || [])) {
+      const lv = Number(state.skillLv?.[r.id] || 0) || 0;
+      const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
+      usedSp += lv * Number(r.sp || 0);
+      usedTp += tp * Number(r.tpCost || 0);
+    }
+
+    state.sp.total = totalSp;
+    state.sp.left = Math.max(0, totalSp - usedSp);
+    state.tp.total = totalTp;
+    state.tp.left = Math.max(0, totalTp - usedTp);
+    state.stUsedSP = usedSp;
+    state.stUsedTP = usedTp;
+
+    if (typeof renderSpTp === 'function') renderSpTp();
+  }
+} catch (e) {
+  console.warn('[renderSkillTreeBands] mobile preset skillTrees 변환 실패:', e);
+}
 
 
     // ===== 아바타 / 스킬룬 / 룬각인 버킷 =====
@@ -19414,12 +19419,22 @@
     }
 
 
-    // 현재 프론트 state 전체를 스냅샷으로 만들어서 서버에 보낼 객체로 반환
-    function buildFrontPresetState() {
-  const raw = window.state || {};
-  const snap = {};
+    function _getCurrentCharKeyForPreset_pc(snap) {
+  const c = snap?.currentCharacter || {};
+  return (
+    String(c.ownerKey || '').trim().replace(/\s+/g, '') ||
+    String((c.jobGroupLabel || c.jobGroup || '') + (c.name || c.charName || ''))
+      .trim()
+      .replace(/\s+/g, '')
+  );
+}
 
-  // 필요한 키들만 골라서 저장 (모자라면 여기 키를 더 추가해)
+function _buildSkillTreeOnlyPreset_pc(rawState) {
+  const raw = rawState || {};
+  const snap = {};
+  const charKey = _getCurrentCharKeyForPreset_pc(raw);
+
+  // 필요한 키들만 골라서 저장
   const keys = [
     'currentCharacter',
     'charRow',
@@ -19446,8 +19461,6 @@
     'tp',
     'stUsedSP',
     'stUsedTP',
-    'skillLv',
-    'skillTpLv',
     'skillDmg',
     'skillUseOpts',
 
@@ -19483,7 +19496,64 @@
     snap.equip = raw.selections;
   }
 
+  // ✅ 스킬트리는 skillTrees 하나로만 저장
+  snap.skillTrees = {};
+
+  // 1) 이미 syncSkillTreesFromLvMaps_pc()로 최신화된 skillTrees가 있으면 그걸 우선 사용
+  if (
+    charKey &&
+    raw.skillTrees &&
+    typeof raw.skillTrees === 'object' &&
+    raw.skillTrees[charKey] &&
+    typeof raw.skillTrees[charKey] === 'object'
+  ) {
+    snap.skillTrees[charKey] = JSON.parse(JSON.stringify(raw.skillTrees[charKey]));
+  } else {
+    // 2) 혹시 skillTrees가 아직 없고 구형 skillLv / skillTpLv만 있으면 여기서 1회 변환
+    const lvMap = (raw.skillLv && typeof raw.skillLv === 'object') ? raw.skillLv : {};
+    const tpMap = (raw.skillTpLv && typeof raw.skillTpLv === 'object') ? raw.skillTpLv : {};
+    const hasLv = Object.keys(lvMap).length > 0;
+    const hasTp = Object.keys(tpMap).length > 0;
+
+    if (charKey && (hasLv || hasTp)) {
+      const tree = {};
+      const rows = Array.isArray(window.ST2?.rows) ? window.ST2.rows : [];
+
+      rows.forEach(r => {
+        const id = String(r?.id || '').trim();
+        if (!id) return;
+
+        const skillName = String(r?.name || '').trim();
+        if (!skillName) return;
+
+        const spLv = Number(lvMap[id] || 0) || 0;
+        const tpLv = Number(tpMap[id] || 0) || 0;
+
+        if (spLv <= 0 && tpLv <= 0) return;
+
+        tree[skillName] = {};
+        if (spLv > 0) tree[skillName].spLv = spLv;
+        if (tpLv > 0) tree[skillName].tpLv = tpLv;
+      });
+
+      if (Object.keys(tree).length > 0) {
+        snap.skillTrees[charKey] = tree;
+      }
+    }
+  }
+
+  // ✅ 구형/보조 스킬맵은 저장하지 않음
+  delete snap.skillLv;
+  delete snap.skillTpLv;
+  delete snap._skillTreesConvertedFor;
+  delete snap._stOwnerKey;
+
   return snap;
+}
+
+// 현재 프론트 state 전체를 스냅샷으로 만들어서 서버에 보낼 객체로 반환
+function buildFrontPresetState() {
+  return _buildSkillTreeOnlyPreset_pc(window.state || {});
 }
 
     // 프리셋에서 불러온 state 스냅샷을 현재 state에 적용 + 슬롯 UI/캐릭터 UI 갱신
@@ -19567,7 +19637,7 @@
       try {
         const normTxt = (v) => String(v ?? '')
           .normalize('NFC')
-          .replace(/[﻿ ​-\u200D\u2060\u180E]/g, '')
+          .replace(/[﻿ ​-\u200D\u2060\u180E]/g, '')
           .trim();
 
         const normImg = (p) => {
@@ -20937,7 +21007,7 @@
           // 슬롯 내 소켓별 스냅샷 (없으면 null)    서버로 넘겨주는 컬럼 목록
           const _normEmTxt = (v) => String(v ?? '')
             .normalize('NFC')
-            .replace(/[﻿ ​-\u200D\u2060\u180E]/g, '')
+            .replace(/[﻿ ​-\u200D\u2060\u180E]/g, '')
             .trim();
 
           const mapped = arr.map(e => {

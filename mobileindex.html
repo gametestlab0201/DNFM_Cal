@@ -6447,24 +6447,194 @@ if (s.currentCharacter && typeof s.currentCharacter === 'object') {
   // -> 이후 _getCharMainImage()가 CORE.lists에서 '이미지'를 재탐색하는 루트로 가야 함.
 }
 
-  // 2) 장비 객체 보정 (selections/equips 어디에 있든 최대한 커버)
+    // 2) 장비 객체 보정 (selections/equips/equip 어디에 있든 최대한 커버)
+  const SLOT_KEYS = [
+    'weapon',
+    'headshoulder', 'top', 'bottom', 'belt', 'shoes',
+    'bracelet', 'necklace', 'ring',
+    'sub', 'earring', 'magestone',
+    'aura', 'title', 'creature', 'artifact'
+  ];
+
   const patchMap = (m) => {
     if (!m || typeof m !== 'object') return;
     for (const k of Object.keys(m)) {
       const it = m[k];
       if (!it || typeof it !== 'object') continue;
-      const img = _pickAnyImg(it);
+
+      // ✅ PC 저장본의 equip(stats 구조)도 이름/이미지 키를 모바일 표준으로 보정
+      const meta = (it._meta && typeof it._meta === 'object') ? it._meta : {};
+
+      const pickedName = String(
+        it.name ??
+        it['이름'] ??
+        meta.name ??
+        meta['이름'] ??
+        ''
+      ).trim();
+
+      const pickedType = String(
+        it.type ??
+        it['종류'] ??
+        it['타입'] ??
+        meta.type ??
+        meta['종류'] ??
+        meta['타입'] ??
+        ''
+      ).trim();
+
+      const pickedCode = String(
+        it.code ??
+        it.Code ??
+        it.itemCode ??
+        it.key ??
+        it.id ??
+        it['코드'] ??
+        meta.code ??
+        meta.Code ??
+        meta.itemCode ??
+        meta.key ??
+        meta.id ??
+        meta['코드'] ??
+        ''
+      ).trim();
+
+      const img = _pickAnyImg(it) || _pickAnyImg(meta);
+
+      if (pickedName && !it.name) it.name = pickedName;
+      if (pickedType && !it.type) it.type = pickedType;
+      if (pickedCode && !it.code) it.code = pickedCode;
+
       if (img) {
         if (!it.image) it.image = img;
+        if (!it.img) it.img = img;
         if (!it.imgSrc) it.imgSrc = img;
         if (!it['이미지']) it['이미지'] = img;
       }
     }
   };
 
-    patchMap(s.equips);
+  patchMap(s.equips);
   patchMap(s.selections);
-  patchMap(s.equip); // 혹시 단수 키 대비
+  patchMap(s.equip); // PC 저장본 대응
+
+  // ✅ PC 저장본이 equip(단수)만 가지고 온 경우,
+  //    모바일이 쓰는 equips / selections 로 승격
+  if ((!s.equips || typeof s.equips !== 'object')) s.equips = {};
+  if ((!s.selections || typeof s.selections !== 'object')) s.selections = {};
+
+  if (s.equip && typeof s.equip === 'object') {
+    for (const slotKey of SLOT_KEYS) {
+      const src = s.equip[slotKey];
+      if (!src || typeof src !== 'object') continue;
+
+      const meta = (src._meta && typeof src._meta === 'object') ? src._meta : {};
+
+      const name = String(
+        src.name ??
+        src['이름'] ??
+        meta.name ??
+        meta['이름'] ??
+        ''
+      ).trim();
+
+      const type = String(
+        src.type ??
+        src['종류'] ??
+        src['타입'] ??
+        meta.type ??
+        meta['종류'] ??
+        meta['타입'] ??
+        ''
+      ).trim();
+
+      const code = String(
+        src.code ??
+        src.Code ??
+        src.itemCode ??
+        src.key ??
+        src.id ??
+        src['코드'] ??
+        meta.code ??
+        meta.Code ??
+        meta.itemCode ??
+        meta.key ??
+        meta.id ??
+        meta['코드'] ??
+        ''
+      ).trim();
+
+      const img = _pickAnyImg(src) || _pickAnyImg(meta);
+
+      // equips 쪽은 원본(stats 구조)을 최대한 유지하되 모바일 표시용 키만 보강
+      if (!s.equips[slotKey]) {
+        s.equips[slotKey] = {
+          ...src,
+          name: name || '',
+          type: type || '',
+          code: code || null,
+          image: img || '',
+          img: img || '',
+          imgSrc: img || '',
+          ['이미지']: img || ''
+        };
+      } else {
+        if (!s.equips[slotKey].name && name) s.equips[slotKey].name = name;
+        if (!s.equips[slotKey].type && type) s.equips[slotKey].type = type;
+        if (!s.equips[slotKey].code && code) s.equips[slotKey].code = code;
+        if (!s.equips[slotKey].image && img) s.equips[slotKey].image = img;
+        if (!s.equips[slotKey].img && img) s.equips[slotKey].img = img;
+        if (!s.equips[slotKey].imgSrc && img) s.equips[slotKey].imgSrc = img;
+        if (!s.equips[slotKey]['이미지'] && img) s.equips[slotKey]['이미지'] = img;
+      }
+
+      // selections 쪽은 모바일 UI/저장용 최소 메타 보장
+      if (!s.selections[slotKey]) {
+        s.selections[slotKey] = {
+          name: name || '',
+          code: code || null,
+          img: img || null,
+          type: type || '',
+          rarity: String(
+            src.rarity ??
+            src['레어리티'] ??
+            src['희귀도'] ??
+            src['등급'] ??
+            meta.rarity ??
+            meta['레어리티'] ??
+            meta['희귀도'] ??
+            meta['등급'] ??
+            ''
+          ).trim(),
+          level: Number(
+            src.level ??
+            src['레벨'] ??
+            src['요구레벨'] ??
+            meta.level ??
+            meta['레벨'] ??
+            meta['요구레벨'] ??
+            0
+          ) || null,
+          prefixLabel: String(
+            src.prefixLabel ??
+            src.prefix ??
+            meta.prefixLabel ??
+            meta.prefix ??
+            ''
+          ).trim(),
+          desc: String(
+            src.desc ??
+            src['설명'] ??
+            src.description ??
+            meta.desc ??
+            meta['설명'] ??
+            meta.description ??
+            ''
+          ).trim()
+        };
+      }
+    }
+  }
 
   // ✅ (추가) PC 프리셋 호환: customSkills.type(무기) → weaponType(모바일 UI)
   if (s.customSkills && typeof s.customSkills === 'object') {
@@ -14743,10 +14913,84 @@ function bindMobileDamageCompareUI() {
     }
 
     // 현재 프론트 state 전체를 스냅샷으로 만들어서 서버에 보낼 객체로 반환
-    function buildFrontPresetState_mobile() {
-      // 모바일도 결국 window.state가 “PC와 동일한 구조”로 유지되는 걸 전제로 함
-      return _clonePlain(window.state || {});
+    function _getCurrentCharKeyForPreset_mobile(snap) {
+  const c = snap?.currentCharacter || {};
+  return (
+    String(c.ownerKey || '').trim().replace(/\s+/g, '') ||
+    String((c.jobGroupLabel || c.jobGroup || '') + (c.name || c.charName || ''))
+      .trim()
+      .replace(/\s+/g, '')
+  );
+}
+
+function _buildSkillTreeOnlyPreset_mobile(rawState) {
+  const snap = _clonePlain(rawState || {});
+  const charKey = _getCurrentCharKeyForPreset_mobile(snap);
+
+  snap.skillTrees = (snap.skillTrees && typeof snap.skillTrees === 'object') ? snap.skillTrees : {};
+
+  // 1) 이미 모바일 skillTrees가 있으면 현재 캐릭터 것만 남김
+  let pickedTree = null;
+  if (charKey && snap.skillTrees[charKey] && typeof snap.skillTrees[charKey] === 'object') {
+    pickedTree = _clonePlain(snap.skillTrees[charKey]);
+  }
+
+  // 2) skillTrees가 없고, 구형 PC식 skillLv / skillTpLv만 있으면 그것으로 변환
+  if (!pickedTree && charKey) {
+    const lvMap = (snap.skillLv && typeof snap.skillLv === 'object') ? snap.skillLv : {};
+    const tpMap = (snap.skillTpLv && typeof snap.skillTpLv === 'object') ? snap.skillTpLv : {};
+    const hasLv = Object.keys(lvMap).length > 0;
+    const hasTp = Object.keys(tpMap).length > 0;
+
+    if (hasLv || hasTp) {
+      pickedTree = {};
+
+      const raw = (typeof _getSkillListRaw === 'function')
+        ? _getSkillListRaw()
+        : (CORE?.skillsLite || CORE?.lists?.skillsLite);
+
+      const rows = Array.isArray(raw) ? raw : [];
+      const byId = {};
+      rows.forEach(r => {
+        const id = String(r?.id || '').trim();
+        if (id) byId[id] = r;
+      });
+
+      Object.keys(lvMap).forEach(id => {
+        const row = byId[String(id)];
+        if (!row) return;
+        const skillName = String(row.name || row['스킬명'] || '').trim();
+        if (!skillName) return;
+
+        const spLv = Number(lvMap[id] || 0) || 0;
+        const tpLv = Number(tpMap[id] || 0) || 0;
+
+        if (!pickedTree[skillName]) pickedTree[skillName] = {};
+        if (spLv > 0) pickedTree[skillName].spLv = spLv;
+        if (tpLv > 0) pickedTree[skillName].tpLv = tpLv;
+      });
     }
+  }
+
+  // 3) 저장 포맷 단일화: 현재 캐릭터 것만 저장
+  snap.skillTrees = {};
+  if (charKey && pickedTree && Object.keys(pickedTree).length > 0) {
+    snap.skillTrees[charKey] = pickedTree;
+  }
+
+  // 4) 구형/PC 보조맵 제거
+  delete snap.skillLv;
+  delete snap.skillTpLv;
+  delete snap._skillTreesConvertedFor;
+  delete snap._stOwnerKey;
+
+  return snap;
+}
+
+// 현재 프론트 state 전체를 스냅샷으로 만들어서 서버에 보낼 객체로 반환
+function buildFrontPresetState_mobile() {
+  return _buildSkillTreeOnlyPreset_mobile(window.state || {});
+}
 
     // 저장된 state를 window.state에 반영하고, 화면을 state 기준으로 갱신
         function applyFrontPresetState_mobile(presetState) {
@@ -14779,23 +15023,165 @@ function bindMobileDamageCompareUI() {
 
       // 2) 장비 UI
 try {
-  const equips = s.equips || {};
-  const sels = s.selections || {};
+  const equips = (s.equips && typeof s.equips === 'object') ? s.equips : {};
+  const sels   = (s.selections && typeof s.selections === 'object') ? s.selections : {};
+  const equip1 = (s.equip && typeof s.equip === 'object') ? s.equip : {}; // ✅ PC 저장본 대응
 
-  // 2-1) equips(실제 아이템 객체) 우선 반영
-  let applied = 0;
-  for (const [slotKey, it] of Object.entries(equips)) {
-    if (!it) continue;
-    applyPickedEquipUI(slotKey, it);
-    applied++;
-  }
+  const SLOT_KEYS = [
+    'weapon',
+    'headshoulder', 'top', 'bottom', 'belt', 'shoes',
+    'bracelet', 'necklace', 'ring',
+    'sub', 'earring', 'magestone',
+    'aura', 'title', 'creature', 'artifact'
+  ];
 
-  // 2-2) equips가 비어있거나 일부만 있을 때 selections로 보완
-  // (예: 아주 옛날 저장본 / equips가 누락된 경우)
-  if (applied === 0) {
-    for (const [slotKey, info] of Object.entries(sels)) {
-      if (!info) continue;
-      applyPickedEquipUI(slotKey, info);
+  const normImg = (v) => {
+    const x = String(v || '').trim();
+    if (!x) return '';
+    return (typeof _normImg === 'function') ? _normImg(x) : x;
+  };
+
+  const normalizeEquipForMobileUI = (slotKey, eq, sel, eqLegacy) => {
+    const a = (eq && typeof eq === 'object') ? eq : {};
+    const b = (sel && typeof sel === 'object') ? sel : {};
+    const c = (eqLegacy && typeof eqLegacy === 'object') ? eqLegacy : {};
+    const cm = (c._meta && typeof c._meta === 'object') ? c._meta : {};
+
+    const out = { ...c, ...a, ...b };
+
+out.name = String(
+  b.name ??
+  b['이름'] ??
+  out.name ??
+  out['이름'] ??
+  a.name ??
+  a['이름'] ??
+  c.name ??
+  c['이름'] ??
+  cm.name ??
+  cm['이름'] ??
+  ''
+).trim();
+
+    out.image = normImg(
+      out.image ??
+      out.img ??
+      out.icon ??
+      out.thumb ??
+      out['이미지'] ??
+      c.image ??
+      c.img ??
+      c.icon ??
+      c.thumb ??
+      c['이미지'] ??
+      cm.image ??
+      cm.img ??
+      cm.icon ??
+      cm.thumb ??
+      cm['이미지'] ??
+      b.image ??
+      b.img ??
+      b.icon ??
+      b.thumb ??
+      b['이미지'] ??
+      ''
+    );
+
+    out.img = out.image || normImg(out.img || c.img || '');
+
+    // ✅ code도 legacy equip + _meta까지 반영
+    if (out.code == null || out.code === '') {
+      const code =
+        a.code ?? a.Code ?? a.itemCode ?? a.key ?? a.id ?? a['코드'] ??
+        c.code ?? c.Code ?? c.itemCode ?? c.key ?? c.id ?? c['코드'] ??
+        cm.code ?? cm.Code ?? cm.itemCode ?? cm.key ?? cm.id ?? cm['코드'] ??
+        b.code ?? b.Code ?? b.itemCode ?? b.key ?? b.id ?? b['코드'] ?? '';
+      out.code = String(code || '').trim() || null;
+    }
+
+    if (!out.type) {
+      out.type = String(
+        a.type ?? a['종류'] ?? a['타입'] ??
+        c.type ?? c['종류'] ?? c['타입'] ??
+        cm.type ?? cm['종류'] ?? cm['타입'] ??
+        b.type ?? b['종류'] ?? b['타입'] ?? ''
+      ).trim();
+    }
+
+    if (!out.rarity) {
+      out.rarity = String(
+        a.rarity ?? a['레어리티'] ?? a['희귀도'] ?? a['등급'] ??
+        c.rarity ?? c['레어리티'] ?? c['희귀도'] ?? c['등급'] ??
+        cm.rarity ?? cm['레어리티'] ?? cm['희귀도'] ?? cm['등급'] ??
+        b.rarity ?? b['레어리티'] ?? b['희귀도'] ?? b['등급'] ?? ''
+      ).trim();
+    }
+
+    if (!out.prefixLabel) {
+      out.prefixLabel = String(
+        a.prefixLabel ?? a.prefix ??
+        c.prefixLabel ?? c.prefix ??
+        cm.prefixLabel ?? cm.prefix ??
+        b.prefixLabel ?? b.prefix ?? ''
+      ).trim();
+    }
+
+    if (!out.desc) {
+      out.desc = String(
+        a.desc ?? a['설명'] ?? a.description ??
+        c.desc ?? c['설명'] ?? c.description ??
+        cm.desc ?? cm['설명'] ?? cm.description ??
+        b.desc ?? b['설명'] ?? b.description ?? ''
+      ).trim();
+    }
+
+    const lv =
+      a.level ?? a['레벨'] ?? a['요구레벨'] ??
+      c.level ?? c['레벨'] ?? c['요구레벨'] ??
+      cm.level ?? cm['레벨'] ?? cm['요구레벨'] ??
+      b.level ?? b['레벨'] ?? b['요구레벨'];
+
+    if (lv !== '' && lv != null && !Number.isNaN(Number(lv))) {
+      out.level = Number(lv);
+    }
+
+    return out;
+  };
+
+  const hasRenderableEquip = (it) => {
+    if (!it || typeof it !== 'object') return false;
+    const name = String(it.name || it['이름'] || '').trim();
+    const image = String(it.image || it.img || it['이미지'] || '').trim();
+    return !!(name || image);
+  };
+
+  s.equips = s.equips || {};
+  s.selections = s.selections || {};
+
+  for (const slotKey of SLOT_KEYS) {
+    const eq  = equips[slotKey] || null;
+    const sel = sels[slotKey] || null;
+    const eqLegacy = equip1[slotKey] || null; // ✅ 추가
+
+    const merged = normalizeEquipForMobileUI(slotKey, eq, sel, eqLegacy);
+
+    if (hasRenderableEquip(merged)) {
+      applyPickedEquipUI(slotKey, merged);
+
+      s.equips[slotKey] = merged;
+
+      if (!s.selections[slotKey]) {
+        s.selections[slotKey] = {
+          name: String(merged.name || '').trim(),
+          code: merged.code ?? null,
+          img: String(merged.image || merged.img || '').trim() || null,
+          type: String(merged.type || '').trim(),
+          rarity: String(merged.rarity || '').trim(),
+          level: (merged.level == null ? null : Number(merged.level)),
+          prefixLabel: String(merged.prefixLabel || '').trim(),
+          desc: String(merged.desc || '').trim()
+        };
+      }
     }
   }
 } catch (e) {
@@ -15075,33 +15461,135 @@ async function loadFromFpresetSlot_mobile(slotNum) {
   if (!res || !res.ok) throw new Error(res?.error || 'fpreset_load_fail');
 
   const rawState = res.state || {};
-  const fixedState = normalizePresetStateForMobile(rawState);
+
+  // ✅ PC 저장본에서는 selections가 실제 장비 본체이므로
+  //    모바일 로드 직후 selections를 기준으로 equip / equips를 통일한다.
+  const EQUIP_SLOTS = [
+    'weapon',
+    'headshoulder', 'top', 'bottom', 'belt', 'shoes',
+    'bracelet', 'necklace', 'ring',
+    'sub', 'earring', 'magestone',
+    'aura', 'title', 'creature', 'artifact'
+  ];
+
+  const canonicalSelections =
+    (rawState.selections && typeof rawState.selections === 'object')
+      ? _clonePlain(rawState.selections)
+      : {};
+
+  // selections가 없으면 기존 구조 fallback
+  if (!Object.keys(canonicalSelections).length) {
+    const fallbackEquips =
+      (rawState.equips && typeof rawState.equips === 'object')
+        ? rawState.equips
+        : ((rawState.equip && typeof rawState.equip === 'object') ? rawState.equip : {});
+
+    for (const slot of EQUIP_SLOTS) {
+      const eq = fallbackEquips[slot];
+      if (!eq || typeof eq !== 'object') continue;
+
+      canonicalSelections[slot] =
+        (typeof _buildSelectionFromEquip_ === 'function')
+          ? _buildSelectionFromEquip_(eq)
+          : {
+              name: String(eq?.name || eq?.['이름'] || '').trim(),
+              code: String(eq?.code ?? eq?.Code ?? eq?.itemCode ?? eq?.key ?? eq?.id ?? '').trim() || null,
+              img: String(eq?.image || eq?.img || eq?.thumb || eq?.icon || eq?.['이미지'] || '').trim() || null,
+              desc: String(eq?.desc || eq?.['설명'] || eq?.description || '').trim() || undefined,
+              rarity: String(eq?.rarity || eq?.['레어리티'] || eq?.['희귀도'] || eq?.['등급'] || '').trim() || undefined,
+              type: String(eq?.type || eq?.['타입'] || eq?.['종류'] || '').trim() || undefined,
+              level: (
+                eq?.level === '' || eq?.level == null
+                  ? null
+                  : (Number.isFinite(+eq.level) ? +eq.level : null)
+              ),
+              prefixLabel: String(eq?.prefixLabel || eq?.prefix || '').trim() || undefined,
+            };
+    }
+  }
+
+  rawState.selections = canonicalSelections;
+
+  // ✅ equips / equip 도 selections 기준으로 재구성
+  rawState.equips = rawState.equips && typeof rawState.equips === 'object'
+    ? rawState.equips
+    : {};
+  rawState.equip = rawState.equip && typeof rawState.equip === 'object'
+    ? rawState.equip
+    : {};
+
+  for (const slot of EQUIP_SLOTS) {
+    const sel = canonicalSelections[slot];
+    if (!sel || typeof sel !== 'object') continue;
+
+    const rebuiltEq = {
+      name: String(sel.name || sel['이름'] || '').trim(),
+      code: sel.code ?? null,
+      img: String(sel.img || sel.image || sel['이미지'] || '').trim() || '',
+      image: String(sel.img || sel.image || sel['이미지'] || '').trim() || '',
+      imgSrc: String(sel.img || sel.image || sel['이미지'] || '').trim() || '',
+      desc: String(sel.desc || sel['설명'] || '').trim(),
+      rarity: String(sel.rarity || sel['레어리티'] || sel['희귀도'] || sel['등급'] || '').trim(),
+      type: String(sel.type || sel['타입'] || sel['종류'] || '').trim(),
+      level: (sel.level == null || sel.level === '' || Number.isNaN(Number(sel.level))) ? null : Number(sel.level),
+      prefixLabel: (sel.prefixLabel == null ? '' : String(sel.prefixLabel).trim())
+    };
+
+    rawState.equips[slot] = rebuiltEq;
+    rawState.equip[slot] = { ...rebuiltEq };
+  }
+
+  // 1) 먼저 모바일 표준 포맷(skillTrees only)으로 정규화
+  const normalizedForSave = _buildSkillTreeOnlyPreset_mobile(rawState);
+  const fixedState = normalizePresetStateForMobile(normalizedForSave);
 
   applyFrontPresetState_mobile(fixedState);
 
-  // ✅ (추가) PC 저장본 스킬 반영: skillLv/skillTpLv → skillTrees 동기화
+  // 2) 이미 skillTrees 기준으로 정규화된 상태이므로,
+  //    무조건 syncSkillTreesFromLvMaps_mobile()를 다시 돌리지 않는다.
+  //    단, 정말 구형 저장본이라 skillTrees가 비어 있고 lvMap만 남은 특수 케이스일 때만 1회 보조 변환
   try {
-    if (typeof syncSkillTreesFromLvMaps_mobile === 'function') {
-      // applyFrontPresetState_mobile 내부에서 window.state = ... 로 세팅되므로
-      // 여기서는 window.state 기준으로 한 번 더 안전하게 동기화
-      syncSkillTreesFromLvMaps_mobile(window.state?.currentCharacter);
+    const s = window.state || {};
+    const charKey = _getCurrentCharKeyForPreset_mobile(s);
+    const hasTree =
+      !!(charKey && s.skillTrees && s.skillTrees[charKey] && Object.keys(s.skillTrees[charKey]).length > 0);
 
-      // 동기화 직후 4페이지 UI가 바로 갱신되게 재렌더(이미 내부에서 렌더해도 재렌더 1번은 안전)
-      if (typeof ensurePage4Init === 'function') ensurePage4Init();
-      if (typeof renderSkillPageMobile === 'function') renderSkillPageMobile(window.state?.currentCharacter);
+    const hasLvMap =
+      !!(s.skillLv && Object.keys(s.skillLv).length > 0) ||
+      !!(s.skillTpLv && Object.keys(s.skillTpLv).length > 0);
+
+    if (!hasTree && hasLvMap && typeof syncSkillTreesFromLvMaps_mobile === 'function') {
+      syncSkillTreesFromLvMaps_mobile(window.state?.currentCharacter);
     }
+
+    if (typeof ensurePage4Init === 'function') ensurePage4Init();
+    if (typeof renderSkillPageMobile === 'function') renderSkillPageMobile(window.state?.currentCharacter);
   } catch (e) {
     console.warn('[preset] skill sync in loadFrom fail', e);
   }
 
-  // ✅ 로드 직후: 2페이지 슬롯 미리보기(마부/엠블렘) 강제 동기화
   if (typeof syncEquipSubOptionsFromState_mobile === 'function') {
     syncEquipSubOptionsFromState_mobile();
   }
 
-  // ✅ (추가) 고유효과 미니라벨도 즉시 갱신
   if (typeof syncUniqueMiniLabels === 'function') {
     syncUniqueMiniLabels();
+  }
+
+  // 3) 예전 슬롯 자동 변환: 불러온 직후 서버에도 표준 포맷으로 다시 저장
+  try {
+    const currentLabel =
+      presetSlots?.data?.[String(slotNum)]?.label ||
+      res.label ||
+      '';
+
+    await apiJSON('fpreset_save', {
+      slot: slotNum,
+      label: currentLabel,
+      state: _buildSkillTreeOnlyPreset_mobile(window.state || {})
+    });
+  } catch (e) {
+    console.warn('[preset] auto-migrate save fail', e);
   }
 
   await refreshFpresetList_mobile();
