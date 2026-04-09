@@ -6145,7 +6145,7 @@ function getUserPresetLimit() {
 
   // ✅ 1순위: 백엔드가 사용자별 슬롯 수를 명시적으로 내려주면 그 값을 최우선 사용
   if (typeof info.presetSlots === 'number' && info.presetSlots >= 0) {
-    return Math.max(0, Math.min(40, info.presetSlots));
+    return Math.max(0, Math.min(50, info.presetSlots));
   }
 
   // ✅ 2순위: 프론트에서 직급명(roleLabel) 기준으로 계산 (백워드 호환)
@@ -6156,7 +6156,7 @@ function getUserPresetLimit() {
 
   // 관리자 신설
   if (label.includes('관리자')) {
-    base = 40;
+    base = 50;
   } else if (label.includes('수석')) {
     base = 10;
   } else if (label.includes('책임')) {
@@ -6166,20 +6166,20 @@ function getUserPresetLimit() {
   } else {
     // ✅ 직급명이 비어있거나 애매하면 level 기준 보조 처리
     const lvl = (typeof info.level === 'number') ? info.level : 0;
-    if (lvl >= 4) base = 40;        // 관리자
+    if (lvl >= 4) base = 50;        // 관리자
     else if (lvl >= 3) base = 10;   // 수석
     else if (lvl === 2) base = 3;   // 책임
     else if (lvl === 1) base = 1;   // 선임
     else base = 0;
   }
 
-  // ✅ [이벤트] 직급은 2배 (단, 관리자는 이미 40으로 고정이라 그대로 유지)
-  if (base > 0 && base < 40 && isEvent) {
+  // ✅ [이벤트] 직급은 2배 (단, 관리자는 이미 50으로 고정이라 그대로 유지)
+  if (base > 0 && base < 50 && isEvent) {
     base *= 2;
   }
 
-  // 최대 40칸 제한
-  return Math.max(0, Math.min(40, base));
+  // 최대 50칸 제한
+  return Math.max(0, Math.min(50, base));
 }
 
 // 모바일용 login_ping 1회 호출 (PC와 동일 개념)
@@ -6206,7 +6206,7 @@ async function loginPingOnce_mobile() {
       );
 
       const slots = (typeof data.presetSlots === 'number' && data.presetSlots >= 0)
-        ? Math.min(40, data.presetSlots)
+        ? Math.min(50, data.presetSlots)
         : 0;
 
       // 전역 상태 저장
@@ -14750,7 +14750,7 @@ function bindMobileDamageCompareUI() {
       data: {}
     };
 
-    const PRESET_UI_TOTAL = 40;
+    const PRESET_UI_TOTAL = 50;
     const PRESET_UI_PER_PAGE = 5;
     let presetPage = 0;
 
