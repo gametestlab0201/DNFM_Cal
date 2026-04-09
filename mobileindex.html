@@ -14929,13 +14929,39 @@ function _buildSkillTreeOnlyPreset_mobile(rawState) {
 
   snap.skillTrees = (snap.skillTrees && typeof snap.skillTrees === 'object') ? snap.skillTrees : {};
 
-  // 1) 이미 모바일 skillTrees가 있으면 현재 캐릭터 것만 남김
+  // 1) 이미 mobile/PC skillTrees가 있으면 현재 캐릭터 것만 추출
   let pickedTree = null;
+
+  // 1-a) exact hit 우선
   if (charKey && snap.skillTrees[charKey] && typeof snap.skillTrees[charKey] === 'object') {
     pickedTree = _clonePlain(snap.skillTrees[charKey]);
   }
 
-  // 2) skillTrees가 없고, 구형 PC식 skillLv / skillTpLv만 있으면 그것으로 변환
+  // 1-b) exact hit이 없으면 ownerKey 느슨 매칭으로 1회 보정
+  if (!pickedTree && charKey) {
+    for (const [ownerKey, tree] of _entriesOf(snap.skillTrees)) {
+      if (!tree || typeof tree !== 'object') continue;
+      if (!_looseOwnerMatch(ownerKey, charKey)) continue;
+
+      pickedTree = {};
+      for (const [skillKey, node] of Object.entries(tree)) {
+        const skillName = _stripPcSkillKeyToName(skillKey);
+        if (!skillName) continue;
+
+        const spLv = Number(node?.spLv ?? node?.lv ?? node?.level ?? 0) || 0;
+        const tpLv = Number(node?.tpLv ?? node?.tp ?? 0) || 0;
+
+        if (!pickedTree[skillName]) pickedTree[skillName] = {};
+        if (spLv > 0) pickedTree[skillName].spLv = spLv;
+        if (tpLv > 0) pickedTree[skillName].tpLv = tpLv;
+      }
+
+      if (Object.keys(pickedTree).length > 0) break;
+      pickedTree = null;
+    }
+  }
+
+  // 2) skillTrees도 못 찾았고, 구형 PC식 skillLv / skillTpLv만 있으면 그것으로 변환
   if (!pickedTree && charKey) {
     const lvMap = (snap.skillLv && typeof snap.skillLv === 'object') ? snap.skillLv : {};
     const tpMap = (snap.skillTpLv && typeof snap.skillTpLv === 'object') ? snap.skillTpLv : {};
@@ -14951,14 +14977,25 @@ function _buildSkillTreeOnlyPreset_mobile(rawState) {
 
       const rows = Array.isArray(raw) ? raw : [];
       const byId = {};
+      const byName = {};
+
       rows.forEach(r => {
         const id = String(r?.id || '').trim();
+        const nm = String(r?.name || r?.['스킬명'] || '').trim();
         if (id) byId[id] = r;
+        if (nm) byName[_normNoSpace(nm)] = r;
       });
 
       Object.keys(lvMap).forEach(id => {
-        const row = byId[String(id)];
+        let row = byId[String(id)];
+
+        // ✅ 옛 PC 키가 SK_번호_스킬명 형태면 이름 fallback
+        if (!row) {
+          const stripped = _stripPcSkillKeyToName(id);
+          row = byName[_normNoSpace(stripped)];
+        }
         if (!row) return;
+
         const skillName = String(row.name || row['스킬명'] || '').trim();
         if (!skillName) return;
 
@@ -14972,17 +15009,27 @@ function _buildSkillTreeOnlyPreset_mobile(rawState) {
     }
   }
 
-  // 3) 저장 포맷 단일화: 현재 캐릭터 것만 저장
-  snap.skillTrees = {};
-  if (charKey && pickedTree && Object.keys(pickedTree).length > 0) {
-    snap.skillTrees[charKey] = pickedTree;
-  }
+   // 3) 저장 포맷 단일화: 현재 캐릭터 것만 저장
+  const hasPickedTree = !!(charKey && pickedTree && Object.keys(pickedTree).length > 0);
 
-  // 4) 구형/PC 보조맵 제거
-  delete snap.skillLv;
-  delete snap.skillTpLv;
-  delete snap._skillTreesConvertedFor;
-  delete snap._stOwnerKey;
+  if (hasPickedTree) {
+    snap.skillTrees = {};
+    snap.skillTrees[charKey] = pickedTree;
+
+    // ✅ 새 포맷 변환이 실제로 성공했을 때만 구형/PC 보조맵 제거
+    delete snap.skillLv;
+    delete snap.skillTpLv;
+    delete snap._skillTreesConvertedFor;
+    delete snap._stOwnerKey;
+  } else {
+    // ✅ 변환 실패 시에는 기존 데이터 보존
+    //    skillTrees는 기존 값이 있으면 유지하고,
+    //    skillLv / skillTpLv 도 지우지 않는다.
+    snap.skillTrees =
+      (snap.skillTrees && typeof snap.skillTrees === 'object')
+        ? snap.skillTrees
+        : {};
+  }
 
   return snap;
 }
@@ -15545,28 +15592,55 @@ async function loadFromFpresetSlot_mobile(slotNum) {
 
   applyFrontPresetState_mobile(fixedState);
 
-  // 2) 이미 skillTrees 기준으로 정규화된 상태이므로,
-  //    무조건 syncSkillTreesFromLvMaps_mobile()를 다시 돌리지 않는다.
-  //    단, 정말 구형 저장본이라 skillTrees가 비어 있고 lvMap만 남은 특수 케이스일 때만 1회 보조 변환
-  try {
-    const s = window.state || {};
-    const charKey = _getCurrentCharKeyForPreset_mobile(s);
-    const hasTree =
-      !!(charKey && s.skillTrees && s.skillTrees[charKey] && Object.keys(s.skillTrees[charKey]).length > 0);
+  // 2) skillTrees / 구형 lvMap 호환 처리
+try {
+  const s = window.state || {};
+  const charKey = _getCurrentCharKeyForPreset_mobile(s);
 
-    const hasLvMap =
-      !!(s.skillLv && Object.keys(s.skillLv).length > 0) ||
-      !!(s.skillTpLv && Object.keys(s.skillTpLv).length > 0);
+  // ✅ 2-1) 정확 일치 트리가 없으면, PC 저장본의 ownerKey를 느슨하게 찾아 현재 charKey로 복구
+  if (
+    charKey &&
+    s.skillTrees &&
+    typeof s.skillTrees === 'object' &&
+    (!s.skillTrees[charKey] || Object.keys(s.skillTrees[charKey]).length === 0)
+  ) {
+    for (const [ownerKey, tree] of _entriesOf(s.skillTrees)) {
+      if (!tree || typeof tree !== 'object') continue;
+      if (!_looseOwnerMatch(ownerKey, charKey)) continue;
 
-    if (!hasTree && hasLvMap && typeof syncSkillTreesFromLvMaps_mobile === 'function') {
-      syncSkillTreesFromLvMaps_mobile(window.state?.currentCharacter);
+      const remapped = {};
+      for (const [skillKey, node] of Object.entries(tree)) {
+        const skillName = _stripPcSkillKeyToName(skillKey);
+        remapped[skillName] = {
+          spLv: Number(node?.spLv ?? node?.lv ?? node?.level ?? 0) || 0,
+          tpLv: Number(node?.tpLv ?? node?.tp ?? 0) || 0,
+        };
+      }
+
+      if (Object.keys(remapped).length > 0) {
+        s.skillTrees[charKey] = remapped;
+        break;
+      }
     }
-
-    if (typeof ensurePage4Init === 'function') ensurePage4Init();
-    if (typeof renderSkillPageMobile === 'function') renderSkillPageMobile(window.state?.currentCharacter);
-  } catch (e) {
-    console.warn('[preset] skill sync in loadFrom fail', e);
   }
+
+  const hasTree =
+    !!(charKey && s.skillTrees && s.skillTrees[charKey] && Object.keys(s.skillTrees[charKey]).length > 0);
+
+  const hasLvMap =
+    !!(s.skillLv && Object.keys(s.skillLv).length > 0) ||
+    !!(s.skillTpLv && Object.keys(s.skillTpLv).length > 0);
+
+  // ✅ 2-2) 정말 구형 PC 슬롯(skillLv/skillTpLv만 존재)일 때만 1회 보조 변환
+  if (!hasTree && hasLvMap && typeof syncSkillTreesFromLvMaps_mobile === 'function') {
+    syncSkillTreesFromLvMaps_mobile(window.state?.currentCharacter);
+  }
+
+  if (typeof ensurePage4Init === 'function') ensurePage4Init();
+  if (typeof renderSkillPageMobile === 'function') renderSkillPageMobile(window.state?.currentCharacter);
+} catch (e) {
+  console.warn('[preset] skill sync in loadFrom fail', e);
+}
 
   if (typeof syncEquipSubOptionsFromState_mobile === 'function') {
     syncEquipSubOptionsFromState_mobile();
@@ -15576,18 +15650,36 @@ async function loadFromFpresetSlot_mobile(slotNum) {
     syncUniqueMiniLabels();
   }
 
-  // 3) 예전 슬롯 자동 변환: 불러온 직후 서버에도 표준 포맷으로 다시 저장
+    // 3) 예전 슬롯 자동 변환:
+  //    불러온 직후 새 포맷(skillTrees)이 실제로 만들어졌을 때만 다시 저장
   try {
     const currentLabel =
       presetSlots?.data?.[String(slotNum)]?.label ||
       res.label ||
       '';
 
-    await apiJSON('fpreset_save', {
-      slot: slotNum,
-      label: currentLabel,
-      state: _buildSkillTreeOnlyPreset_mobile(window.state || {})
-    });
+    const migratedState = _buildSkillTreeOnlyPreset_mobile(window.state || {});
+    const migratedCharKey = _getCurrentCharKeyForPreset_mobile(migratedState);
+    const migratedTree =
+      migratedCharKey &&
+      migratedState?.skillTrees &&
+      migratedState.skillTrees[migratedCharKey];
+
+    const hasMigratedTree =
+      !!(migratedTree && Object.keys(migratedTree).length > 0);
+
+    if (hasMigratedTree) {
+      await apiJSON('fpreset_save', {
+        slot: slotNum,
+        label: currentLabel,
+        state: migratedState
+      });
+    } else {
+      console.warn('[preset] auto-migrate skipped: empty skillTrees', {
+        slot: slotNum,
+        charKey: migratedCharKey
+      });
+    }
   } catch (e) {
     console.warn('[preset] auto-migrate save fail', e);
   }
