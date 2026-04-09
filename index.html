@@ -5843,6 +5843,10 @@
               선택 세트 자동계산
             </button>
 
+            <button id="btnMacroSetSweep" class="btn btn-special-patch" type="button" style="display:none;">
+  매크로 계산
+</button>
+
             <button id="btnAutoSetSweepMissing" class="ui-btnetc" style="display:none;">
               누락만 재계산(방어구 고정)
             </button>
@@ -8041,21 +8045,23 @@
 
       // ✅ [특정 유저 전용 유지] 아래 버튼들은 special_user / research_user 공통 허용
       const btnSynergy = document.getElementById('btnSynergyEffect');
-      const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
-      const rowDmgOpt = document.getElementById('specialDamageOptRow');
-      const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
-      const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
-      const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
-      const rowUnique = document.getElementById('uniqueOnOffRow');
+const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
+const rowDmgOpt = document.getElementById('specialDamageOptRow');
+const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
+const btnMacroSet = document.getElementById('btnMacroSetSweep');
+const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
+const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
+const rowUnique = document.getElementById('uniqueOnOffRow');
 
-      if (btnSynergy) btnSynergy.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-      if (btnSkillDamage) btnSkillDamage.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-      // ✅ 크리100/투함포 체크박스는 전체 공개
-      if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
-      if (btnAutoSet) btnAutoSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-      if (btnAutoSetMissing) btnAutoSetMissing.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-      if (btnAutoWeapon) btnAutoWeapon.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-      if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
+if (btnSynergy) btnSynergy.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+if (btnSkillDamage) btnSkillDamage.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+// ✅ 크리100/투함포 체크박스는 전체 공개
+if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
+if (btnAutoSet) btnAutoSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+if (btnMacroSet) btnMacroSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+if (btnAutoSetMissing) btnAutoSetMissing.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+if (btnAutoWeapon) btnAutoWeapon.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
     }
 
 
@@ -13664,16 +13670,18 @@
       //    프로젝트 전체에서 쓰는 전역 state 객체 기준으로 작성
       if (!window.state) window.state = {};
       if (!state.customSkills) {
-        state.customSkills = {
-          // 무기 커스텀
-          type: '',
-          weaponName: '',
-          // 상의 커스텀
-          armorType: '',
-          // 팔찌 커스텀
-          braceletType: '',
-        };
-      }
+  state.customSkills = {
+    // 무기 커스텀
+    type: '',
+    weaponName: '',
+    // 상의 커스텀
+    armorType: '',
+    // 팔찌 커스텀
+    braceletType: '',
+    // 귀걸이 커스텀
+    earringType: '',
+  };
+}
 
       // 3) 커스텀옵 버튼 클릭 시: 무기 체크 → 모달 열기 (기존 그대로)
       btnCustomOpt.addEventListener('click', async (e) => {
@@ -21509,12 +21517,16 @@ function buildFrontPresetState() {
 
     // 🔹 현재 장비 선택 상태를 얕은 복사
     function cloneSelections(sel) {
-      const out = {};
-      for (const [slot, info] of Object.entries(sel || {})) {
-        out[slot] = info ? { ...info } : null;
-      }
-      return out;
+  try {
+    return JSON.parse(JSON.stringify(sel || {}));
+  } catch (_) {
+    const out = {};
+    for (const [slot, info] of Object.entries(sel || {})) {
+      out[slot] = info ? { ...info } : null;
     }
+    return out;
+  }
+}
 
     // 🔹 백업해 둔 장비 상태로 되돌리기
     async function restoreSelections(selBackup) {
@@ -21526,6 +21538,47 @@ function buildFrontPresetState() {
         await applyItemToSlot(slotKey, info);
       }
     }
+
+    function cloneCustomOptState() {
+  return {
+    customSkills: state?.customSkills ? JSON.parse(JSON.stringify(state.customSkills)) : null,
+
+    customArmor: state?.customArmor ? JSON.parse(JSON.stringify(state.customArmor)) : null,
+    customBracelet: state?.customBracelet ? JSON.parse(JSON.stringify(state.customBracelet)) : null,
+    customEarring: state?.customEarring ? JSON.parse(JSON.stringify(state.customEarring)) : null,
+
+    customArmorLabel: state?.customArmorLabel ?? null,
+    customBraceletLabel: state?.customBraceletLabel ?? null,
+    customEarringLabel: state?.customEarringLabel ?? null,
+  };
+}
+
+function restoreCustomOptState(snapshot) {
+  if (!window.state) window.state = {};
+
+  state.customSkills = snapshot?.customSkills
+    ? JSON.parse(JSON.stringify(snapshot.customSkills))
+    : {};
+
+  state.customArmor = snapshot?.customArmor
+    ? JSON.parse(JSON.stringify(snapshot.customArmor))
+    : null;
+
+  state.customBracelet = snapshot?.customBracelet
+    ? JSON.parse(JSON.stringify(snapshot.customBracelet))
+    : null;
+
+  state.customEarring = snapshot?.customEarring
+    ? JSON.parse(JSON.stringify(snapshot.customEarring))
+    : null;
+
+  state.customArmorLabel = snapshot?.customArmorLabel ?? null;
+  state.customBraceletLabel = snapshot?.customBraceletLabel ?? null;
+  state.customEarringLabel = snapshot?.customEarringLabel ?? null;
+
+  try { applyCustomOptUIFromState?.(); } catch (_) {}
+  try { updateEquipDescPreview?.(); } catch (_) {}
+}
 
     function filterSetsForAutoSweep(sets, nameList) {
       if (!Array.isArray(sets) || !sets.length) return [];
@@ -21597,6 +21650,100 @@ function buildFrontPresetState() {
         isAutoSetSweepRunning = false;
       }
     }
+
+    // 🔹 미리 정해둔 조합만 순차 계산해서 계산값 시트에 기록
+async function runMacroSetSweep(targetId, p /* 'phys' | 'mag' 생략 가능 */) {
+  if (isAutoSetSweepRunning) return;
+  isAutoSetSweepRunning = true;
+
+  const originalSel = cloneSelections(state.selections || {});
+  const originalCustom = cloneCustomOptState();
+
+  try {
+    const armorSetsAll = getArmorSetListForSweep();
+    const accSetsAll = getAccSetListForSweep();
+    const specSetsAll = getSpecSetListForSweep();
+
+    const findSetByName = (arr, name) => {
+      const want = String(name || '').trim();
+      return (arr || []).find(x => String(x?.name || '').trim() === want) || null;
+    };
+
+    const macroCombos = [
+      {
+        name: '1번 세트',
+        armor: '레거시: 마력의 소용돌이 세트',
+        acc: '견고: 엘팅 메모리얼의 기억 세트',
+        spec: '불굴: 개구쟁이 호문쿨루스 세트',
+      },
+      {
+        name: '2번 세트',
+        armor: '수호: 거인의 스펙쿨룸 아이언 세트',
+        acc: '레거시: 에테리얼 리벤넌트 세트',
+        spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+      },
+    ];
+
+    if (!macroCombos.length) {
+      alert('매크로 조합이 비어 있습니다.');
+      return;
+    }
+
+    let done = 0;
+    let failed = 0;
+
+    for (const combo of macroCombos) {
+      const armorSet = findSetByName(armorSetsAll, combo.armor);
+      const accSet = findSetByName(accSetsAll, combo.acc);
+      const specSet = findSetByName(specSetsAll, combo.spec);
+
+      if (!armorSet || !accSet || !specSet) {
+        console.warn('[runMacroSetSweep] 세트 찾기 실패:', combo, {
+          armorFound: !!armorSet,
+          accFound: !!accSet,
+          specFound: !!specSet,
+        });
+        failed++;
+        continue;
+      }
+
+      await applyArmorSetToSlots(armorSet);
+      await applyAccSetToSlots(accSet);
+      await applySpecSetToSlots(specSet);
+
+      // ✅ 세트 적용 과정에서 지워질 수 있는 고유효과 상태를 다시 주입
+      restoreCustomOptState(originalCustom);
+
+      // 프리뷰 최신화
+      try { updateEquipDescPreview?.(); } catch (_) {}
+
+      // ✅ 각 조합마다 최종 계산 + 계산값 시트 기록
+      await computeViaBackend(targetId, p);
+      done++;
+    }
+
+    if (typeof toast === 'function') {
+      toast(`매크로 계산 완료 ✅ (성공 ${done}, 실패 ${failed})`);
+    }
+  } catch (e) {
+    console.warn('[runMacroSetSweep] 실패:', e);
+    if (typeof toast === 'function') toast('매크로 계산 중 오류가 발생했습니다.');
+  } finally {
+    try {
+      await restoreSelections(originalSel);
+    } catch (e2) {
+      console.warn('[runMacroSetSweep] 원래 장비 복원 실패:', e2);
+    }
+
+    try {
+      restoreCustomOptState(originalCustom);
+    } catch (e3) {
+      console.warn('[runMacroSetSweep] 고유효과 원복 실패:', e3);
+    }
+
+    isAutoSetSweepRunning = false;
+  }
+}
 
     function _comboKey(a, b, c) {
       return `${String(a ?? '').trim()}||${String(b ?? '').trim()}||${String(c ?? '').trim()}`;
@@ -23264,29 +23411,33 @@ function buildFrontPresetState() {
     });
 
     document.getElementById('btn-sum-all-final')?.setAttribute('data-compute-btn', '');
-    document.getElementById('btn-sum-all-final2')?.setAttribute('data-compute-btn', '');
+document.getElementById('btn-sum-all-final2')?.setAttribute('data-compute-btn', '');
 
-    // 버튼: 누를 때만 값 채움
-    document.getElementById('btn-sum-all-final')?.addEventListener('click', () => {
-      computeViaBackend('finalDamageValue');
-    });
+// 버튼: 누를 때만 값 채움
+document.getElementById('btn-sum-all-final')?.addEventListener('click', () => {
+  computeViaBackend('finalDamageValue');
+});
 
-    // 버튼: 누를 때만 값 채움
-    document.getElementById('btn-sum-all-final2')?.addEventListener('click', () => {
-      computeViaBackend('finalDamageValue2');
-    });
+// 버튼: 누를 때만 값 채움
+document.getElementById('btn-sum-all-final2')?.addEventListener('click', () => {
+  computeViaBackend('finalDamageValue2');
+});
 
-    document.getElementById('btnAutoSetSweepSelected')?.addEventListener('click', () => {
-      runAutoSetSweepSelected('finalDamageValue');
-    });
+document.getElementById('btnAutoSetSweepSelected')?.addEventListener('click', () => {
+  runAutoSetSweepSelected('finalDamageValue');
+});
 
-    document.getElementById('btnAutoSetSweepMissing')?.addEventListener('click', () => {
-      runAutoSetSweepMissingArmorFixed('finalDamageValue');
-    });
+document.getElementById('btnMacroSetSweep')?.addEventListener('click', () => {
+  runMacroSetSweep('finalDamageValue');
+});
 
-    document.getElementById('btnAutoWeaponSweepSelected')?.addEventListener('click', async () => {
-      await runAutoWeaponCustomSweepSelected('finalDamageValue');
-    });
+document.getElementById('btnAutoSetSweepMissing')?.addEventListener('click', () => {
+  runAutoSetSweepMissingArmorFixed('finalDamageValue');
+});
+
+document.getElementById('btnAutoWeaponSweepSelected')?.addEventListener('click', async () => {
+  await runAutoWeaponCustomSweepSelected('finalDamageValue');
+});
 
     (() => {
       window.WEBAPP_URL = 'https://dnf-backend.gogo456654.workers.dev';
