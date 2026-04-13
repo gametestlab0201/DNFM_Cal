@@ -5843,8 +5843,12 @@
               선택 세트 자동계산
             </button>
 
-            <button id="btnMacroSetSweep" class="btn btn-special-patch" type="button" style="display:none;">
-  매크로 계산
+            <button id="btnMacroSetGeneral" class="btn btn-special-patch" type="button" style="display:none;">
+  일반 매크로 계산
+</button>
+
+<button id="btnMacroSetElting" class="btn btn-special-patch" type="button" style="display:none;">
+  엘팅 매크로 계산
 </button>
 
             <button id="btnAutoSetSweepMissing" class="ui-btnetc" style="display:none;">
@@ -8048,7 +8052,8 @@
 const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
 const rowDmgOpt = document.getElementById('specialDamageOptRow');
 const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
-const btnMacroSet = document.getElementById('btnMacroSetSweep');
+const btnMacroSetGeneral = document.getElementById('btnMacroSetGeneral');
+const btnMacroSetElting = document.getElementById('btnMacroSetElting');
 const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
 const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
 const rowUnique = document.getElementById('uniqueOnOffRow');
@@ -8058,7 +8063,8 @@ if (btnSkillDamage) btnSkillDamage.style.display = hasSpecialLike ? 'inline-flex
 // ✅ 크리100/투함포 체크박스는 전체 공개
 if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
 if (btnAutoSet) btnAutoSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-if (btnMacroSet) btnMacroSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+if (btnMacroSetGeneral) btnMacroSetGeneral.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+if (btnMacroSetElting) btnMacroSetElting.style.display = hasSpecialLike ? 'inline-flex' : 'none';
 if (btnAutoSetMissing) btnAutoSetMissing.style.display = hasSpecialLike ? 'inline-flex' : 'none';
 if (btnAutoWeapon) btnAutoWeapon.style.display = hasSpecialLike ? 'inline-flex' : 'none';
 if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
@@ -21553,6 +21559,55 @@ function buildFrontPresetState() {
   };
 }
 
+function cloneRuneEngraveState() {
+  return {
+    runeEngrave: state?.runeEngrave
+      ? JSON.parse(JSON.stringify(state.runeEngrave))
+      : null
+  };
+}
+
+async function restoreRuneEngraveState(snapshot) {
+  const savedName = String(snapshot?.runeEngrave?.name || '').trim();
+  const savedLevel = String(snapshot?.runeEngrave?.level || '').trim();
+
+  state.runeEngrave = state.runeEngrave || {};
+  state.runeEngrave.name = savedName;
+  state.runeEngrave.level = savedLevel;
+
+  const sel1 = document.getElementById('selRuneEngrave');
+  const sel2 = document.getElementById('selRuneDetail');
+
+  if (sel1) {
+    sel1.value = savedName || '';
+  }
+
+  if (typeof fillRuneDetailOptionsByName === 'function') {
+    fillRuneDetailOptionsByName(savedName);
+  }
+
+  if (sel2) {
+    if (savedLevel) {
+      const hasOption = Array.from(sel2.options).some(op => String(op.value) === savedLevel);
+      if (!hasOption) {
+        const op = document.createElement('option');
+        op.value = savedLevel;
+        op.textContent = savedLevel;
+        sel2.appendChild(op);
+      }
+      sel2.disabled = false;
+      sel2.value = savedLevel;
+    } else {
+      sel2.innerHTML = `<option value="" selected disabled>세부 설정</option>`;
+      sel2.disabled = true;
+    }
+  }
+
+  if (savedName && savedLevel) {
+    await applyRuneEngraveByNameTag(savedName, savedLevel);
+  }
+}
+
 function restoreCustomOptState(snapshot) {
   if (!window.state) window.state = {};
 
@@ -21652,12 +21707,13 @@ function restoreCustomOptState(snapshot) {
     }
 
     // 🔹 미리 정해둔 조합만 순차 계산해서 계산값 시트에 기록
-async function runMacroSetSweep(targetId, p /* 'phys' | 'mag' 생략 가능 */) {
+async function runMacroSetSweep(targetId, presetKey = 'general', p /* 'phys' | 'mag' 생략 가능 */) {
   if (isAutoSetSweepRunning) return;
   isAutoSetSweepRunning = true;
 
   const originalSel = cloneSelections(state.selections || {});
   const originalCustom = cloneCustomOptState();
+  const originalRuneEngrave = cloneRuneEngraveState();
 
   try {
     const armorSetsAll = getArmorSetListForSweep();
@@ -21669,20 +21725,296 @@ async function runMacroSetSweep(targetId, p /* 'phys' | 'mag' 생략 가능 */) 
       return (arr || []).find(x => String(x?.name || '').trim() === want) || null;
     };
 
-    const macroCombos = [
-      {
-        name: '1번 세트',
-        armor: '레거시: 마력의 소용돌이 세트',
-        acc: '견고: 엘팅 메모리얼의 기억 세트',
-        spec: '불굴: 개구쟁이 호문쿨루스 세트',
-      },
-      {
-        name: '2번 세트',
-        armor: '수호: 거인의 스펙쿨룸 아이언 세트',
-        acc: '레거시: 에테리얼 리벤넌트 세트',
-        spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
-      },
-    ];
+    const macroPresets = {
+  general: [
+  {
+    name: '일반 1번 세트',
+    armor: '전격: 어느 말괄량이의 탐사복 세트',
+    acc: '조화: 신비로운 빛의 소용돌이 세트',
+    spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '일반 2번 세트',
+    armor: '침식: 섬뜩한 강철 용 세트',
+    acc: '각오: 섬뜩한 빛의 관리자 세트',
+    spec: '격변: 부정한 빛의 우상 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '일반 3번 세트',
+    armor: '허상: 어느 말괄량이의 탐사복 세트',
+    acc: '조화: 신비로운 빛의 소용돌이 세트',
+    spec: '불굴: 개구쟁이 호문쿨루스 세트',
+    runeEngraveName: '스킬공격력(%)',
+    runeEngraveLevel: '5',
+  },
+  {
+    name: '일반 4번 세트',
+    armor: '작열: 포이즈닝 퀸 스파이더 세트',
+    acc: '견고: 화력 개조 탄띠 세트',
+    spec: '불굴: 개구쟁이 호문쿨루스 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '일반 5번 세트',
+    armor: '작열: 포이즈닝 퀸 스파이더 세트',
+    acc: '조화: 신비로운 빛의 소용돌이 세트',
+    spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '일반 6번 세트',
+    armor: '작열: 포이즈닝 퀸 스파이더 세트',
+    acc: '조화: 신비로운 빛의 소용돌이 세트',
+    spec: '결의: 허영 속 어둠의 피조물 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '일반 7번 세트',
+    armor: '수호: 거인의 스펙쿨룸 아이언 세트',
+    acc: '견고: 화력 개조 탄띠 세트',
+    spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+    runeEngraveName: '스킬공격력(%)',
+    runeEngraveLevel: '5',
+  },
+  {
+    name: '일반 8번 세트',
+    armor: '작열: 포이즈닝 퀸 스파이더 세트',
+    acc: '각오: 섬뜩한 빛의 관리자 세트',
+    spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '일반 9번 세트',
+    armor: '전격: 어느 말괄량이의 탐사복 세트',
+    acc: '레거시: 지나온 영광의 시대 세트',
+    spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '일반 10번 세트',
+    armor: '레거시: 마력의 소용돌이 세트',
+    acc: '각오: 섬뜩한 빛의 관리자 세트',
+    spec: '불굴: 개구쟁이 호문쿨루스 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '일반 11번 세트',
+    armor: '작열: 포이즈닝 퀸 스파이더 세트',
+    acc: '각오: 섬뜩한 빛의 관리자 세트',
+    spec: '숙련: 개구쟁이 호문쿨루스 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '일반 12번 세트',
+    armor: '허상: 어느 말괄량이의 탐사복 세트',
+    acc: '각오: 섬뜩한 빛의 관리자 세트',
+    spec: '숙련: 개구쟁이 호문쿨루스 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+  name: '일반 13번 세트',
+  armor: '전격: 어느 말괄량이의 탐사복 세트',
+  acc: '레거시: 에테리얼 리벤넌트 세트',
+  spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+  runeEngraveName: '상변데미지(%)',
+  runeEngraveLevel: '50',
+},
+{
+  name: '일반 14번 세트',
+  armor: '침식: 섬뜩한 강철 용 세트',
+  acc: '레거시: 에테리얼 리벤넌트 세트',
+  spec: '격변: 부정한 빛의 우상 세트',
+  runeEngraveName: '상변데미지(%)',
+  runeEngraveLevel: '50',
+},
+{
+  name: '일반 15번 세트',
+  armor: '허상: 어느 말괄량이의 탐사복 세트',
+  acc: '레거시: 에테리얼 리벤넌트 세트',
+  spec: '불굴: 개구쟁이 호문쿨루스 세트',
+  runeEngraveName: '스킬공격력(%)',
+  runeEngraveLevel: '5',
+},
+{
+  name: '일반 16번 세트',
+  armor: '작열: 포이즈닝 퀸 스파이더 세트',
+  acc: '레거시: 에테리얼 리벤넌트 세트',
+  spec: '불굴: 개구쟁이 호문쿨루스 세트',
+  runeEngraveName: '상변데미지(%)',
+  runeEngraveLevel: '50',
+},
+{
+  name: '일반 17번 세트',
+  armor: '작열: 포이즈닝 퀸 스파이더 세트',
+  acc: '레거시: 에테리얼 리벤넌트 세트',
+  spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+  runeEngraveName: '상변데미지(%)',
+  runeEngraveLevel: '50',
+},
+{
+  name: '일반 18번 세트',
+  armor: '작열: 포이즈닝 퀸 스파이더 세트',
+  acc: '레거시: 에테리얼 리벤넌트 세트',
+  spec: '결의: 허영 속 어둠의 피조물 세트',
+  runeEngraveName: '상변데미지(%)',
+  runeEngraveLevel: '50',
+},
+{
+  name: '일반 19번 세트',
+  armor: '수호: 거인의 스펙쿨룸 아이언 세트',
+  acc: '레거시: 에테리얼 리벤넌트 세트',
+  spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+  runeEngraveName: '스킬공격력(%)',
+  runeEngraveLevel: '5',
+},
+{
+  name: '일반 22번 세트',
+  armor: '레거시: 마력의 소용돌이 세트',
+  acc: '레거시: 에테리얼 리벤넌트 세트',
+  spec: '불굴: 개구쟁이 호문쿨루스 세트',
+  runeEngraveName: '스킬공격력(%)',
+  runeEngraveLevel: '5',
+},
+{
+  name: '일반 23번 세트',
+  armor: '작열: 포이즈닝 퀸 스파이더 세트',
+  acc: '레거시: 에테리얼 리벤넌트 세트',
+  spec: '숙련: 개구쟁이 호문쿨루스 세트',
+  runeEngraveName: '상변데미지(%)',
+  runeEngraveLevel: '50',
+},
+{
+  name: '일반 24번 세트',
+  armor: '허상: 어느 말괄량이의 탐사복 세트',
+  acc: '레거시: 에테리얼 리벤넌트 세트',
+  spec: '숙련: 개구쟁이 호문쿨루스 세트',
+  runeEngraveName: '스킬공격력(%)',
+  runeEngraveLevel: '5',
+},
+],
+
+elting: [
+  {
+    name: '엘팅 1번 세트',
+    armor: '레거시: 마력의 소용돌이 세트',
+    acc: '견고: 엘팅 메모리얼의 기억 세트',
+    spec: '결의: 허영 속 어둠의 피조물 세트',
+    runeEngraveName: '스킬공격력(%)',
+    runeEngraveLevel: '5',
+  },
+  {
+    name: '엘팅 2번 세트',
+    armor: '레거시: 마력의 소용돌이 세트',
+    acc: '견고: 엘팅 메모리얼의 기억 세트',
+    spec: '불굴: 개구쟁이 호문쿨루스 세트',
+    runeEngraveName: '스킬공격력(%)',
+    runeEngraveLevel: '5',
+  },
+  {
+    name: '엘팅 3번 세트',
+    armor: '수호: 거인의 스펙쿨룸 아이언 세트',
+    acc: '견고: 엘팅 메모리얼의 기억 세트',
+    spec: '질주: 부정한 빛의 우상 세트',
+    runeEngraveName: '스킬공격력(%)',
+    runeEngraveLevel: '5',
+  },
+  {
+    name: '엘팅 4번 세트',
+    armor: '작열: 포이즈닝 퀸 스파이더 세트',
+    acc: '견고: 엘팅 메모리얼의 기억 세트',
+    spec: '결의: 허영 속 어둠의 피조물 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '엘팅 5번 세트',
+    armor: '작열: 포이즈닝 퀸 스파이더 세트',
+    acc: '견고: 엘팅 메모리얼의 기억 세트',
+    spec: '불굴: 개구쟁이 호문쿨루스 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '엘팅 6번 세트',
+    armor: '침식: 섬뜩한 강철 용 세트',
+    acc: '견고: 엘팅 메모리얼의 기억 세트',
+    spec: '불굴: 개구쟁이 호문쿨루스 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '엘팅 7번 세트',
+    armor: '수호: 거인의 스펙쿨룸 아이언 세트',
+    acc: '견고: 엘팅 메모리얼의 기억 세트',
+    spec: '불굴: 개구쟁이 호문쿨루스 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '엘팅 8번 세트',
+    armor: '수호: 거인의 스펙쿨룸 아이언 세트',
+    acc: '견고: 엘팅 메모리얼의 기억 세트',
+    spec: '불굴: 개구쟁이 호문쿨루스 세트',
+    runeEngraveName: '스킬공격력(%)',
+    runeEngraveLevel: '5',
+  },
+  {
+    name: '엘팅 9번 세트',
+    armor: '자상: 여명을 쏘아 올리는 자 세트',
+    acc: '견고: 엘팅 메모리얼의 기억 세트',
+    spec: '결의: 허영 속 어둠의 피조물 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '엘팅 10번 세트',
+    armor: '수호: 거인의 스펙쿨룸 아이언 세트',
+    acc: '견고: 엘팅 메모리얼의 기억 세트',
+    spec: '결의: 라이트닝 에너지 코어 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+  {
+    name: '엘팅 11번 세트',
+    armor: '허상: 어느 말괄량이의 탐사복 세트',
+    acc: '견고: 엘팅 메모리얼의 기억 세트',
+    spec: '결의: 허영 속 어둠의 피조물 세트',
+    runeEngraveName: '스킬공격력(%)',
+    runeEngraveLevel: '5',
+  },
+  {
+    name: '엘팅 12번 세트',
+    armor: '신속: 익스플로시브 버닝 스톤 세트',
+    acc: '견고: 엘팅 메모리얼의 기억 세트',
+    spec: '질주: 부정한 빛의 우상 세트',
+    runeEngraveName: '상변데미지(%)',
+    runeEngraveLevel: '50',
+  },
+],
+};
+
+const macroCombos = macroPresets[presetKey] || [];
+
+if (!macroCombos.length) {
+  alert(
+    presetKey === 'elting'
+      ? '엘팅 매크로 조합이 비어 있습니다.'
+      : '일반 매크로 조합이 비어 있습니다.'
+  );
+  return;
+}
 
     if (!macroCombos.length) {
       alert('매크로 조합이 비어 있습니다.');
@@ -21714,17 +22046,40 @@ async function runMacroSetSweep(targetId, p /* 'phys' | 'mag' 생략 가능 */) 
       // ✅ 세트 적용 과정에서 지워질 수 있는 고유효과 상태를 다시 주입
       restoreCustomOptState(originalCustom);
 
-      // 프리뷰 최신화
+      // ✅ 룬 각인 설정/세부 설정 적용
+      const runeName = String(combo.runeEngraveName || '').trim();
+      const runeLevel = String(combo.runeEngraveLevel || '').trim();
+
+      if (runeName && runeLevel) {
+        state.runeEngrave = state.runeEngrave || {};
+        state.runeEngrave.name = runeName;
+        state.runeEngrave.level = runeLevel;
+
+        const sel1 = document.getElementById('selRuneEngrave');
+        const sel2 = document.getElementById('selRuneDetail');
+
+        if (sel1) sel1.value = runeName;
+        if (typeof fillRuneDetailOptionsByName === 'function') {
+          fillRuneDetailOptionsByName(runeName);
+        }
+        if (sel2) {
+          sel2.disabled = false;
+          sel2.value = runeLevel;
+        }
+
+        await applyRuneEngraveByNameTag(runeName, runeLevel);
+      }
+
       try { updateEquipDescPreview?.(); } catch (_) {}
 
-      // ✅ 각 조합마다 최종 계산 + 계산값 시트 기록
       await computeViaBackend(targetId, p);
       done++;
     }
 
     if (typeof toast === 'function') {
-      toast(`매크로 계산 완료 ✅ (성공 ${done}, 실패 ${failed})`);
-    }
+  const label = (presetKey === 'elting') ? '엘팅 매크로 계산' : '일반 매크로 계산';
+  toast(`${label} 완료 ✅ (성공 ${done}, 실패 ${failed})`);
+}
   } catch (e) {
     console.warn('[runMacroSetSweep] 실패:', e);
     if (typeof toast === 'function') toast('매크로 계산 중 오류가 발생했습니다.');
@@ -21739,6 +22094,12 @@ async function runMacroSetSweep(targetId, p /* 'phys' | 'mag' 생략 가능 */) 
       restoreCustomOptState(originalCustom);
     } catch (e3) {
       console.warn('[runMacroSetSweep] 고유효과 원복 실패:', e3);
+    }
+
+    try {
+      await restoreRuneEngraveState(originalRuneEngrave);
+    } catch (e4) {
+      console.warn('[runMacroSetSweep] 룬 각인 원복 실패:', e4);
     }
 
     isAutoSetSweepRunning = false;
@@ -23427,8 +23788,12 @@ document.getElementById('btnAutoSetSweepSelected')?.addEventListener('click', ()
   runAutoSetSweepSelected('finalDamageValue');
 });
 
-document.getElementById('btnMacroSetSweep')?.addEventListener('click', () => {
-  runMacroSetSweep('finalDamageValue');
+document.getElementById('btnMacroSetGeneral')?.addEventListener('click', () => {
+  runMacroSetSweep('finalDamageValue', 'general');
+});
+
+document.getElementById('btnMacroSetElting')?.addEventListener('click', () => {
+  runMacroSetSweep('finalDamageValue', 'elting');
 });
 
 document.getElementById('btnAutoSetSweepMissing')?.addEventListener('click', () => {
