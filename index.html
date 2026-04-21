@@ -20660,92 +20660,95 @@ function buildFrontPresetState() {
           }
         }
 
-        // 1-2) (중요) 모바일 skillTrees 형태 프리셋을 PC 스킬맵(skillLv/skillTpLv)으로 즉시 변환한다.
-        //      (스킬트리 설정 모달을 열지 않아도 불러오기 직후 적용되도록)
-        try {
-          const hasTrees = (state.skillTrees && typeof state.skillTrees === 'object');
-          if (hasTrees && Array.isArray(window.ST2?.rows) && window.ST2.rows.length) {
-            // ownerKey 산출
-            const cc2 = state.currentCharacter || {};
-            let ownerKey2 = '';
-            const job2 = String(cc2.jobGroupLabel || cc2.jobGroup || '').trim();
-            const nm2 = String(cc2.name || '').trim();
-            if (job2 || nm2) ownerKey2 = (job2 + nm2).replace(/\s+/g, '');
-            if (!ownerKey2) ownerKey2 = String(state?.CurrentSumStats?.ownerKey || '').trim();
+        // 1-2) (중요) 모바일/신형 skillTrees 형태 프리셋을
+//      PC 스킬맵(skillLv/skillTpLv)으로 즉시 "강제 재구성"한다.
+//      (기존 skillLv/skillTpLv에 양수값이 남아 있어도, 현재 프리셋 기준으로 덮어쓴다)
+try {
+  const hasTrees = (state.skillTrees && typeof state.skillTrees === 'object');
+  if (hasTrees && Array.isArray(window.ST2?.rows) && window.ST2.rows.length) {
+    // ownerKey 산출
+    const cc2 = state.currentCharacter || {};
+    let ownerKey2 = '';
+    const job2 = String(cc2.jobGroupLabel || cc2.jobGroup || '').trim();
+    const nm2 = String(cc2.name || '').trim();
+    if (job2 || nm2) ownerKey2 = (job2 + nm2).replace(/\s+/g, '');
+    if (!ownerKey2) ownerKey2 = String(state?.CurrentSumStats?.ownerKey || '').trim();
 
-            const _ok2 = String(ownerKey2 || '').replace(/\s+/g, '');
-            const _ck2 = String(state?.currentCharacter?.ownerKey || '').replace(/\s+/g, '');
-            const charKey2 = _ok2 || _ck2;
-            const treeStore2 = charKey2 ? (state.skillTrees[_ok2] || state.skillTrees[_ck2]) : null;
+    const _ok2 = String(ownerKey2 || '').replace(/\s+/g, '');
+    const _ck2 = String(state?.currentCharacter?.ownerKey || '').replace(/\s+/g, '');
+    const charKey2 = _ok2 || _ck2;
+    const treeStore2 = charKey2 ? (state.skillTrees[_ok2] || state.skillTrees[_ck2]) : null;
 
-            const hasAnyPositive2 = (m) => {
-              if (!m || typeof m !== 'object') return false;
-              for (const k in m) if ((Number(m[k]) || 0) > 0) return true;
-              return false;
-            };
+    // ✅ 기존처럼 hasPosLv2 / hasPosTp2 를 보지 않는다.
+    //    프리셋 불러오기 시점에는 skillTrees를 진실원본으로 보고,
+    //    계산용 skillLv / skillTpLv 를 무조건 다시 만든다.
+    if (treeStore2 && typeof treeStore2 === 'object') {
+      state.skillLv = {};
+      state.skillTpLv = {};
 
-            const hasPosLv2 = hasAnyPositive2(state.skillLv);
-            const hasPosTp2 = hasAnyPositive2(state.skillTpLv);
-            const alreadyConverted2 = (String(state._skillTreesConvertedFor || '') === String(charKey2 || ''));
+      const idxByName2 = {};
+      for (const r of (window.ST2.rows || [])) {
+        const k = normKey(r?.name || '');
+        if (k && !idxByName2[k]) idxByName2[k] = r;
+      }
 
-            if (!alreadyConverted2 && treeStore2 && typeof treeStore2 === 'object' && (!hasPosLv2 && !hasPosTp2)) {
-              state.skillLv = {};
-              state.skillTpLv = state.skillTpLv || {};
+      for (const k in treeStore2) {
+        const node = treeStore2[k] || {};
+        const spLv = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
+        const tpLv = Number(node.tpLv ?? node.tp ?? 0) || 0;
 
-              const idxByName2 = {};
-              for (const r of (window.ST2.rows || [])) {
-                const k = normKey(r?.name || '');
-                if (k && !idxByName2[k]) idxByName2[k] = r;
-              }
+        const row = idxByName2[normKey(k)];
+        if (!row) continue;
 
-              for (const k in treeStore2) {
-                const node = treeStore2[k] || {};
-                const spLv = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
-                const tpLv = Number(node.tpLv ?? node.tp ?? 0) || 0;
+        const maxLv = Number(row.maxLv || 0) || 0;
+        const cappedSp = Math.max(0, maxLv ? Math.min(spLv, maxLv) : spLv);
+        const cappedTp = Math.max(0, Math.min(tpLv, 5));
 
-                const row = idxByName2[normKey(k)];
-                if (!row) continue;
+        if (cappedSp > 0) state.skillLv[row.id] = cappedSp;
+        if (cappedTp > 0) state.skillTpLv[row.id] = cappedTp;
+      }
 
-                const maxLv = Number(row.maxLv || 0) || 0;
-                const cappedSp = Math.max(0, maxLv ? Math.min(spLv, maxLv) : spLv);
-                const cappedTp = Math.max(0, Math.min(tpLv, 5));
+      const totalSp = Number(state?.currentCharacter?.sp || state?.sp?.total || 0) || 0;
+      const totalTp = Number(state?.currentCharacter?.tp || state?.tp?.total || 0) || 0;
+      let usedSp = 0, usedTp = 0;
 
-                if (cappedSp) state.skillLv[row.id] = cappedSp;
-                if (cappedTp) state.skillTpLv[row.id] = cappedTp;
-              }
+      for (const r of (window.ST2.rows || [])) {
+        const lv = Number(state.skillLv?.[r.id] || 0) || 0;
+        const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
+        usedSp += lv * Number(r.sp || 0);
+        usedTp += tp * Number(r.tpCost || 0);
+      }
 
-              const totalSp = Number(state?.currentCharacter?.sp || state?.sp?.total || 0) || 0;
-              const totalTp = Number(state?.currentCharacter?.tp || state?.tp?.total || 0) || 0;
-              let usedSp = 0, usedTp = 0;
+      state.sp = state.sp || {};
+      state.tp = state.tp || {};
+      state.sp.total = totalSp;
+      state.sp.left = Math.max(0, totalSp - usedSp);
+      state.tp.total = totalTp;
+      state.tp.left = Math.max(0, totalTp - usedTp);
+      state.stUsedSP = usedSp;
+      state.stUsedTP = usedTp;
 
-              for (const r of (window.ST2.rows || [])) {
-                const lv = Number(state.skillLv?.[r.id] || 0) || 0;
-                const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
-                usedSp += lv * Number(r.sp || 0);
-                usedTp += tp * Number(r.tpCost || 0);
-              }
+      state._skillTreesConvertedFor = String(charKey2 || '');
 
-              state.sp.total = totalSp;
-              state.sp.left = Math.max(0, totalSp - usedSp);
-              state.tp.total = totalTp;
-              state.tp.left = Math.max(0, totalTp - usedTp);
-              state.stUsedSP = usedSp;
-              state.stUsedTP = usedTp;
+      // ✅ 화면 갱신
+      if (typeof renderSpTp === 'function') renderSpTp();
 
-              state._skillTreesConvertedFor = String(charKey2 || '');
-              if (typeof renderSpTp === 'function') renderSpTp();
-            }
+      // ✅ 내부 skillTrees / skillLv / skillTpLv 정합성 한번 더 맞춤
+      if (typeof syncSkillTreesFromLvMaps_pc === 'function') {
+        try { syncSkillTreesFromLvMaps_pc(); }
+        catch (e) { console.warn('[fpreset_load] syncSkillTreesFromLvMaps_pc 실패:', e); }
+      }
+    }
 
-            // 서버 세션에도 반영(계산하기에서 바로 적용되도록)
-            if (typeof saveSkillSelections === 'function') {
-              try { await saveSkillSelections(); }
-              catch (e) { console.warn('[fpreset_load] saveSkillSelections 실패:', e); }
-            }
-          }
-        } catch (e) {
-          console.warn('[fpreset_load] mobile skillTrees 즉시 변환 실패:', e);
-        }
-
+    // 서버 세션에도 반영(계산하기에서 바로 적용되도록)
+    if (typeof saveSkillSelections === 'function') {
+      try { await saveSkillSelections(); }
+      catch (e) { console.warn('[fpreset_load] saveSkillSelections 실패:', e); }
+    }
+  }
+} catch (e) {
+  console.warn('[fpreset_load] mobile skillTrees 즉시 변환 실패:', e);
+}
         alert(`슬롯 ${slot}의 프리셋을 불러왔습니다.`);
       } catch (err) {
         console.error('[fpreset_load] 에러:', err);
