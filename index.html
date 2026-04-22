@@ -1141,6 +1141,25 @@
       box-shadow: none;
     }
 
+.macro-statusdmg-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05);
+  color: #e5e7eb;
+  font-size: 12px;
+  user-select: none;
+}
+
+.macro-statusdmg-row input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: #cfa24f;
+}
 
     /* (선택) 무기 슬롯도 열 폭에 맞춰서 정렬 */
     /*.slot-row.weapon-row .slot[data-slot="R1"] {
@@ -5851,9 +5870,14 @@
   엘팅 매크로 계산
 </button>
 
-            <button id="btnAutoSetSweepMissing" class="ui-btnetc" style="display:none;">
-              누락만 재계산(방어구 고정)
-            </button>
+<label id="rowMacroStatusDmg" class="macro-statusdmg-row" style="display:none;">
+  <input type="checkbox" id="chkMacroStatusDmg">
+  <span>상변뎀 고정</span>
+</label>
+
+<button id="btnAutoSetSweepMissing" class="ui-btnetc" style="display:none;">
+  누락만 재계산(방어구 고정)
+</button>
 
             <button id="btnAutoWeaponSweepSelected" class="special-btn" style="display:none;">
               무기/무기고유효과 자동계산
@@ -7344,7 +7368,7 @@
   <div id="noticeModal" class="modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
     <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="noticeModalTitle"
-      style="width:min(740px,95vw);height:min(810px,87vh);max-height:min(810px,87vh);display:flex;flex-direction:column;">
+      style="width:min(740px,95vw);height:auto;max-height:min(810px,87vh);display:flex;flex-direction:column;">
       <header>
         <div style="width:32px;"></div>
         <h2 id="noticeModalTitle">안내사항</h2>
@@ -7354,36 +7378,24 @@
       <div class="patch-log-body" style="flex:1;min-height:0;overflow-y:auto;">
         <ul class="patch-log-list notice-list">
           <li></li>
-          <li>
-            <strong style="font-size:18px;">[3월 26일자 패치관련 공지]</strong>
-          </li>
-          <li></li>
-          <li><br>안녕하세요 게임실험연구소 입니다.<br><br>
+          
+            <strong style="font-size:18px;">🎉 누적 로그인 20,000회 돌파! 감사 기념 <strong style="color: #ff4444;">저장슬롯 3배</strong> 이벤트 🎉</strong><br><br>
+          
+          <br>안녕하세요 게임실험연구소 입니다.<br><br>
 
-            03월 26일자 시로코 레이드 업데이트 패치 관련 최대한 빠르게 모든 업데이트 완료하도록 하겠습니다!<br><br>
+            계산기 오픈 이후 연구원분들의 많은 관심과 이용 덕분에 누적 로그인 <strong style="font-size:1.15em;">20,000회</strong>를 넘겼습니다! <br><br>
 
-            아래는 업데이트 예정 및 완료 목록입니다.<br><br>
+            보내주신 성원에 감사드리며, 감사 기념으로 1개월 이상 장기 이용자분들께 <strong style="font-size:1.15em; color:#ff4444;">저장슬롯 3배 이벤트</strong>를 진행합니다.<br><br>
 
-            <s>신규 시로코 아티팩트 추가</s><br>
-            <s>신규 악세사리 마법부여 추가</s><br>
-            <s>쿨타임 감소 룬, 스킬 공격력 증가 룬 추가</s><br>
-            <strong style="color: #ff4444;">[03.26] 업데이트 완료</strong><br><br>
+            더 많은 세팅을 저장하고, 더 편하게 비교해보시길 바랍니다.<br>
+            앞으로도 더욱 좋은 계산기로 보답하겠습니다.<br><br>
+            
+            감사합니다.<br><br><br>
 
-            <s>캐릭터 밸런스 패치 업데이트</s><br>
-            <strong style="color: #ff4444;">[03.27] 업데이트 완료</strong><br><br>
+            ※ 본 이벤트는 '선임 연구원' 이상 등급에서 연속 2회 이상 이용하고 계신 연구원분들께 자동 적용됩니다.<br>
+            (정확한 이벤트 적용 시점은 2회차 이용이 시작된 뒤 약 2주 후, 총 이용기간 45일 전후로 자동 반영됩니다.)<br><br>
 
-            <s>죽은 자의 성 에픽/익시드 장비 오브젝트 데미지 개선</s><br>
-            <strong style="color: #ff4444;">[03.30] 업데이트 완료</strong><br><br>
-
-            <s>죽은 자의 성 에픽/익시드 장비 시너지 옵션 개선</s><br>
-            <strong style="color: #ff4444;">[04.06] 업데이트 완료</strong><br><br>
-
-            시로코 레이드 [침식] 무기 추가<br>
-            <strong style="color: #ff4444;">업데이트 예정</strong><br><br>
-
-            참고하셔서 계산 진행해보시기 바랍니다!<br><br>
-
-            감사합니다.<br>
+        
           <li class="sign-row">
             <span class="sign-text">- 게임실험연구소장 드림 -</span>
             <img src="/img/sign.png" alt="게임실험연구소장 직인" class="seal-stamp">
@@ -8054,6 +8066,7 @@ const rowDmgOpt = document.getElementById('specialDamageOptRow');
 const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
 const btnMacroSetGeneral = document.getElementById('btnMacroSetGeneral');
 const btnMacroSetElting = document.getElementById('btnMacroSetElting');
+const rowMacroStatusDmg = document.getElementById('rowMacroStatusDmg');
 const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
 const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
 const rowUnique = document.getElementById('uniqueOnOffRow');
@@ -8065,6 +8078,7 @@ if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
 if (btnAutoSet) btnAutoSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
 if (btnMacroSetGeneral) btnMacroSetGeneral.style.display = hasSpecialLike ? 'inline-flex' : 'none';
 if (btnMacroSetElting) btnMacroSetElting.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+if (rowMacroStatusDmg) rowMacroStatusDmg.style.display = hasSpecialLike ? 'inline-flex' : 'none';
 if (btnAutoSetMissing) btnAutoSetMissing.style.display = hasSpecialLike ? 'inline-flex' : 'none';
 if (btnAutoWeapon) btnAutoWeapon.style.display = hasSpecialLike ? 'inline-flex' : 'none';
 if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
@@ -11388,7 +11402,11 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
         // ★ skill_state_set 호출 (이미 JSON 객체 반환)
         const patchBefore = !!document.getElementById('chkUsePrePatchSkills')?.checked;
 
-        const payload = { ownerKey, skills: arr, patchBefore };
+console.log('[saveSkillSelections] ownerKey =', ownerKey);
+console.log('[saveSkillSelections] arr.length =', arr.length);
+console.table(arr);
+
+const payload = { ownerKey, skills: arr, patchBefore };
 
         // ✅ 워리어윈드시어는 트리 선택값도 같이 보낸다
         if (ownerKey === '워리어윈드시어') {
@@ -20749,10 +20767,47 @@ function buildFrontPresetState() {
             }
 
             // 서버 세션에도 반영(계산하기에서 바로 적용되도록)
-            if (typeof saveSkillSelections === 'function') {
-              try { await saveSkillSelections(); }
-              catch (e) { console.warn('[fpreset_load] saveSkillSelections 실패:', e); }
-            }
+if (typeof saveSkillSelections === 'function') {
+  try {
+    console.log('[fpreset_load] currentCharacter =', state.currentCharacter);
+    console.log('[fpreset_load] ownerKey(currentCharacter) =',
+      String(
+        (state?.currentCharacter?.jobGroupLabel || state?.currentCharacter?.jobGroup || '') +
+        (state?.currentCharacter?.name || '')
+      ).replace(/\s+/g, '')
+    );
+    console.log('[fpreset_load] skillLv keys =', Object.keys(state.skillLv || {}).length);
+    console.log('[fpreset_load] skillTpLv keys =', Object.keys(state.skillTpLv || {}).length);
+
+    const frostRows = (window.ST2?.rows || []).filter(r =>
+      [
+        '크리스탈 블레이드',
+        '빙백검',
+        '빙백검 3타',
+        '헤일스톰',
+        '설화연창',
+        '아이스 크래쉬',
+        '회전투창',
+        '브로큰 애로우',
+        '글라키에스'
+      ].includes(String(r?.name || '').trim())
+    );
+
+    console.table(frostRows.map(r => ({
+      id: r.id,
+      name: r.name,
+      minLv: Number(r.minLv || 0) || 0,
+      maxLv: Number(r.maxLv || 0) || 0,
+      lv: Number(state.skillLv?.[r.id] ?? 0) || 0,
+      tp: Number(state.skillTpLv?.[r.id] ?? 0) || 0
+    })));
+
+    await saveSkillSelections();
+  }
+  catch (e) {
+    console.warn('[fpreset_load] saveSkillSelections 실패:', e);
+  }
+}
           }
         } catch (e) {
           console.warn('[fpreset_load] mobile skillTrees 즉시 변환 실패:', e);
@@ -22046,9 +22101,16 @@ if (!macroCombos.length) {
       // ✅ 세트 적용 과정에서 지워질 수 있는 고유효과 상태를 다시 주입
       restoreCustomOptState(originalCustom);
 
-      // ✅ 룬 각인 설정/세부 설정 적용
-      const runeName = String(combo.runeEngraveName || '').trim();
-      const runeLevel = String(combo.runeEngraveLevel || '').trim();
+            // ✅ 룬 각인 설정/세부 설정 적용
+      const forceStatusDmg = !!document.getElementById('chkMacroStatusDmg')?.checked;
+
+      const runeName = forceStatusDmg
+        ? '상변데미지(%)'
+        : String(combo.runeEngraveName || '').trim();
+
+      const runeLevel = forceStatusDmg
+        ? '50'
+        : String(combo.runeEngraveLevel || '').trim();
 
       if (runeName && runeLevel) {
         state.runeEngrave = state.runeEngrave || {};
