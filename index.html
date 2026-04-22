@@ -11375,38 +11375,104 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
     }
 
     async function saveSkillSelections() {
-      const arr = [];
-      for (const s of (ST2.rows || [])) {
-        const lv = Number(state.skillLv?.[s.id] ?? 0);
-        const tp = Number(state.skillTpLv?.[s.id] ?? 0);
-        if (lv > 0) arr.push({ name: s.name, lv, tp });
+  try {
+    // ownerKey 계산 (1순위: 현재 캐릭 정보, 2순위: 합산캐시)
+    const raw = state.CurrentSumStats || {};
+
+    let ownerKey = '';
+    if (state.currentCharacter) {
+      const jg = String(state.currentCharacter.jobGroupLabel || state.currentCharacter.jobGroup || '').trim();
+      const nm = String(state.currentCharacter.name || '').trim();
+      if (jg || nm) {
+        ownerKey = (jg + nm).replace(/\s+/g, '');
       }
+    }
 
-      try {
-        // ownerKey 계산 (1순위: 현재 캐릭 정보, 2순위: 합산캐시)
-        const raw = state.CurrentSumStats || {};
+    if (!ownerKey) {
+      ownerKey = String(raw.ownerKey || '').trim();
+    }
 
-        let ownerKey = '';
-        if (state.currentCharacter) {
-          const jg = String(state.currentCharacter.jobGroupLabel || state.currentCharacter.jobGroup || '').trim();
-          const nm = String(state.currentCharacter.name || '').trim();
-          if (jg || nm) {
-            ownerKey = (jg + nm).replace(/\s+/g, '');
-          }
+    // ✅ [핵심] 계산 직전, 현재 캐릭터용 skillTrees가 있으면
+    //    그걸 진실원본으로 보고 skillLv / skillTpLv를 다시 만든다.
+    try {
+      const hasTrees = (state.skillTrees && typeof state.skillTrees === 'object');
+      const _ok = String(ownerKey || '').replace(/\s+/g, '');
+      const _ck = String(state?.currentCharacter?.ownerKey || '').replace(/\s+/g, '');
+      const treeStore = hasTrees ? (state.skillTrees[_ok] || state.skillTrees[_ck]) : null;
+
+      if (treeStore && typeof treeStore === 'object' && Array.isArray(ST2.rows) && ST2.rows.length) {
+        state.skillLv = {};
+        state.skillTpLv = {};
+
+        const idxByName = {};
+        for (const r of (ST2.rows || [])) {
+          const k = normKey(r?.name || '');
+          if (k && !idxByName[k]) idxByName[k] = r;
         }
 
-        if (!ownerKey) {
-          ownerKey = String(raw.ownerKey || '').trim();
+        for (const k in treeStore) {
+          const node = treeStore[k] || {};
+          const spLv = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
+          const tpLv = Number(node.tpLv ?? node.tp ?? 0) || 0;
+
+          const row = idxByName[normKey(k)];
+          if (!row) continue;
+
+          const maxLv = Number(row.maxLv || 0) || 0;
+          const cappedSp = Math.max(0, maxLv ? Math.min(spLv, maxLv) : spLv);
+          const cappedTp = Math.max(0, Math.min(tpLv, 5));
+
+          if (cappedSp > 0) state.skillLv[row.id] = cappedSp;
+          if (cappedTp > 0) state.skillTpLv[row.id] = cappedTp;
         }
 
-        // ★ skill_state_set 호출 (이미 JSON 객체 반환)
-        const patchBefore = !!document.getElementById('chkUsePrePatchSkills')?.checked;
+        // SP / TP 표시도 현재 재구성 결과 기준으로 다시 맞춤
+        const totalSp = Number(state?.currentCharacter?.sp || state?.sp?.total || 0) || 0;
+        const totalTp = Number(state?.currentCharacter?.tp || state?.tp?.total || 0) || 0;
+        let usedSp = 0, usedTp = 0;
 
-console.log('[saveSkillSelections] ownerKey =', ownerKey);
-console.log('[saveSkillSelections] arr.length =', arr.length);
-console.table(arr);
+        for (const r of (ST2.rows || [])) {
+          const lv = Number(state.skillLv?.[r.id] || 0) || 0;
+          const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
+          const base = Number(r.minLv ?? 0) || 0;
+          const perSp = Number(r.sp || 0) || 0;
+          const perTp = Number(r.tpCost || 0) || 0;
 
-const payload = { ownerKey, skills: arr, patchBefore };
+          usedSp += Math.max(0, lv - base) * perSp;
+          usedTp += Math.max(0, tp) * perTp;
+        }
+
+        state.sp = state.sp || { total: 0, left: 0 };
+        state.tp = state.tp || { total: 0, left: 0 };
+        state.sp.total = totalSp;
+        state.sp.left = Math.max(0, totalSp - usedSp);
+        state.tp.total = totalTp;
+        state.tp.left = Math.max(0, totalTp - usedTp);
+        state.stUsedSP = usedSp;
+        state.stUsedTP = usedTp;
+
+        if (typeof renderSpTp === 'function') renderSpTp();
+      }
+    } catch (e) {
+      console.warn('[saveSkillSelections] skillTrees -> skillLv 재동기화 실패:', e);
+    }
+
+    // ✅ 재동기화가 끝난 뒤 arr 생성
+    const arr = [];
+    for (const s of (ST2.rows || [])) {
+      const lv = Number(state.skillLv?.[s.id] ?? 0);
+      const tp = Number(state.skillTpLv?.[s.id] ?? 0);
+      if (lv > 0) arr.push({ name: s.name, lv, tp });
+    }
+
+    // ★ skill_state_set 호출 (이미 JSON 객체 반환)
+    const patchBefore = !!document.getElementById('chkUsePrePatchSkills')?.checked;
+
+    console.log('[saveSkillSelections] ownerKey =', ownerKey);
+    console.log('[saveSkillSelections] arr.length =', arr.length);
+    console.table(arr);
+
+    const payload = { ownerKey, skills: arr, patchBefore };
 
         // ✅ 워리어윈드시어는 트리 선택값도 같이 보낸다
         if (ownerKey === '워리어윈드시어') {
