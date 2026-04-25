@@ -898,8 +898,22 @@
     }
 
     #charModal .mchar-row:active {
-      transform: translateY(1px);
-    }
+  transform: translateY(1px);
+}
+
+/* ✅ 활성화여부=0 캐릭터: PC처럼 흑백 + 선택 불가 */
+#charModal .mchar-row.is-disabled,
+#charModal .mchar-row:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  filter: grayscale(1);
+  pointer-events: none;
+}
+
+#charModal .mchar-row.is-disabled .mchar-thumb,
+#charModal .mchar-row:disabled .mchar-thumb {
+  filter: grayscale(1);
+}
 
     #charModal .mchar-thumb {
       width: 72px;
@@ -6959,43 +6973,57 @@ function _getCharMainImage(c) {
         body.className = 'mchar-group-body';
 
         for (const c of g.list) {
-          const name = _getCharName(c);
-          const thumb = _getCharThumb(c);
+  const name = _getCharName(c);
+  const thumb = _getCharThumb(c);
 
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'mchar-row';
-          btn.innerHTML = `
-        <img class="mchar-thumb" src="${thumb}" alt="">
-        <div class="mchar-name">${name}</div>
-      `;
+  // ✅ 백엔드 char:list의 enabled 사용
+  // 활성화여부 컬럼이 0이면 enabled=false로 내려옴
+  const isEnabled = c?.enabled !== false;
 
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'mchar-row';
 
+  if (!isEnabled) {
+    btn.classList.add('is-disabled');
+    btn.disabled = true;
+    btn.setAttribute('aria-disabled', 'true');
+    btn.title = '현재 선택할 수 없는 캐릭터입니다.';
+  }
 
-          btn.addEventListener('click', () => {
-            const job = String(c.jobGroupLabel || c.jobGroup || c.job || '').trim();
-            const nm = String(name || c.name || '').trim();
-            const ownerKey = (job + nm).replace(/\s+/g, '');
-            // 선택 저장
-            window.state.currentCharacter = { ...c, name: nm, ownerKey };
+  btn.innerHTML = `
+    <img class="mchar-thumb" src="${thumb}" alt="">
+    <div class="mchar-name">${name}</div>
+  `;
 
-            // ✅ 버튼 숨기고, 캐릭 이미지 표시
-            applyPickedCharacterUI(window.state.currentCharacter);
+  // ✅ 비활성 캐릭터는 클릭 이벤트 자체를 붙이지 않음
+  if (isEnabled) {
+    btn.addEventListener('click', () => {
+      const job = String(c.jobGroupLabel || c.jobGroup || c.job || '').trim();
+      const nm = String(name || c.name || '').trim();
+      const ownerKey = (job + nm).replace(/\s+/g, '');
 
-            // ✅ 스킬 페이지 갱신
-            ensurePage4Init();
-            renderSkillPageMobile(window.state.currentCharacter);
+      // 선택 저장
+      window.state.currentCharacter = { ...c, name: nm, ownerKey };
 
-            // 모달 닫기
-            const m = document.getElementById('charModal');
-            if (m) {
-              m.classList.remove('show');
-              m.setAttribute('aria-hidden', 'true');
-            }
-          });
+      // ✅ 버튼 숨기고, 캐릭 이미지 표시
+      applyPickedCharacterUI(window.state.currentCharacter);
 
-          body.appendChild(btn);
-        }
+      // ✅ 스킬 페이지 갱신
+      ensurePage4Init();
+      renderSkillPageMobile(window.state.currentCharacter);
+
+      // 모달 닫기
+      const m = document.getElementById('charModal');
+      if (m) {
+        m.classList.remove('show');
+        m.setAttribute('aria-hidden', 'true');
+      }
+    });
+  }
+
+  body.appendChild(btn);
+}
 
         groupEl.appendChild(head);
         groupEl.appendChild(body);
