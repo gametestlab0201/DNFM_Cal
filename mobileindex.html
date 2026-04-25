@@ -8952,8 +8952,10 @@ function _looseOwnerMatch(rowOwner, charKey) {
   const a = _normNoSpace(rowOwner);
   const b = _normNoSpace(charKey);
   if (!a || !b) return false;
-  if (a === b) return true;
-  return a.includes(b) || b.includes(a) || a.endsWith(b) || b.endsWith(a);
+
+  // ✅ 캐릭터명은 반드시 정확히 일치해야 함
+  // 예: 격투가스트라이커 !== 남격투가스트라이커
+  return a === b;
 }
 
 // ✅ Object/Map 모두를 "entries"로 받기
@@ -9009,14 +9011,13 @@ function syncSkillTreesFromLvMaps_mobile(charObj) {
 
     // owner 느슨 매칭(공백 제거 후 포함/접미 허용)
     const isOwnerMatchLoose = (rowOwnerKey, targetCharKey) => {
-      const a = normName(rowOwnerKey);
-      const b = normName(targetCharKey);
-      if (!a) return false;                // row에 owner가 없으면 통과시키지 않음(빈행/공용행 차단)
-      if (a === b) return true;
-      if (a.includes(b) || b.includes(a)) return true;
-      if (a.endsWith(b) || b.endsWith(a)) return true;
-      return false;
-    };
+  const a = normName(rowOwnerKey);
+  const b = normName(targetCharKey);
+  if (!a || !b) return false;
+
+  // ✅ 구형 PC 저장본 변환에서도 캐릭터명은 정확히 일치해야 함
+  return a === b;
+};
 
     // 1) lvMap/tpMap을 “스킬명 기반”으로 변환해 lookup 테이블 생성
     const lvBySkill = Object.create(null);
