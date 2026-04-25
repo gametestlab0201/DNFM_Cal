@@ -1141,6 +1141,25 @@
       box-shadow: none;
     }
 
+.macro-statusdmg-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05);
+  color: #e5e7eb;
+  font-size: 12px;
+  user-select: none;
+}
+
+.macro-statusdmg-row input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: #cfa24f;
+}
 
     /* (선택) 무기 슬롯도 열 폭에 맞춰서 정렬 */
     /*.slot-row.weapon-row .slot[data-slot="R1"] {
@@ -5681,11 +5700,11 @@
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-                  <li>04.02 <span style="color: greenyellow;">[모바일]</span> 블레이드 와플 콤보 설정 추가 </li>
                   <li>04.03 버서커 '블러드 임팩트' 미사용 버그 수정 </li>
                   <li>04.03 윈드시어 '초초초초빨' 추가 </li>
                   <li>04.04 <span style="color: greenyellow;">[모바일]</span> 결의: 허영 속 어둠의 피조물 버그 수정</li>
                   <li>04.06 솔플 ↔ 파티 시너지 옵션 설정 추가 </li>
+                  <li>04.25 260423 캐릭터 밸런스 패치 적용 </li>
                 </ul>
               </div>
               <div class="upgrade">
@@ -5851,9 +5870,14 @@
   엘팅 매크로 계산
 </button>
 
-            <button id="btnAutoSetSweepMissing" class="ui-btnetc" style="display:none;">
-              누락만 재계산(방어구 고정)
-            </button>
+<label id="rowMacroStatusDmg" class="macro-statusdmg-row" style="display:none;">
+  <input type="checkbox" id="chkMacroStatusDmg">
+  <span>상변뎀 고정</span>
+</label>
+
+<button id="btnAutoSetSweepMissing" class="ui-btnetc" style="display:none;">
+  누락만 재계산(방어구 고정)
+</button>
 
             <button id="btnAutoWeaponSweepSelected" class="special-btn" style="display:none;">
               무기/무기고유효과 자동계산
@@ -7340,7 +7364,7 @@
   </div>
 
 
-    <!-- PC 계산기 로딩 후 안내 공지 모달 -->
+  <!-- PC 계산기 로딩 후 안내 공지 모달 -->
   <div id="noticeModal" class="modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
     <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="noticeModalTitle"
@@ -7426,6 +7450,7 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
+          <li>26.04.25 <span style="color: yellow;">260425</span><span style="color: #ff4444;"> 캐릭터 밸런스 패치</span> 적용</li>
           <li>26.04.06 <span style="color: yellow;">솔플 ↔ 파티</span><span style="color: #ff4444;"> 시너지 버프/장비 옵션 설정 토글버튼</span> 추가</li>
           <li>26.04.04 [모바일] <span style="color: yellow;">결의: 허영 속 어둠의 피조물 세트</span><span style="color: #ff4444;"> 조건부
               모든 타입 피해 증가 미적용 버그</span> 수정</li>
@@ -8042,6 +8067,7 @@ const rowDmgOpt = document.getElementById('specialDamageOptRow');
 const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
 const btnMacroSetGeneral = document.getElementById('btnMacroSetGeneral');
 const btnMacroSetElting = document.getElementById('btnMacroSetElting');
+const rowMacroStatusDmg = document.getElementById('rowMacroStatusDmg');
 const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
 const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
 const rowUnique = document.getElementById('uniqueOnOffRow');
@@ -8053,6 +8079,7 @@ if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
 if (btnAutoSet) btnAutoSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
 if (btnMacroSetGeneral) btnMacroSetGeneral.style.display = hasSpecialLike ? 'inline-flex' : 'none';
 if (btnMacroSetElting) btnMacroSetElting.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+if (rowMacroStatusDmg) rowMacroStatusDmg.style.display = hasSpecialLike ? 'inline-flex' : 'none';
 if (btnAutoSetMissing) btnAutoSetMissing.style.display = hasSpecialLike ? 'inline-flex' : 'none';
 if (btnAutoWeapon) btnAutoWeapon.style.display = hasSpecialLike ? 'inline-flex' : 'none';
 if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
@@ -11376,7 +11403,11 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
         // ★ skill_state_set 호출 (이미 JSON 객체 반환)
         const patchBefore = !!document.getElementById('chkUsePrePatchSkills')?.checked;
 
-        const payload = { ownerKey, skills: arr, patchBefore };
+console.log('[saveSkillSelections] ownerKey =', ownerKey);
+console.log('[saveSkillSelections] arr.length =', arr.length);
+console.table(arr);
+
+const payload = { ownerKey, skills: arr, patchBefore };
 
         // ✅ 워리어윈드시어는 트리 선택값도 같이 보낸다
         if (ownerKey === '워리어윈드시어') {
@@ -20660,95 +20691,129 @@ function buildFrontPresetState() {
           }
         }
 
-        // 1-2) (중요) 모바일/신형 skillTrees 형태 프리셋을
-//      PC 스킬맵(skillLv/skillTpLv)으로 즉시 "강제 재구성"한다.
-//      (기존 skillLv/skillTpLv에 양수값이 남아 있어도, 현재 프리셋 기준으로 덮어쓴다)
-try {
-  const hasTrees = (state.skillTrees && typeof state.skillTrees === 'object');
-  if (hasTrees && Array.isArray(window.ST2?.rows) && window.ST2.rows.length) {
-    // ownerKey 산출
-    const cc2 = state.currentCharacter || {};
-    let ownerKey2 = '';
-    const job2 = String(cc2.jobGroupLabel || cc2.jobGroup || '').trim();
-    const nm2 = String(cc2.name || '').trim();
-    if (job2 || nm2) ownerKey2 = (job2 + nm2).replace(/\s+/g, '');
-    if (!ownerKey2) ownerKey2 = String(state?.CurrentSumStats?.ownerKey || '').trim();
+        // 1-2) (중요) 모바일 skillTrees 형태 프리셋을 PC 스킬맵(skillLv/skillTpLv)으로 즉시 변환한다.
+        //      (스킬트리 설정 모달을 열지 않아도 불러오기 직후 적용되도록)
+        try {
+          const hasTrees = (state.skillTrees && typeof state.skillTrees === 'object');
+          if (hasTrees && Array.isArray(window.ST2?.rows) && window.ST2.rows.length) {
+            // ownerKey 산출
+            const cc2 = state.currentCharacter || {};
+            let ownerKey2 = '';
+            const job2 = String(cc2.jobGroupLabel || cc2.jobGroup || '').trim();
+            const nm2 = String(cc2.name || '').trim();
+            if (job2 || nm2) ownerKey2 = (job2 + nm2).replace(/\s+/g, '');
+            if (!ownerKey2) ownerKey2 = String(state?.CurrentSumStats?.ownerKey || '').trim();
 
-    const _ok2 = String(ownerKey2 || '').replace(/\s+/g, '');
-    const _ck2 = String(state?.currentCharacter?.ownerKey || '').replace(/\s+/g, '');
-    const charKey2 = _ok2 || _ck2;
-    const treeStore2 = charKey2 ? (state.skillTrees[_ok2] || state.skillTrees[_ck2]) : null;
+            const _ok2 = String(ownerKey2 || '').replace(/\s+/g, '');
+            const _ck2 = String(state?.currentCharacter?.ownerKey || '').replace(/\s+/g, '');
+            const charKey2 = _ok2 || _ck2;
+            const treeStore2 = charKey2 ? (state.skillTrees[_ok2] || state.skillTrees[_ck2]) : null;
 
-    // ✅ 기존처럼 hasPosLv2 / hasPosTp2 를 보지 않는다.
-    //    프리셋 불러오기 시점에는 skillTrees를 진실원본으로 보고,
-    //    계산용 skillLv / skillTpLv 를 무조건 다시 만든다.
-    if (treeStore2 && typeof treeStore2 === 'object') {
-      state.skillLv = {};
-      state.skillTpLv = {};
+            const hasAnyPositive2 = (m) => {
+              if (!m || typeof m !== 'object') return false;
+              for (const k in m) if ((Number(m[k]) || 0) > 0) return true;
+              return false;
+            };
 
-      const idxByName2 = {};
-      for (const r of (window.ST2.rows || [])) {
-        const k = normKey(r?.name || '');
-        if (k && !idxByName2[k]) idxByName2[k] = r;
-      }
+            const hasPosLv2 = hasAnyPositive2(state.skillLv);
+            const hasPosTp2 = hasAnyPositive2(state.skillTpLv);
+            const alreadyConverted2 = (String(state._skillTreesConvertedFor || '') === String(charKey2 || ''));
 
-      for (const k in treeStore2) {
-        const node = treeStore2[k] || {};
-        const spLv = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
-        const tpLv = Number(node.tpLv ?? node.tp ?? 0) || 0;
+            if (!alreadyConverted2 && treeStore2 && typeof treeStore2 === 'object' && (!hasPosLv2 && !hasPosTp2)) {
+              state.skillLv = {};
+              state.skillTpLv = state.skillTpLv || {};
 
-        const row = idxByName2[normKey(k)];
-        if (!row) continue;
+              const idxByName2 = {};
+              for (const r of (window.ST2.rows || [])) {
+                const k = normKey(r?.name || '');
+                if (k && !idxByName2[k]) idxByName2[k] = r;
+              }
 
-        const maxLv = Number(row.maxLv || 0) || 0;
-        const cappedSp = Math.max(0, maxLv ? Math.min(spLv, maxLv) : spLv);
-        const cappedTp = Math.max(0, Math.min(tpLv, 5));
+              for (const k in treeStore2) {
+                const node = treeStore2[k] || {};
+                const spLv = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
+                const tpLv = Number(node.tpLv ?? node.tp ?? 0) || 0;
 
-        if (cappedSp > 0) state.skillLv[row.id] = cappedSp;
-        if (cappedTp > 0) state.skillTpLv[row.id] = cappedTp;
-      }
+                const row = idxByName2[normKey(k)];
+                if (!row) continue;
 
-      const totalSp = Number(state?.currentCharacter?.sp || state?.sp?.total || 0) || 0;
-      const totalTp = Number(state?.currentCharacter?.tp || state?.tp?.total || 0) || 0;
-      let usedSp = 0, usedTp = 0;
+                const maxLv = Number(row.maxLv || 0) || 0;
+                const cappedSp = Math.max(0, maxLv ? Math.min(spLv, maxLv) : spLv);
+                const cappedTp = Math.max(0, Math.min(tpLv, 5));
 
-      for (const r of (window.ST2.rows || [])) {
-        const lv = Number(state.skillLv?.[r.id] || 0) || 0;
-        const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
-        usedSp += lv * Number(r.sp || 0);
-        usedTp += tp * Number(r.tpCost || 0);
-      }
+                if (cappedSp) state.skillLv[row.id] = cappedSp;
+                if (cappedTp) state.skillTpLv[row.id] = cappedTp;
+              }
 
-      state.sp = state.sp || {};
-      state.tp = state.tp || {};
-      state.sp.total = totalSp;
-      state.sp.left = Math.max(0, totalSp - usedSp);
-      state.tp.total = totalTp;
-      state.tp.left = Math.max(0, totalTp - usedTp);
-      state.stUsedSP = usedSp;
-      state.stUsedTP = usedTp;
+              const totalSp = Number(state?.currentCharacter?.sp || state?.sp?.total || 0) || 0;
+              const totalTp = Number(state?.currentCharacter?.tp || state?.tp?.total || 0) || 0;
+              let usedSp = 0, usedTp = 0;
 
-      state._skillTreesConvertedFor = String(charKey2 || '');
+              for (const r of (window.ST2.rows || [])) {
+                const lv = Number(state.skillLv?.[r.id] || 0) || 0;
+                const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
+                usedSp += lv * Number(r.sp || 0);
+                usedTp += tp * Number(r.tpCost || 0);
+              }
 
-      // ✅ 화면 갱신
-      if (typeof renderSpTp === 'function') renderSpTp();
+              state.sp.total = totalSp;
+              state.sp.left = Math.max(0, totalSp - usedSp);
+              state.tp.total = totalTp;
+              state.tp.left = Math.max(0, totalTp - usedTp);
+              state.stUsedSP = usedSp;
+              state.stUsedTP = usedTp;
 
-      // ✅ 내부 skillTrees / skillLv / skillTpLv 정합성 한번 더 맞춤
-      if (typeof syncSkillTreesFromLvMaps_pc === 'function') {
-        try { syncSkillTreesFromLvMaps_pc(); }
-        catch (e) { console.warn('[fpreset_load] syncSkillTreesFromLvMaps_pc 실패:', e); }
-      }
-    }
+              state._skillTreesConvertedFor = String(charKey2 || '');
+              if (typeof renderSpTp === 'function') renderSpTp();
+            }
 
-    // 서버 세션에도 반영(계산하기에서 바로 적용되도록)
-    if (typeof saveSkillSelections === 'function') {
-      try { await saveSkillSelections(); }
-      catch (e) { console.warn('[fpreset_load] saveSkillSelections 실패:', e); }
-    }
+            // 서버 세션에도 반영(계산하기에서 바로 적용되도록)
+if (typeof saveSkillSelections === 'function') {
+  try {
+    console.log('[fpreset_load] currentCharacter =', state.currentCharacter);
+    console.log('[fpreset_load] ownerKey(currentCharacter) =',
+      String(
+        (state?.currentCharacter?.jobGroupLabel || state?.currentCharacter?.jobGroup || '') +
+        (state?.currentCharacter?.name || '')
+      ).replace(/\s+/g, '')
+    );
+    console.log('[fpreset_load] skillLv keys =', Object.keys(state.skillLv || {}).length);
+    console.log('[fpreset_load] skillTpLv keys =', Object.keys(state.skillTpLv || {}).length);
+
+    const frostRows = (window.ST2?.rows || []).filter(r =>
+      [
+        '크리스탈 블레이드',
+        '빙백검',
+        '빙백검 3타',
+        '헤일스톰',
+        '설화연창',
+        '아이스 크래쉬',
+        '회전투창',
+        '브로큰 애로우',
+        '글라키에스'
+      ].includes(String(r?.name || '').trim())
+    );
+
+    console.table(frostRows.map(r => ({
+      id: r.id,
+      name: r.name,
+      minLv: Number(r.minLv || 0) || 0,
+      maxLv: Number(r.maxLv || 0) || 0,
+      lv: Number(state.skillLv?.[r.id] ?? 0) || 0,
+      tp: Number(state.skillTpLv?.[r.id] ?? 0) || 0
+    })));
+
+    await saveSkillSelections();
   }
-} catch (e) {
-  console.warn('[fpreset_load] mobile skillTrees 즉시 변환 실패:', e);
+  catch (e) {
+    console.warn('[fpreset_load] saveSkillSelections 실패:', e);
+  }
 }
+          }
+        } catch (e) {
+          console.warn('[fpreset_load] mobile skillTrees 즉시 변환 실패:', e);
+        }
+
         alert(`슬롯 ${slot}의 프리셋을 불러왔습니다.`);
       } catch (err) {
         console.error('[fpreset_load] 에러:', err);
@@ -22037,9 +22102,16 @@ if (!macroCombos.length) {
       // ✅ 세트 적용 과정에서 지워질 수 있는 고유효과 상태를 다시 주입
       restoreCustomOptState(originalCustom);
 
-      // ✅ 룬 각인 설정/세부 설정 적용
-      const runeName = String(combo.runeEngraveName || '').trim();
-      const runeLevel = String(combo.runeEngraveLevel || '').trim();
+            // ✅ 룬 각인 설정/세부 설정 적용
+      const forceStatusDmg = !!document.getElementById('chkMacroStatusDmg')?.checked;
+
+      const runeName = forceStatusDmg
+        ? '상변데미지(%)'
+        : String(combo.runeEngraveName || '').trim();
+
+      const runeLevel = forceStatusDmg
+        ? '50'
+        : String(combo.runeEngraveLevel || '').trim();
 
       if (runeName && runeLevel) {
         state.runeEngrave = state.runeEngrave || {};
