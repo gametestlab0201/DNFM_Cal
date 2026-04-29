@@ -8440,6 +8440,151 @@ function bindWindshearTreeModalMobile() {
       if (set === 1 || set === 2) return set;
     }
 
+       function refreshCurrentCharacterSpTpFromCharList_mobile() {
+      try {
+        const s = window.state || (window.state = {});
+        const cc = s.currentCharacter || {};
+
+        const curJob = String(cc.jobGroupLabel || cc.jobGroup || '').trim();
+        const curName = String(cc.name || cc.charName || '').trim();
+        const curOwnerKey = String((typeof _getCurrentCharKey === 'function' ? _getCurrentCharKey() : '') || (curJob + curName)).replace(/\s+/g, '');
+
+        if (!curOwnerKey && !curName) return null;
+
+        const lists =
+          (window.CORE && CORE.lists) ||
+          (window.CORE_DATA && CORE_DATA.lists) ||
+          {};
+
+        let charRows = lists['char:list'] || [];
+        if (charRows && typeof charRows === 'object' && Array.isArray(charRows.rows)) {
+          charRows = charRows.rows;
+        }
+        if (!Array.isArray(charRows) || !charRows.length) return null;
+
+        const norm = (v) => String(v ?? '').replace(/\s+/g, '').trim();
+
+        const row = charRows.find(r => {
+          const rowJob = String(r.jobGroup || r['직업군'] || '').trim();
+          const rowName = String(r.name || r['이름'] || '').trim();
+          const rowOwnerKey = norm(rowJob + rowName);
+
+          return (
+            rowOwnerKey === norm(curOwnerKey) ||
+            (curJob && curName && norm(rowJob) === norm(curJob) && norm(rowName) === norm(curName)) ||
+            (curName && norm(rowName) === norm(curName))
+          );
+        });
+
+        if (!row) return null;
+
+        const latestSP = Number(row.sp ?? row.TotalSP ?? row.totalSP ?? row['총SP'] ?? 0) || 0;
+        const latestTP = Number(row.tp ?? row.TotalTP ?? row.totalTP ?? row['총TP'] ?? 0) || 0;
+
+        if (!latestSP && !latestTP) return null;
+
+        s.currentCharacter = {
+          ...cc,
+          jobGroup: curJob || cc.jobGroup,
+          jobGroupLabel: curJob || cc.jobGroupLabel,
+          name: curName || cc.name,
+
+          // ✅ _getCharTotalSpTp()가 어떤 키를 읽어도 최신값을 보도록 모두 갱신
+          sp: latestSP,
+          tp: latestTP,
+          TotalSP: latestSP,
+          TotalTP: latestTP,
+          totalSP: latestSP,
+          totalTP: latestTP,
+          총SP: latestSP,
+          총TP: latestTP,
+        };
+
+        s.sp = s.sp && typeof s.sp === 'object' ? s.sp : { total: 0, left: 0 };
+        s.tp = s.tp && typeof s.tp === 'object' ? s.tp : { total: 0, left: 0 };
+
+        s.sp.total = latestSP;
+        s.tp.total = latestTP;
+
+        return { sp: latestSP, tp: latestTP };
+      } catch (e) {
+        console.warn('[mobile skill reset] char:list 최신 SP/TP 갱신 실패:', e);
+        return null;
+      }
+    }
+
+    function getSkillResetNeedMessage_mobile(st) {
+      try {
+        const s = st || window.state || {};
+        const cc = s.currentCharacter || {};
+
+        const curJob = String(cc.jobGroupLabel || cc.jobGroup || '').trim();
+        const curName = String(cc.name || cc.charName || '').trim();
+        const curOwnerKey = String((typeof _getCurrentCharKey === 'function' ? _getCurrentCharKey() : '') || (curJob + curName)).replace(/\s+/g, '');
+
+        if (!curOwnerKey && !curName) return '';
+
+        // ✅ 불러온 저장슬롯 안에 들어있던 총SP
+        const loadedSP = Number(
+          cc.sp ??
+          cc.TotalSP ??
+          cc.totalSP ??
+          cc['총SP'] ??
+          s.sp?.total ??
+          0
+        ) || 0;
+
+        if (!loadedSP) return '';
+
+        const lists =
+          (window.CORE && CORE.lists) ||
+          (window.CORE_DATA && CORE_DATA.lists) ||
+          {};
+
+        let charRows = lists['char:list'] || [];
+        if (charRows && typeof charRows === 'object' && Array.isArray(charRows.rows)) {
+          charRows = charRows.rows;
+        }
+        if (!Array.isArray(charRows) || !charRows.length) return '';
+
+        const norm = (v) => String(v ?? '').replace(/\s+/g, '').trim();
+
+        const row = charRows.find(r => {
+          const rowJob = String(r.jobGroup || r['직업군'] || '').trim();
+          const rowName = String(r.name || r['이름'] || '').trim();
+          const rowOwnerKey = norm(rowJob + rowName);
+
+          return (
+            rowOwnerKey === norm(curOwnerKey) ||
+            (curJob && curName && norm(rowJob) === norm(curJob) && norm(rowName) === norm(curName)) ||
+            (curName && norm(rowName) === norm(curName))
+          );
+        });
+
+        if (!row) return '';
+
+        // ✅ 현재 캐릭터 시트(char:list)의 최신 총SP
+        const currentSP = Number(
+          row.sp ??
+          row.TotalSP ??
+          row.totalSP ??
+          row['총SP'] ??
+          0
+        ) || 0;
+
+        if (!currentSP) return '';
+
+        if (loadedSP !== currentSP) {
+          return `2차 각성 패시브 적용으로 인해 사용할 수 있는 SP가 변경되었습니다.\n스킬 초기화를 진행하여 스킬을 새로 찍고 재저장 해주세요.`;
+        }
+
+        return '';
+      } catch (e) {
+        console.warn('[mobile fpreset_load] 총SP 비교 실패:', e);
+        return '';
+      }
+    }
+
     // ===== Page4 Skill: 남은 SP/TP 표시 =====
     function _getCharTotalSpTp() {
       const s = window.state || {};
@@ -8928,15 +9073,20 @@ const _blockIfExclusiveFalcon = (nextSp, storeObj) => {
     }
   }
 
-  // (3) 초기화 버튼
+    // (3) 초기화 버튼
   if (resetBtn && !resetBtn.dataset.bound) {
     resetBtn.dataset.bound = '1';
     resetBtn.addEventListener('click', () => {
       const s = (window.state || (window.state = {}));
       const charKey = _getCurrentCharKey() || '__nochar__';
+
       if (s.skillTrees && s.skillTrees[charKey]) {
         delete s.skillTrees[charKey];
       }
+
+      // ✅ 스킬초기화를 누른 순간에만 현재 캐릭터 시트(char:list)의 최신 총SP/총TP로 갱신
+      refreshCurrentCharacterSpTpFromCharList_mobile();
+
       renderSkillPageMobile();
       updateSkillRemainBar();
       toast('스킬이 초기화되었습니다.');
@@ -15943,8 +16093,17 @@ async function handlePresetLoad_mobile() {
   // ✅ (FIX) 체감 속도 개선: 슬롯 관리 모달을 먼저 닫고 불러오기를 진행
   closePresetModal_mobile();
 
-  try {
+      try {
     await loadFromFpresetSlot_mobile(slotNum);
+
+    const resetNeedMsg = getSkillResetNeedMessage_mobile(window.state);
+
+    if (resetNeedMsg) {
+      alert(`불러왔습니다.\n\n${resetNeedMsg}`);
+    } else {
+      (window.toast || alert)('불러왔습니다.');
+    }
+
   } catch (err) {
     console.error(err);
     (window.toast || alert)('불러오기에 실패했습니다.');
