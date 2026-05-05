@@ -5041,15 +5041,31 @@
     }
 
         /* ✅ 남격투가스트라이커 충전 UI: 스킬 이미지 우측 배치 */
-    .st2-icon-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+        .st2-icon-row {
+      /* ✅ 핵심:
+         아이콘 자체는 기존처럼 타일 중앙에 고정하고,
+         충전 UI만 아이콘 우측에 absolute로 붙인다. */
+      position: relative;
+      width: clamp(68px, 7.6vw, 92px);
+      height: clamp(68px, 7.6vw, 92px);
       min-height: clamp(68px, 7.6vw, 92px);
+
+      display: grid;
+      place-items: center;
+      overflow: visible;
+    }
+
+    /* ✅ 충전 UI가 아이콘 우측으로 튀어나올 수 있게 */
+    .st2-tile {
+      overflow: visible;
     }
 
     .st2-charge {
+      position: absolute;
+      left: calc(100% + 6px);
+      top: 50%;
+      transform: translateY(-50%);
+
       display: inline-flex;
       flex-direction: column;
       align-items: center;
@@ -5061,6 +5077,7 @@
       background: rgba(26, 19, 15, .82);
       box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
       min-width: 46px;
+      z-index: 3;
     }
 
     .st2-charge-label {
@@ -10201,24 +10218,34 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
           // 무기종류가 지정된 스킬은 현재 무기종류와 일치하는 것만
           return rowWeapon === weaponType;
         })
-                .map((r, idx) => ({
-          id: 'SK_' + idx + '_' + (r.name || ''),
-          name: r.name || '',
-          img: r.image || '',
-          who: ownerKey,
-          show: true,
-          level: Number(r.reqLevel || 0),      // 스킬렙제
-          x: Math.min(6, Math.max(1, Number(r.x || 1))),
-          y: Math.max(1, Number(r.y || 1)),
-          minLv: Number(r.minLevel || 0),
-          maxLv: Number(r.maxLevel || 0),
-          sp: Number(r.costSP || 0),
-          tpCost: Number(r.tp || 0),
+                .map((r, idx) => {
+          const rawKind = String(
+            r.kind ??
+            r.skillType ??
+            r['구분'] ??
+            '스킬'
+          ).trim();
 
-          // ✅ 신규 컬럼: 스킬 시트의 '단계'
-          // 백엔드 skill:list에 stage/step/단계 중 어떤 이름으로 오든 받을 수 있게 열어둠
-          stage: String(r.stage ?? r.step ?? r['단계'] ?? '').trim(),
-        }));
+          return {
+            id: 'SK_' + idx + '_' + (r.name || ''),
+            name: r.name || '',
+            img: r.image || '',
+            who: ownerKey,
+            show: true,
+            level: Number(r.reqLevel || 0),      // 스킬렙제
+            x: Math.min(6, Math.max(1, Number(r.x || 1))),
+            y: Math.max(1, Number(r.y || 1)),
+            minLv: Number(r.minLevel || 0),
+            maxLv: Number(r.maxLevel || 0),
+            sp: Number(r.costSP || 0),
+            tpCost: Number(r.tp || 0),
+
+            // ✅ 기존 '구분' 컬럼 기반
+            kind: rawKind,
+            skillType: rawKind,
+            chargeSkill: !!r.chargeSkill || rawKind.replace(/\s+/g, '') === '충전스킬',
+          };
+        });
 
 
       // (4) ST2 전역에 반영
@@ -10341,10 +10368,16 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
 
       const isMaleStrikerOwner = (String(ownerKey || '').replace(/\s+/g, '') === '남격투가스트라이커');
 
-      const hasChargeStageColumn = (s) => {
-        // 단계 컬럼에 값이 있는 스킬만 충전 UI 표시
-        // 예: 1, TRUE, 충전, 사용 등 무엇이든 비어있지만 않으면 표시
-        return String(s?.stage ?? '').trim() !== '';
+            const isChargeSkillRow = (s) => {
+        // ✅ 스킬 시트의 '구분' 컬럼이 '충전스킬'인 경우만 충전 UI 표시
+        const rawKind = String(
+          s?.skillType ??
+          s?.kind ??
+          s?.['구분'] ??
+          ''
+        ).replace(/\s+/g, '');
+
+        return !!s?.chargeSkill || rawKind === '충전스킬';
       };
 
       const clampChargeIndex = (idx) => {
@@ -10903,8 +10936,8 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
           iconRow.className = 'st2-icon-row';
           iconRow.appendChild(icon);
 
-          // ✅ 남격투가스트라이커 + 단계 컬럼이 있는 스킬만 충전 UI 표시
-          const useChargeUi = isMaleStrikerOwner && hasChargeStageColumn(s);
+                    // ✅ 남격투가스트라이커 + 구분=충전스킬 인 스킬만 충전 UI 표시
+          const useChargeUi = isMaleStrikerOwner && isChargeSkillRow(s);
 
           let chargeValEl = null;
           let chargeMinusBtn = null;
@@ -11802,14 +11835,40 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
     }
 
     async function saveSkillSelections() {
-      const arr = [];
-      for (const s of (ST2.rows || [])) {
-        const lv = Number(state.skillLv?.[s.id] ?? 0);
-        const tp = Number(state.skillTpLv?.[s.id] ?? 0);
-        if (lv > 0) arr.push({ name: s.name, lv, tp });
-      }
+  const arr = [];
 
-      try {
+  // ✅ 남격투가스트라이커 충전 단계값
+  // renderSkillTreeBands() 내부 상수와 동일하게 맞춤
+  const CHARGE_STAGE_VALUES_PC = [0, 1.5, 4.5, 7.5, 15];
+
+  const clampChargeIndexForSave = (idx) => {
+    const n = Number(idx) || 0;
+    return Math.max(0, Math.min(CHARGE_STAGE_VALUES_PC.length - 1, n));
+  };
+
+  for (const s of (ST2.rows || [])) {
+    const lv = Number(state.skillLv?.[s.id] ?? 0);
+    const tp = Number(state.skillTpLv?.[s.id] ?? 0);
+
+    if (lv > 0) {
+      const chargeStageIndex = clampChargeIndexForSave(state.skillChargeStage?.[s.id] ?? 0);
+      const chargeStage = CHARGE_STAGE_VALUES_PC[chargeStageIndex] || 0;
+
+      arr.push({
+        name: s.name,
+        lv,
+        tp,
+
+        // ✅ 충전스킬 계산용
+        // 백엔드에서는 chargeSkill=true인 스킬에만 적용하므로
+        // 일반 스킬에 같이 보내져도 영향 없음
+        chargeStage,
+        chargeStageIndex,
+      });
+    }
+  }
+
+  try {
         // ownerKey 계산 (1순위: 현재 캐릭 정보, 2순위: 합산캐시)
         const raw = state.CurrentSumStats || {};
 
