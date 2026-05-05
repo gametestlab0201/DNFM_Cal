@@ -5040,6 +5040,78 @@
       /* 우측 상단 TP 색상과 동일 */
     }
 
+        /* ✅ 남격투가스트라이커 충전 UI: 스킬 이미지 우측 배치 */
+    .st2-icon-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: clamp(68px, 7.6vw, 92px);
+    }
+
+    .st2-charge {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 4px 5px;
+      border-radius: 10px;
+      border: 1px solid rgba(207, 162, 79, .45);
+      background: rgba(26, 19, 15, .82);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+      min-width: 46px;
+    }
+
+    .st2-charge-label {
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1;
+      color: #facc15;
+      letter-spacing: -0.2px;
+    }
+
+    .st2-charge-ctrl {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+
+    .st2-charge-btn {
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      border-radius: 999px;
+      border: 1px solid #3a2c21;
+      background: #1a130f;
+      color: #e7c27a;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .st2-charge-btn:hover {
+      border-color: #cfa24f;
+      box-shadow: 0 0 0 2px rgba(207, 162, 79, .18) inset;
+    }
+
+    .st2-charge-btn:disabled {
+      opacity: .45;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .st2-charge-val {
+      min-width: 22px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+      color: #f0e6d2;
+    }
+
     /* Circular icon */
     .st2-skill {
       width: clamp(68px, 7.6vw, 92px);
@@ -8100,8 +8172,30 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
 
 
 
-    // (원하면 콘솔에서 직접 호출할 수 있게 전역에 노출)
+        // (원하면 콘솔에서 직접 호출할 수 있게 전역에 노출)
     window.updateSpecialUserButton = updateSpecialUserButton;
+
+    // ✅ special_user / research_user는 캐릭터 시트의 활성화여부를 무시하고 선택 가능
+    function canBypassDisabledCharacter_pc() {
+      const lp = window.__loginPingResult || {};
+      return !!(
+        window.__IS_SPECIAL_USER__ ||
+        window.__IS_RESEARCH_USER__ ||
+        lp.specialUser ||
+        lp.researchUser
+      );
+    }
+
+    function isCharacterEnabledForPick_pc(item) {
+      if (canBypassDisabledCharacter_pc()) return true;
+
+      return (
+        item?.enabled === true ||
+        item?.enabled === 1 ||
+        String(item?.enabled).trim() === 'true' ||
+        String(item?.enabled).trim() === '1'
+      );
+    }
 
     // ✅ research_user: 캐릭터 선택 즉시 SP 스킬을 전부 최대레벨로 채움 (TP 제외)
     function applyResearchUserAutoMaxSkillsForCharacter() {
@@ -10107,7 +10201,7 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
           // 무기종류가 지정된 스킬은 현재 무기종류와 일치하는 것만
           return rowWeapon === weaponType;
         })
-        .map((r, idx) => ({
+                .map((r, idx) => ({
           id: 'SK_' + idx + '_' + (r.name || ''),
           name: r.name || '',
           img: r.image || '',
@@ -10120,6 +10214,10 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
           maxLv: Number(r.maxLevel || 0),
           sp: Number(r.costSP || 0),
           tpCost: Number(r.tp || 0),
+
+          // ✅ 신규 컬럼: 스킬 시트의 '단계'
+          // 백엔드 skill:list에 stage/step/단계 중 어떤 이름으로 오든 받을 수 있게 열어둠
+          stage: String(r.stage ?? r.step ?? r['단계'] ?? '').trim(),
         }));
 
 
@@ -10234,7 +10332,97 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
         console.warn('[renderSkillTreeBands] mobile skillTrees → skillLv 변환 실패:', e);
       }
 
-      const TP_MIN = 0, TP_MAX = 5;
+            const TP_MIN = 0, TP_MAX = 5;
+
+      // ✅ 남격투가스트라이커 충전 단계
+      const STRIKER_CHARGE_VALUES = [0, 1.5, 4.5, 7.5, 15];
+
+      state.skillChargeStage = state.skillChargeStage || {};
+
+      const isMaleStrikerOwner = (String(ownerKey || '').replace(/\s+/g, '') === '남격투가스트라이커');
+
+      const hasChargeStageColumn = (s) => {
+        // 단계 컬럼에 값이 있는 스킬만 충전 UI 표시
+        // 예: 1, TRUE, 충전, 사용 등 무엇이든 비어있지만 않으면 표시
+        return String(s?.stage ?? '').trim() !== '';
+      };
+
+      const clampChargeIndex = (idx) => {
+        const n = Number(idx) || 0;
+        return Math.max(0, Math.min(STRIKER_CHARGE_VALUES.length - 1, n));
+      };
+
+      const getChargeIndex = (s) => {
+        const raw = state.skillChargeStage?.[s.id];
+        return clampChargeIndex(raw);
+      };
+
+      const getChargeValue = (s) => {
+        return STRIKER_CHARGE_VALUES[getChargeIndex(s)] || 0;
+      };
+
+      const setChargeIndex = (s, idx) => {
+        const nextIdx = clampChargeIndex(idx);
+        state.skillChargeStage[s.id] = nextIdx;
+
+        // ✅ 저장슬롯 호환용 skillTrees에도 같이 저장
+        try {
+          const ownerKey2 = String(ownerKey || '').replace(/\s+/g, '');
+          const skillName = String(s?.name || '').trim();
+          if (ownerKey2 && skillName) {
+            state.skillTrees = state.skillTrees || {};
+            state.skillTrees[ownerKey2] = state.skillTrees[ownerKey2] || {};
+            const prev = state.skillTrees[ownerKey2][skillName] || {};
+            state.skillTrees[ownerKey2][skillName] = {
+              ...prev,
+              chargeStage: STRIKER_CHARGE_VALUES[nextIdx],
+              chargeStageIndex: nextIdx,
+            };
+          }
+        } catch (e) {
+          console.warn('[chargeStage] skillTrees 저장 실패:', e);
+        }
+
+        onSkillTreeChanged();
+      };
+
+      const syncChargeFromSkillTrees_pc = () => {
+        try {
+          const ownerKey2 = String(ownerKey || '').replace(/\s+/g, '');
+          const store = state?.skillTrees?.[ownerKey2];
+          if (!ownerKey2 || !store || typeof store !== 'object') return;
+
+          const rows = Array.isArray(ST2?.rows) ? ST2.rows : [];
+          const byName = {};
+          const nk = (v) => String(v ?? '').trim().replace(/\s+/g, '').normalize('NFC');
+
+          for (const r of rows) {
+            if (!r?.id || !r?.name) continue;
+            byName[nk(r.name)] = r;
+          }
+
+          for (const skillName in store) {
+            const node = store[skillName] || {};
+            const row = byName[nk(skillName)];
+            if (!row?.id) continue;
+
+            const rawIdx = node.chargeStageIndex;
+            const rawVal = node.chargeStage;
+
+            let idx = Number(rawIdx);
+            if (!Number.isFinite(idx)) {
+              const found = STRIKER_CHARGE_VALUES.findIndex(v => Number(v) === Number(rawVal));
+              idx = found >= 0 ? found : 0;
+            }
+
+            state.skillChargeStage[row.id] = clampChargeIndex(idx);
+          }
+        } catch (e) {
+          console.warn('[chargeStage] skillTrees 불러오기 실패:', e);
+        }
+      };
+
+      syncChargeFromSkillTrees_pc();
 
       // ✅ 각 스킬 타일의 버튼 비활성화 상태를 한꺼번에 다시 계산하기 위한 배열
       const skillTileRefreshers = [];
@@ -10322,10 +10510,16 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
             //    기본 minLv만 있는 스킬도 store에는 남겨두면 다음 렌더에서 안정적이다.
             if (lv > 0 || tp > 0 || minLv > 0) {
               const prev = store[skillName] || {};
+              const chargeIdx = clampChargeIndex(state.skillChargeStage?.[r.id] ?? 0);
+
               store[skillName] = {
                 ...prev,
                 spLv: Math.max(minLv, lv),
-                tpLv: tp
+                tpLv: tp,
+
+                // ✅ 남격투가스트라이커 충전값 저장
+                chargeStage: STRIKER_CHARGE_VALUES[chargeIdx],
+                chargeStageIndex: chargeIdx,
               };
             } else {
               delete store[skillName];
@@ -10697,12 +10891,57 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
             tile.classList.add('no-tp');
           }
 
-          const icon = document.createElement('div');
+                    const icon = document.createElement('div');
           icon.className = 'st2-skill';
           const img = document.createElement('img');
           img.alt = s.name;
           img.src = s.img || '';
           icon.appendChild(img);
+
+          // ✅ 아이콘 + 충전 UI 래퍼
+          const iconRow = document.createElement('div');
+          iconRow.className = 'st2-icon-row';
+          iconRow.appendChild(icon);
+
+          // ✅ 남격투가스트라이커 + 단계 컬럼이 있는 스킬만 충전 UI 표시
+          const useChargeUi = isMaleStrikerOwner && hasChargeStageColumn(s);
+
+          let chargeValEl = null;
+          let chargeMinusBtn = null;
+          let chargePlusBtn = null;
+
+          if (useChargeUi) {
+            const chargeBox = document.createElement('div');
+            chargeBox.className = 'st2-charge';
+
+            const chargeLabel = document.createElement('div');
+            chargeLabel.className = 'st2-charge-label';
+            chargeLabel.textContent = '충전';
+
+            const chargeCtrl = document.createElement('div');
+            chargeCtrl.className = 'st2-charge-ctrl';
+
+            chargeMinusBtn = document.createElement('button');
+            chargeMinusBtn.type = 'button';
+            chargeMinusBtn.className = 'st2-charge-btn';
+            chargeMinusBtn.textContent = '−';
+
+            chargeValEl = document.createElement('span');
+            chargeValEl.className = 'st2-charge-val';
+
+            chargePlusBtn = document.createElement('button');
+            chargePlusBtn.type = 'button';
+            chargePlusBtn.className = 'st2-charge-btn';
+            chargePlusBtn.textContent = '+';
+
+            chargeCtrl.appendChild(chargeMinusBtn);
+            chargeCtrl.appendChild(chargeValEl);
+            chargeCtrl.appendChild(chargePlusBtn);
+
+            chargeBox.appendChild(chargeLabel);
+            chargeBox.appendChild(chargeCtrl);
+            iconRow.appendChild(chargeBox);
+          }
 
           const nameEl = document.createElement('div');
           nameEl.className = 'st2-name';
@@ -10788,16 +11027,25 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
           ctrl.appendChild(tags); ctrl.appendChild(lvBox);
           ctrl.appendChild(RTop); ctrl.appendChild(RBot);
 
-          tile.appendChild(icon);
+          tile.appendChild(iconRow);
           tile.appendChild(nameEl);
           tile.appendChild(ctrl);
           grid.appendChild(tile);
 
-          const refresh = () => {
+            const refresh = () => {
             const cur = getSkill(s);
             const tp = getTp(s);
             spanCur.textContent = String(cur);
             spanTp.textContent = String(tp);
+
+            // ✅ 남격투가스트라이커 충전 UI 갱신
+            if (useChargeUi && chargeValEl) {
+              const cIdx = getChargeIndex(s);
+              chargeValEl.textContent = String(STRIKER_CHARGE_VALUES[cIdx]);
+
+              if (chargeMinusBtn) chargeMinusBtn.disabled = (cIdx <= 0);
+              if (chargePlusBtn) chargePlusBtn.disabled = (cIdx >= STRIKER_CHARGE_VALUES.length - 1);
+            }
 
             // ★ 본 크러셔/풀 블룸: SP는 자동습득 → 버튼 완전 비활성화
             if (isBoneCrusher || isFullBloom) {
@@ -10840,7 +11088,25 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
           // ✅ 이 row의 버튼 상태 갱신 함수를 전체 갱신 목록에 등록
           skillTileRefreshers.push(refresh);
 
-          refresh();
+                    refresh();
+
+          if (useChargeUi) {
+            chargePlusBtn?.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              setChargeIndex(s, getChargeIndex(s) + 1);
+              refreshAllSkillTileButtons();
+            });
+
+            chargeMinusBtn?.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              setChargeIndex(s, getChargeIndex(s) - 1);
+              refreshAllSkillTileButtons();
+            });
+          }
 
           const stepSkillUp = () => {
             if (isDeathHurricane && hurricaneSkill && getSkill(hurricaneSkill) <= 0) {
@@ -14682,13 +14948,7 @@ const payload = { ownerKey, skills: arr, patchBefore };
           card.appendChild(img);
           card.appendChild(name);
 
-          const isDisabled =
-            !(
-              item.enabled === true ||
-              item.enabled === 1 ||
-              String(item.enabled).trim() === 'true' ||
-              String(item.enabled).trim() === '1'
-            );
+          const isDisabled = !isCharacterEnabledForPick_pc(item);
 
           if (isDisabled) {
             card.classList.add("disabled");
