@@ -3296,6 +3296,57 @@
       cursor: not-allowed;
     }
 
+    .skill-ctrl .lbl.c-charge {
+  color: #facc15;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.skill-ctrl.skill-charge-ctrl {
+  margin-top: 1px;
+  /* ✅ 충전 줄만 버튼/숫자 사이 간격 축소 */
+  gap: 5.6px;
+}
+
+.skill-ctrl.skill-charge-ctrl .lbl {
+  width: 30px;
+}
+
+.skill-ctrl.skill-charge-ctrl .skill-val {
+  /* ✅ 소수점 표시 공간은 유지하되 과하게 넓지 않게 */
+  min-width: 28px;
+  color: #facc15;
+}
+
+.skill-ctrl.skill-charge-ctrl .skill-mini {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.skill-extreme-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  margin-top: -1px;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(233, 238, 247, 0.88);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.skill-extreme-row input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: #facc15;
+}
+
+.skill-extreme-row input[type="checkbox"]:disabled + span {
+  opacity: 0.45;
+}
+
     .skill-footnote {
       margin-top: 10px;
       font-size: 12px;
@@ -8843,6 +8894,54 @@ function _refreshFMechGMagneticRowUiMobile(info) {
   });
 }
 
+const STRIKER_CHARGE_MIN = 0;
+const STRIKER_CHARGE_ACTIVE_MIN = 1;
+const STRIKER_CHARGE_MAX = 10;
+const STRIKER_CHARGE_STEP = 0.1;
+const STRIKER_CHARGE_OLD_VALUES = [0, 1, 3, 5, 10];
+
+function clampChargeSecondsMobile(value) {
+  const n = Number(value);
+  const safe = Number.isFinite(n) ? n : 0;
+  if (safe < 1) return 0;
+  const clamped = Math.max(1, Math.min(10, safe));
+  return Math.round(clamped * 10) / 10;
+}
+
+function normalizeChargeFromNodeMobile(node) {
+  if (!node || typeof node !== 'object') return 0;
+
+  if (node.chargeStage !== undefined && node.chargeStage !== null && node.chargeStage !== '') {
+    return clampChargeSecondsMobile(node.chargeStage);
+  }
+
+  const idx = Number(node.chargeStageIndex);
+  if (Number.isFinite(idx)) {
+    if (idx >= 0 && idx <= 4) {
+      return clampChargeSecondsMobile(STRIKER_CHARGE_OLD_VALUES[idx] ?? 0);
+    }
+    return clampChargeSecondsMobile(idx / 10);
+  }
+
+  return 0;
+}
+
+function formatChargeSecondsMobile(value) {
+  const v = clampChargeSecondsMobile(value);
+  return v <= 0 ? '0' : v.toFixed(1);
+}
+
+function isChargeSkillRowMobile(r) {
+  const rawKind = String(
+    r?.skillType ??
+    r?.kind ??
+    r?.['구분'] ??
+    ''
+  ).replace(/\s+/g, '');
+
+  return !!r?.chargeSkill || rawKind === '충전스킬';
+}
+
     function bindSkillPageMobile() {
   const listEl = document.getElementById('skillListM');
   const resetBtn = document.getElementById('btnSkillResetM');
@@ -8851,6 +8950,140 @@ function _refreshFMechGMagneticRowUiMobile(info) {
   // (1) 버튼 이벤트(위임)
   if (!listEl.dataset.bound) {
     listEl.dataset.bound = '1';
+        // ✅ 모바일 충전 + / - 길게 누르기용 타이머
+    let mobileChargeHoldDelayTimer = null;
+    let mobileChargeHoldIntervalTimer = null;
+    let mobileChargeHoldSuppressClick = false;
+
+    const clearMobileChargeHold = () => {
+      if (mobileChargeHoldDelayTimer) {
+        clearTimeout(mobileChargeHoldDelayTimer);
+        mobileChargeHoldDelayTimer = null;
+      }
+
+      if (mobileChargeHoldIntervalTimer) {
+        clearInterval(mobileChargeHoldIntervalTimer);
+        mobileChargeHoldIntervalTimer = null;
+      }
+
+      // pointerdown에서 이미 1회 처리했기 때문에,
+      // 손을 뗄 때 발생하는 기본 click은 잠깐 무시
+      if (mobileChargeHoldSuppressClick) {
+        setTimeout(() => {
+          mobileChargeHoldSuppressClick = false;
+        }, 250);
+      }
+    };
+
+    const runMobileChargeButton = (btn) => {
+      if (!btn || btn.disabled) return false;
+
+      const row = btn.closest('.skill-row');
+      if (!row) return false;
+
+      const act = btn.dataset.act || '';
+      if (!act.startsWith('charge-')) return false;
+
+      const skillName = row.dataset.skill || row.dataset.skillName || '';
+      if (!skillName) return false;
+
+      const s = (window.state || (window.state = {}));
+      const charKey = _getCurrentCharKey() || '__nochar__';
+
+      s.skillTrees = s.skillTrees || {};
+      s.skillTrees[charKey] = s.skillTrees[charKey] || {};
+      const store = s.skillTrees[charKey];
+
+      const node = store[skillName] || {};
+      let curCharge = normalizeChargeFromNodeMobile(node);
+
+      if (act === 'charge-min') {
+        curCharge = 0;
+      } else if (act === 'charge-dec') {
+        curCharge = curCharge <= STRIKER_CHARGE_ACTIVE_MIN
+          ? 0
+          : curCharge - STRIKER_CHARGE_STEP;
+      } else if (act === 'charge-inc') {
+        curCharge = curCharge <= 0
+          ? STRIKER_CHARGE_ACTIVE_MIN
+          : curCharge + STRIKER_CHARGE_STEP;
+      } else if (act === 'charge-max') {
+        curCharge = STRIKER_CHARGE_MAX;
+      }
+
+      curCharge = clampChargeSecondsMobile(curCharge);
+
+      store[skillName] = {
+        ...node,
+        chargeStage: curCharge,
+        chargeStageIndex: Math.round(curCharge * 10),
+      };
+
+      const valSpan = row.querySelector('.skill-val[data-val="charge"]');
+      if (valSpan) {
+        valSpan.textContent = formatChargeSecondsMobile(curCharge);
+      }
+
+      if (typeof onSkillTreeChanged === 'function') {
+        onSkillTreeChanged();
+      }
+
+      updateSkillRemainBar();
+
+      // ✅ 계속 반복할지 판단
+      if (act === 'charge-inc') {
+        return curCharge < STRIKER_CHARGE_MAX;
+      }
+
+      if (act === 'charge-dec') {
+        return curCharge > STRIKER_CHARGE_MIN;
+      }
+
+      return false;
+    };
+
+    const startMobileChargeHold = (e, btn) => {
+      const act = btn?.dataset?.act || '';
+
+      // ✅ 길게 누르기는 + / - 에만 적용
+      if (act !== 'charge-inc' && act !== 'charge-dec') return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      clearMobileChargeHold();
+      mobileChargeHoldSuppressClick = true;
+
+      // ✅ 누르는 즉시 1회 실행
+      const canContinue = runMobileChargeButton(btn);
+      if (!canContinue) return;
+
+      // ✅ 약간 기다린 뒤 주르륵 반복
+      mobileChargeHoldDelayTimer = setTimeout(() => {
+        mobileChargeHoldIntervalTimer = setInterval(() => {
+          const keepGoing = runMobileChargeButton(btn);
+
+          if (!keepGoing) {
+            clearMobileChargeHold();
+          }
+        }, 35);
+      }, 180);
+    };
+
+    // ✅ 모바일 충전 + / - 길게 누르기
+    listEl.addEventListener('pointerdown', (e) => {
+      const btn = e.target?.closest?.('button[data-act]');
+      if (!btn) return;
+
+      const act = btn.dataset.act || '';
+      if (act !== 'charge-inc' && act !== 'charge-dec') return;
+
+      startMobileChargeHold(e, btn);
+    });
+
+    window.addEventListener('pointerup', clearMobileChargeHold);
+    window.addEventListener('pointercancel', clearMobileChargeHold);
+    window.addEventListener('blur', clearMobileChargeHold);
 
     listEl.addEventListener('click', (e) => {
       const btn = e.target?.closest?.('button[data-act]');
@@ -8863,8 +9096,10 @@ function _refreshFMechGMagneticRowUiMobile(info) {
 
       // ✅ row.dataset.col에 의존하지 말고, act 접두사로 SP/TP 판별
       const isSp = act.startsWith('sp-');
-      const isTp = act.startsWith('tp-');
-      if (!isSp && !isTp) return;
+const isTp = act.startsWith('tp-');
+const isCharge = act.startsWith('charge-');
+
+if (!isSp && !isTp && !isCharge) return;
 
       // ✅ 렌더쪽이 data-skill을 쓰는 경우가 많으니 우선 사용
       const skillName = row.dataset.skill || row.dataset.skillName || '';
@@ -8981,14 +9216,28 @@ const _blockIfExclusiveFalcon = (nextSp, storeObj) => {
 
       const cur = store[skillName] || { spLv: 0, tpLv: 0, spMin: 0, spMax: 0, tpMax: 0 };
 
-      const spMin = _num(cur.spMin, 0);
-      const spMax = _num(cur.spMax, 0);
-      const tpMax = _num(cur.tpMax, 0);
+// ✅ 남격투가스트라이커 충전 조작
+// ✅ 남격투가스트라이커 충전 조작
+if (isCharge) {
+  // pointerdown에서 이미 처리한 + / - 클릭은 중복 방지
+  if ((act === 'charge-inc' || act === 'charge-dec') && mobileChargeHoldSuppressClick) {
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
 
-      let spLv = _num(cur.spLv, 0);
-      let tpLv = _num(cur.tpLv, 0);
+  runMobileChargeButton(btn);
+  return;
+}
 
-      const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const spMin = _num(cur.spMin, 0);
+const spMax = _num(cur.spMax, 0);
+const tpMax = _num(cur.tpMax, 0);
+
+let spLv = _num(cur.spLv, 0);
+let tpLv = _num(cur.tpLv, 0);
+
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
       // ✅ 핵심: 남은 SP/TP로 “이 스킬이 찍을 수 있는 최대치”를 매번 계산
       const { totalSP, totalTP } = _getCharTotalSpTp();
@@ -9071,6 +9320,48 @@ const _blockIfExclusiveFalcon = (nextSp, storeObj) => {
         }
       }
 
+            updateSkillRemainBar();
+    });
+
+    // ✅ 남격투가스트라이커 이중개방 체크박스 이벤트
+    listEl.addEventListener('change', (e) => {
+      const chk = e.target?.closest?.('.skill-extreme-check');
+      if (!chk) return;
+
+      const row = chk.closest('.skill-row');
+      if (!row) return;
+
+      const skillName = row.dataset.skill || row.dataset.skillName || '';
+      if (!skillName) return;
+
+      const s = (window.state || (window.state = {}));
+      const charKey = _getCurrentCharKey() || '__nochar__';
+
+      s.skillTrees = s.skillTrees || {};
+      s.skillTrees[charKey] = s.skillTrees[charKey] || {};
+      const store = s.skillTrees[charKey];
+
+      // ✅ 전체 충전스킬 중 이중개방은 1개만 허용
+      for (const name of Object.keys(store)) {
+        store[name] = {
+          ...(store[name] || {}),
+          extremeCharge: false,
+        };
+      }
+
+      if (chk.checked) {
+        store[skillName] = {
+          ...(store[skillName] || {}),
+          extremeCharge: true,
+        };
+      }
+
+      if (typeof onSkillTreeChanged === 'function') {
+        onSkillTreeChanged();
+      }
+
+      // ✅ 다른 체크박스 비활성화 상태 갱신을 위해 다시 렌더
+      renderSkillPageMobile();
       updateSkillRemainBar();
     });
   }
@@ -9288,10 +9579,16 @@ function syncSkillTreesFromLvMaps_mobile(charObj) {
   const remainBar = document.getElementById('skillRemainBarM');
   const footnote = document.querySelector('#pageSkill .skill-footnote');
 
-    const ownerKeyNow = String(charKey || '').trim().replace(/\s+/g, '');
-  const isBlade   = (ownerKeyNow === '여귀검사블레이드');
-  const isStriker = (ownerKeyNow === '격투가스트라이커');
-  const isFMech   = (ownerKeyNow === '여거너메카닉');   // ✅ 추가
+  const ownerKeyNow = String(charKey || '').trim().replace(/\s+/g, '');
+const isBlade = (ownerKeyNow === '여귀검사블레이드');
+
+// ✅ 구버전 '격투가스트라이커' + 신버전 '남격투가스트라이커' 둘 다 대응
+const isStriker = (
+  ownerKeyNow === '격투가스트라이커' ||
+  ownerKeyNow === '남격투가스트라이커'
+);
+
+const isFMech = (ownerKeyNow === '여거너메카닉');
   const isWildbane = (ownerKeyNow === '워리어와일드베인');
   const isWindshear = (ownerKeyNow === '워리어윈드시어');
 
@@ -9389,10 +9686,66 @@ const mine = rows.filter(r => {
     return;
   }
 
-  // ✅ 저장소(캐릭별)
+    // ✅ 저장소(캐릭별)
   s.skillTrees = s.skillTrees || {};
   s.skillTrees[charKey] = s.skillTrees[charKey] || {};
   const store = s.skillTrees[charKey];
+
+  // ✅ 남격투가스트라이커 충전 헬퍼
+  const STRIKER_CHARGE_MIN = 0;
+  const STRIKER_CHARGE_ACTIVE_MIN = 1;
+  const STRIKER_CHARGE_MAX = 10;
+  const STRIKER_CHARGE_STEP = 0.1;
+  const STRIKER_CHARGE_OLD_VALUES = [0, 1, 3, 5, 10];
+
+  const clampChargeSecondsMobile = (value) => {
+    const n = Number(value);
+    const safe = Number.isFinite(n) ? n : 0;
+
+    if (safe < 1) return 0;
+
+    const clamped = Math.max(1, Math.min(10, safe));
+    return Math.round(clamped * 10) / 10;
+  };
+
+  const normalizeChargeFromNodeMobile = (node) => {
+    if (!node || typeof node !== 'object') return 0;
+
+    // ✅ 신형: 실제 초 단위 chargeStage
+    if (node.chargeStage !== undefined && node.chargeStage !== null && node.chargeStage !== '') {
+      return clampChargeSecondsMobile(node.chargeStage);
+    }
+
+    // ✅ 구형/호환: chargeStageIndex
+    const idx = Number(node.chargeStageIndex);
+    if (Number.isFinite(idx)) {
+      // 예전 0~4 인덱스: 0/1/3/5/10초
+      if (idx >= 0 && idx <= 4) {
+        return clampChargeSecondsMobile(STRIKER_CHARGE_OLD_VALUES[idx] ?? 0);
+      }
+
+      // 신형 인덱스: 47 → 4.7초
+      return clampChargeSecondsMobile(idx / 10);
+    }
+
+    return 0;
+  };
+
+  const formatChargeSecondsMobile = (value) => {
+    const v = clampChargeSecondsMobile(value);
+    return v <= 0 ? '0' : v.toFixed(1);
+  };
+
+  const isChargeSkillRowMobile = (r) => {
+    const rawKind = String(
+      r?.skillType ??
+      r?.kind ??
+      r?.['구분'] ??
+      ''
+    ).replace(/\s+/g, '');
+
+    return !!r?.chargeSkill || rawKind === '충전스킬';
+  };
 
   // ✅ 정렬: 요구레벨 → 이름 (402 유지)
   mine.sort((a, b) => {
@@ -9448,11 +9801,31 @@ const mine = rows.filter(r => {
     }
 
     const cur = store[skillName] || {};
-    const spLv = _clamp(cur.spLv ?? spMin, spMin, spMax);
-    const tpLv = _clamp(cur.tpLv ?? 0, 0, tpMax);
+const spLv = _clamp(cur.spLv ?? spMin, spMin, spMax);
+const tpLv = _clamp(cur.tpLv ?? 0, 0, tpMax);
 
-    // ✅ cap/cost 포함 저장(403에서 필요로 하던 구조 포함)
-    store[skillName] = { ...cur, spLv, tpLv, spMin, spMax, tpMax, spCost: effSpCost, tpCost };
+// ✅ 남격투가스트라이커 충전스킬 여부
+const isChargeSkill = isStriker && isChargeSkillRowMobile(r);
+const chargeStage = isChargeSkill
+  ? normalizeChargeFromNodeMobile(cur)
+  : 0;
+
+// ✅ cap/cost 포함 저장 + 충전/이중개방 상태 유지
+store[skillName] = {
+  ...cur,
+  spLv,
+  tpLv,
+  spMin,
+  spMax,
+  tpMax,
+  spCost: effSpCost,
+  tpCost,
+
+  // ✅ 충전스킬만 의미 있음
+  chargeStage,
+  chargeStageIndex: Math.round(chargeStage * 10),
+  extremeCharge: isChargeSkill ? !!cur.extremeCharge : false,
+};
 
     const row = document.createElement('div');
     row.className = 'skill-row';
@@ -9526,6 +9899,67 @@ const mine = rows.filter(r => {
       return line;
     };
 
+const mkChargeCtrl = () => {
+  const line = document.createElement('div');
+  line.className = 'skill-ctrl skill-charge-ctrl';
+
+  const lbl = document.createElement('span');
+  lbl.className = 'lbl c-charge';
+  lbl.textContent = '충전';
+
+  const makeBtn = (text, act, wide = false) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'skill-mini' + (wide ? ' is-wide' : '');
+    b.textContent = text;
+    b.dataset.act = act;
+    return b;
+  };
+
+  const v = document.createElement('span');
+  v.className = 'skill-val';
+  v.dataset.val = 'charge';
+  v.textContent = formatChargeSecondsMobile(store[skillName]?.chargeStage ?? 0);
+
+  line.appendChild(lbl);
+
+  // 요청한 순서: MAX, +, 수치, -, MIN
+  line.appendChild(makeBtn('MAX', 'charge-max', true));
+  line.appendChild(makeBtn('+', 'charge-inc'));
+  line.appendChild(v);
+  line.appendChild(makeBtn('-', 'charge-dec'));
+  line.appendChild(makeBtn('MIN', 'charge-min', true));
+
+  return line;
+};
+
+const mkExtremeChargeRow = () => {
+  const wrap = document.createElement('label');
+  wrap.className = 'skill-extreme-row';
+
+  const chk = document.createElement('input');
+  chk.type = 'checkbox';
+  chk.className = 'skill-extreme-check';
+
+  const curNode = store[skillName] || {};
+  const checked = !!curNode.extremeCharge;
+
+  const selectedOther = Object.entries(store).some(([nm, node]) => {
+    return nm !== skillName && !!node?.extremeCharge;
+  });
+
+  chk.checked = checked;
+  chk.disabled = selectedOther && !checked;
+
+  const txt = document.createElement('span');
+  txt.textContent = '이중개방';
+
+  wrap.appendChild(chk);
+  wrap.appendChild(txt);
+
+  return wrap;
+};
+
         // ✅ 본 크러셔 / G마그네틱은 SP 컨트롤 버튼 비활성화(“찍을 수 없음” UI 반영)
     right.appendChild(mkCtrl('SP', 'sp', {
       min: 'sp-min', dec: 'sp-dec', inc: 'sp-inc', max: 'sp-max'
@@ -9534,6 +9968,12 @@ const mine = rows.filter(r => {
     right.appendChild(mkCtrl('TP', 'tp', {
   min: 'tp-min', dec: 'tp-dec', inc: 'tp-inc', max: 'tp-max'
 }, !(tpMax > 0 && tpCost > 0))); // TP 최대치와 TP 비용이 둘 다 있어야 활성
+
+// ✅ 남격투가스트라이커 충전스킬: TP 아래에 충전 UI + 이중개방 체크박스 표시
+if (isChargeSkill) {
+  right.appendChild(mkChargeCtrl());
+  right.appendChild(mkExtremeChargeRow());
+}
 
     row.appendChild(left);
     row.appendChild(right);
@@ -13497,7 +13937,26 @@ bindMobileDamageCompareUI();
         const lv = Number(v?.spLv ?? 0);
         const tp = Number(v?.tpLv ?? 0);
         // lv/tp 둘 중 하나라도 있으면 보내기 (tp만 찍는 케이스 방어)
-        if (lv > 0 || tp > 0) skills.push({ name, lv, tp });
+        if (lv > 0 || tp > 0) {
+  const chargeStage = clampChargeSecondsMobile(
+    v?.chargeStage ?? normalizeChargeFromNodeMobile(v)
+  );
+
+  skills.push({
+    name,
+    lv,
+    tp,
+
+    // ✅ 백엔드 전송용: 실제 충전 시간
+    chargeStage,
+
+    // ✅ 호환용: 0.1초 단위 인덱스
+    chargeStageIndex: Math.round(chargeStage * 10),
+
+    // ✅ 남격투가스트라이커 이중개방 극한충전 대상 여부
+    extremeCharge: !!v?.extremeCharge,
+  });
+}
       }
 
       // ✅ 핵심: byName이 아니라 skills 배열로 보낸다 (PC 동일)
