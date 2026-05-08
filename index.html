@@ -5062,7 +5062,7 @@
 
     .st2-charge {
       position: absolute;
-      left: calc(100% + 6px);
+      left: calc(100% + 12px);
       top: 50%;
       transform: translateY(-50%);
 
@@ -5107,6 +5107,8 @@
       font-weight: 900;
       line-height: 1;
       cursor: pointer;
+        touch-action: none;
+  user-select: none;
     }
 
     .st2-charge-btn:hover {
@@ -5121,13 +5123,93 @@
     }
 
     .st2-charge-val {
-      min-width: 22px;
-      text-align: center;
-      font-size: 12px;
-      font-weight: 900;
-      line-height: 1;
-      color: #f0e6d2;
-    }
+  width: 42px;
+  min-width: 42px;
+  height: 20px;
+  padding: 0 2px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  color: #f0e6d2;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(207, 162, 79, .45);
+  border-radius: 6px;
+  outline: none;
+}
+
+.st2-charge-val:focus {
+  border-color: #facc15;
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, .18);
+}
+
+/* 크롬 number input 화살표 제거 */
+.st2-charge-val::-webkit-outer-spin-button,
+.st2-charge-val::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.st2-charge-val[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.st2-extreme-charge-row {
+  position: absolute;
+
+  /* 충전상자와 같은 시작점 */
+  left: calc(100% + 12px);
+
+  /* 충전상자 바로 아래 */
+  top: calc(50% + 37px);
+
+  /*
+    핵심:
+    - X축 -50%를 주면 체크박스 묶음의 가운데가 기준점으로 잡힘
+    - translateX(42px)는 충전상자 가운데쯤으로 맞추기 위한 보정값
+  */
+  transform: translateX(20px) translateY(-50%);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+
+  /* 상자 제거 */
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  color: #f0e6d2;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  z-index: 3;
+}
+
+.st2-extreme-charge-row input[type="checkbox"] {
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  accent-color: #facc15;
+  cursor: pointer;
+}
+
+.st2-extreme-charge-row input[type="checkbox"]:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+.st2-extreme-charge-row:has(input[type="checkbox"]:disabled) {
+  opacity: .45;
+  cursor: not-allowed;
+}
 
     /* Circular icon */
     .st2-skill {
@@ -5801,6 +5883,8 @@
                   <li>05.04 <span style="color: yellow;">[남레인저]</span> 2각 패시브 적용</li>
                   <li>05.05 <span style="color: yellow;">[여스파]</span> 2각 패시브 적용</li>
                   <li>05.06 <span style="color: yellow;">[무녀]</span> 2각 패시브 적용</li>
+                  <li>05.08 <span class="notice-badge">'남스트라이커'</span> 캐릭 추가</li>
+
                 </ul>
               </div>
               <div class="upgrade">
@@ -7546,6 +7630,7 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
+          <li>26.05.08 <span class="notice-badge">'남스트라이커'</span> 캐릭 추가</li>
           <li>26.05.06 [무녀] <span style="color: #ff4444;">2각 패시브 적용</li>
           <li>26.05.05 [여스파] <span style="color: #ff4444;">2각 패시브 적용</li>
           <li>26.05.04 [남레인저] <span style="color: #ff4444;">2각 패시브 적용</li>
@@ -10365,63 +10450,143 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
 
             const TP_MIN = 0, TP_MAX = 5;
 
-      // ✅ 남격투가스트라이커 충전 단계
-      const STRIKER_CHARGE_VALUES = [0, 1.5, 4.5, 7.5, 15];
+      // ✅ 남격투가스트라이커 충전 시간
+// - 0초: 비충전
+// - 충전공격은 1.0초부터 적용
+// - 1.0초 ~ 10.0초는 0.1초 단위
+const STRIKER_CHARGE_MIN = 0;
+const STRIKER_CHARGE_ACTIVE_MIN = 1;
+const STRIKER_CHARGE_MAX = 10;
+const STRIKER_CHARGE_STEP = 0.1;
 
-      state.skillChargeStage = state.skillChargeStage || {};
+// ✅ 구버전 저장슬롯 호환용
+// 예전 chargeStageIndex: 0/1/2/3/4 → 0/1/3/5/10초
+const STRIKER_CHARGE_OLD_VALUES = [0, 1, 3, 5, 10];
 
-      const isMaleStrikerOwner = (String(ownerKey || '').replace(/\s+/g, '') === '남격투가스트라이커');
+state.skillChargeStage = state.skillChargeStage || {};
 
-            const isChargeSkillRow = (s) => {
-        // ✅ 스킬 시트의 '구분' 컬럼이 '충전스킬'인 경우만 충전 UI 표시
-        const rawKind = String(
-          s?.skillType ??
-          s?.kind ??
-          s?.['구분'] ??
-          ''
-        ).replace(/\s+/g, '');
+// ✅ 남격투가스트라이커 이중개방 극한충전 대상 스킬
+// - 전체 충전스킬 중 단 하나만 선택 가능
+// - 값은 선택된 스킬의 s.id
+state.strikerExtremeChargeSkillId = state.strikerExtremeChargeSkillId || null;
 
-        return !!s?.chargeSkill || rawKind === '충전스킬';
+const isMaleStrikerOwner = (String(ownerKey || '').replace(/\s+/g, '') === '남격투가스트라이커');
+
+const getExtremeChargeSkillId = () => {
+  return state.strikerExtremeChargeSkillId || null;
+};
+
+const isExtremeChargeSkill = (s) => {
+  return !!s?.id && getExtremeChargeSkillId() === s.id;
+};
+
+const setExtremeChargeSkill = (s, checked) => {
+  const nextId = checked && s?.id ? s.id : null;
+  state.strikerExtremeChargeSkillId = nextId;
+
+  // ✅ 저장슬롯 호환용 skillTrees에도 같이 저장
+  try {
+    const ownerKey2 = String(ownerKey || '').replace(/\s+/g, '');
+    const skillName = String(s?.name || '').trim();
+
+    if (ownerKey2 && skillName) {
+      state.skillTrees = state.skillTrees || {};
+      state.skillTrees[ownerKey2] = state.skillTrees[ownerKey2] || {};
+
+      // 먼저 전체 스킬의 extremeCharge 플래그 제거
+      for (const name in state.skillTrees[ownerKey2]) {
+        if (!state.skillTrees[ownerKey2][name]) continue;
+        state.skillTrees[ownerKey2][name] = {
+          ...state.skillTrees[ownerKey2][name],
+          extremeCharge: false,
+        };
+      }
+
+      // 체크한 경우 현재 스킬만 true
+      const prev = state.skillTrees[ownerKey2][skillName] || {};
+      state.skillTrees[ownerKey2][skillName] = {
+        ...prev,
+        extremeCharge: !!nextId,
       };
+    }
+  } catch (e) {
+    console.warn('[extremeCharge] skillTrees 저장 실패:', e);
+  }
 
-      const clampChargeIndex = (idx) => {
-        const n = Number(idx) || 0;
-        return Math.max(0, Math.min(STRIKER_CHARGE_VALUES.length - 1, n));
+  onSkillTreeChanged();
+};
+
+const isChargeSkillRow = (s) => {
+  // ✅ 스킬 시트의 '구분' 컬럼이 '충전스킬'인 경우만 충전 UI 표시
+  const rawKind = String(
+    s?.skillType ??
+    s?.kind ??
+    s?.['구분'] ??
+    ''
+  ).replace(/\s+/g, '');
+
+  return !!s?.chargeSkill || rawKind === '충전스킬';
+};
+
+const clampChargeSeconds = (value) => {
+  const n = Number(value);
+  const safe = Number.isFinite(n) ? n : 0;
+
+  // ✅ 1초 미만은 전부 비충전
+  // 0.1~0.9를 직접 입력해도 0초로 저장/표시/전송한다.
+  if (safe < STRIKER_CHARGE_ACTIVE_MIN) {
+    return 0;
+  }
+
+  // ✅ 1.0초 ~ 10.0초 사이로 제한
+  const clamped = Math.max(
+    STRIKER_CHARGE_ACTIVE_MIN,
+    Math.min(STRIKER_CHARGE_MAX, safe)
+  );
+
+  // ✅ 0.1초 단위 반올림
+  return Math.round(clamped * 10) / 10;
+};
+
+const formatChargeSeconds = (value) => {
+  return clampChargeSeconds(value).toFixed(1);
+};
+
+const getChargeValue = (s) => {
+  return clampChargeSeconds(state.skillChargeStage?.[s.id] ?? 0);
+};
+
+const setChargeValue = (s, value) => {
+  const nextValue = clampChargeSeconds(value);
+  state.skillChargeStage[s.id] = nextValue;
+
+  // ✅ 저장슬롯 호환용 skillTrees에도 같이 저장
+  try {
+    const ownerKey2 = String(ownerKey || '').replace(/\s+/g, '');
+    const skillName = String(s?.name || '').trim();
+
+    if (ownerKey2 && skillName) {
+      state.skillTrees = state.skillTrees || {};
+      state.skillTrees[ownerKey2] = state.skillTrees[ownerKey2] || {};
+
+      const prev = state.skillTrees[ownerKey2][skillName] || {};
+      state.skillTrees[ownerKey2][skillName] = {
+        ...prev,
+
+        // ✅ 이제는 실제 충전 시간 자체를 저장
+        chargeStage: nextValue,
+
+        // ✅ 구형 코드/저장슬롯 호환용
+        // 0.1초 단위이므로 4.7초면 47
+        chargeStageIndex: Math.round(nextValue * 10),
       };
+    }
+  } catch (e) {
+    console.warn('[chargeStage] skillTrees 저장 실패:', e);
+  }
 
-      const getChargeIndex = (s) => {
-        const raw = state.skillChargeStage?.[s.id];
-        return clampChargeIndex(raw);
-      };
-
-      const getChargeValue = (s) => {
-        return STRIKER_CHARGE_VALUES[getChargeIndex(s)] || 0;
-      };
-
-      const setChargeIndex = (s, idx) => {
-        const nextIdx = clampChargeIndex(idx);
-        state.skillChargeStage[s.id] = nextIdx;
-
-        // ✅ 저장슬롯 호환용 skillTrees에도 같이 저장
-        try {
-          const ownerKey2 = String(ownerKey || '').replace(/\s+/g, '');
-          const skillName = String(s?.name || '').trim();
-          if (ownerKey2 && skillName) {
-            state.skillTrees = state.skillTrees || {};
-            state.skillTrees[ownerKey2] = state.skillTrees[ownerKey2] || {};
-            const prev = state.skillTrees[ownerKey2][skillName] || {};
-            state.skillTrees[ownerKey2][skillName] = {
-              ...prev,
-              chargeStage: STRIKER_CHARGE_VALUES[nextIdx],
-              chargeStageIndex: nextIdx,
-            };
-          }
-        } catch (e) {
-          console.warn('[chargeStage] skillTrees 저장 실패:', e);
-        }
-
-        onSkillTreeChanged();
-      };
+  onSkillTreeChanged();
+};
 
       const syncChargeFromSkillTrees_pc = () => {
         try {
@@ -10444,15 +10609,31 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
             if (!row?.id) continue;
 
             const rawIdx = node.chargeStageIndex;
-            const rawVal = node.chargeStage;
+const rawVal = node.chargeStage;
 
-            let idx = Number(rawIdx);
-            if (!Number.isFinite(idx)) {
-              const found = STRIKER_CHARGE_VALUES.findIndex(v => Number(v) === Number(rawVal));
-              idx = found >= 0 ? found : 0;
-            }
+let chargeSec;
 
-            state.skillChargeStage[row.id] = clampChargeIndex(idx);
+// ✅ 신버전: chargeStage 자체가 실제 초 단위
+if (rawVal !== undefined && rawVal !== null && rawVal !== '') {
+  chargeSec = Number(rawVal);
+} else {
+  const idx = Number(rawIdx);
+
+  // ✅ 구버전: chargeStageIndex 0~4는 [0,1,3,5,10]으로 해석
+  if (Number.isFinite(idx) && idx >= 0 && idx <= 4) {
+    chargeSec = STRIKER_CHARGE_OLD_VALUES[idx] || 0;
+  } else {
+    // ✅ 혹시 0.1초 단위 인덱스가 들어온 경우: 47 → 4.7초
+    chargeSec = Number.isFinite(idx) ? idx / 10 : 0;
+  }
+}
+
+state.skillChargeStage[row.id] = clampChargeSeconds(chargeSec);
+
+// ✅ 저장슬롯에서 이중개방 극한충전 대상 복원
+if (node.extremeCharge === true) {
+  state.strikerExtremeChargeSkillId = row.id;
+}
           }
         } catch (e) {
           console.warn('[chargeStage] skillTrees 불러오기 실패:', e);
@@ -10944,8 +11125,11 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
           const useChargeUi = isMaleStrikerOwner && isChargeSkillRow(s);
 
           let chargeValEl = null;
-          let chargeMinusBtn = null;
-          let chargePlusBtn = null;
+let chargeMinusBtn = null;
+let chargePlusBtn = null;
+
+// ✅ 이중개방 극한충전 체크박스
+let extremeChargeCheck = null;
 
           if (useChargeUi) {
             const chargeBox = document.createElement('div');
@@ -10963,8 +11147,13 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
             chargeMinusBtn.className = 'st2-charge-btn';
             chargeMinusBtn.textContent = '−';
 
-            chargeValEl = document.createElement('span');
-            chargeValEl.className = 'st2-charge-val';
+            chargeValEl = document.createElement('input');
+chargeValEl.type = 'number';
+chargeValEl.min = String(STRIKER_CHARGE_MIN);
+chargeValEl.max = String(STRIKER_CHARGE_MAX);
+chargeValEl.step = String(STRIKER_CHARGE_STEP);
+chargeValEl.inputMode = 'decimal';
+chargeValEl.className = 'st2-charge-val';
 
             chargePlusBtn = document.createElement('button');
             chargePlusBtn.type = 'button';
@@ -10972,12 +11161,28 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
             chargePlusBtn.textContent = '+';
 
             chargeCtrl.appendChild(chargeMinusBtn);
-            chargeCtrl.appendChild(chargeValEl);
-            chargeCtrl.appendChild(chargePlusBtn);
+chargeCtrl.appendChild(chargeValEl);
+chargeCtrl.appendChild(chargePlusBtn);
 
-            chargeBox.appendChild(chargeLabel);
-            chargeBox.appendChild(chargeCtrl);
-            iconRow.appendChild(chargeBox);
+// ✅ 이중개방 극한충전 체크박스
+const extremeRow = document.createElement('label');
+extremeRow.className = 'st2-extreme-charge-row';
+
+extremeChargeCheck = document.createElement('input');
+extremeChargeCheck.type = 'checkbox';
+extremeChargeCheck.className = 'st2-extreme-charge-check';
+
+const extremeText = document.createElement('span');
+extremeText.textContent = '이중개방';
+
+extremeRow.appendChild(extremeChargeCheck);
+extremeRow.appendChild(extremeText);
+
+chargeBox.appendChild(chargeLabel);
+chargeBox.appendChild(chargeCtrl);
+
+iconRow.appendChild(chargeBox);
+iconRow.appendChild(extremeRow);
           }
 
           const nameEl = document.createElement('div');
@@ -11076,13 +11281,28 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
             spanTp.textContent = String(tp);
 
             // ✅ 남격투가스트라이커 충전 UI 갱신
-            if (useChargeUi && chargeValEl) {
-              const cIdx = getChargeIndex(s);
-              chargeValEl.textContent = String(STRIKER_CHARGE_VALUES[cIdx]);
+if (useChargeUi && chargeValEl) {
+  const curCharge = getChargeValue(s);
 
-              if (chargeMinusBtn) chargeMinusBtn.disabled = (cIdx <= 0);
-              if (chargePlusBtn) chargePlusBtn.disabled = (cIdx >= STRIKER_CHARGE_VALUES.length - 1);
-            }
+  // input 직접 입력 중이 아닐 때만 값 덮어쓰기
+  if (document.activeElement !== chargeValEl) {
+    chargeValEl.value = formatChargeSeconds(curCharge);
+  }
+
+  if (chargeMinusBtn) chargeMinusBtn.disabled = (curCharge <= STRIKER_CHARGE_MIN);
+  if (chargePlusBtn) chargePlusBtn.disabled = (curCharge >= STRIKER_CHARGE_MAX);
+
+  // ✅ 이중개방 체크박스 갱신
+  if (extremeChargeCheck) {
+    const selectedId = getExtremeChargeSkillId();
+    const checked = selectedId === s.id;
+
+    extremeChargeCheck.checked = checked;
+
+    // 다른 스킬이 이미 이중개방 대상으로 선택되어 있으면 비활성화
+    extremeChargeCheck.disabled = !!selectedId && !checked;
+  }
+}
 
             // ★ 본 크러셔/풀 블룸: SP는 자동습득 → 버튼 완전 비활성화
             if (isBoneCrusher || isFullBloom) {
@@ -11128,22 +11348,134 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
                     refresh();
 
           if (useChargeUi) {
-            chargePlusBtn?.addEventListener('click', (e) => {
-              e.preventDefault();
-              e.stopPropagation();
+  // ✅ 충전 + / - 버튼 길게 누르면 연속 증가/감소
+let chargeHoldDelayTimer = null;
+let chargeHoldIntervalTimer = null;
 
-              setChargeIndex(s, getChargeIndex(s) + 1);
-              refreshAllSkillTileButtons();
-            });
+const clearChargeHold = () => {
+  if (chargeHoldDelayTimer) {
+    clearTimeout(chargeHoldDelayTimer);
+    chargeHoldDelayTimer = null;
+  }
 
-            chargeMinusBtn?.addEventListener('click', (e) => {
-              e.preventDefault();
-              e.stopPropagation();
+  if (chargeHoldIntervalTimer) {
+    clearInterval(chargeHoldIntervalTimer);
+    chargeHoldIntervalTimer = null;
+  }
+};
 
-              setChargeIndex(s, getChargeIndex(s) - 1);
-              refreshAllSkillTileButtons();
-            });
-          }
+const stepChargeUp = () => {
+  if (!chargePlusBtn || chargePlusBtn.disabled) return false;
+
+  const cur = getChargeValue(s);
+
+  // ✅ 0초 다음은 0.1초가 아니라 1.0초
+  const next = cur <= 0
+    ? STRIKER_CHARGE_ACTIVE_MIN
+    : cur + STRIKER_CHARGE_STEP;
+
+  setChargeValue(s, next);
+  refreshAllSkillTileButtons();
+
+  return getChargeValue(s) < STRIKER_CHARGE_MAX;
+};
+
+const stepChargeDown = () => {
+  if (!chargeMinusBtn || chargeMinusBtn.disabled) return false;
+
+  const cur = getChargeValue(s);
+
+  // ✅ 1.0초에서 -를 누르면 0초로 복귀
+  // ✅ 1.1초 이상에서는 0.1초씩 감소
+  const next = cur <= STRIKER_CHARGE_ACTIVE_MIN
+    ? 0
+    : cur - STRIKER_CHARGE_STEP;
+
+  setChargeValue(s, next);
+  refreshAllSkillTileButtons();
+
+  return getChargeValue(s) > STRIKER_CHARGE_MIN;
+};
+
+const startChargeHold = (e, stepFn) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  clearChargeHold();
+
+  // ✅ 누르는 즉시 1회 실행
+  const canContinue = stepFn();
+  if (!canContinue) return;
+
+  // ✅ 살짝 기다렸다가 연속 실행 시작
+  chargeHoldDelayTimer = setTimeout(() => {
+  chargeHoldIntervalTimer = setInterval(() => {
+    const keepGoing = stepFn();
+
+    if (!keepGoing) {
+      clearChargeHold();
+    }
+  }, 35); // 기존 70 → 35
+}, 180); // 기존 330 → 180
+};
+
+chargePlusBtn?.addEventListener('pointerdown', (e) => {
+  startChargeHold(e, stepChargeUp);
+});
+
+chargeMinusBtn?.addEventListener('pointerdown', (e) => {
+  startChargeHold(e, stepChargeDown);
+});
+
+// ✅ 버튼에서 손을 떼거나 벗어나면 정지
+chargePlusBtn?.addEventListener('pointerup', clearChargeHold);
+chargePlusBtn?.addEventListener('pointercancel', clearChargeHold);
+chargePlusBtn?.addEventListener('pointerleave', clearChargeHold);
+
+chargeMinusBtn?.addEventListener('pointerup', clearChargeHold);
+chargeMinusBtn?.addEventListener('pointercancel', clearChargeHold);
+chargeMinusBtn?.addEventListener('pointerleave', clearChargeHold);
+
+// ✅ 드래그하다가 버튼 밖에서 손을 떼도 정지
+window.addEventListener('pointerup', clearChargeHold);
+window.addEventListener('blur', clearChargeHold);
+
+  // ✅ 직접 입력
+  chargeValEl?.addEventListener('change', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setChargeValue(s, chargeValEl.value);
+    refreshAllSkillTileButtons();
+  });
+
+  // ✅ 엔터 입력 시 바로 확정
+  chargeValEl?.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      chargeValEl.blur();
+    }
+  });
+
+    // ✅ 클릭/입력 중 타일 클릭 이벤트로 번지지 않게 방지
+  chargeValEl?.addEventListener('click', (e) => e.stopPropagation());
+  chargeValEl?.addEventListener('input', (e) => e.stopPropagation());
+
+  // ✅ 이중개방 극한충전 대상 선택
+  extremeChargeCheck?.addEventListener('change', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setExtremeChargeSkill(s, extremeChargeCheck.checked);
+    refreshAllSkillTileButtons();
+  });
+
+  extremeChargeCheck?.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+}
 
           const stepSkillUp = () => {
             if (isDeathHurricane && hurricaneSkill && getSkill(hurricaneSkill) <= 0) {
@@ -11841,34 +12173,47 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
     async function saveSkillSelections() {
   const arr = [];
 
-  // ✅ 남격투가스트라이커 충전 단계값
-  // renderSkillTreeBands() 내부 상수와 동일하게 맞춤
-  const CHARGE_STAGE_VALUES_PC = [0, 1.5, 4.5, 7.5, 15];
+  // ✅ 남격투가스트라이커 충전 시간 저장용
+  // 0.0초 ~ 10.0초, 0.1초 단위
+  const clampChargeSecondsForSave = (value) => {
+  const n = Number(value);
+  const safe = Number.isFinite(n) ? n : 0;
 
-  const clampChargeIndexForSave = (idx) => {
-    const n = Number(idx) || 0;
-    return Math.max(0, Math.min(CHARGE_STAGE_VALUES_PC.length - 1, n));
-  };
+  // ✅ 1초 미만은 전부 비충전으로 저장
+  if (safe < 1) return 0;
+
+  // ✅ 1.0초 ~ 10.0초 제한
+  const clamped = Math.max(1, Math.min(10, safe));
+
+  // ✅ 0.1초 단위 반올림
+  return Math.round(clamped * 10) / 10;
+};
 
   for (const s of (ST2.rows || [])) {
     const lv = Number(state.skillLv?.[s.id] ?? 0);
     const tp = Number(state.skillTpLv?.[s.id] ?? 0);
 
     if (lv > 0) {
-      const chargeStageIndex = clampChargeIndexForSave(state.skillChargeStage?.[s.id] ?? 0);
-      const chargeStage = CHARGE_STAGE_VALUES_PC[chargeStageIndex] || 0;
+      // ✅ 이제 state.skillChargeStage[s.id]는 "인덱스"가 아니라 실제 충전 시간이다.
+      // 예: 0, 1.5, 4.7, 10
+      const chargeStage = clampChargeSecondsForSave(state.skillChargeStage?.[s.id] ?? 0);
 
       arr.push({
-        name: s.name,
-        lv,
-        tp,
+  name: s.name,
+  lv,
+  tp,
 
-        // ✅ 충전스킬 계산용
-        // 백엔드에서는 chargeSkill=true인 스킬에만 적용하므로
-        // 일반 스킬에 같이 보내져도 영향 없음
-        chargeStage,
-        chargeStageIndex,
-      });
+  // ✅ 백엔드 전송용: 실제 충전 시간
+  chargeStage,
+
+  // ✅ 호환용: 0.1초 단위 인덱스
+  // 예: 4.7초 → 47
+  chargeStageIndex: Math.round(chargeStage * 10),
+
+  // ✅ 남격투가스트라이커 이중개방 극한충전 대상 여부
+  // 전체 스킬 중 true는 최대 1개만 존재
+  extremeCharge: state.strikerExtremeChargeSkillId === s.id,
+});
     }
   }
 
