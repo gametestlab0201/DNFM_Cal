@@ -10731,21 +10731,39 @@ if (node.extremeCharge === true) {
             // ✅ 모바일 저장 형식과 맞추기
             //    기본 minLv만 있는 스킬도 store에는 남겨두면 다음 렌더에서 안정적이다.
             if (lv > 0 || tp > 0 || minLv > 0) {
-              const prev = store[skillName] || {};
-              const chargeIdx = clampChargeIndex(state.skillChargeStage?.[r.id] ?? 0);
+  const prev = store[skillName] || {};
 
-              store[skillName] = {
-                ...prev,
-                spLv: Math.max(minLv, lv),
-                tpLv: tp,
+  // ✅ 현재 PC 충전값은 "인덱스"가 아니라 "초 단위"로 관리한다.
+  //    예: 0, 1.5, 4.5, 7.5, 15 또는 현재 코드 기준 0~10초
+  const rawChargeSec = Number(state.skillChargeStage?.[r.id] ?? prev.chargeStage ?? 0) || 0;
 
-                // ✅ 남격투가스트라이커 충전값 저장
-                chargeStage: STRIKER_CHARGE_VALUES[chargeIdx],
-                chargeStageIndex: chargeIdx,
-              };
-            } else {
-              delete store[skillName];
-            }
+  const chargeSec =
+    typeof clampChargeSeconds === 'function'
+      ? clampChargeSeconds(rawChargeSec)
+      : rawChargeSec;
+
+  store[skillName] = {
+    ...prev,
+    spLv: Math.max(minLv, lv),
+    tpLv: tp,
+  };
+
+  // ✅ 충전값은 충전스킬에만 저장
+  if (chargeSec > 0 || prev.chargeStage != null || prev.chargeStageIndex != null) {
+    store[skillName].chargeStage = chargeSec;
+
+    // ✅ 호환용: 예전 index처럼 쓰지 말고 0.1초 단위 index로 저장
+    //    예: 4.5초 → 45
+    store[skillName].chargeStageIndex = Math.round(chargeSec * 10);
+  }
+
+  // ✅ 기존 이중개방/극한충전 정보가 있으면 유지
+  if (prev.extremeCharge === true) {
+    store[skillName].extremeCharge = true;
+  }
+} else {
+  delete store[skillName];
+}
           }
 
           // ✅ 이번 캐릭터는 이미 PC값 기준으로 동기화 완료 표시
@@ -20283,8 +20301,18 @@ const payload = { ownerKey, skills: arr, patchBefore };
       updatePresetPagerUI(maxSlot);
     }
 
+    function _clonePlain_pc(obj) {
+  try {
+    if (typeof structuredClone === 'function') return structuredClone(obj);
+  } catch (_) {}
+  try {
+    return JSON.parse(JSON.stringify(obj || {}));
+  } catch (_) {
+    return {};
+  }
+}
 
-    function _getCurrentCharKeyForPreset_pc(snap) {
+function _getCurrentCharKeyForPreset_pc(snap) {
   const c = snap?.currentCharacter || {};
   return (
     String(c.ownerKey || '').trim().replace(/\s+/g, '') ||
@@ -20294,120 +20322,247 @@ const payload = { ownerKey, skills: arr, patchBefore };
   );
 }
 
-function _buildSkillTreeOnlyPreset_pc(rawState) {
-  const raw = rawState || {};
-  const snap = {};
-  const charKey = _getCurrentCharKeyForPreset_pc(raw);
+function _normPresetSkillName_pc(v) {
+  return String(v ?? '')
+    .trim()
+    .replace(/\s+/g, '')
+    .normalize('NFC');
+}
 
-  // 필요한 키들만 골라서 저장
-  const keys = [
-    'currentCharacter',
-    'charRow',
+// PC 스킬키가 "id|스킬명" 같은 형태로 들어왔을 때 이름만 뽑기
+function _stripPcSkillKeyToName_pc(skillKey) {
+  const s = String(skillKey || '').trim();
+  if (!s) return '';
 
-    // ✅ 장비 프리셋 호환 저장
-    'equip',
-    'equips',
-    'selections',
+  if (s.includes('|')) {
+    const parts = s.split('|').map(x => x.trim()).filter(Boolean);
+    return parts[parts.length - 1] || s;
+  }
 
-    'enh',
-    'enchants',
-    'seals',
-    'emblems',
-    'refines',
-    'skillrune',
-    'runeEngrave',
-    'castleSeal',
-    'CastleSeal',
-    'avatar',
-    'buff',
+  if (s.includes('::')) {
+    const parts = s.split('::').map(x => x.trim()).filter(Boolean);
+    return parts[parts.length - 1] || s;
+  }
 
-    // ★ 스킬/스킬트리 관련
-    'sp',
-    'tp',
-    'stUsedSP',
-    'stUsedTP',
-    'skillDmg',
-    'skillUseOpts',
+  return s;
+}
 
-    // 기타 옵션/몬스터 등
-    'monster',
-    'options',
+function _looseOwnerMatch_pc(a, b) {
+  const na = String(a || '').replace(/\s+/g, '').normalize('NFC');
+  const nb = String(b || '').replace(/\s+/g, '').normalize('NFC');
+  if (!na || !nb) return false;
+  return na === nb || na.includes(nb) || nb.includes(na);
+}
 
-    // ★ 커스텀옵
-    'customSkills',
-    'specialRunes',
+function _presetEntries_pc(obj) {
+  return obj && typeof obj === 'object' ? Object.entries(obj) : [];
+}
 
-    // ✅ 솔플 / 파티
-    'soloPartyMode',
-    'isPartyMode',
+const PRESET_EQUIP_SLOTS_PC = [
+  'weapon',
+  'headshoulder',
+  'top',
+  'bottom',
+  'belt',
+  'shoes',
+  'bracelet',
+  'necklace',
+  'ring',
+  'sub',
+  'earring',
+  'magestone',
+  'title',
+  'aura',
+  'creature',
+  'artifact'
+];
 
-    'synergy',
-  ];
+function _normalizePresetEquipItem_pc(item) {
+  if (!item || typeof item !== 'object') return null;
 
-  for (const k of keys) {
-    if (raw[k] !== undefined) {
-      snap[k] = raw[k];
+  const img = String(item.img || item.image || item.imgSrc || item['이미지'] || '').trim();
+
+  return {
+    name: String(item.name || item['이름'] || '').trim(),
+    code: item.code ?? null,
+    img,
+    image: img,
+    imgSrc: img,
+    desc: String(item.desc || item['설명'] || '').trim(),
+    rarity: String(item.rarity || item['레어리티'] || item['희귀도'] || item['등급'] || '').trim(),
+    type: String(item.type || item['타입'] || item['종류'] || '').trim(),
+    level: (item.level == null || item.level === '' || Number.isNaN(Number(item.level)))
+      ? null
+      : Number(item.level),
+    prefixLabel: String(item.prefixLabel || item.prefix || item['접두사'] || '').trim()
+  };
+}
+
+function _pickCanonicalSelections_pc(raw) {
+  const out = {};
+
+  const sources = [
+    raw?.selections,
+    raw?.equip,
+    raw?.equips
+  ].filter(x => x && typeof x === 'object');
+
+  for (const src of sources) {
+    for (const slot of PRESET_EQUIP_SLOTS_PC) {
+      if (out[slot]) continue;
+      const item = _normalizePresetEquipItem_pc(src[slot]);
+      if (item && item.name) out[slot] = item;
     }
   }
 
-  // ✅ 구형/신형 장비 구조를 모두 저장되게 보정
-  if (!snap.selections && raw.equip && typeof raw.equip === 'object') {
-    snap.selections = raw.equip;
-  }
-  if (!snap.equips && raw.equip && typeof raw.equip === 'object') {
-    snap.equips = raw.equip;
-  }
-  if (!snap.equip && raw.selections && typeof raw.selections === 'object') {
-    snap.equip = raw.selections;
-  }
+  return out;
+}
 
-  // ✅ 스킬트리는 skillTrees 하나로만 저장
-  snap.skillTrees = {};
+function _buildCanonicalSkillTrees_pc(raw, charKey) {
+  const result = {};
 
-  // 1) 이미 syncSkillTreesFromLvMaps_pc()로 최신화된 skillTrees가 있으면 그걸 우선 사용
-  if (
-    charKey &&
-    raw.skillTrees &&
-    typeof raw.skillTrees === 'object' &&
-    raw.skillTrees[charKey] &&
-    typeof raw.skillTrees[charKey] === 'object'
-  ) {
-    snap.skillTrees[charKey] = JSON.parse(JSON.stringify(raw.skillTrees[charKey]));
-  } else {
-    // 2) 혹시 skillTrees가 아직 없고 구형 skillLv / skillTpLv만 있으면 여기서 1회 변환
-    const lvMap = (raw.skillLv && typeof raw.skillLv === 'object') ? raw.skillLv : {};
-    const tpMap = (raw.skillTpLv && typeof raw.skillTpLv === 'object') ? raw.skillTpLv : {};
-    const hasLv = Object.keys(lvMap).length > 0;
-    const hasTp = Object.keys(tpMap).length > 0;
+  // 1) 이미 skillTrees가 있으면 현재 캐릭터 것을 우선 사용
+  if (charKey && raw?.skillTrees && typeof raw.skillTrees === 'object') {
+    let pickedTree = null;
 
-    if (charKey && (hasLv || hasTp)) {
-      const tree = {};
-      const rows = Array.isArray(window.ST2?.rows) ? window.ST2.rows : [];
+    if (raw.skillTrees[charKey] && typeof raw.skillTrees[charKey] === 'object') {
+      pickedTree = raw.skillTrees[charKey];
+    }
 
-      rows.forEach(r => {
-        const id = String(r?.id || '').trim();
-        if (!id) return;
-
-        const skillName = String(r?.name || '').trim();
-        if (!skillName) return;
-
-        const spLv = Number(lvMap[id] || 0) || 0;
-        const tpLv = Number(tpMap[id] || 0) || 0;
-
-        if (spLv <= 0 && tpLv <= 0) return;
-
-        tree[skillName] = {};
-        if (spLv > 0) tree[skillName].spLv = spLv;
-        if (tpLv > 0) tree[skillName].tpLv = tpLv;
-      });
-
-      if (Object.keys(tree).length > 0) {
-        snap.skillTrees[charKey] = tree;
+    if (!pickedTree) {
+      for (const [ownerKey, tree] of _presetEntries_pc(raw.skillTrees)) {
+        if (!tree || typeof tree !== 'object') continue;
+        if (!_looseOwnerMatch_pc(ownerKey, charKey)) continue;
+        pickedTree = tree;
+        break;
       }
     }
+
+    if (pickedTree && typeof pickedTree === 'object') {
+  const tree = {};
+
+  for (const [skillKey, nodeRaw] of Object.entries(pickedTree)) {
+    const skillName = _stripPcSkillKeyToName_pc(skillKey);
+    if (!skillName) continue;
+
+    const node = nodeRaw && typeof nodeRaw === 'object' ? nodeRaw : {};
+
+    const next = {
+      ..._clonePlain_pc(node),
+      spLv: Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0,
+      tpLv: Number(node.tpLv ?? node.tp ?? 0) || 0
+    };
+
+    const hasUseful =
+      next.spLv > 0 ||
+      next.tpLv > 0 ||
+      next.chargeStage != null ||
+      next.chargeStageIndex != null ||
+      next.extremeCharge != null ||
+      next.extremeOpen != null ||
+      next.doubleOpen != null;
+
+    if (hasUseful) tree[skillName] = next;
   }
 
-  // ✅ 구형/보조 스킬맵은 저장하지 않음
+  // ✅ tree가 실제로 있을 때만 여기서 종료
+  if (Object.keys(tree).length > 0) {
+    result[charKey] = tree;
+    return result;
+  }
+
+  // ✅ 비어 있으면 아래의 skillLv / skillTpLv 변환으로 계속 진행
+  console.warn('[preset save pc] skillTrees는 있으나 유효 스킬이 없어 lvMap 변환으로 fallback');
+}
+  }
+
+  // 2) 구형 PC 포맷: skillLv / skillTpLv → skillTrees 변환
+  const lvMap = raw?.skillLv && typeof raw.skillLv === 'object' ? raw.skillLv : {};
+  const tpMap = raw?.skillTpLv && typeof raw.skillTpLv === 'object' ? raw.skillTpLv : {};
+  const chargeMap = raw?.skillChargeStage && typeof raw.skillChargeStage === 'object' ? raw.skillChargeStage : {};
+  const rows = Array.isArray(window.ST2?.rows) ? window.ST2.rows : [];
+
+  if (charKey && (Object.keys(lvMap).length || Object.keys(tpMap).length || Object.keys(chargeMap).length)) {
+    const tree = {};
+
+    rows.forEach(r => {
+      const id = String(r?.id || '').trim();
+      const skillName = String(r?.name || '').trim();
+      if (!id || !skillName) return;
+
+      const spLv = Number(lvMap[id] || 0) || 0;
+      const tpLv = Number(tpMap[id] || 0) || 0;
+      const chargeStage = Number(chargeMap[id] || 0) || 0;
+
+      if (spLv <= 0 && tpLv <= 0 && chargeStage <= 0) return;
+
+      tree[skillName] = {};
+      if (spLv > 0) tree[skillName].spLv = spLv;
+      if (tpLv > 0) tree[skillName].tpLv = tpLv;
+
+      if (chargeStage > 0) {
+        tree[skillName].chargeStage = chargeStage;
+        tree[skillName].chargeStageIndex = Math.round(chargeStage * 10);
+      }
+    });
+
+    if (Object.keys(tree).length > 0) {
+      result[charKey] = tree;
+    }
+  }
+
+  return result;
+}
+
+function normalizePresetStateForSave_pc(rawState) {
+  const raw = rawState || {};
+  const snap = _clonePlain_pc(raw);
+  const charKey = _getCurrentCharKeyForPreset_pc(snap);
+
+  // ✅ 포맷 버전 명시
+  snap.presetVersion = 2;
+
+  // ✅ 장비 표준 필드: selections
+  const selections = _pickCanonicalSelections_pc(snap);
+  snap.selections = selections;
+
+  // ✅ 호환용 mirror
+  // 저장본 안에 같이 남겨두면 PC/모바일 기존 코드가 안전하게 읽을 수 있음
+  snap.equip = _clonePlain_pc(selections);
+  snap.equips = _clonePlain_pc(selections);
+
+  // ✅ 아바타 표준 필드: avatar
+  if ((!snap.avatar || typeof snap.avatar !== 'object') && snap.avatarSel && typeof snap.avatarSel === 'object') {
+    snap.avatar = _clonePlain_pc(snap.avatarSel);
+  }
+  if (snap.avatar && typeof snap.avatar === 'object') {
+    snap.avatarSel = _clonePlain_pc(snap.avatar); // 호환용 mirror
+  }
+
+  // ✅ 성안의 봉인 표준 필드: castleSeal
+  if ((!snap.castleSeal || typeof snap.castleSeal !== 'object') && snap.CastleSeal && typeof snap.CastleSeal === 'object') {
+    snap.castleSeal = _clonePlain_pc(snap.CastleSeal);
+  }
+  if (snap.castleSeal && typeof snap.castleSeal === 'object') {
+    snap.CastleSeal = _clonePlain_pc(snap.castleSeal); // 호환용 mirror
+  }
+
+  // ✅ 솔플/파티 표준화
+  const modeRaw = String(snap.soloPartyMode || '').trim();
+  const isParty =
+    modeRaw === 'party'
+      ? true
+      : modeRaw === 'solo'
+        ? false
+        : !!snap.isPartyMode;
+
+  snap.isPartyMode = isParty;
+  snap.soloPartyMode = isParty ? 'party' : 'solo';
+
+  // ✅ 스킬 표준 필드: skillTrees
+  snap.skillTrees = _buildCanonicalSkillTrees_pc(snap, charKey);
+
+  // ✅ 구형/보조맵은 저장본에서 제거
   delete snap.skillLv;
   delete snap.skillTpLv;
   delete snap._skillTreesConvertedFor;
@@ -20416,20 +20571,167 @@ function _buildSkillTreeOnlyPreset_pc(rawState) {
   return snap;
 }
 
+function hydratePcSkillMapsFromSkillTrees_pc(snap) {
+  if (!snap || typeof snap !== 'object') return snap;
+
+  const rows = Array.isArray(window.ST2?.rows) ? window.ST2.rows : [];
+  if (!rows.length) return snap;
+
+  const normKey = (v) => String(v ?? '')
+    .trim()
+    .replace(/\s+/g, '')
+    .normalize('NFC');
+
+  const charKey = _getCurrentCharKeyForPreset_pc(snap);
+
+  const possibleKeys = [];
+
+  if (charKey) possibleKeys.push(charKey);
+
+  const c = snap.currentCharacter || {};
+  const ownerKey = String(c.ownerKey || '').trim().replace(/\s+/g, '');
+  if (ownerKey) possibleKeys.push(ownerKey);
+
+  const jobNameKey = String(
+    (c.jobGroupLabel || c.jobGroup || '') +
+    (c.name || c.charName || '')
+  ).trim().replace(/\s+/g, '');
+  if (jobNameKey) possibleKeys.push(jobNameKey);
+
+  const sumOwnerKey = String(
+    snap?.CurrentSumStats?.ownerKey ||
+    snap?.ownerKey ||
+    ''
+  ).trim().replace(/\s+/g, '');
+  if (sumOwnerKey) possibleKeys.push(sumOwnerKey);
+
+  let treeStore = null;
+  const trees = snap.skillTrees && typeof snap.skillTrees === 'object'
+    ? snap.skillTrees
+    : {};
+
+  // 1) 정확 일치 우선
+  for (const k of possibleKeys) {
+    if (k && trees[k] && typeof trees[k] === 'object') {
+      treeStore = trees[k];
+      break;
+    }
+  }
+
+  // 2) 정확 일치가 없으면 느슨 매칭
+  if (!treeStore) {
+    for (const [owner, tree] of Object.entries(trees)) {
+      if (!tree || typeof tree !== 'object') continue;
+
+      const ownerNorm = normKey(owner);
+      const matched = possibleKeys.some(k => {
+        const kk = normKey(k);
+        return kk && ownerNorm && (
+          kk === ownerNorm ||
+          kk.includes(ownerNorm) ||
+          ownerNorm.includes(kk)
+        );
+      });
+
+      if (matched) {
+        treeStore = tree;
+        break;
+      }
+    }
+  }
+
+  if (!treeStore || typeof treeStore !== 'object') {
+    console.warn('[preset hydrate PC] skillTrees 매칭 실패', {
+      possibleKeys,
+      treeKeys: Object.keys(trees || {})
+    });
+    return snap;
+  }
+
+  const idxByName = {};
+  for (const r of rows) {
+    const nameKey = normKey(r?.name || r?.['스킬명'] || '');
+    if (nameKey && !idxByName[nameKey]) idxByName[nameKey] = r;
+  }
+
+  snap.skillLv = {};
+  snap.skillTpLv = {};
+
+  for (const [skillKey, nodeRaw] of Object.entries(treeStore)) {
+    const skillName = _stripPcSkillKeyToName_pc(skillKey);
+    const row = idxByName[normKey(skillName)];
+    if (!row || !row.id) continue;
+
+    const node = nodeRaw && typeof nodeRaw === 'object' ? nodeRaw : {};
+
+    const spLvRaw = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
+    const tpLvRaw = Number(node.tpLv ?? node.tp ?? 0) || 0;
+
+    const minLv = Number(row.minLv ?? 0) || 0;
+    const maxLv = Number(row.maxLv ?? 0) || 0;
+
+    const spLv = Math.max(minLv, maxLv ? Math.min(spLvRaw, maxLv) : spLvRaw);
+    const tpLv = Math.max(0, Math.min(tpLvRaw, 5));
+
+    if (spLv > 0) snap.skillLv[row.id] = spLv;
+    if (tpLv > 0) snap.skillTpLv[row.id] = tpLv;
+  }
+
+  console.log('[preset hydrate PC] skillTrees → skillLv 복원 완료', {
+    charKey,
+    skillTreeKeys: Object.keys(treeStore || {}).length,
+    skillLvKeys: Object.keys(snap.skillLv || {}).length,
+    skillTpLvKeys: Object.keys(snap.skillTpLv || {}).length
+  });
+
+  return snap;
+}
+
+// 불러오기용:
+// 저장 포맷 정규화는 하되, PC UI가 바로 쓸 수 있도록
+// skillTrees → skillLv / skillTpLv 를 다시 복원한다.
+function normalizePresetStateForLoad_pc(rawState) {
+  const snap = normalizePresetStateForSave_pc(rawState);
+
+  try {
+    hydratePcSkillMapsFromSkillTrees_pc(snap);
+  } catch (e) {
+    console.warn('[normalizePresetStateForLoad_pc] skill hydrate fail:', e);
+  }
+
+  return snap;
+}
+
 // 현재 프론트 state 전체를 스냅샷으로 만들어서 서버에 보낼 객체로 반환
 function buildFrontPresetState() {
-  return _buildSkillTreeOnlyPreset_pc(window.state || {});
+  return normalizePresetStateForSave_pc(window.state || {});
 }
+
+// 기존 이름을 다른 곳에서 참조하고 있을 가능성 대비
+function _buildSkillTreeOnlyPreset_pc(rawState) {
+  return normalizePresetStateForSave_pc(rawState);
+}
+    
 
     // 프리셋에서 불러온 state 스냅샷을 현재 state에 적용 + 슬롯 UI/캐릭터 UI 갱신
         function applyFrontPresetState(snap) {
-      if (!snap || typeof snap !== 'object') return;
+  if (!snap || typeof snap !== 'object') return;
 
-      // 🔹 항상 window.state 기준으로만 처리
-      if (!window.state || typeof window.state !== 'object') {
-        window.state = {};
-      }
-      const target = window.state;
+  // ✅ 저장슬롯 포맷 통합:
+  // PC/모바일/구형 슬롯을 모두 presetVersion 2 기준으로 정규화한 뒤 적용
+  try {
+    if (typeof normalizePresetStateForLoad_pc === 'function') {
+      snap = normalizePresetStateForLoad_pc(snap);
+    }
+  } catch (e) {
+    console.warn('[applyFrontPresetState] preset normalize fail:', e);
+  }
+
+  // 🔹 항상 window.state 기준으로만 처리
+  if (!window.state || typeof window.state !== 'object') {
+    window.state = {};
+  }
+  const target = window.state;
 
       // 1) 스냅샷 깊은 복사 (공유 참조 방지)
       let src;
