@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -1142,25 +1140,25 @@
       box-shadow: none;
     }
 
-.macro-statusdmg-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 2px;
-  padding: 4px 8px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.05);
-  color: #e5e7eb;
-  font-size: 12px;
-  user-select: none;
-}
+    .macro-statusdmg-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.05);
+      color: #e5e7eb;
+      font-size: 12px;
+      user-select: none;
+    }
 
-.macro-statusdmg-row input[type="checkbox"] {
-  width: 14px;
-  height: 14px;
-  accent-color: #cfa24f;
-}
+    .macro-statusdmg-row input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      accent-color: #cfa24f;
+    }
 
     /* (선택) 무기 슬롯도 열 폭에 맞춰서 정렬 */
     /*.slot-row.weapon-row .slot[data-slot="R1"] {
@@ -4062,7 +4060,7 @@
       justify-content: flex-start;
     }
 
-        /* ✅ ON/OFF 전용 색상 (에픽/익시드와 비슷한 느낌) */
+    /* ✅ ON/OFF 전용 색상 (에픽/익시드와 비슷한 느낌) */
     .armor-toggle.mode-off {
       background: linear-gradient(135deg, #111827, #1f2937);
       /* 어두운 회색 */
@@ -4101,7 +4099,7 @@
       font-weight: 600;
     }
 
-        /* ✅ 캐릭터 카드 안 우측 상단 솔플/파티 토글 */
+    /* ✅ 캐릭터 카드 안 우측 상단 솔플/파티 토글 */
     .character-card {
       position: relative;
     }
@@ -5040,8 +5038,8 @@
       /* 우측 상단 TP 색상과 동일 */
     }
 
-        /* ✅ 남격투가스트라이커 충전 UI: 스킬 이미지 우측 배치 */
-        .st2-icon-row {
+    /* ✅ 남격투가스트라이커 충전 UI: 스킬 이미지 우측 배치 */
+    .st2-icon-row {
       /* ✅ 핵심:
          아이콘 자체는 기존처럼 타일 중앙에 고정하고,
          충전 UI만 아이콘 우측에 absolute로 붙인다. */
@@ -5107,8 +5105,8 @@
       font-weight: 900;
       line-height: 1;
       cursor: pointer;
-        touch-action: none;
-  user-select: none;
+      touch-action: none;
+      user-select: none;
     }
 
     .st2-charge-btn:hover {
@@ -5123,93 +5121,93 @@
     }
 
     .st2-charge-val {
-  width: 42px;
-  min-width: 42px;
-  height: 20px;
-  padding: 0 2px;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 900;
-  line-height: 1;
-  color: #f0e6d2;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(207, 162, 79, .45);
-  border-radius: 6px;
-  outline: none;
-}
+      width: 42px;
+      min-width: 42px;
+      height: 20px;
+      padding: 0 2px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+      color: #f0e6d2;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(207, 162, 79, .45);
+      border-radius: 6px;
+      outline: none;
+    }
 
-.st2-charge-val:focus {
-  border-color: #facc15;
-  box-shadow: 0 0 0 2px rgba(250, 204, 21, .18);
-}
+    .st2-charge-val:focus {
+      border-color: #facc15;
+      box-shadow: 0 0 0 2px rgba(250, 204, 21, .18);
+    }
 
-/* 크롬 number input 화살표 제거 */
-.st2-charge-val::-webkit-outer-spin-button,
-.st2-charge-val::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
+    /* 크롬 number input 화살표 제거 */
+    .st2-charge-val::-webkit-outer-spin-button,
+    .st2-charge-val::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
 
-.st2-charge-val[type="number"] {
-  appearance: textfield;
-  -moz-appearance: textfield;
-}
+    .st2-charge-val[type="number"] {
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
 
-.st2-extreme-charge-row {
-  position: absolute;
+    .st2-extreme-charge-row {
+      position: absolute;
 
-  /* 충전상자와 같은 시작점 */
-  left: calc(100% + 12px);
+      /* 충전상자와 같은 시작점 */
+      left: calc(100% + 12px);
 
-  /* 충전상자 바로 아래 */
-  top: calc(50% + 37px);
+      /* 충전상자 바로 아래 */
+      top: calc(50% + 37px);
 
-  /*
+      /*
     핵심:
     - X축 -50%를 주면 체크박스 묶음의 가운데가 기준점으로 잡힘
     - translateX(42px)는 충전상자 가운데쯤으로 맞추기 위한 보정값
   */
-  transform: translateX(20px) translateY(-50%);
+      transform: translateX(20px) translateY(-50%);
 
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
 
-  /* 상자 제거 */
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
+      /* 상자 제거 */
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
 
-  font-size: 10px;
-  font-weight: 800;
-  line-height: 1;
-  color: #f0e6d2;
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-  z-index: 3;
-}
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1;
+      color: #f0e6d2;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      z-index: 3;
+    }
 
-.st2-extreme-charge-row input[type="checkbox"] {
-  width: 12px;
-  height: 12px;
-  margin: 0;
-  accent-color: #facc15;
-  cursor: pointer;
-}
+    .st2-extreme-charge-row input[type="checkbox"] {
+      width: 12px;
+      height: 12px;
+      margin: 0;
+      accent-color: #facc15;
+      cursor: pointer;
+    }
 
-.st2-extreme-charge-row input[type="checkbox"]:disabled {
-  opacity: .35;
-  cursor: not-allowed;
-}
+    .st2-extreme-charge-row input[type="checkbox"]:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+    }
 
-.st2-extreme-charge-row:has(input[type="checkbox"]:disabled) {
-  opacity: .45;
-  cursor: not-allowed;
-}
+    .st2-extreme-charge-row:has(input[type="checkbox"]:disabled) {
+      opacity: .45;
+      cursor: not-allowed;
+    }
 
     /* Circular icon */
     .st2-skill {
@@ -6045,21 +6043,21 @@
             </button>
 
             <button id="btnMacroSetGeneral" class="btn btn-special-patch" type="button" style="display:none;">
-  일반 매크로 계산
-</button>
+              일반 매크로 계산
+            </button>
 
-<button id="btnMacroSetElting" class="btn btn-special-patch" type="button" style="display:none;">
-  엘팅 매크로 계산
-</button>
+            <button id="btnMacroSetElting" class="btn btn-special-patch" type="button" style="display:none;">
+              엘팅 매크로 계산
+            </button>
 
-<label id="rowMacroStatusDmg" class="macro-statusdmg-row" style="display:none;">
-  <input type="checkbox" id="chkMacroStatusDmg">
-  <span>상변뎀 고정</span>
-</label>
+            <label id="rowMacroStatusDmg" class="macro-statusdmg-row" style="display:none;">
+              <input type="checkbox" id="chkMacroStatusDmg">
+              <span>상변뎀 고정</span>
+            </label>
 
-<button id="btnAutoSetSweepMissing" class="ui-btnetc" style="display:none;">
-  누락만 재계산(방어구 고정)
-</button>
+            <button id="btnAutoSetSweepMissing" class="ui-btnetc" style="display:none;">
+              누락만 재계산(방어구 고정)
+            </button>
 
             <button id="btnAutoWeaponSweepSelected" class="special-btn" style="display:none;">
               무기/무기고유효과 자동계산
@@ -7560,24 +7558,26 @@
       <div class="patch-log-body" style="flex:1;min-height:0;overflow-y:auto;">
         <ul class="patch-log-list notice-list">
           <li></li>
-          
-            <strong style="font-size:18px;">🎉 누적 로그인 20,000회 돌파! 감사 기념 <strong style="color: #ff4444;">저장슬롯 3배</strong> 이벤트 🎉</strong><br><br>
-          
+
+          <strong style="font-size:18px;">🎉 누적 로그인 20,000회 돌파! 감사 기념 <strong style="color: #ff4444;">저장슬롯 3배</strong>
+            이벤트 🎉</strong><br><br>
+
           <br>안녕하세요 게임실험연구소 입니다.<br><br>
 
-            계산기 오픈 이후 연구원분들의 많은 관심과 이용 덕분에 누적 로그인 <strong style="font-size:1.15em;">20,000회</strong>를 넘겼습니다! <br><br>
+          계산기 오픈 이후 연구원분들의 많은 관심과 이용 덕분에 누적 로그인 <strong style="font-size:1.15em;">20,000회</strong>를 넘겼습니다! <br><br>
 
-            보내주신 성원에 감사드리며, 감사 기념으로 1개월 이상 장기 이용자분들께 <strong style="font-size:1.15em; color:#ff4444;">저장슬롯 3배 이벤트</strong>를 진행합니다.<br><br>
+          보내주신 성원에 감사드리며, 감사 기념으로 1개월 이상 장기 이용자분들께 <strong style="font-size:1.15em; color:#ff4444;">저장슬롯 3배
+            이벤트</strong>를 진행합니다.<br><br>
 
-            더 많은 세팅을 저장하고, 더 편하게 비교해보시길 바랍니다.<br>
-            앞으로도 더욱 좋은 계산기로 보답하겠습니다.<br><br>
-            
-            감사합니다.<br><br><br>
+          더 많은 세팅을 저장하고, 더 편하게 비교해보시길 바랍니다.<br>
+          앞으로도 더욱 좋은 계산기로 보답하겠습니다.<br><br>
 
-            ※ 본 이벤트는 '선임 연구원' 이상 등급에서 연속 2회 이상 이용하고 계신 연구원분들께 자동 적용됩니다.<br>
-            (정확한 이벤트 적용 시점은 2회차 이용이 시작된 뒤 약 2주 후, 총 이용기간 45일 전후로 자동 반영됩니다.)<br><br>
+          감사합니다.<br><br><br>
 
-        
+          ※ 본 이벤트는 '선임 연구원' 이상 등급에서 연속 2회 이상 이용하고 계신 연구원분들께 자동 적용됩니다.<br>
+          (정확한 이벤트 적용 시점은 2회차 이용이 시작된 뒤 약 2주 후, 총 이용기간 45일 전후로 자동 반영됩니다.)<br><br>
+
+
           <li class="sign-row">
             <span class="sign-text">- 게임실험연구소장 드림 -</span>
             <img src="/img/sign.png" alt="게임실험연구소장 직인" class="seal-stamp">
@@ -7638,15 +7638,22 @@
           <li>26.05.06 [무녀] <span style="color: #ff4444;">2각 패시브 적용</li>
           <li>26.05.05 [여스파] <span style="color: #ff4444;">2각 패시브 적용</li>
           <li>26.05.04 [남레인저] <span style="color: #ff4444;">2각 패시브 적용</li>
-          <li>26.05.03 [남/여프리스트] <span style="color: #ff4444;">2각 패시브 적용<span style="color: yellow;"> (이단심판관, <s>무녀</s> 제외)</span></li>
+          <li>26.05.03 [남/여프리스트] <span style="color: #ff4444;">2각 패시브 적용<span style="color: yellow;"> (이단심판관, <s>무녀</s>
+                제외)</span></li>
           <li>26.05.02 [마창사] <span style="color: #ff4444;">2각 패시브 적용</li>
           <li>26.05.01 [워리어] <span style="color: #ff4444;">2각 패시브 적용</li>
-          <li>26.05.01 [남/여마법사] <span style="color: #ff4444;">2각 패시브 적용</span><span style="color: yellow;"> (<s>마도학자,</s> 인챈트리스 제외)</span></li>
-          <li>26.05.01 [남/여거너] <span style="color: #ff4444;">2각 패시브 적용</span><span style="color: yellow;"> <s>(남레인저 제외)</s></span></li>
-          <li>26.05.01 [여격투가] <span style="color: #ff4444;">2각 패시브 적용</span><span style="color: yellow;"> <s>(여스트리트파이터 제외)</s></span></li>
-          <li>26.04.30 [남/여귀검사] <span style="color: #ff4444;">2각 패시브 적용</span><span style="color: yellow;"> <s>(베가본드 제외)</s></span></li>
-          <li>26.04.25 <span style="color: yellow;">260425</span><span style="color: #ff4444;"> 캐릭터 밸런스 패치</span> 적용</li>
-          <li>26.04.06 <span style="color: yellow;">솔플 ↔ 파티</span><span style="color: #ff4444;"> 시너지 버프/장비 옵션 설정 토글버튼</span> 추가</li>
+          <li>26.05.01 [남/여마법사] <span style="color: #ff4444;">2각 패시브 적용</span><span style="color: yellow;">
+              (<s>마도학자,</s> 인챈트리스 제외)</span></li>
+          <li>26.05.01 [남/여거너] <span style="color: #ff4444;">2각 패시브 적용</span><span style="color: yellow;"> <s>(남레인저
+                제외)</s></span></li>
+          <li>26.05.01 [여격투가] <span style="color: #ff4444;">2각 패시브 적용</span><span style="color: yellow;"> <s>(여스트리트파이터
+                제외)</s></span></li>
+          <li>26.04.30 [남/여귀검사] <span style="color: #ff4444;">2각 패시브 적용</span><span style="color: yellow;"> <s>(베가본드
+                제외)</s></span></li>
+          <li>26.04.25 <span style="color: yellow;">260425</span><span style="color: #ff4444;"> 캐릭터 밸런스 패치</span> 적용
+          </li>
+          <li>26.04.06 <span style="color: yellow;">솔플 ↔ 파티</span><span style="color: #ff4444;"> 시너지 버프/장비 옵션 설정
+              토글버튼</span> 추가</li>
           <li>26.04.04 [모바일] <span style="color: yellow;">결의: 허영 속 어둠의 피조물 세트</span><span style="color: #ff4444;"> 조건부
               모든 타입 피해 증가 미적용 버그</span> 수정</li>
           <li>26.04.03 <span style="color: yellow;">윈드시어</span><span style="color: #ff4444;"> '초초초초파파빨'</span> 삭제, <span
@@ -7881,22 +7888,22 @@
 
     // 🔹 직책별 프리셋 사용 가능 최대 슬롯 수
     function getUserPresetLimit() {
-  const info = window.__userRole || {};
+      const info = window.__userRole || {};
 
-  // 1순위: 계산기목록 시트의 '슬롯' 컬럼 값
-  if (typeof info.presetSlots === 'number' && info.presetSlots >= 0) {
-    return Math.max(0, Math.min(50, info.presetSlots));
-  }
+      // 1순위: 계산기목록 시트의 '슬롯' 컬럼 값
+      if (typeof info.presetSlots === 'number' && info.presetSlots >= 0) {
+        return Math.max(0, Math.min(50, info.presetSlots));
+      }
 
-  // 2순위: 기존 직책별 기본값 (백워드 호환용)
-  const lvl = (typeof info.level === 'number') ? info.level : 0;
+      // 2순위: 기존 직책별 기본값 (백워드 호환용)
+      const lvl = (typeof info.level === 'number') ? info.level : 0;
 
-  if (lvl >= 4) return 50; // 관리자
-  if (lvl >= 3) return 10; // 수석
-  if (lvl === 2) return 3; // 책임
-  if (lvl === 1) return 1; // 선임
-  return 0;                // 전임
-}
+      if (lvl >= 4) return 50; // 관리자
+      if (lvl >= 3) return 10; // 수석
+      if (lvl === 2) return 3; // 책임
+      if (lvl === 1) return 1; // 선임
+      return 0;                // 전임
+    }
 
     async function loginPingOnce() {
       if (window.__loginPingSent && window.__loginPingResult) {
@@ -7925,8 +7932,8 @@
 
           // ★ 백엔드에서 내려준 사용자별 프리셋 슬롯 수
           const slots = (typeof data.presetSlots === 'number')
-  ? Math.max(0, Math.min(50, data.presetSlots))        // 0~50 사이로 클램프
-  : 0;
+            ? Math.max(0, Math.min(50, data.presetSlots))        // 0~50 사이로 클램프
+            : 0;
 
           // 🔹 전역 직책/슬롯 상태 저장
           window.__userRole = { level: lvl, label, presetSlots: slots };
@@ -8257,32 +8264,32 @@
 
       // ✅ [특정 유저 전용 유지] 아래 버튼들은 special_user / research_user 공통 허용
       const btnSynergy = document.getElementById('btnSynergyEffect');
-const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
-const rowDmgOpt = document.getElementById('specialDamageOptRow');
-const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
-const btnMacroSetGeneral = document.getElementById('btnMacroSetGeneral');
-const btnMacroSetElting = document.getElementById('btnMacroSetElting');
-const rowMacroStatusDmg = document.getElementById('rowMacroStatusDmg');
-const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
-const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
-const rowUnique = document.getElementById('uniqueOnOffRow');
+      const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
+      const rowDmgOpt = document.getElementById('specialDamageOptRow');
+      const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
+      const btnMacroSetGeneral = document.getElementById('btnMacroSetGeneral');
+      const btnMacroSetElting = document.getElementById('btnMacroSetElting');
+      const rowMacroStatusDmg = document.getElementById('rowMacroStatusDmg');
+      const btnAutoSetMissing = document.getElementById('btnAutoSetSweepMissing');
+      const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
+      const rowUnique = document.getElementById('uniqueOnOffRow');
 
-if (btnSynergy) btnSynergy.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-if (btnSkillDamage) btnSkillDamage.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-// ✅ 크리100/투함포 체크박스는 전체 공개
-if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
-if (btnAutoSet) btnAutoSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-if (btnMacroSetGeneral) btnMacroSetGeneral.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-if (btnMacroSetElting) btnMacroSetElting.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-if (rowMacroStatusDmg) rowMacroStatusDmg.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-if (btnAutoSetMissing) btnAutoSetMissing.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-if (btnAutoWeapon) btnAutoWeapon.style.display = hasSpecialLike ? 'inline-flex' : 'none';
-if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
+      if (btnSynergy) btnSynergy.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (btnSkillDamage) btnSkillDamage.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      // ✅ 크리100/투함포 체크박스는 전체 공개
+      if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
+      if (btnAutoSet) btnAutoSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (btnMacroSetGeneral) btnMacroSetGeneral.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (btnMacroSetElting) btnMacroSetElting.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (rowMacroStatusDmg) rowMacroStatusDmg.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (btnAutoSetMissing) btnAutoSetMissing.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (btnAutoWeapon) btnAutoWeapon.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
     }
 
 
 
-        // (원하면 콘솔에서 직접 호출할 수 있게 전역에 노출)
+    // (원하면 콘솔에서 직접 호출할 수 있게 전역에 노출)
     window.updateSpecialUserButton = updateSpecialUserButton;
 
     // ✅ special_user / research_user는 캐릭터 시트의 활성화여부를 무시하고 선택 가능
@@ -8413,66 +8420,66 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
     // 모바일은 skillTrees[charKey][skillName] = { spLv, tpLv } 형태로 저장하는 경우가 있음.
     // PC는 skillLv/skillTpLv (id→레벨 맵) 형태를 사용하므로, 여기서 변환한다.
     try {
-  const hasTrees = (state.skillTrees && typeof state.skillTrees === 'object');
+      const hasTrees = (state.skillTrees && typeof state.skillTrees === 'object');
 
-  // ownerKey(=charKey) 우선, 없으면 currentCharacter.ownerKey 보조
-  const _ok = String(ownerKey || '').replace(/\s+/g, '');
-  const _ck = String(state?.currentCharacter?.ownerKey || '').replace(/\s+/g, '');
-  const treeStore = hasTrees ? (state.skillTrees[_ok] || state.skillTrees[_ck]) : null;
+      // ownerKey(=charKey) 우선, 없으면 currentCharacter.ownerKey 보조
+      const _ok = String(ownerKey || '').replace(/\s+/g, '');
+      const _ck = String(state?.currentCharacter?.ownerKey || '').replace(/\s+/g, '');
+      const treeStore = hasTrees ? (state.skillTrees[_ok] || state.skillTrees[_ck]) : null;
 
-  // ✅ 핵심: 현재 캐릭터용 skillTrees가 있으면,
-  //    기존 stale skillLv / skillTpLv 를 버리고 treeStore 기준으로 다시 만든다.
-  if (treeStore && typeof treeStore === 'object') {
-    state.skillLv = {};
-    state.skillTpLv = {};
+      // ✅ 핵심: 현재 캐릭터용 skillTrees가 있으면,
+      //    기존 stale skillLv / skillTpLv 를 버리고 treeStore 기준으로 다시 만든다.
+      if (treeStore && typeof treeStore === 'object') {
+        state.skillLv = {};
+        state.skillTpLv = {};
 
-    // 스킬명 → row 매핑
-    const idxByName = {};
-    for (const r of (ST2.rows || [])) {
-      const k = normKey(r?.name || '');
-      if (k && !idxByName[k]) idxByName[k] = r;
+        // 스킬명 → row 매핑
+        const idxByName = {};
+        for (const r of (ST2.rows || [])) {
+          const k = normKey(r?.name || '');
+          if (k && !idxByName[k]) idxByName[k] = r;
+        }
+
+        // 변환: skillTrees(name) → skillLv(id)
+        for (const k in treeStore) {
+          const node = treeStore[k] || {};
+          const spLv = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
+          const tpLv = Number(node.tpLv ?? node.tp ?? 0) || 0;
+          const row = idxByName[normKey(k)];
+          if (!row) continue;
+
+          const maxLv = Number(row.maxLv || 0) || 0;
+          const cappedSp = Math.max(0, maxLv ? Math.min(spLv, maxLv) : spLv);
+          const cappedTp = Math.max(0, Math.min(tpLv, 5));
+
+          if (cappedSp) state.skillLv[row.id] = cappedSp;
+          if (cappedTp) state.skillTpLv[row.id] = cappedTp;
+        }
+
+        // SP/TP 재계산 (총량은 캐릭터 시트 값을 우선)
+        const totalSp = Number(state?.currentCharacter?.sp || state?.sp?.total || 0) || 0;
+        const totalTp = Number(state?.currentCharacter?.tp || state?.tp?.total || 0) || 0;
+        let usedSp = 0, usedTp = 0;
+
+        for (const r of (ST2.rows || [])) {
+          const lv = Number(state.skillLv?.[r.id] || 0) || 0;
+          const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
+          usedSp += lv * Number(r.sp || 0);
+          usedTp += tp * Number(r.tpCost || 0);
+        }
+
+        state.sp.total = totalSp;
+        state.sp.left = Math.max(0, totalSp - usedSp);
+        state.tp.total = totalTp;
+        state.tp.left = Math.max(0, totalTp - usedTp);
+        state.stUsedSP = usedSp;
+        state.stUsedTP = usedTp;
+
+        if (typeof renderSpTp === 'function') renderSpTp();
+      }
+    } catch (e) {
+      console.warn('[renderSkillTreeBands] mobile preset skillTrees 변환 실패:', e);
     }
-
-    // 변환: skillTrees(name) → skillLv(id)
-    for (const k in treeStore) {
-      const node = treeStore[k] || {};
-      const spLv = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
-      const tpLv = Number(node.tpLv ?? node.tp ?? 0) || 0;
-      const row = idxByName[normKey(k)];
-      if (!row) continue;
-
-      const maxLv = Number(row.maxLv || 0) || 0;
-      const cappedSp = Math.max(0, maxLv ? Math.min(spLv, maxLv) : spLv);
-      const cappedTp = Math.max(0, Math.min(tpLv, 5));
-
-      if (cappedSp) state.skillLv[row.id] = cappedSp;
-      if (cappedTp) state.skillTpLv[row.id] = cappedTp;
-    }
-
-    // SP/TP 재계산 (총량은 캐릭터 시트 값을 우선)
-    const totalSp = Number(state?.currentCharacter?.sp || state?.sp?.total || 0) || 0;
-    const totalTp = Number(state?.currentCharacter?.tp || state?.tp?.total || 0) || 0;
-    let usedSp = 0, usedTp = 0;
-
-    for (const r of (ST2.rows || [])) {
-      const lv = Number(state.skillLv?.[r.id] || 0) || 0;
-      const tp = Number(state.skillTpLv?.[r.id] || 0) || 0;
-      usedSp += lv * Number(r.sp || 0);
-      usedTp += tp * Number(r.tpCost || 0);
-    }
-
-    state.sp.total = totalSp;
-    state.sp.left = Math.max(0, totalSp - usedSp);
-    state.tp.total = totalTp;
-    state.tp.left = Math.max(0, totalTp - usedTp);
-    state.stUsedSP = usedSp;
-    state.stUsedTP = usedTp;
-
-    if (typeof renderSpTp === 'function') renderSpTp();
-  }
-} catch (e) {
-  console.warn('[renderSkillTreeBands] mobile preset skillTrees 변환 실패:', e);
-}
 
 
     // ===== 아바타 / 스킬룬 / 룬각인 버킷 =====
@@ -9168,7 +9175,7 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
       }
     }
 
-        // ✅ 고유효과 ON/OFF 토글 UI 반영
+    // ✅ 고유효과 ON/OFF 토글 UI 반영
     function updateUniqueOnOffUI() {
       if (!$uniqueOnOffToggle) return;
 
@@ -9244,7 +9251,7 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
       });
     }
 
-       if ($uniqueOnOffToggle) {
+    if ($uniqueOnOffToggle) {
       const toggleUnique = () => {
         uniqueToggleMode = (uniqueToggleMode === 'on') ? 'off' : 'on';
 
@@ -9269,7 +9276,7 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
       });
     }
 
-            if ($soloPartyToggle) {
+    if ($soloPartyToggle) {
       const toggleSoloParty = () => {
         soloPartyMode = (soloPartyMode === 'solo') ? 'party' : 'solo';
 
@@ -10311,7 +10318,7 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
           // 무기종류가 지정된 스킬은 현재 무기종류와 일치하는 것만
           return rowWeapon === weaponType;
         })
-                .map((r, idx) => {
+        .map((r, idx) => {
           const rawKind = String(
             r.kind ??
             r.skillType ??
@@ -10452,145 +10459,145 @@ if (rowUnique) rowUnique.style.display = hasSpecialLike ? 'flex' : 'none';
         console.warn('[renderSkillTreeBands] mobile skillTrees → skillLv 변환 실패:', e);
       }
 
-            const TP_MIN = 0, TP_MAX = 5;
+      const TP_MIN = 0, TP_MAX = 5;
 
       // ✅ 남격투가스트라이커 충전 시간
-// - 0초: 비충전
-// - 충전공격은 1.0초부터 적용
-// - 1.0초 ~ 10.0초는 0.1초 단위
-const STRIKER_CHARGE_MIN = 0;
-const STRIKER_CHARGE_ACTIVE_MIN = 1;
-const STRIKER_CHARGE_MAX = 10;
-const STRIKER_CHARGE_STEP = 0.1;
+      // - 0초: 비충전
+      // - 충전공격은 1.0초부터 적용
+      // - 1.0초 ~ 10.0초는 0.1초 단위
+      const STRIKER_CHARGE_MIN = 0;
+      const STRIKER_CHARGE_ACTIVE_MIN = 1;
+      const STRIKER_CHARGE_MAX = 10;
+      const STRIKER_CHARGE_STEP = 0.1;
 
-// ✅ 구버전 저장슬롯 호환용
-// 예전 chargeStageIndex: 0/1/2/3/4 → 0/1/3/5/10초
-const STRIKER_CHARGE_OLD_VALUES = [0, 1, 3, 5, 10];
+      // ✅ 구버전 저장슬롯 호환용
+      // 예전 chargeStageIndex: 0/1/2/3/4 → 0/1/3/5/10초
+      const STRIKER_CHARGE_OLD_VALUES = [0, 1, 3, 5, 10];
 
-state.skillChargeStage = state.skillChargeStage || {};
+      state.skillChargeStage = state.skillChargeStage || {};
 
-// ✅ 남격투가스트라이커 이중개방 극한충전 대상 스킬
-// - 전체 충전스킬 중 단 하나만 선택 가능
-// - 값은 선택된 스킬의 s.id
-state.strikerExtremeChargeSkillId = state.strikerExtremeChargeSkillId || null;
+      // ✅ 남격투가스트라이커 이중개방 극한충전 대상 스킬
+      // - 전체 충전스킬 중 단 하나만 선택 가능
+      // - 값은 선택된 스킬의 s.id
+      state.strikerExtremeChargeSkillId = state.strikerExtremeChargeSkillId || null;
 
-const isMaleStrikerOwner = (String(ownerKey || '').replace(/\s+/g, '') === '남격투가스트라이커');
+      const isMaleStrikerOwner = (String(ownerKey || '').replace(/\s+/g, '') === '남격투가스트라이커');
 
-const getExtremeChargeSkillId = () => {
-  return state.strikerExtremeChargeSkillId || null;
-};
-
-const isExtremeChargeSkill = (s) => {
-  return !!s?.id && getExtremeChargeSkillId() === s.id;
-};
-
-const setExtremeChargeSkill = (s, checked) => {
-  const nextId = checked && s?.id ? s.id : null;
-  state.strikerExtremeChargeSkillId = nextId;
-
-  // ✅ 저장슬롯 호환용 skillTrees에도 같이 저장
-  try {
-    const ownerKey2 = String(ownerKey || '').replace(/\s+/g, '');
-    const skillName = String(s?.name || '').trim();
-
-    if (ownerKey2 && skillName) {
-      state.skillTrees = state.skillTrees || {};
-      state.skillTrees[ownerKey2] = state.skillTrees[ownerKey2] || {};
-
-      // 먼저 전체 스킬의 extremeCharge 플래그 제거
-      for (const name in state.skillTrees[ownerKey2]) {
-        if (!state.skillTrees[ownerKey2][name]) continue;
-        state.skillTrees[ownerKey2][name] = {
-          ...state.skillTrees[ownerKey2][name],
-          extremeCharge: false,
-        };
-      }
-
-      // 체크한 경우 현재 스킬만 true
-      const prev = state.skillTrees[ownerKey2][skillName] || {};
-      state.skillTrees[ownerKey2][skillName] = {
-        ...prev,
-        extremeCharge: !!nextId,
+      const getExtremeChargeSkillId = () => {
+        return state.strikerExtremeChargeSkillId || null;
       };
-    }
-  } catch (e) {
-    console.warn('[extremeCharge] skillTrees 저장 실패:', e);
-  }
 
-  onSkillTreeChanged();
-};
-
-const isChargeSkillRow = (s) => {
-  // ✅ 스킬 시트의 '구분' 컬럼이 '충전스킬'인 경우만 충전 UI 표시
-  const rawKind = String(
-    s?.skillType ??
-    s?.kind ??
-    s?.['구분'] ??
-    ''
-  ).replace(/\s+/g, '');
-
-  return !!s?.chargeSkill || rawKind === '충전스킬';
-};
-
-const clampChargeSeconds = (value) => {
-  const n = Number(value);
-  const safe = Number.isFinite(n) ? n : 0;
-
-  // ✅ 1초 미만은 전부 비충전
-  // 0.1~0.9를 직접 입력해도 0초로 저장/표시/전송한다.
-  if (safe < STRIKER_CHARGE_ACTIVE_MIN) {
-    return 0;
-  }
-
-  // ✅ 1.0초 ~ 10.0초 사이로 제한
-  const clamped = Math.max(
-    STRIKER_CHARGE_ACTIVE_MIN,
-    Math.min(STRIKER_CHARGE_MAX, safe)
-  );
-
-  // ✅ 0.1초 단위 반올림
-  return Math.round(clamped * 10) / 10;
-};
-
-const formatChargeSeconds = (value) => {
-  return clampChargeSeconds(value).toFixed(1);
-};
-
-const getChargeValue = (s) => {
-  return clampChargeSeconds(state.skillChargeStage?.[s.id] ?? 0);
-};
-
-const setChargeValue = (s, value) => {
-  const nextValue = clampChargeSeconds(value);
-  state.skillChargeStage[s.id] = nextValue;
-
-  // ✅ 저장슬롯 호환용 skillTrees에도 같이 저장
-  try {
-    const ownerKey2 = String(ownerKey || '').replace(/\s+/g, '');
-    const skillName = String(s?.name || '').trim();
-
-    if (ownerKey2 && skillName) {
-      state.skillTrees = state.skillTrees || {};
-      state.skillTrees[ownerKey2] = state.skillTrees[ownerKey2] || {};
-
-      const prev = state.skillTrees[ownerKey2][skillName] || {};
-      state.skillTrees[ownerKey2][skillName] = {
-        ...prev,
-
-        // ✅ 이제는 실제 충전 시간 자체를 저장
-        chargeStage: nextValue,
-
-        // ✅ 구형 코드/저장슬롯 호환용
-        // 0.1초 단위이므로 4.7초면 47
-        chargeStageIndex: Math.round(nextValue * 10),
+      const isExtremeChargeSkill = (s) => {
+        return !!s?.id && getExtremeChargeSkillId() === s.id;
       };
-    }
-  } catch (e) {
-    console.warn('[chargeStage] skillTrees 저장 실패:', e);
-  }
 
-  onSkillTreeChanged();
-};
+      const setExtremeChargeSkill = (s, checked) => {
+        const nextId = checked && s?.id ? s.id : null;
+        state.strikerExtremeChargeSkillId = nextId;
+
+        // ✅ 저장슬롯 호환용 skillTrees에도 같이 저장
+        try {
+          const ownerKey2 = String(ownerKey || '').replace(/\s+/g, '');
+          const skillName = String(s?.name || '').trim();
+
+          if (ownerKey2 && skillName) {
+            state.skillTrees = state.skillTrees || {};
+            state.skillTrees[ownerKey2] = state.skillTrees[ownerKey2] || {};
+
+            // 먼저 전체 스킬의 extremeCharge 플래그 제거
+            for (const name in state.skillTrees[ownerKey2]) {
+              if (!state.skillTrees[ownerKey2][name]) continue;
+              state.skillTrees[ownerKey2][name] = {
+                ...state.skillTrees[ownerKey2][name],
+                extremeCharge: false,
+              };
+            }
+
+            // 체크한 경우 현재 스킬만 true
+            const prev = state.skillTrees[ownerKey2][skillName] || {};
+            state.skillTrees[ownerKey2][skillName] = {
+              ...prev,
+              extremeCharge: !!nextId,
+            };
+          }
+        } catch (e) {
+          console.warn('[extremeCharge] skillTrees 저장 실패:', e);
+        }
+
+        onSkillTreeChanged();
+      };
+
+      const isChargeSkillRow = (s) => {
+        // ✅ 스킬 시트의 '구분' 컬럼이 '충전스킬'인 경우만 충전 UI 표시
+        const rawKind = String(
+          s?.skillType ??
+          s?.kind ??
+          s?.['구분'] ??
+          ''
+        ).replace(/\s+/g, '');
+
+        return !!s?.chargeSkill || rawKind === '충전스킬';
+      };
+
+      const clampChargeSeconds = (value) => {
+        const n = Number(value);
+        const safe = Number.isFinite(n) ? n : 0;
+
+        // ✅ 1초 미만은 전부 비충전
+        // 0.1~0.9를 직접 입력해도 0초로 저장/표시/전송한다.
+        if (safe < STRIKER_CHARGE_ACTIVE_MIN) {
+          return 0;
+        }
+
+        // ✅ 1.0초 ~ 10.0초 사이로 제한
+        const clamped = Math.max(
+          STRIKER_CHARGE_ACTIVE_MIN,
+          Math.min(STRIKER_CHARGE_MAX, safe)
+        );
+
+        // ✅ 0.1초 단위 반올림
+        return Math.round(clamped * 10) / 10;
+      };
+
+      const formatChargeSeconds = (value) => {
+        return clampChargeSeconds(value).toFixed(1);
+      };
+
+      const getChargeValue = (s) => {
+        return clampChargeSeconds(state.skillChargeStage?.[s.id] ?? 0);
+      };
+
+      const setChargeValue = (s, value) => {
+        const nextValue = clampChargeSeconds(value);
+        state.skillChargeStage[s.id] = nextValue;
+
+        // ✅ 저장슬롯 호환용 skillTrees에도 같이 저장
+        try {
+          const ownerKey2 = String(ownerKey || '').replace(/\s+/g, '');
+          const skillName = String(s?.name || '').trim();
+
+          if (ownerKey2 && skillName) {
+            state.skillTrees = state.skillTrees || {};
+            state.skillTrees[ownerKey2] = state.skillTrees[ownerKey2] || {};
+
+            const prev = state.skillTrees[ownerKey2][skillName] || {};
+            state.skillTrees[ownerKey2][skillName] = {
+              ...prev,
+
+              // ✅ 이제는 실제 충전 시간 자체를 저장
+              chargeStage: nextValue,
+
+              // ✅ 구형 코드/저장슬롯 호환용
+              // 0.1초 단위이므로 4.7초면 47
+              chargeStageIndex: Math.round(nextValue * 10),
+            };
+          }
+        } catch (e) {
+          console.warn('[chargeStage] skillTrees 저장 실패:', e);
+        }
+
+        onSkillTreeChanged();
+      };
 
       const syncChargeFromSkillTrees_pc = () => {
         try {
@@ -10613,31 +10620,31 @@ const setChargeValue = (s, value) => {
             if (!row?.id) continue;
 
             const rawIdx = node.chargeStageIndex;
-const rawVal = node.chargeStage;
+            const rawVal = node.chargeStage;
 
-let chargeSec;
+            let chargeSec;
 
-// ✅ 신버전: chargeStage 자체가 실제 초 단위
-if (rawVal !== undefined && rawVal !== null && rawVal !== '') {
-  chargeSec = Number(rawVal);
-} else {
-  const idx = Number(rawIdx);
+            // ✅ 신버전: chargeStage 자체가 실제 초 단위
+            if (rawVal !== undefined && rawVal !== null && rawVal !== '') {
+              chargeSec = Number(rawVal);
+            } else {
+              const idx = Number(rawIdx);
 
-  // ✅ 구버전: chargeStageIndex 0~4는 [0,1,3,5,10]으로 해석
-  if (Number.isFinite(idx) && idx >= 0 && idx <= 4) {
-    chargeSec = STRIKER_CHARGE_OLD_VALUES[idx] || 0;
-  } else {
-    // ✅ 혹시 0.1초 단위 인덱스가 들어온 경우: 47 → 4.7초
-    chargeSec = Number.isFinite(idx) ? idx / 10 : 0;
-  }
-}
+              // ✅ 구버전: chargeStageIndex 0~4는 [0,1,3,5,10]으로 해석
+              if (Number.isFinite(idx) && idx >= 0 && idx <= 4) {
+                chargeSec = STRIKER_CHARGE_OLD_VALUES[idx] || 0;
+              } else {
+                // ✅ 혹시 0.1초 단위 인덱스가 들어온 경우: 47 → 4.7초
+                chargeSec = Number.isFinite(idx) ? idx / 10 : 0;
+              }
+            }
 
-state.skillChargeStage[row.id] = clampChargeSeconds(chargeSec);
+            state.skillChargeStage[row.id] = clampChargeSeconds(chargeSec);
 
-// ✅ 저장슬롯에서 이중개방 극한충전 대상 복원
-if (node.extremeCharge === true) {
-  state.strikerExtremeChargeSkillId = row.id;
-}
+            // ✅ 저장슬롯에서 이중개방 극한충전 대상 복원
+            if (node.extremeCharge === true) {
+              state.strikerExtremeChargeSkillId = row.id;
+            }
           }
         } catch (e) {
           console.warn('[chargeStage] skillTrees 불러오기 실패:', e);
@@ -10731,39 +10738,39 @@ if (node.extremeCharge === true) {
             // ✅ 모바일 저장 형식과 맞추기
             //    기본 minLv만 있는 스킬도 store에는 남겨두면 다음 렌더에서 안정적이다.
             if (lv > 0 || tp > 0 || minLv > 0) {
-  const prev = store[skillName] || {};
+              const prev = store[skillName] || {};
 
-  // ✅ 현재 PC 충전값은 "인덱스"가 아니라 "초 단위"로 관리한다.
-  //    예: 0, 1.5, 4.5, 7.5, 15 또는 현재 코드 기준 0~10초
-  const rawChargeSec = Number(state.skillChargeStage?.[r.id] ?? prev.chargeStage ?? 0) || 0;
+              // ✅ 현재 PC 충전값은 "인덱스"가 아니라 "초 단위"로 관리한다.
+              //    예: 0, 1.5, 4.5, 7.5, 15 또는 현재 코드 기준 0~10초
+              const rawChargeSec = Number(state.skillChargeStage?.[r.id] ?? prev.chargeStage ?? 0) || 0;
 
-  const chargeSec =
-    typeof clampChargeSeconds === 'function'
-      ? clampChargeSeconds(rawChargeSec)
-      : rawChargeSec;
+              const chargeSec =
+                typeof clampChargeSeconds === 'function'
+                  ? clampChargeSeconds(rawChargeSec)
+                  : rawChargeSec;
 
-  store[skillName] = {
-    ...prev,
-    spLv: Math.max(minLv, lv),
-    tpLv: tp,
-  };
+              store[skillName] = {
+                ...prev,
+                spLv: Math.max(minLv, lv),
+                tpLv: tp,
+              };
 
-  // ✅ 충전값은 충전스킬에만 저장
-  if (chargeSec > 0 || prev.chargeStage != null || prev.chargeStageIndex != null) {
-    store[skillName].chargeStage = chargeSec;
+              // ✅ 충전값은 충전스킬에만 저장
+              if (chargeSec > 0 || prev.chargeStage != null || prev.chargeStageIndex != null) {
+                store[skillName].chargeStage = chargeSec;
 
-    // ✅ 호환용: 예전 index처럼 쓰지 말고 0.1초 단위 index로 저장
-    //    예: 4.5초 → 45
-    store[skillName].chargeStageIndex = Math.round(chargeSec * 10);
-  }
+                // ✅ 호환용: 예전 index처럼 쓰지 말고 0.1초 단위 index로 저장
+                //    예: 4.5초 → 45
+                store[skillName].chargeStageIndex = Math.round(chargeSec * 10);
+              }
 
-  // ✅ 기존 이중개방/극한충전 정보가 있으면 유지
-  if (prev.extremeCharge === true) {
-    store[skillName].extremeCharge = true;
-  }
-} else {
-  delete store[skillName];
-}
+              // ✅ 기존 이중개방/극한충전 정보가 있으면 유지
+              if (prev.extremeCharge === true) {
+                store[skillName].extremeCharge = true;
+              }
+            } else {
+              delete store[skillName];
+            }
           }
 
           // ✅ 이번 캐릭터는 이미 PC값 기준으로 동기화 완료 표시
@@ -11131,7 +11138,7 @@ if (node.extremeCharge === true) {
             tile.classList.add('no-tp');
           }
 
-                    const icon = document.createElement('div');
+          const icon = document.createElement('div');
           icon.className = 'st2-skill';
           const img = document.createElement('img');
           img.alt = s.name;
@@ -11143,15 +11150,15 @@ if (node.extremeCharge === true) {
           iconRow.className = 'st2-icon-row';
           iconRow.appendChild(icon);
 
-                    // ✅ 남격투가스트라이커 + 구분=충전스킬 인 스킬만 충전 UI 표시
+          // ✅ 남격투가스트라이커 + 구분=충전스킬 인 스킬만 충전 UI 표시
           const useChargeUi = isMaleStrikerOwner && isChargeSkillRow(s);
 
           let chargeValEl = null;
-let chargeMinusBtn = null;
-let chargePlusBtn = null;
+          let chargeMinusBtn = null;
+          let chargePlusBtn = null;
 
-// ✅ 이중개방 극한충전 체크박스
-let extremeChargeCheck = null;
+          // ✅ 이중개방 극한충전 체크박스
+          let extremeChargeCheck = null;
 
           if (useChargeUi) {
             const chargeBox = document.createElement('div');
@@ -11170,12 +11177,12 @@ let extremeChargeCheck = null;
             chargeMinusBtn.textContent = '−';
 
             chargeValEl = document.createElement('input');
-chargeValEl.type = 'number';
-chargeValEl.min = String(STRIKER_CHARGE_MIN);
-chargeValEl.max = String(STRIKER_CHARGE_MAX);
-chargeValEl.step = String(STRIKER_CHARGE_STEP);
-chargeValEl.inputMode = 'decimal';
-chargeValEl.className = 'st2-charge-val';
+            chargeValEl.type = 'number';
+            chargeValEl.min = String(STRIKER_CHARGE_MIN);
+            chargeValEl.max = String(STRIKER_CHARGE_MAX);
+            chargeValEl.step = String(STRIKER_CHARGE_STEP);
+            chargeValEl.inputMode = 'decimal';
+            chargeValEl.className = 'st2-charge-val';
 
             chargePlusBtn = document.createElement('button');
             chargePlusBtn.type = 'button';
@@ -11183,28 +11190,28 @@ chargeValEl.className = 'st2-charge-val';
             chargePlusBtn.textContent = '+';
 
             chargeCtrl.appendChild(chargeMinusBtn);
-chargeCtrl.appendChild(chargeValEl);
-chargeCtrl.appendChild(chargePlusBtn);
+            chargeCtrl.appendChild(chargeValEl);
+            chargeCtrl.appendChild(chargePlusBtn);
 
-// ✅ 이중개방 극한충전 체크박스
-const extremeRow = document.createElement('label');
-extremeRow.className = 'st2-extreme-charge-row';
+            // ✅ 이중개방 극한충전 체크박스
+            const extremeRow = document.createElement('label');
+            extremeRow.className = 'st2-extreme-charge-row';
 
-extremeChargeCheck = document.createElement('input');
-extremeChargeCheck.type = 'checkbox';
-extremeChargeCheck.className = 'st2-extreme-charge-check';
+            extremeChargeCheck = document.createElement('input');
+            extremeChargeCheck.type = 'checkbox';
+            extremeChargeCheck.className = 'st2-extreme-charge-check';
 
-const extremeText = document.createElement('span');
-extremeText.textContent = '이중개방';
+            const extremeText = document.createElement('span');
+            extremeText.textContent = '이중개방';
 
-extremeRow.appendChild(extremeChargeCheck);
-extremeRow.appendChild(extremeText);
+            extremeRow.appendChild(extremeChargeCheck);
+            extremeRow.appendChild(extremeText);
 
-chargeBox.appendChild(chargeLabel);
-chargeBox.appendChild(chargeCtrl);
+            chargeBox.appendChild(chargeLabel);
+            chargeBox.appendChild(chargeCtrl);
 
-iconRow.appendChild(chargeBox);
-iconRow.appendChild(extremeRow);
+            iconRow.appendChild(chargeBox);
+            iconRow.appendChild(extremeRow);
           }
 
           const nameEl = document.createElement('div');
@@ -11296,35 +11303,35 @@ iconRow.appendChild(extremeRow);
           tile.appendChild(ctrl);
           grid.appendChild(tile);
 
-            const refresh = () => {
+          const refresh = () => {
             const cur = getSkill(s);
             const tp = getTp(s);
             spanCur.textContent = String(cur);
             spanTp.textContent = String(tp);
 
             // ✅ 남격투가스트라이커 충전 UI 갱신
-if (useChargeUi && chargeValEl) {
-  const curCharge = getChargeValue(s);
+            if (useChargeUi && chargeValEl) {
+              const curCharge = getChargeValue(s);
 
-  // input 직접 입력 중이 아닐 때만 값 덮어쓰기
-  if (document.activeElement !== chargeValEl) {
-    chargeValEl.value = formatChargeSeconds(curCharge);
-  }
+              // input 직접 입력 중이 아닐 때만 값 덮어쓰기
+              if (document.activeElement !== chargeValEl) {
+                chargeValEl.value = formatChargeSeconds(curCharge);
+              }
 
-  if (chargeMinusBtn) chargeMinusBtn.disabled = (curCharge <= STRIKER_CHARGE_MIN);
-  if (chargePlusBtn) chargePlusBtn.disabled = (curCharge >= STRIKER_CHARGE_MAX);
+              if (chargeMinusBtn) chargeMinusBtn.disabled = (curCharge <= STRIKER_CHARGE_MIN);
+              if (chargePlusBtn) chargePlusBtn.disabled = (curCharge >= STRIKER_CHARGE_MAX);
 
-  // ✅ 이중개방 체크박스 갱신
-  if (extremeChargeCheck) {
-    const selectedId = getExtremeChargeSkillId();
-    const checked = selectedId === s.id;
+              // ✅ 이중개방 체크박스 갱신
+              if (extremeChargeCheck) {
+                const selectedId = getExtremeChargeSkillId();
+                const checked = selectedId === s.id;
 
-    extremeChargeCheck.checked = checked;
+                extremeChargeCheck.checked = checked;
 
-    // 다른 스킬이 이미 이중개방 대상으로 선택되어 있으면 비활성화
-    extremeChargeCheck.disabled = !!selectedId && !checked;
-  }
-}
+                // 다른 스킬이 이미 이중개방 대상으로 선택되어 있으면 비활성화
+                extremeChargeCheck.disabled = !!selectedId && !checked;
+              }
+            }
 
             // ★ 본 크러셔/풀 블룸: SP는 자동습득 → 버튼 완전 비활성화
             if (isBoneCrusher || isFullBloom) {
@@ -11367,137 +11374,137 @@ if (useChargeUi && chargeValEl) {
           // ✅ 이 row의 버튼 상태 갱신 함수를 전체 갱신 목록에 등록
           skillTileRefreshers.push(refresh);
 
-                    refresh();
+          refresh();
 
           if (useChargeUi) {
-  // ✅ 충전 + / - 버튼 길게 누르면 연속 증가/감소
-let chargeHoldDelayTimer = null;
-let chargeHoldIntervalTimer = null;
+            // ✅ 충전 + / - 버튼 길게 누르면 연속 증가/감소
+            let chargeHoldDelayTimer = null;
+            let chargeHoldIntervalTimer = null;
 
-const clearChargeHold = () => {
-  if (chargeHoldDelayTimer) {
-    clearTimeout(chargeHoldDelayTimer);
-    chargeHoldDelayTimer = null;
-  }
+            const clearChargeHold = () => {
+              if (chargeHoldDelayTimer) {
+                clearTimeout(chargeHoldDelayTimer);
+                chargeHoldDelayTimer = null;
+              }
 
-  if (chargeHoldIntervalTimer) {
-    clearInterval(chargeHoldIntervalTimer);
-    chargeHoldIntervalTimer = null;
-  }
-};
+              if (chargeHoldIntervalTimer) {
+                clearInterval(chargeHoldIntervalTimer);
+                chargeHoldIntervalTimer = null;
+              }
+            };
 
-const stepChargeUp = () => {
-  if (!chargePlusBtn || chargePlusBtn.disabled) return false;
+            const stepChargeUp = () => {
+              if (!chargePlusBtn || chargePlusBtn.disabled) return false;
 
-  const cur = getChargeValue(s);
+              const cur = getChargeValue(s);
 
-  // ✅ 0초 다음은 0.1초가 아니라 1.0초
-  const next = cur <= 0
-    ? STRIKER_CHARGE_ACTIVE_MIN
-    : cur + STRIKER_CHARGE_STEP;
+              // ✅ 0초 다음은 0.1초가 아니라 1.0초
+              const next = cur <= 0
+                ? STRIKER_CHARGE_ACTIVE_MIN
+                : cur + STRIKER_CHARGE_STEP;
 
-  setChargeValue(s, next);
-  refreshAllSkillTileButtons();
+              setChargeValue(s, next);
+              refreshAllSkillTileButtons();
 
-  return getChargeValue(s) < STRIKER_CHARGE_MAX;
-};
+              return getChargeValue(s) < STRIKER_CHARGE_MAX;
+            };
 
-const stepChargeDown = () => {
-  if (!chargeMinusBtn || chargeMinusBtn.disabled) return false;
+            const stepChargeDown = () => {
+              if (!chargeMinusBtn || chargeMinusBtn.disabled) return false;
 
-  const cur = getChargeValue(s);
+              const cur = getChargeValue(s);
 
-  // ✅ 1.0초에서 -를 누르면 0초로 복귀
-  // ✅ 1.1초 이상에서는 0.1초씩 감소
-  const next = cur <= STRIKER_CHARGE_ACTIVE_MIN
-    ? 0
-    : cur - STRIKER_CHARGE_STEP;
+              // ✅ 1.0초에서 -를 누르면 0초로 복귀
+              // ✅ 1.1초 이상에서는 0.1초씩 감소
+              const next = cur <= STRIKER_CHARGE_ACTIVE_MIN
+                ? 0
+                : cur - STRIKER_CHARGE_STEP;
 
-  setChargeValue(s, next);
-  refreshAllSkillTileButtons();
+              setChargeValue(s, next);
+              refreshAllSkillTileButtons();
 
-  return getChargeValue(s) > STRIKER_CHARGE_MIN;
-};
+              return getChargeValue(s) > STRIKER_CHARGE_MIN;
+            };
 
-const startChargeHold = (e, stepFn) => {
-  e.preventDefault();
-  e.stopPropagation();
+            const startChargeHold = (e, stepFn) => {
+              e.preventDefault();
+              e.stopPropagation();
 
-  clearChargeHold();
+              clearChargeHold();
 
-  // ✅ 누르는 즉시 1회 실행
-  const canContinue = stepFn();
-  if (!canContinue) return;
+              // ✅ 누르는 즉시 1회 실행
+              const canContinue = stepFn();
+              if (!canContinue) return;
 
-  // ✅ 살짝 기다렸다가 연속 실행 시작
-  chargeHoldDelayTimer = setTimeout(() => {
-  chargeHoldIntervalTimer = setInterval(() => {
-    const keepGoing = stepFn();
+              // ✅ 살짝 기다렸다가 연속 실행 시작
+              chargeHoldDelayTimer = setTimeout(() => {
+                chargeHoldIntervalTimer = setInterval(() => {
+                  const keepGoing = stepFn();
 
-    if (!keepGoing) {
-      clearChargeHold();
-    }
-  }, 35); // 기존 70 → 35
-}, 180); // 기존 330 → 180
-};
+                  if (!keepGoing) {
+                    clearChargeHold();
+                  }
+                }, 35); // 기존 70 → 35
+              }, 180); // 기존 330 → 180
+            };
 
-chargePlusBtn?.addEventListener('pointerdown', (e) => {
-  startChargeHold(e, stepChargeUp);
-});
+            chargePlusBtn?.addEventListener('pointerdown', (e) => {
+              startChargeHold(e, stepChargeUp);
+            });
 
-chargeMinusBtn?.addEventListener('pointerdown', (e) => {
-  startChargeHold(e, stepChargeDown);
-});
+            chargeMinusBtn?.addEventListener('pointerdown', (e) => {
+              startChargeHold(e, stepChargeDown);
+            });
 
-// ✅ 버튼에서 손을 떼거나 벗어나면 정지
-chargePlusBtn?.addEventListener('pointerup', clearChargeHold);
-chargePlusBtn?.addEventListener('pointercancel', clearChargeHold);
-chargePlusBtn?.addEventListener('pointerleave', clearChargeHold);
+            // ✅ 버튼에서 손을 떼거나 벗어나면 정지
+            chargePlusBtn?.addEventListener('pointerup', clearChargeHold);
+            chargePlusBtn?.addEventListener('pointercancel', clearChargeHold);
+            chargePlusBtn?.addEventListener('pointerleave', clearChargeHold);
 
-chargeMinusBtn?.addEventListener('pointerup', clearChargeHold);
-chargeMinusBtn?.addEventListener('pointercancel', clearChargeHold);
-chargeMinusBtn?.addEventListener('pointerleave', clearChargeHold);
+            chargeMinusBtn?.addEventListener('pointerup', clearChargeHold);
+            chargeMinusBtn?.addEventListener('pointercancel', clearChargeHold);
+            chargeMinusBtn?.addEventListener('pointerleave', clearChargeHold);
 
-// ✅ 드래그하다가 버튼 밖에서 손을 떼도 정지
-window.addEventListener('pointerup', clearChargeHold);
-window.addEventListener('blur', clearChargeHold);
+            // ✅ 드래그하다가 버튼 밖에서 손을 떼도 정지
+            window.addEventListener('pointerup', clearChargeHold);
+            window.addEventListener('blur', clearChargeHold);
 
-  // ✅ 직접 입력
-  chargeValEl?.addEventListener('change', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+            // ✅ 직접 입력
+            chargeValEl?.addEventListener('change', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
 
-    setChargeValue(s, chargeValEl.value);
-    refreshAllSkillTileButtons();
-  });
+              setChargeValue(s, chargeValEl.value);
+              refreshAllSkillTileButtons();
+            });
 
-  // ✅ 엔터 입력 시 바로 확정
-  chargeValEl?.addEventListener('keydown', (e) => {
-    e.stopPropagation();
+            // ✅ 엔터 입력 시 바로 확정
+            chargeValEl?.addEventListener('keydown', (e) => {
+              e.stopPropagation();
 
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      chargeValEl.blur();
-    }
-  });
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                chargeValEl.blur();
+              }
+            });
 
-    // ✅ 클릭/입력 중 타일 클릭 이벤트로 번지지 않게 방지
-  chargeValEl?.addEventListener('click', (e) => e.stopPropagation());
-  chargeValEl?.addEventListener('input', (e) => e.stopPropagation());
+            // ✅ 클릭/입력 중 타일 클릭 이벤트로 번지지 않게 방지
+            chargeValEl?.addEventListener('click', (e) => e.stopPropagation());
+            chargeValEl?.addEventListener('input', (e) => e.stopPropagation());
 
-  // ✅ 이중개방 극한충전 대상 선택
-  extremeChargeCheck?.addEventListener('change', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+            // ✅ 이중개방 극한충전 대상 선택
+            extremeChargeCheck?.addEventListener('change', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
 
-    setExtremeChargeSkill(s, extremeChargeCheck.checked);
-    refreshAllSkillTileButtons();
-  });
+              setExtremeChargeSkill(s, extremeChargeCheck.checked);
+              refreshAllSkillTileButtons();
+            });
 
-  extremeChargeCheck?.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
-}
+            extremeChargeCheck?.addEventListener('click', (e) => {
+              e.stopPropagation();
+            });
+          }
 
           const stepSkillUp = () => {
             if (isDeathHurricane && hurricaneSkill && getSkill(hurricaneSkill) <= 0) {
@@ -11972,7 +11979,7 @@ window.addEventListener('blur', clearChargeHold);
     });
 
 
-        function refreshCurrentCharacterSpTpFromCharList_pc(ownerKey) {
+    function refreshCurrentCharacterSpTpFromCharList_pc(ownerKey) {
       try {
         const s = window.state || state || {};
         const cc = s.currentCharacter || {};
@@ -12193,53 +12200,53 @@ window.addEventListener('blur', clearChargeHold);
     }
 
     async function saveSkillSelections() {
-  const arr = [];
+      const arr = [];
 
-  // ✅ 남격투가스트라이커 충전 시간 저장용
-  // 0.0초 ~ 10.0초, 0.1초 단위
-  const clampChargeSecondsForSave = (value) => {
-  const n = Number(value);
-  const safe = Number.isFinite(n) ? n : 0;
+      // ✅ 남격투가스트라이커 충전 시간 저장용
+      // 0.0초 ~ 10.0초, 0.1초 단위
+      const clampChargeSecondsForSave = (value) => {
+        const n = Number(value);
+        const safe = Number.isFinite(n) ? n : 0;
 
-  // ✅ 1초 미만은 전부 비충전으로 저장
-  if (safe < 1) return 0;
+        // ✅ 1초 미만은 전부 비충전으로 저장
+        if (safe < 1) return 0;
 
-  // ✅ 1.0초 ~ 10.0초 제한
-  const clamped = Math.max(1, Math.min(10, safe));
+        // ✅ 1.0초 ~ 10.0초 제한
+        const clamped = Math.max(1, Math.min(10, safe));
 
-  // ✅ 0.1초 단위 반올림
-  return Math.round(clamped * 10) / 10;
-};
+        // ✅ 0.1초 단위 반올림
+        return Math.round(clamped * 10) / 10;
+      };
 
-  for (const s of (ST2.rows || [])) {
-    const lv = Number(state.skillLv?.[s.id] ?? 0);
-    const tp = Number(state.skillTpLv?.[s.id] ?? 0);
+      for (const s of (ST2.rows || [])) {
+        const lv = Number(state.skillLv?.[s.id] ?? 0);
+        const tp = Number(state.skillTpLv?.[s.id] ?? 0);
 
-    if (lv > 0) {
-      // ✅ 이제 state.skillChargeStage[s.id]는 "인덱스"가 아니라 실제 충전 시간이다.
-      // 예: 0, 1.5, 4.7, 10
-      const chargeStage = clampChargeSecondsForSave(state.skillChargeStage?.[s.id] ?? 0);
+        if (lv > 0) {
+          // ✅ 이제 state.skillChargeStage[s.id]는 "인덱스"가 아니라 실제 충전 시간이다.
+          // 예: 0, 1.5, 4.7, 10
+          const chargeStage = clampChargeSecondsForSave(state.skillChargeStage?.[s.id] ?? 0);
 
-      arr.push({
-  name: s.name,
-  lv,
-  tp,
+          arr.push({
+            name: s.name,
+            lv,
+            tp,
 
-  // ✅ 백엔드 전송용: 실제 충전 시간
-  chargeStage,
+            // ✅ 백엔드 전송용: 실제 충전 시간
+            chargeStage,
 
-  // ✅ 호환용: 0.1초 단위 인덱스
-  // 예: 4.7초 → 47
-  chargeStageIndex: Math.round(chargeStage * 10),
+            // ✅ 호환용: 0.1초 단위 인덱스
+            // 예: 4.7초 → 47
+            chargeStageIndex: Math.round(chargeStage * 10),
 
-  // ✅ 남격투가스트라이커 이중개방 극한충전 대상 여부
-  // 전체 스킬 중 true는 최대 1개만 존재
-  extremeCharge: state.strikerExtremeChargeSkillId === s.id,
-});
-    }
-  }
+            // ✅ 남격투가스트라이커 이중개방 극한충전 대상 여부
+            // 전체 스킬 중 true는 최대 1개만 존재
+            extremeCharge: state.strikerExtremeChargeSkillId === s.id,
+          });
+        }
+      }
 
-  try {
+      try {
         // ownerKey 계산 (1순위: 현재 캐릭 정보, 2순위: 합산캐시)
         const raw = state.CurrentSumStats || {};
 
@@ -12259,11 +12266,11 @@ window.addEventListener('blur', clearChargeHold);
         // ★ skill_state_set 호출 (이미 JSON 객체 반환)
         const patchBefore = !!document.getElementById('chkUsePrePatchSkills')?.checked;
 
-console.log('[saveSkillSelections] ownerKey =', ownerKey);
-console.log('[saveSkillSelections] arr.length =', arr.length);
-console.table(arr);
+        console.log('[saveSkillSelections] ownerKey =', ownerKey);
+        console.log('[saveSkillSelections] arr.length =', arr.length);
+        console.table(arr);
 
-const payload = { ownerKey, skills: arr, patchBefore };
+        const payload = { ownerKey, skills: arr, patchBefore };
 
         // ✅ 워리어윈드시어는 트리 선택값도 같이 보낸다
         if (ownerKey === '워리어윈드시어') {
@@ -14551,18 +14558,18 @@ const payload = { ownerKey, skills: arr, patchBefore };
       //    프로젝트 전체에서 쓰는 전역 state 객체 기준으로 작성
       if (!window.state) window.state = {};
       if (!state.customSkills) {
-  state.customSkills = {
-    // 무기 커스텀
-    type: '',
-    weaponName: '',
-    // 상의 커스텀
-    armorType: '',
-    // 팔찌 커스텀
-    braceletType: '',
-    // 귀걸이 커스텀
-    earringType: '',
-  };
-}
+        state.customSkills = {
+          // 무기 커스텀
+          type: '',
+          weaponName: '',
+          // 상의 커스텀
+          armorType: '',
+          // 팔찌 커스텀
+          braceletType: '',
+          // 귀걸이 커스텀
+          earringType: '',
+        };
+      }
 
       // 3) 커스텀옵 버튼 클릭 시: 무기 체크 → 모달 열기 (기존 그대로)
       btnCustomOpt.addEventListener('click', async (e) => {
@@ -20302,436 +20309,453 @@ const payload = { ownerKey, skills: arr, patchBefore };
     }
 
     function _clonePlain_pc(obj) {
-  try {
-    if (typeof structuredClone === 'function') return structuredClone(obj);
-  } catch (_) {}
-  try {
-    return JSON.parse(JSON.stringify(obj || {}));
-  } catch (_) {
-    return {};
-  }
-}
-
-function _getCurrentCharKeyForPreset_pc(snap) {
-  const c = snap?.currentCharacter || {};
-  return (
-    String(c.ownerKey || '').trim().replace(/\s+/g, '') ||
-    String((c.jobGroupLabel || c.jobGroup || '') + (c.name || c.charName || ''))
-      .trim()
-      .replace(/\s+/g, '')
-  );
-}
-
-function _normPresetSkillName_pc(v) {
-  return String(v ?? '')
-    .trim()
-    .replace(/\s+/g, '')
-    .normalize('NFC');
-}
-
-// PC 스킬키가 "id|스킬명" 같은 형태로 들어왔을 때 이름만 뽑기
-function _stripPcSkillKeyToName_pc(skillKey) {
-  const s = String(skillKey || '').trim();
-  if (!s) return '';
-
-  if (s.includes('|')) {
-    const parts = s.split('|').map(x => x.trim()).filter(Boolean);
-    return parts[parts.length - 1] || s;
-  }
-
-  if (s.includes('::')) {
-    const parts = s.split('::').map(x => x.trim()).filter(Boolean);
-    return parts[parts.length - 1] || s;
-  }
-
-  return s;
-}
-
-function _looseOwnerMatch_pc(a, b) {
-  const na = String(a || '').replace(/\s+/g, '').normalize('NFC');
-  const nb = String(b || '').replace(/\s+/g, '').normalize('NFC');
-  if (!na || !nb) return false;
-  return na === nb || na.includes(nb) || nb.includes(na);
-}
-
-function _presetEntries_pc(obj) {
-  return obj && typeof obj === 'object' ? Object.entries(obj) : [];
-}
-
-const PRESET_EQUIP_SLOTS_PC = [
-  'weapon',
-  'headshoulder',
-  'top',
-  'bottom',
-  'belt',
-  'shoes',
-  'bracelet',
-  'necklace',
-  'ring',
-  'sub',
-  'earring',
-  'magestone',
-  'title',
-  'aura',
-  'creature',
-  'artifact'
-];
-
-function _normalizePresetEquipItem_pc(item) {
-  if (!item || typeof item !== 'object') return null;
-
-  const img = String(item.img || item.image || item.imgSrc || item['이미지'] || '').trim();
-
-  return {
-    name: String(item.name || item['이름'] || '').trim(),
-    code: item.code ?? null,
-    img,
-    image: img,
-    imgSrc: img,
-    desc: String(item.desc || item['설명'] || '').trim(),
-    rarity: String(item.rarity || item['레어리티'] || item['희귀도'] || item['등급'] || '').trim(),
-    type: String(item.type || item['타입'] || item['종류'] || '').trim(),
-    level: (item.level == null || item.level === '' || Number.isNaN(Number(item.level)))
-      ? null
-      : Number(item.level),
-    prefixLabel: String(item.prefixLabel || item.prefix || item['접두사'] || '').trim()
-  };
-}
-
-function _pickCanonicalSelections_pc(raw) {
-  const out = {};
-
-  const sources = [
-    raw?.selections,
-    raw?.equip,
-    raw?.equips
-  ].filter(x => x && typeof x === 'object');
-
-  for (const src of sources) {
-    for (const slot of PRESET_EQUIP_SLOTS_PC) {
-      if (out[slot]) continue;
-      const item = _normalizePresetEquipItem_pc(src[slot]);
-      if (item && item.name) out[slot] = item;
-    }
-  }
-
-  return out;
-}
-
-function _buildCanonicalSkillTrees_pc(raw, charKey) {
-  const result = {};
-
-  // 1) 이미 skillTrees가 있으면 현재 캐릭터 것을 우선 사용
-  if (charKey && raw?.skillTrees && typeof raw.skillTrees === 'object') {
-    let pickedTree = null;
-
-    if (raw.skillTrees[charKey] && typeof raw.skillTrees[charKey] === 'object') {
-      pickedTree = raw.skillTrees[charKey];
-    }
-
-    if (!pickedTree) {
-      for (const [ownerKey, tree] of _presetEntries_pc(raw.skillTrees)) {
-        if (!tree || typeof tree !== 'object') continue;
-        if (!_looseOwnerMatch_pc(ownerKey, charKey)) continue;
-        pickedTree = tree;
-        break;
+      try {
+        if (typeof structuredClone === 'function') return structuredClone(obj);
+      } catch (_) { }
+      try {
+        return JSON.parse(JSON.stringify(obj || {}));
+      } catch (_) {
+        return {};
       }
     }
 
-    if (pickedTree && typeof pickedTree === 'object') {
-  const tree = {};
+    function _getCurrentCharKeyForPreset_pc(snap) {
+      const c = snap?.currentCharacter || {};
+      return (
+        String(c.ownerKey || '').trim().replace(/\s+/g, '') ||
+        String((c.jobGroupLabel || c.jobGroup || '') + (c.name || c.charName || ''))
+          .trim()
+          .replace(/\s+/g, '')
+      );
+    }
 
-  for (const [skillKey, nodeRaw] of Object.entries(pickedTree)) {
-    const skillName = _stripPcSkillKeyToName_pc(skillKey);
-    if (!skillName) continue;
+    function _normPresetSkillName_pc(v) {
+      return String(v ?? '')
+        .trim()
+        .replace(/\s+/g, '')
+        .normalize('NFC');
+    }
 
-    const node = nodeRaw && typeof nodeRaw === 'object' ? nodeRaw : {};
+    // PC 스킬키가 "id|스킬명" 같은 형태로 들어왔을 때 이름만 뽑기
+    function _stripPcSkillKeyToName_pc(skillKey) {
+      const s = String(skillKey || '').trim();
+      if (!s) return '';
 
-    const next = {
-      ..._clonePlain_pc(node),
-      spLv: Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0,
-      tpLv: Number(node.tpLv ?? node.tp ?? 0) || 0
-    };
-
-    const hasUseful =
-      next.spLv > 0 ||
-      next.tpLv > 0 ||
-      next.chargeStage != null ||
-      next.chargeStageIndex != null ||
-      next.extremeCharge != null ||
-      next.extremeOpen != null ||
-      next.doubleOpen != null;
-
-    if (hasUseful) tree[skillName] = next;
-  }
-
-  // ✅ tree가 실제로 있을 때만 여기서 종료
-  if (Object.keys(tree).length > 0) {
-    result[charKey] = tree;
-    return result;
-  }
-
-  // ✅ 비어 있으면 아래의 skillLv / skillTpLv 변환으로 계속 진행
-  console.warn('[preset save pc] skillTrees는 있으나 유효 스킬이 없어 lvMap 변환으로 fallback');
-}
-  }
-
-  // 2) 구형 PC 포맷: skillLv / skillTpLv → skillTrees 변환
-  const lvMap = raw?.skillLv && typeof raw.skillLv === 'object' ? raw.skillLv : {};
-  const tpMap = raw?.skillTpLv && typeof raw.skillTpLv === 'object' ? raw.skillTpLv : {};
-  const chargeMap = raw?.skillChargeStage && typeof raw.skillChargeStage === 'object' ? raw.skillChargeStage : {};
-  const rows = Array.isArray(window.ST2?.rows) ? window.ST2.rows : [];
-
-  if (charKey && (Object.keys(lvMap).length || Object.keys(tpMap).length || Object.keys(chargeMap).length)) {
-    const tree = {};
-
-    rows.forEach(r => {
-      const id = String(r?.id || '').trim();
-      const skillName = String(r?.name || '').trim();
-      if (!id || !skillName) return;
-
-      const spLv = Number(lvMap[id] || 0) || 0;
-      const tpLv = Number(tpMap[id] || 0) || 0;
-      const chargeStage = Number(chargeMap[id] || 0) || 0;
-
-      if (spLv <= 0 && tpLv <= 0 && chargeStage <= 0) return;
-
-      tree[skillName] = {};
-      if (spLv > 0) tree[skillName].spLv = spLv;
-      if (tpLv > 0) tree[skillName].tpLv = tpLv;
-
-      if (chargeStage > 0) {
-        tree[skillName].chargeStage = chargeStage;
-        tree[skillName].chargeStageIndex = Math.round(chargeStage * 10);
+      if (s.includes('|')) {
+        const parts = s.split('|').map(x => x.trim()).filter(Boolean);
+        return parts[parts.length - 1] || s;
       }
-    });
 
-    if (Object.keys(tree).length > 0) {
-      result[charKey] = tree;
+      if (s.includes('::')) {
+        const parts = s.split('::').map(x => x.trim()).filter(Boolean);
+        return parts[parts.length - 1] || s;
+      }
+
+      return s;
     }
-  }
 
-  return result;
-}
-
-function normalizePresetStateForSave_pc(rawState) {
-  const raw = rawState || {};
-  const snap = _clonePlain_pc(raw);
-  const charKey = _getCurrentCharKeyForPreset_pc(snap);
-
-  // ✅ 포맷 버전 명시
-  snap.presetVersion = 2;
-
-  // ✅ 장비 표준 필드: selections
-  const selections = _pickCanonicalSelections_pc(snap);
-  snap.selections = selections;
-
-  // ✅ 호환용 mirror
-  // 저장본 안에 같이 남겨두면 PC/모바일 기존 코드가 안전하게 읽을 수 있음
-  snap.equip = _clonePlain_pc(selections);
-  snap.equips = _clonePlain_pc(selections);
-
-  // ✅ 아바타 표준 필드: avatar
-  if ((!snap.avatar || typeof snap.avatar !== 'object') && snap.avatarSel && typeof snap.avatarSel === 'object') {
-    snap.avatar = _clonePlain_pc(snap.avatarSel);
-  }
-  if (snap.avatar && typeof snap.avatar === 'object') {
-    snap.avatarSel = _clonePlain_pc(snap.avatar); // 호환용 mirror
-  }
-
-  // ✅ 성안의 봉인 표준 필드: castleSeal
-  if ((!snap.castleSeal || typeof snap.castleSeal !== 'object') && snap.CastleSeal && typeof snap.CastleSeal === 'object') {
-    snap.castleSeal = _clonePlain_pc(snap.CastleSeal);
-  }
-  if (snap.castleSeal && typeof snap.castleSeal === 'object') {
-    snap.CastleSeal = _clonePlain_pc(snap.castleSeal); // 호환용 mirror
-  }
-
-  // ✅ 솔플/파티 표준화
-  const modeRaw = String(snap.soloPartyMode || '').trim();
-  const isParty =
-    modeRaw === 'party'
-      ? true
-      : modeRaw === 'solo'
-        ? false
-        : !!snap.isPartyMode;
-
-  snap.isPartyMode = isParty;
-  snap.soloPartyMode = isParty ? 'party' : 'solo';
-
-  // ✅ 스킬 표준 필드: skillTrees
-  snap.skillTrees = _buildCanonicalSkillTrees_pc(snap, charKey);
-
-  // ✅ 구형/보조맵은 저장본에서 제거
-  delete snap.skillLv;
-  delete snap.skillTpLv;
-  delete snap._skillTreesConvertedFor;
-  delete snap._stOwnerKey;
-
-  return snap;
-}
-
-function hydratePcSkillMapsFromSkillTrees_pc(snap) {
-  if (!snap || typeof snap !== 'object') return snap;
-
-  const rows = Array.isArray(window.ST2?.rows) ? window.ST2.rows : [];
-  if (!rows.length) return snap;
-
-  const normKey = (v) => String(v ?? '')
-    .trim()
-    .replace(/\s+/g, '')
-    .normalize('NFC');
-
-  const charKey = _getCurrentCharKeyForPreset_pc(snap);
-
-  const possibleKeys = [];
-
-  if (charKey) possibleKeys.push(charKey);
-
-  const c = snap.currentCharacter || {};
-  const ownerKey = String(c.ownerKey || '').trim().replace(/\s+/g, '');
-  if (ownerKey) possibleKeys.push(ownerKey);
-
-  const jobNameKey = String(
-    (c.jobGroupLabel || c.jobGroup || '') +
-    (c.name || c.charName || '')
-  ).trim().replace(/\s+/g, '');
-  if (jobNameKey) possibleKeys.push(jobNameKey);
-
-  const sumOwnerKey = String(
-    snap?.CurrentSumStats?.ownerKey ||
-    snap?.ownerKey ||
-    ''
-  ).trim().replace(/\s+/g, '');
-  if (sumOwnerKey) possibleKeys.push(sumOwnerKey);
-
-  let treeStore = null;
-  const trees = snap.skillTrees && typeof snap.skillTrees === 'object'
-    ? snap.skillTrees
-    : {};
-
-  // 1) 정확 일치 우선
-  for (const k of possibleKeys) {
-    if (k && trees[k] && typeof trees[k] === 'object') {
-      treeStore = trees[k];
-      break;
+    function _looseOwnerMatch_pc(a, b) {
+      const na = String(a || '').replace(/\s+/g, '').normalize('NFC');
+      const nb = String(b || '').replace(/\s+/g, '').normalize('NFC');
+      if (!na || !nb) return false;
+      return na === nb || na.includes(nb) || nb.includes(na);
     }
-  }
 
-  // 2) 정확 일치가 없으면 느슨 매칭
-  if (!treeStore) {
-    for (const [owner, tree] of Object.entries(trees)) {
-      if (!tree || typeof tree !== 'object') continue;
+    function _presetEntries_pc(obj) {
+      return obj && typeof obj === 'object' ? Object.entries(obj) : [];
+    }
 
-      const ownerNorm = normKey(owner);
-      const matched = possibleKeys.some(k => {
-        const kk = normKey(k);
-        return kk && ownerNorm && (
-          kk === ownerNorm ||
-          kk.includes(ownerNorm) ||
-          ownerNorm.includes(kk)
-        );
+    const PRESET_EQUIP_SLOTS_PC = [
+      'weapon',
+      'headshoulder',
+      'top',
+      'bottom',
+      'belt',
+      'shoes',
+      'bracelet',
+      'necklace',
+      'ring',
+      'sub',
+      'earring',
+      'magestone',
+      'title',
+      'aura',
+      'creature',
+      'artifact'
+    ];
+
+    function _normalizePresetEquipItem_pc(item) {
+      if (!item || typeof item !== 'object') return null;
+
+      const img = String(item.img || item.image || item.imgSrc || item['이미지'] || '').trim();
+
+      return {
+        name: String(item.name || item['이름'] || '').trim(),
+        code: item.code ?? null,
+        img,
+        image: img,
+        imgSrc: img,
+        desc: String(item.desc || item['설명'] || '').trim(),
+        rarity: String(item.rarity || item['레어리티'] || item['희귀도'] || item['등급'] || '').trim(),
+        type: String(item.type || item['타입'] || item['종류'] || '').trim(),
+        level: (item.level == null || item.level === '' || Number.isNaN(Number(item.level)))
+          ? null
+          : Number(item.level),
+        prefixLabel: String(item.prefixLabel || item.prefix || item['접두사'] || '').trim()
+      };
+    }
+
+    function _pickCanonicalSelections_pc(raw) {
+      const out = {};
+
+      const sources = [
+        raw?.selections,
+        raw?.equip,
+        raw?.equips
+      ].filter(x => x && typeof x === 'object');
+
+      for (const src of sources) {
+        for (const slot of PRESET_EQUIP_SLOTS_PC) {
+          if (out[slot]) continue;
+          const item = _normalizePresetEquipItem_pc(src[slot]);
+          if (item && item.name) out[slot] = item;
+        }
+      }
+
+      return out;
+    }
+
+    function _buildCanonicalSkillTrees_pc(raw, charKey) {
+      const result = {};
+
+      // 1) 이미 skillTrees가 있으면 현재 캐릭터 것을 우선 사용
+      if (charKey && raw?.skillTrees && typeof raw.skillTrees === 'object') {
+        let pickedTree = null;
+
+        if (raw.skillTrees[charKey] && typeof raw.skillTrees[charKey] === 'object') {
+          pickedTree = raw.skillTrees[charKey];
+        }
+
+        if (!pickedTree) {
+          for (const [ownerKey, tree] of _presetEntries_pc(raw.skillTrees)) {
+            if (!tree || typeof tree !== 'object') continue;
+            if (!_looseOwnerMatch_pc(ownerKey, charKey)) continue;
+            pickedTree = tree;
+            break;
+          }
+        }
+
+        if (pickedTree && typeof pickedTree === 'object') {
+          const tree = {};
+
+          for (const [skillKey, nodeRaw] of Object.entries(pickedTree)) {
+            const skillName = _stripPcSkillKeyToName_pc(skillKey);
+            if (!skillName) continue;
+
+            const node = nodeRaw && typeof nodeRaw === 'object' ? nodeRaw : {};
+
+            const next = {
+              ..._clonePlain_pc(node),
+              spLv: Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0,
+              tpLv: Number(node.tpLv ?? node.tp ?? 0) || 0
+            };
+
+            const chargeStageNum = Number(next.chargeStage ?? 0) || 0;
+            const chargeStageIndexNum = Number(next.chargeStageIndex ?? 0) || 0;
+
+            const hasExtreme =
+              next.extremeCharge === true ||
+              next.extremeOpen === true ||
+              next.doubleOpen === true;
+
+            const hasUseful =
+              next.spLv > 0 ||
+              next.tpLv > 0 ||
+              chargeStageNum > 0 ||
+              chargeStageIndexNum > 0 ||
+              hasExtreme;
+
+            if (hasUseful) {
+              // false 값은 굳이 저장슬롯에 남기지 않음
+              if (next.extremeCharge !== true) delete next.extremeCharge;
+              if (next.extremeOpen !== true) delete next.extremeOpen;
+              if (next.doubleOpen !== true) delete next.doubleOpen;
+
+              // 충전값이 0이면 찌꺼기 제거
+              if (chargeStageNum <= 0) delete next.chargeStage;
+              if (chargeStageIndexNum <= 0) delete next.chargeStageIndex;
+
+              tree[skillName] = next;
+            }
+          }
+
+          // ✅ tree가 실제로 있을 때만 여기서 종료
+          if (Object.keys(tree).length > 0) {
+            result[charKey] = tree;
+            return result;
+          }
+
+          // ✅ 비어 있으면 아래의 skillLv / skillTpLv 변환으로 계속 진행
+          console.warn('[preset save pc] skillTrees는 있으나 유효 스킬이 없어 lvMap 변환으로 fallback');
+        }
+      }
+
+      // 2) 구형 PC 포맷: skillLv / skillTpLv → skillTrees 변환
+      const lvMap = raw?.skillLv && typeof raw.skillLv === 'object' ? raw.skillLv : {};
+      const tpMap = raw?.skillTpLv && typeof raw.skillTpLv === 'object' ? raw.skillTpLv : {};
+      const chargeMap = raw?.skillChargeStage && typeof raw.skillChargeStage === 'object' ? raw.skillChargeStage : {};
+      const rows = Array.isArray(window.ST2?.rows) ? window.ST2.rows : [];
+
+      if (charKey && (Object.keys(lvMap).length || Object.keys(tpMap).length || Object.keys(chargeMap).length)) {
+        const tree = {};
+
+        rows.forEach(r => {
+          const id = String(r?.id || '').trim();
+          const skillName = String(r?.name || '').trim();
+          if (!id || !skillName) return;
+
+          const spLv = Number(lvMap[id] || 0) || 0;
+          const tpLv = Number(tpMap[id] || 0) || 0;
+          const chargeStage = Number(chargeMap[id] || 0) || 0;
+
+          if (spLv <= 0 && tpLv <= 0 && chargeStage <= 0) return;
+
+          tree[skillName] = {};
+          if (spLv > 0) tree[skillName].spLv = spLv;
+          if (tpLv > 0) tree[skillName].tpLv = tpLv;
+
+          if (chargeStage > 0) {
+            tree[skillName].chargeStage = chargeStage;
+            tree[skillName].chargeStageIndex = Math.round(chargeStage * 10);
+          }
+        });
+
+        if (Object.keys(tree).length > 0) {
+          result[charKey] = tree;
+        }
+      }
+
+      return result;
+    }
+
+    function normalizePresetStateForSave_pc(rawState) {
+      const raw = rawState || {};
+      const snap = _clonePlain_pc(raw);
+      const charKey = _getCurrentCharKeyForPreset_pc(snap);
+
+      // ✅ 포맷 버전 명시
+      snap.presetVersion = 2;
+
+      // ✅ 장비 표준 필드: selections
+      const selections = _pickCanonicalSelections_pc(snap);
+      snap.selections = selections;
+
+      // ✅ 호환용 mirror
+      // 저장본 안에 같이 남겨두면 PC/모바일 기존 코드가 안전하게 읽을 수 있음
+      snap.equip = _clonePlain_pc(selections);
+      snap.equips = _clonePlain_pc(selections);
+
+      // ✅ 아바타 표준 필드: avatar
+      if ((!snap.avatar || typeof snap.avatar !== 'object') && snap.avatarSel && typeof snap.avatarSel === 'object') {
+        snap.avatar = _clonePlain_pc(snap.avatarSel);
+      }
+      if (snap.avatar && typeof snap.avatar === 'object') {
+        snap.avatarSel = _clonePlain_pc(snap.avatar); // 호환용 mirror
+      }
+
+      // ✅ 성안의 봉인 표준 필드: castleSeal
+      if ((!snap.castleSeal || typeof snap.castleSeal !== 'object') && snap.CastleSeal && typeof snap.CastleSeal === 'object') {
+        snap.castleSeal = _clonePlain_pc(snap.CastleSeal);
+      }
+      if (snap.castleSeal && typeof snap.castleSeal === 'object') {
+        snap.CastleSeal = _clonePlain_pc(snap.castleSeal); // 호환용 mirror
+      }
+
+      // ✅ 솔플/파티 표준화
+      const modeRaw = String(snap.soloPartyMode || '').trim();
+      const isParty =
+        modeRaw === 'party'
+          ? true
+          : modeRaw === 'solo'
+            ? false
+            : !!snap.isPartyMode;
+
+      snap.isPartyMode = isParty;
+      snap.soloPartyMode = isParty ? 'party' : 'solo';
+
+      // ✅ 스킬 표준 필드: skillTrees
+      snap.skillTrees = _buildCanonicalSkillTrees_pc(snap, charKey);
+
+      // ✅ 구형/보조맵은 저장본에서 제거
+      delete snap.skillLv;
+      delete snap.skillTpLv;
+      delete snap._skillTreesConvertedFor;
+      delete snap._stOwnerKey;
+
+      return snap;
+    }
+
+    function hydratePcSkillMapsFromSkillTrees_pc(snap) {
+      if (!snap || typeof snap !== 'object') return snap;
+
+      const rows = Array.isArray(window.ST2?.rows) ? window.ST2.rows : [];
+      if (!rows.length) return snap;
+
+      const normKey = (v) => String(v ?? '')
+        .trim()
+        .replace(/\s+/g, '')
+        .normalize('NFC');
+
+      const charKey = _getCurrentCharKeyForPreset_pc(snap);
+
+      const possibleKeys = [];
+
+      if (charKey) possibleKeys.push(charKey);
+
+      const c = snap.currentCharacter || {};
+      const ownerKey = String(c.ownerKey || '').trim().replace(/\s+/g, '');
+      if (ownerKey) possibleKeys.push(ownerKey);
+
+      const jobNameKey = String(
+        (c.jobGroupLabel || c.jobGroup || '') +
+        (c.name || c.charName || '')
+      ).trim().replace(/\s+/g, '');
+      if (jobNameKey) possibleKeys.push(jobNameKey);
+
+      const sumOwnerKey = String(
+        snap?.CurrentSumStats?.ownerKey ||
+        snap?.ownerKey ||
+        ''
+      ).trim().replace(/\s+/g, '');
+      if (sumOwnerKey) possibleKeys.push(sumOwnerKey);
+
+      let treeStore = null;
+      const trees = snap.skillTrees && typeof snap.skillTrees === 'object'
+        ? snap.skillTrees
+        : {};
+
+      // 1) 정확 일치 우선
+      for (const k of possibleKeys) {
+        if (k && trees[k] && typeof trees[k] === 'object') {
+          treeStore = trees[k];
+          break;
+        }
+      }
+
+      // 2) 정확 일치가 없으면 느슨 매칭
+      if (!treeStore) {
+        for (const [owner, tree] of Object.entries(trees)) {
+          if (!tree || typeof tree !== 'object') continue;
+
+          const ownerNorm = normKey(owner);
+          const matched = possibleKeys.some(k => {
+            const kk = normKey(k);
+            return kk && ownerNorm && (
+              kk === ownerNorm ||
+              kk.includes(ownerNorm) ||
+              ownerNorm.includes(kk)
+            );
+          });
+
+          if (matched) {
+            treeStore = tree;
+            break;
+          }
+        }
+      }
+
+      if (!treeStore || typeof treeStore !== 'object') {
+        console.warn('[preset hydrate PC] skillTrees 매칭 실패', {
+          possibleKeys,
+          treeKeys: Object.keys(trees || {})
+        });
+        return snap;
+      }
+
+      const idxByName = {};
+      for (const r of rows) {
+        const nameKey = normKey(r?.name || r?.['스킬명'] || '');
+        if (nameKey && !idxByName[nameKey]) idxByName[nameKey] = r;
+      }
+
+      snap.skillLv = {};
+      snap.skillTpLv = {};
+
+      for (const [skillKey, nodeRaw] of Object.entries(treeStore)) {
+        const skillName = _stripPcSkillKeyToName_pc(skillKey);
+        const row = idxByName[normKey(skillName)];
+        if (!row || !row.id) continue;
+
+        const node = nodeRaw && typeof nodeRaw === 'object' ? nodeRaw : {};
+
+        const spLvRaw = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
+        const tpLvRaw = Number(node.tpLv ?? node.tp ?? 0) || 0;
+
+        const minLv = Number(row.minLv ?? 0) || 0;
+        const maxLv = Number(row.maxLv ?? 0) || 0;
+
+        const spLv = Math.max(minLv, maxLv ? Math.min(spLvRaw, maxLv) : spLvRaw);
+        const tpLv = Math.max(0, Math.min(tpLvRaw, 5));
+
+        if (spLv > 0) snap.skillLv[row.id] = spLv;
+        if (tpLv > 0) snap.skillTpLv[row.id] = tpLv;
+      }
+
+      console.log('[preset hydrate PC] skillTrees → skillLv 복원 완료', {
+        charKey,
+        skillTreeKeys: Object.keys(treeStore || {}).length,
+        skillLvKeys: Object.keys(snap.skillLv || {}).length,
+        skillTpLvKeys: Object.keys(snap.skillTpLv || {}).length
       });
 
-      if (matched) {
-        treeStore = tree;
-        break;
-      }
+      return snap;
     }
-  }
 
-  if (!treeStore || typeof treeStore !== 'object') {
-    console.warn('[preset hydrate PC] skillTrees 매칭 실패', {
-      possibleKeys,
-      treeKeys: Object.keys(trees || {})
-    });
-    return snap;
-  }
+    // 불러오기용:
+    // 저장 포맷 정규화는 하되, PC UI가 바로 쓸 수 있도록
+    // skillTrees → skillLv / skillTpLv 를 다시 복원한다.
+    function normalizePresetStateForLoad_pc(rawState) {
+      const snap = normalizePresetStateForSave_pc(rawState);
 
-  const idxByName = {};
-  for (const r of rows) {
-    const nameKey = normKey(r?.name || r?.['스킬명'] || '');
-    if (nameKey && !idxByName[nameKey]) idxByName[nameKey] = r;
-  }
+      try {
+        hydratePcSkillMapsFromSkillTrees_pc(snap);
+      } catch (e) {
+        console.warn('[normalizePresetStateForLoad_pc] skill hydrate fail:', e);
+      }
 
-  snap.skillLv = {};
-  snap.skillTpLv = {};
+      return snap;
+    }
 
-  for (const [skillKey, nodeRaw] of Object.entries(treeStore)) {
-    const skillName = _stripPcSkillKeyToName_pc(skillKey);
-    const row = idxByName[normKey(skillName)];
-    if (!row || !row.id) continue;
+    // 현재 프론트 state 전체를 스냅샷으로 만들어서 서버에 보낼 객체로 반환
+    function buildFrontPresetState() {
+      return normalizePresetStateForSave_pc(window.state || {});
+    }
 
-    const node = nodeRaw && typeof nodeRaw === 'object' ? nodeRaw : {};
+    // 기존 이름을 다른 곳에서 참조하고 있을 가능성 대비
+    function _buildSkillTreeOnlyPreset_pc(rawState) {
+      return normalizePresetStateForSave_pc(rawState);
+    }
 
-    const spLvRaw = Number(node.spLv ?? node.lv ?? node.level ?? 0) || 0;
-    const tpLvRaw = Number(node.tpLv ?? node.tp ?? 0) || 0;
-
-    const minLv = Number(row.minLv ?? 0) || 0;
-    const maxLv = Number(row.maxLv ?? 0) || 0;
-
-    const spLv = Math.max(minLv, maxLv ? Math.min(spLvRaw, maxLv) : spLvRaw);
-    const tpLv = Math.max(0, Math.min(tpLvRaw, 5));
-
-    if (spLv > 0) snap.skillLv[row.id] = spLv;
-    if (tpLv > 0) snap.skillTpLv[row.id] = tpLv;
-  }
-
-  console.log('[preset hydrate PC] skillTrees → skillLv 복원 완료', {
-    charKey,
-    skillTreeKeys: Object.keys(treeStore || {}).length,
-    skillLvKeys: Object.keys(snap.skillLv || {}).length,
-    skillTpLvKeys: Object.keys(snap.skillTpLv || {}).length
-  });
-
-  return snap;
-}
-
-// 불러오기용:
-// 저장 포맷 정규화는 하되, PC UI가 바로 쓸 수 있도록
-// skillTrees → skillLv / skillTpLv 를 다시 복원한다.
-function normalizePresetStateForLoad_pc(rawState) {
-  const snap = normalizePresetStateForSave_pc(rawState);
-
-  try {
-    hydratePcSkillMapsFromSkillTrees_pc(snap);
-  } catch (e) {
-    console.warn('[normalizePresetStateForLoad_pc] skill hydrate fail:', e);
-  }
-
-  return snap;
-}
-
-// 현재 프론트 state 전체를 스냅샷으로 만들어서 서버에 보낼 객체로 반환
-function buildFrontPresetState() {
-  return normalizePresetStateForSave_pc(window.state || {});
-}
-
-// 기존 이름을 다른 곳에서 참조하고 있을 가능성 대비
-function _buildSkillTreeOnlyPreset_pc(rawState) {
-  return normalizePresetStateForSave_pc(rawState);
-}
-    
 
     // 프리셋에서 불러온 state 스냅샷을 현재 state에 적용 + 슬롯 UI/캐릭터 UI 갱신
-        function applyFrontPresetState(snap) {
-  if (!snap || typeof snap !== 'object') return;
+    function applyFrontPresetState(snap) {
+      if (!snap || typeof snap !== 'object') return;
 
-  // ✅ 저장슬롯 포맷 통합:
-  // PC/모바일/구형 슬롯을 모두 presetVersion 2 기준으로 정규화한 뒤 적용
-  try {
-    if (typeof normalizePresetStateForLoad_pc === 'function') {
-      snap = normalizePresetStateForLoad_pc(snap);
-    }
-  } catch (e) {
-    console.warn('[applyFrontPresetState] preset normalize fail:', e);
-  }
+      // ✅ 저장슬롯 포맷 통합:
+      // PC/모바일/구형 슬롯을 모두 presetVersion 2 기준으로 정규화한 뒤 적용
+      try {
+        if (typeof normalizePresetStateForLoad_pc === 'function') {
+          snap = normalizePresetStateForLoad_pc(snap);
+        }
+      } catch (e) {
+        console.warn('[applyFrontPresetState] preset normalize fail:', e);
+      }
 
-  // 🔹 항상 window.state 기준으로만 처리
-  if (!window.state || typeof window.state !== 'object') {
-    window.state = {};
-  }
-  const target = window.state;
+      // 🔹 항상 window.state 기준으로만 처리
+      if (!window.state || typeof window.state !== 'object') {
+        window.state = {};
+      }
+      const target = window.state;
 
       // 1) 스냅샷 깊은 복사 (공유 참조 방지)
       let src;
@@ -20745,33 +20769,33 @@ function _buildSkillTreeOnlyPreset_pc(rawState) {
         src = snap;
       }
 
-       // 2) 기존 state 내용을 싹 비우고
-  Object.keys(target).forEach((k) => { delete target[k]; });
-  // 3) 새 스냅샷 내용으로 채움
-  Object.entries(src).forEach(([k, v]) => {
-    target[k] = v;
-  });
+      // 2) 기존 state 내용을 싹 비우고
+      Object.keys(target).forEach((k) => { delete target[k]; });
+      // 3) 새 스냅샷 내용으로 채움
+      Object.entries(src).forEach(([k, v]) => {
+        target[k] = v;
+      });
 
-  // ✅ 장비 프리셋 호환
-  // 구형 저장본: equip
-  // 신형 UI 복원: selections / equips
-  if (!target.selections && target.equip && typeof target.equip === 'object') {
-    target.selections = target.equip;
-  }
-  if (!target.equips && target.equip && typeof target.equip === 'object') {
-    target.equips = target.equip;
-  }
-  if (!target.equip && target.selections && typeof target.selections === 'object') {
-    target.equip = target.selections;
-  }
+      // ✅ 장비 프리셋 호환
+      // 구형 저장본: equip
+      // 신형 UI 복원: selections / equips
+      if (!target.selections && target.equip && typeof target.equip === 'object') {
+        target.selections = target.equip;
+      }
+      if (!target.equips && target.equip && typeof target.equip === 'object') {
+        target.equips = target.equip;
+      }
+      if (!target.equip && target.selections && typeof target.selections === 'object') {
+        target.equip = target.selections;
+      }
 
-  // ✅ 구형 프리셋 호환:
-  //    soloPartyMode / isPartyMode 가 없으면 기본은 'party'
-  target.soloPartyMode =
-    String(target.soloPartyMode || 'party').trim().toLowerCase() === 'solo'
-      ? 'solo'
-      : 'party';
-  target.isPartyMode = (target.soloPartyMode === 'party');
+      // ✅ 구형 프리셋 호환:
+      //    soloPartyMode / isPartyMode 가 없으면 기본은 'party'
+      target.soloPartyMode =
+        String(target.soloPartyMode || 'party').trim().toLowerCase() === 'solo'
+          ? 'solo'
+          : 'party';
+      target.isPartyMode = (target.soloPartyMode === 'party');
 
       // ✅ 토글 UI가 참조하는 로컬 변수도 같이 동기화
       soloPartyMode = target.soloPartyMode;
@@ -21902,47 +21926,47 @@ function _buildSkillTreeOnlyPreset_pc(rawState) {
             }
 
             // 서버 세션에도 반영(계산하기에서 바로 적용되도록)
-if (typeof saveSkillSelections === 'function') {
-  try {
-    console.log('[fpreset_load] currentCharacter =', state.currentCharacter);
-    console.log('[fpreset_load] ownerKey(currentCharacter) =',
-      String(
-        (state?.currentCharacter?.jobGroupLabel || state?.currentCharacter?.jobGroup || '') +
-        (state?.currentCharacter?.name || '')
-      ).replace(/\s+/g, '')
-    );
-    console.log('[fpreset_load] skillLv keys =', Object.keys(state.skillLv || {}).length);
-    console.log('[fpreset_load] skillTpLv keys =', Object.keys(state.skillTpLv || {}).length);
+            if (typeof saveSkillSelections === 'function') {
+              try {
+                console.log('[fpreset_load] currentCharacter =', state.currentCharacter);
+                console.log('[fpreset_load] ownerKey(currentCharacter) =',
+                  String(
+                    (state?.currentCharacter?.jobGroupLabel || state?.currentCharacter?.jobGroup || '') +
+                    (state?.currentCharacter?.name || '')
+                  ).replace(/\s+/g, '')
+                );
+                console.log('[fpreset_load] skillLv keys =', Object.keys(state.skillLv || {}).length);
+                console.log('[fpreset_load] skillTpLv keys =', Object.keys(state.skillTpLv || {}).length);
 
-    const frostRows = (window.ST2?.rows || []).filter(r =>
-      [
-        '크리스탈 블레이드',
-        '빙백검',
-        '빙백검 3타',
-        '헤일스톰',
-        '설화연창',
-        '아이스 크래쉬',
-        '회전투창',
-        '브로큰 애로우',
-        '글라키에스'
-      ].includes(String(r?.name || '').trim())
-    );
+                const frostRows = (window.ST2?.rows || []).filter(r =>
+                  [
+                    '크리스탈 블레이드',
+                    '빙백검',
+                    '빙백검 3타',
+                    '헤일스톰',
+                    '설화연창',
+                    '아이스 크래쉬',
+                    '회전투창',
+                    '브로큰 애로우',
+                    '글라키에스'
+                  ].includes(String(r?.name || '').trim())
+                );
 
-    console.table(frostRows.map(r => ({
-      id: r.id,
-      name: r.name,
-      minLv: Number(r.minLv || 0) || 0,
-      maxLv: Number(r.maxLv || 0) || 0,
-      lv: Number(state.skillLv?.[r.id] ?? 0) || 0,
-      tp: Number(state.skillTpLv?.[r.id] ?? 0) || 0
-    })));
+                console.table(frostRows.map(r => ({
+                  id: r.id,
+                  name: r.name,
+                  minLv: Number(r.minLv || 0) || 0,
+                  maxLv: Number(r.maxLv || 0) || 0,
+                  lv: Number(state.skillLv?.[r.id] ?? 0) || 0,
+                  tp: Number(state.skillTpLv?.[r.id] ?? 0) || 0
+                })));
 
-    await saveSkillSelections();
-  }
-  catch (e) {
-    console.warn('[fpreset_load] saveSkillSelections 실패:', e);
-  }
-}
+                await saveSkillSelections();
+              }
+              catch (e) {
+                console.warn('[fpreset_load] saveSkillSelections 실패:', e);
+              }
+            }
           }
         } catch (e) {
           console.warn('[fpreset_load] mobile skillTrees 즉시 변환 실패:', e);
@@ -22329,7 +22353,7 @@ if (typeof saveSkillSelections === 'function') {
           payload.customSkills = customSkillsPayload;
         }
 
-                // ✅ 패치전 스킬/커스텀 시트 사용 여부
+        // ✅ 패치전 스킬/커스텀 시트 사용 여부
         payload.patchBefore = !!document.getElementById('chkUsePrePatchSkills')?.checked;
 
         // ✅ 솔플 / 파티 모드
@@ -22719,16 +22743,16 @@ if (typeof saveSkillSelections === 'function') {
 
     // 🔹 현재 장비 선택 상태를 얕은 복사
     function cloneSelections(sel) {
-  try {
-    return JSON.parse(JSON.stringify(sel || {}));
-  } catch (_) {
-    const out = {};
-    for (const [slot, info] of Object.entries(sel || {})) {
-      out[slot] = info ? { ...info } : null;
+      try {
+        return JSON.parse(JSON.stringify(sel || {}));
+      } catch (_) {
+        const out = {};
+        for (const [slot, info] of Object.entries(sel || {})) {
+          out[slot] = info ? { ...info } : null;
+        }
+        return out;
+      }
     }
-    return out;
-  }
-}
 
     // 🔹 백업해 둔 장비 상태로 되돌리기
     async function restoreSelections(selBackup) {
@@ -22742,94 +22766,94 @@ if (typeof saveSkillSelections === 'function') {
     }
 
     function cloneCustomOptState() {
-  return {
-    customSkills: state?.customSkills ? JSON.parse(JSON.stringify(state.customSkills)) : null,
+      return {
+        customSkills: state?.customSkills ? JSON.parse(JSON.stringify(state.customSkills)) : null,
 
-    customArmor: state?.customArmor ? JSON.parse(JSON.stringify(state.customArmor)) : null,
-    customBracelet: state?.customBracelet ? JSON.parse(JSON.stringify(state.customBracelet)) : null,
-    customEarring: state?.customEarring ? JSON.parse(JSON.stringify(state.customEarring)) : null,
+        customArmor: state?.customArmor ? JSON.parse(JSON.stringify(state.customArmor)) : null,
+        customBracelet: state?.customBracelet ? JSON.parse(JSON.stringify(state.customBracelet)) : null,
+        customEarring: state?.customEarring ? JSON.parse(JSON.stringify(state.customEarring)) : null,
 
-    customArmorLabel: state?.customArmorLabel ?? null,
-    customBraceletLabel: state?.customBraceletLabel ?? null,
-    customEarringLabel: state?.customEarringLabel ?? null,
-  };
-}
-
-function cloneRuneEngraveState() {
-  return {
-    runeEngrave: state?.runeEngrave
-      ? JSON.parse(JSON.stringify(state.runeEngrave))
-      : null
-  };
-}
-
-async function restoreRuneEngraveState(snapshot) {
-  const savedName = String(snapshot?.runeEngrave?.name || '').trim();
-  const savedLevel = String(snapshot?.runeEngrave?.level || '').trim();
-
-  state.runeEngrave = state.runeEngrave || {};
-  state.runeEngrave.name = savedName;
-  state.runeEngrave.level = savedLevel;
-
-  const sel1 = document.getElementById('selRuneEngrave');
-  const sel2 = document.getElementById('selRuneDetail');
-
-  if (sel1) {
-    sel1.value = savedName || '';
-  }
-
-  if (typeof fillRuneDetailOptionsByName === 'function') {
-    fillRuneDetailOptionsByName(savedName);
-  }
-
-  if (sel2) {
-    if (savedLevel) {
-      const hasOption = Array.from(sel2.options).some(op => String(op.value) === savedLevel);
-      if (!hasOption) {
-        const op = document.createElement('option');
-        op.value = savedLevel;
-        op.textContent = savedLevel;
-        sel2.appendChild(op);
-      }
-      sel2.disabled = false;
-      sel2.value = savedLevel;
-    } else {
-      sel2.innerHTML = `<option value="" selected disabled>세부 설정</option>`;
-      sel2.disabled = true;
+        customArmorLabel: state?.customArmorLabel ?? null,
+        customBraceletLabel: state?.customBraceletLabel ?? null,
+        customEarringLabel: state?.customEarringLabel ?? null,
+      };
     }
-  }
 
-  if (savedName && savedLevel) {
-    await applyRuneEngraveByNameTag(savedName, savedLevel);
-  }
-}
+    function cloneRuneEngraveState() {
+      return {
+        runeEngrave: state?.runeEngrave
+          ? JSON.parse(JSON.stringify(state.runeEngrave))
+          : null
+      };
+    }
 
-function restoreCustomOptState(snapshot) {
-  if (!window.state) window.state = {};
+    async function restoreRuneEngraveState(snapshot) {
+      const savedName = String(snapshot?.runeEngrave?.name || '').trim();
+      const savedLevel = String(snapshot?.runeEngrave?.level || '').trim();
 
-  state.customSkills = snapshot?.customSkills
-    ? JSON.parse(JSON.stringify(snapshot.customSkills))
-    : {};
+      state.runeEngrave = state.runeEngrave || {};
+      state.runeEngrave.name = savedName;
+      state.runeEngrave.level = savedLevel;
 
-  state.customArmor = snapshot?.customArmor
-    ? JSON.parse(JSON.stringify(snapshot.customArmor))
-    : null;
+      const sel1 = document.getElementById('selRuneEngrave');
+      const sel2 = document.getElementById('selRuneDetail');
 
-  state.customBracelet = snapshot?.customBracelet
-    ? JSON.parse(JSON.stringify(snapshot.customBracelet))
-    : null;
+      if (sel1) {
+        sel1.value = savedName || '';
+      }
 
-  state.customEarring = snapshot?.customEarring
-    ? JSON.parse(JSON.stringify(snapshot.customEarring))
-    : null;
+      if (typeof fillRuneDetailOptionsByName === 'function') {
+        fillRuneDetailOptionsByName(savedName);
+      }
 
-  state.customArmorLabel = snapshot?.customArmorLabel ?? null;
-  state.customBraceletLabel = snapshot?.customBraceletLabel ?? null;
-  state.customEarringLabel = snapshot?.customEarringLabel ?? null;
+      if (sel2) {
+        if (savedLevel) {
+          const hasOption = Array.from(sel2.options).some(op => String(op.value) === savedLevel);
+          if (!hasOption) {
+            const op = document.createElement('option');
+            op.value = savedLevel;
+            op.textContent = savedLevel;
+            sel2.appendChild(op);
+          }
+          sel2.disabled = false;
+          sel2.value = savedLevel;
+        } else {
+          sel2.innerHTML = `<option value="" selected disabled>세부 설정</option>`;
+          sel2.disabled = true;
+        }
+      }
 
-  try { applyCustomOptUIFromState?.(); } catch (_) {}
-  try { updateEquipDescPreview?.(); } catch (_) {}
-}
+      if (savedName && savedLevel) {
+        await applyRuneEngraveByNameTag(savedName, savedLevel);
+      }
+    }
+
+    function restoreCustomOptState(snapshot) {
+      if (!window.state) window.state = {};
+
+      state.customSkills = snapshot?.customSkills
+        ? JSON.parse(JSON.stringify(snapshot.customSkills))
+        : {};
+
+      state.customArmor = snapshot?.customArmor
+        ? JSON.parse(JSON.stringify(snapshot.customArmor))
+        : null;
+
+      state.customBracelet = snapshot?.customBracelet
+        ? JSON.parse(JSON.stringify(snapshot.customBracelet))
+        : null;
+
+      state.customEarring = snapshot?.customEarring
+        ? JSON.parse(JSON.stringify(snapshot.customEarring))
+        : null;
+
+      state.customArmorLabel = snapshot?.customArmorLabel ?? null;
+      state.customBraceletLabel = snapshot?.customBraceletLabel ?? null;
+      state.customEarringLabel = snapshot?.customEarringLabel ?? null;
+
+      try { applyCustomOptUIFromState?.(); } catch (_) { }
+      try { updateEquipDescPreview?.(); } catch (_) { }
+    }
 
     function filterSetsForAutoSweep(sets, nameList) {
       if (!Array.isArray(sets) || !sets.length) return [];
@@ -22903,411 +22927,411 @@ function restoreCustomOptState(snapshot) {
     }
 
     // 🔹 미리 정해둔 조합만 순차 계산해서 계산값 시트에 기록
-async function runMacroSetSweep(targetId, presetKey = 'general', p /* 'phys' | 'mag' 생략 가능 */) {
-  if (isAutoSetSweepRunning) return;
-  isAutoSetSweepRunning = true;
+    async function runMacroSetSweep(targetId, presetKey = 'general', p /* 'phys' | 'mag' 생략 가능 */) {
+      if (isAutoSetSweepRunning) return;
+      isAutoSetSweepRunning = true;
 
-  const originalSel = cloneSelections(state.selections || {});
-  const originalCustom = cloneCustomOptState();
-  const originalRuneEngrave = cloneRuneEngraveState();
+      const originalSel = cloneSelections(state.selections || {});
+      const originalCustom = cloneCustomOptState();
+      const originalRuneEngrave = cloneRuneEngraveState();
 
-  try {
-    const armorSetsAll = getArmorSetListForSweep();
-    const accSetsAll = getAccSetListForSweep();
-    const specSetsAll = getSpecSetListForSweep();
+      try {
+        const armorSetsAll = getArmorSetListForSweep();
+        const accSetsAll = getAccSetListForSweep();
+        const specSetsAll = getSpecSetListForSweep();
 
-    const findSetByName = (arr, name) => {
-      const want = String(name || '').trim();
-      return (arr || []).find(x => String(x?.name || '').trim() === want) || null;
-    };
+        const findSetByName = (arr, name) => {
+          const want = String(name || '').trim();
+          return (arr || []).find(x => String(x?.name || '').trim() === want) || null;
+        };
 
-    const macroPresets = {
-  general: [
-  {
-    name: '일반 1번 세트',
-    armor: '전격: 어느 말괄량이의 탐사복 세트',
-    acc: '조화: 신비로운 빛의 소용돌이 세트',
-    spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '일반 2번 세트',
-    armor: '침식: 섬뜩한 강철 용 세트',
-    acc: '각오: 섬뜩한 빛의 관리자 세트',
-    spec: '격변: 부정한 빛의 우상 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '일반 3번 세트',
-    armor: '허상: 어느 말괄량이의 탐사복 세트',
-    acc: '조화: 신비로운 빛의 소용돌이 세트',
-    spec: '불굴: 개구쟁이 호문쿨루스 세트',
-    runeEngraveName: '스킬공격력(%)',
-    runeEngraveLevel: '5',
-  },
-  {
-    name: '일반 4번 세트',
-    armor: '작열: 포이즈닝 퀸 스파이더 세트',
-    acc: '견고: 화력 개조 탄띠 세트',
-    spec: '불굴: 개구쟁이 호문쿨루스 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '일반 5번 세트',
-    armor: '작열: 포이즈닝 퀸 스파이더 세트',
-    acc: '조화: 신비로운 빛의 소용돌이 세트',
-    spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '일반 6번 세트',
-    armor: '작열: 포이즈닝 퀸 스파이더 세트',
-    acc: '조화: 신비로운 빛의 소용돌이 세트',
-    spec: '결의: 허영 속 어둠의 피조물 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '일반 7번 세트',
-    armor: '수호: 거인의 스펙쿨룸 아이언 세트',
-    acc: '견고: 화력 개조 탄띠 세트',
-    spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
-    runeEngraveName: '스킬공격력(%)',
-    runeEngraveLevel: '5',
-  },
-  {
-    name: '일반 8번 세트',
-    armor: '작열: 포이즈닝 퀸 스파이더 세트',
-    acc: '각오: 섬뜩한 빛의 관리자 세트',
-    spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '일반 9번 세트',
-    armor: '전격: 어느 말괄량이의 탐사복 세트',
-    acc: '레거시: 지나온 영광의 시대 세트',
-    spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '일반 10번 세트',
-    armor: '레거시: 마력의 소용돌이 세트',
-    acc: '각오: 섬뜩한 빛의 관리자 세트',
-    spec: '불굴: 개구쟁이 호문쿨루스 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '일반 11번 세트',
-    armor: '작열: 포이즈닝 퀸 스파이더 세트',
-    acc: '각오: 섬뜩한 빛의 관리자 세트',
-    spec: '숙련: 개구쟁이 호문쿨루스 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '일반 12번 세트',
-    armor: '허상: 어느 말괄량이의 탐사복 세트',
-    acc: '각오: 섬뜩한 빛의 관리자 세트',
-    spec: '숙련: 개구쟁이 호문쿨루스 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-  name: '일반 13번 세트',
-  armor: '전격: 어느 말괄량이의 탐사복 세트',
-  acc: '레거시: 에테리얼 리벤넌트 세트',
-  spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
-  runeEngraveName: '상변데미지(%)',
-  runeEngraveLevel: '50',
-},
-{
-  name: '일반 14번 세트',
-  armor: '침식: 섬뜩한 강철 용 세트',
-  acc: '레거시: 에테리얼 리벤넌트 세트',
-  spec: '격변: 부정한 빛의 우상 세트',
-  runeEngraveName: '상변데미지(%)',
-  runeEngraveLevel: '50',
-},
-{
-  name: '일반 15번 세트',
-  armor: '허상: 어느 말괄량이의 탐사복 세트',
-  acc: '레거시: 에테리얼 리벤넌트 세트',
-  spec: '불굴: 개구쟁이 호문쿨루스 세트',
-  runeEngraveName: '스킬공격력(%)',
-  runeEngraveLevel: '5',
-},
-{
-  name: '일반 16번 세트',
-  armor: '작열: 포이즈닝 퀸 스파이더 세트',
-  acc: '레거시: 에테리얼 리벤넌트 세트',
-  spec: '불굴: 개구쟁이 호문쿨루스 세트',
-  runeEngraveName: '상변데미지(%)',
-  runeEngraveLevel: '50',
-},
-{
-  name: '일반 17번 세트',
-  armor: '작열: 포이즈닝 퀸 스파이더 세트',
-  acc: '레거시: 에테리얼 리벤넌트 세트',
-  spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
-  runeEngraveName: '상변데미지(%)',
-  runeEngraveLevel: '50',
-},
-{
-  name: '일반 18번 세트',
-  armor: '작열: 포이즈닝 퀸 스파이더 세트',
-  acc: '레거시: 에테리얼 리벤넌트 세트',
-  spec: '결의: 허영 속 어둠의 피조물 세트',
-  runeEngraveName: '상변데미지(%)',
-  runeEngraveLevel: '50',
-},
-{
-  name: '일반 19번 세트',
-  armor: '수호: 거인의 스펙쿨룸 아이언 세트',
-  acc: '레거시: 에테리얼 리벤넌트 세트',
-  spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
-  runeEngraveName: '스킬공격력(%)',
-  runeEngraveLevel: '5',
-},
-{
-  name: '일반 22번 세트',
-  armor: '레거시: 마력의 소용돌이 세트',
-  acc: '레거시: 에테리얼 리벤넌트 세트',
-  spec: '불굴: 개구쟁이 호문쿨루스 세트',
-  runeEngraveName: '스킬공격력(%)',
-  runeEngraveLevel: '5',
-},
-{
-  name: '일반 23번 세트',
-  armor: '작열: 포이즈닝 퀸 스파이더 세트',
-  acc: '레거시: 에테리얼 리벤넌트 세트',
-  spec: '숙련: 개구쟁이 호문쿨루스 세트',
-  runeEngraveName: '상변데미지(%)',
-  runeEngraveLevel: '50',
-},
-{
-  name: '일반 24번 세트',
-  armor: '허상: 어느 말괄량이의 탐사복 세트',
-  acc: '레거시: 에테리얼 리벤넌트 세트',
-  spec: '숙련: 개구쟁이 호문쿨루스 세트',
-  runeEngraveName: '스킬공격력(%)',
-  runeEngraveLevel: '5',
-},
-],
+        const macroPresets = {
+          general: [
+            {
+              name: '일반 1번 세트',
+              armor: '전격: 어느 말괄량이의 탐사복 세트',
+              acc: '조화: 신비로운 빛의 소용돌이 세트',
+              spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 2번 세트',
+              armor: '침식: 섬뜩한 강철 용 세트',
+              acc: '각오: 섬뜩한 빛의 관리자 세트',
+              spec: '격변: 부정한 빛의 우상 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 3번 세트',
+              armor: '허상: 어느 말괄량이의 탐사복 세트',
+              acc: '조화: 신비로운 빛의 소용돌이 세트',
+              spec: '불굴: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '스킬공격력(%)',
+              runeEngraveLevel: '5',
+            },
+            {
+              name: '일반 4번 세트',
+              armor: '작열: 포이즈닝 퀸 스파이더 세트',
+              acc: '견고: 화력 개조 탄띠 세트',
+              spec: '불굴: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 5번 세트',
+              armor: '작열: 포이즈닝 퀸 스파이더 세트',
+              acc: '조화: 신비로운 빛의 소용돌이 세트',
+              spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 6번 세트',
+              armor: '작열: 포이즈닝 퀸 스파이더 세트',
+              acc: '조화: 신비로운 빛의 소용돌이 세트',
+              spec: '결의: 허영 속 어둠의 피조물 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 7번 세트',
+              armor: '수호: 거인의 스펙쿨룸 아이언 세트',
+              acc: '견고: 화력 개조 탄띠 세트',
+              spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+              runeEngraveName: '스킬공격력(%)',
+              runeEngraveLevel: '5',
+            },
+            {
+              name: '일반 8번 세트',
+              armor: '작열: 포이즈닝 퀸 스파이더 세트',
+              acc: '각오: 섬뜩한 빛의 관리자 세트',
+              spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 9번 세트',
+              armor: '전격: 어느 말괄량이의 탐사복 세트',
+              acc: '레거시: 지나온 영광의 시대 세트',
+              spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 10번 세트',
+              armor: '레거시: 마력의 소용돌이 세트',
+              acc: '각오: 섬뜩한 빛의 관리자 세트',
+              spec: '불굴: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 11번 세트',
+              armor: '작열: 포이즈닝 퀸 스파이더 세트',
+              acc: '각오: 섬뜩한 빛의 관리자 세트',
+              spec: '숙련: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 12번 세트',
+              armor: '허상: 어느 말괄량이의 탐사복 세트',
+              acc: '각오: 섬뜩한 빛의 관리자 세트',
+              spec: '숙련: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 13번 세트',
+              armor: '전격: 어느 말괄량이의 탐사복 세트',
+              acc: '레거시: 에테리얼 리벤넌트 세트',
+              spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 14번 세트',
+              armor: '침식: 섬뜩한 강철 용 세트',
+              acc: '레거시: 에테리얼 리벤넌트 세트',
+              spec: '격변: 부정한 빛의 우상 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 15번 세트',
+              armor: '허상: 어느 말괄량이의 탐사복 세트',
+              acc: '레거시: 에테리얼 리벤넌트 세트',
+              spec: '불굴: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '스킬공격력(%)',
+              runeEngraveLevel: '5',
+            },
+            {
+              name: '일반 16번 세트',
+              armor: '작열: 포이즈닝 퀸 스파이더 세트',
+              acc: '레거시: 에테리얼 리벤넌트 세트',
+              spec: '불굴: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 17번 세트',
+              armor: '작열: 포이즈닝 퀸 스파이더 세트',
+              acc: '레거시: 에테리얼 리벤넌트 세트',
+              spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 18번 세트',
+              armor: '작열: 포이즈닝 퀸 스파이더 세트',
+              acc: '레거시: 에테리얼 리벤넌트 세트',
+              spec: '결의: 허영 속 어둠의 피조물 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 19번 세트',
+              armor: '수호: 거인의 스펙쿨룸 아이언 세트',
+              acc: '레거시: 에테리얼 리벤넌트 세트',
+              spec: '불굴: 깊은 불구덩이의 섬멸자 세트',
+              runeEngraveName: '스킬공격력(%)',
+              runeEngraveLevel: '5',
+            },
+            {
+              name: '일반 22번 세트',
+              armor: '레거시: 마력의 소용돌이 세트',
+              acc: '레거시: 에테리얼 리벤넌트 세트',
+              spec: '불굴: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '스킬공격력(%)',
+              runeEngraveLevel: '5',
+            },
+            {
+              name: '일반 23번 세트',
+              armor: '작열: 포이즈닝 퀸 스파이더 세트',
+              acc: '레거시: 에테리얼 리벤넌트 세트',
+              spec: '숙련: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '일반 24번 세트',
+              armor: '허상: 어느 말괄량이의 탐사복 세트',
+              acc: '레거시: 에테리얼 리벤넌트 세트',
+              spec: '숙련: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '스킬공격력(%)',
+              runeEngraveLevel: '5',
+            },
+          ],
 
-elting: [
-  {
-    name: '엘팅 1번 세트',
-    armor: '레거시: 마력의 소용돌이 세트',
-    acc: '견고: 엘팅 메모리얼의 기억 세트',
-    spec: '결의: 허영 속 어둠의 피조물 세트',
-    runeEngraveName: '스킬공격력(%)',
-    runeEngraveLevel: '5',
-  },
-  {
-    name: '엘팅 2번 세트',
-    armor: '레거시: 마력의 소용돌이 세트',
-    acc: '견고: 엘팅 메모리얼의 기억 세트',
-    spec: '불굴: 개구쟁이 호문쿨루스 세트',
-    runeEngraveName: '스킬공격력(%)',
-    runeEngraveLevel: '5',
-  },
-  {
-    name: '엘팅 3번 세트',
-    armor: '수호: 거인의 스펙쿨룸 아이언 세트',
-    acc: '견고: 엘팅 메모리얼의 기억 세트',
-    spec: '질주: 부정한 빛의 우상 세트',
-    runeEngraveName: '스킬공격력(%)',
-    runeEngraveLevel: '5',
-  },
-  {
-    name: '엘팅 4번 세트',
-    armor: '작열: 포이즈닝 퀸 스파이더 세트',
-    acc: '견고: 엘팅 메모리얼의 기억 세트',
-    spec: '결의: 허영 속 어둠의 피조물 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '엘팅 5번 세트',
-    armor: '작열: 포이즈닝 퀸 스파이더 세트',
-    acc: '견고: 엘팅 메모리얼의 기억 세트',
-    spec: '불굴: 개구쟁이 호문쿨루스 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '엘팅 6번 세트',
-    armor: '침식: 섬뜩한 강철 용 세트',
-    acc: '견고: 엘팅 메모리얼의 기억 세트',
-    spec: '불굴: 개구쟁이 호문쿨루스 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '엘팅 7번 세트',
-    armor: '수호: 거인의 스펙쿨룸 아이언 세트',
-    acc: '견고: 엘팅 메모리얼의 기억 세트',
-    spec: '불굴: 개구쟁이 호문쿨루스 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '엘팅 8번 세트',
-    armor: '수호: 거인의 스펙쿨룸 아이언 세트',
-    acc: '견고: 엘팅 메모리얼의 기억 세트',
-    spec: '불굴: 개구쟁이 호문쿨루스 세트',
-    runeEngraveName: '스킬공격력(%)',
-    runeEngraveLevel: '5',
-  },
-  {
-    name: '엘팅 9번 세트',
-    armor: '자상: 여명을 쏘아 올리는 자 세트',
-    acc: '견고: 엘팅 메모리얼의 기억 세트',
-    spec: '결의: 허영 속 어둠의 피조물 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '엘팅 10번 세트',
-    armor: '수호: 거인의 스펙쿨룸 아이언 세트',
-    acc: '견고: 엘팅 메모리얼의 기억 세트',
-    spec: '결의: 라이트닝 에너지 코어 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-  {
-    name: '엘팅 11번 세트',
-    armor: '허상: 어느 말괄량이의 탐사복 세트',
-    acc: '견고: 엘팅 메모리얼의 기억 세트',
-    spec: '결의: 허영 속 어둠의 피조물 세트',
-    runeEngraveName: '스킬공격력(%)',
-    runeEngraveLevel: '5',
-  },
-  {
-    name: '엘팅 12번 세트',
-    armor: '신속: 익스플로시브 버닝 스톤 세트',
-    acc: '견고: 엘팅 메모리얼의 기억 세트',
-    spec: '질주: 부정한 빛의 우상 세트',
-    runeEngraveName: '상변데미지(%)',
-    runeEngraveLevel: '50',
-  },
-],
-};
+          elting: [
+            {
+              name: '엘팅 1번 세트',
+              armor: '레거시: 마력의 소용돌이 세트',
+              acc: '견고: 엘팅 메모리얼의 기억 세트',
+              spec: '결의: 허영 속 어둠의 피조물 세트',
+              runeEngraveName: '스킬공격력(%)',
+              runeEngraveLevel: '5',
+            },
+            {
+              name: '엘팅 2번 세트',
+              armor: '레거시: 마력의 소용돌이 세트',
+              acc: '견고: 엘팅 메모리얼의 기억 세트',
+              spec: '불굴: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '스킬공격력(%)',
+              runeEngraveLevel: '5',
+            },
+            {
+              name: '엘팅 3번 세트',
+              armor: '수호: 거인의 스펙쿨룸 아이언 세트',
+              acc: '견고: 엘팅 메모리얼의 기억 세트',
+              spec: '질주: 부정한 빛의 우상 세트',
+              runeEngraveName: '스킬공격력(%)',
+              runeEngraveLevel: '5',
+            },
+            {
+              name: '엘팅 4번 세트',
+              armor: '작열: 포이즈닝 퀸 스파이더 세트',
+              acc: '견고: 엘팅 메모리얼의 기억 세트',
+              spec: '결의: 허영 속 어둠의 피조물 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '엘팅 5번 세트',
+              armor: '작열: 포이즈닝 퀸 스파이더 세트',
+              acc: '견고: 엘팅 메모리얼의 기억 세트',
+              spec: '불굴: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '엘팅 6번 세트',
+              armor: '침식: 섬뜩한 강철 용 세트',
+              acc: '견고: 엘팅 메모리얼의 기억 세트',
+              spec: '불굴: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '엘팅 7번 세트',
+              armor: '수호: 거인의 스펙쿨룸 아이언 세트',
+              acc: '견고: 엘팅 메모리얼의 기억 세트',
+              spec: '불굴: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '엘팅 8번 세트',
+              armor: '수호: 거인의 스펙쿨룸 아이언 세트',
+              acc: '견고: 엘팅 메모리얼의 기억 세트',
+              spec: '불굴: 개구쟁이 호문쿨루스 세트',
+              runeEngraveName: '스킬공격력(%)',
+              runeEngraveLevel: '5',
+            },
+            {
+              name: '엘팅 9번 세트',
+              armor: '자상: 여명을 쏘아 올리는 자 세트',
+              acc: '견고: 엘팅 메모리얼의 기억 세트',
+              spec: '결의: 허영 속 어둠의 피조물 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '엘팅 10번 세트',
+              armor: '수호: 거인의 스펙쿨룸 아이언 세트',
+              acc: '견고: 엘팅 메모리얼의 기억 세트',
+              spec: '결의: 라이트닝 에너지 코어 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+            {
+              name: '엘팅 11번 세트',
+              armor: '허상: 어느 말괄량이의 탐사복 세트',
+              acc: '견고: 엘팅 메모리얼의 기억 세트',
+              spec: '결의: 허영 속 어둠의 피조물 세트',
+              runeEngraveName: '스킬공격력(%)',
+              runeEngraveLevel: '5',
+            },
+            {
+              name: '엘팅 12번 세트',
+              armor: '신속: 익스플로시브 버닝 스톤 세트',
+              acc: '견고: 엘팅 메모리얼의 기억 세트',
+              spec: '질주: 부정한 빛의 우상 세트',
+              runeEngraveName: '상변데미지(%)',
+              runeEngraveLevel: '50',
+            },
+          ],
+        };
 
-const macroCombos = macroPresets[presetKey] || [];
+        const macroCombos = macroPresets[presetKey] || [];
 
-if (!macroCombos.length) {
-  alert(
-    presetKey === 'elting'
-      ? '엘팅 매크로 조합이 비어 있습니다.'
-      : '일반 매크로 조합이 비어 있습니다.'
-  );
-  return;
-}
-
-    if (!macroCombos.length) {
-      alert('매크로 조합이 비어 있습니다.');
-      return;
-    }
-
-    let done = 0;
-    let failed = 0;
-
-    for (const combo of macroCombos) {
-      const armorSet = findSetByName(armorSetsAll, combo.armor);
-      const accSet = findSetByName(accSetsAll, combo.acc);
-      const specSet = findSetByName(specSetsAll, combo.spec);
-
-      if (!armorSet || !accSet || !specSet) {
-        console.warn('[runMacroSetSweep] 세트 찾기 실패:', combo, {
-          armorFound: !!armorSet,
-          accFound: !!accSet,
-          specFound: !!specSet,
-        });
-        failed++;
-        continue;
-      }
-
-      await applyArmorSetToSlots(armorSet);
-      await applyAccSetToSlots(accSet);
-      await applySpecSetToSlots(specSet);
-
-      // ✅ 세트 적용 과정에서 지워질 수 있는 고유효과 상태를 다시 주입
-      restoreCustomOptState(originalCustom);
-
-            // ✅ 룬 각인 설정/세부 설정 적용
-      const forceStatusDmg = !!document.getElementById('chkMacroStatusDmg')?.checked;
-
-      const runeName = forceStatusDmg
-        ? '상변데미지(%)'
-        : String(combo.runeEngraveName || '').trim();
-
-      const runeLevel = forceStatusDmg
-        ? '50'
-        : String(combo.runeEngraveLevel || '').trim();
-
-      if (runeName && runeLevel) {
-        state.runeEngrave = state.runeEngrave || {};
-        state.runeEngrave.name = runeName;
-        state.runeEngrave.level = runeLevel;
-
-        const sel1 = document.getElementById('selRuneEngrave');
-        const sel2 = document.getElementById('selRuneDetail');
-
-        if (sel1) sel1.value = runeName;
-        if (typeof fillRuneDetailOptionsByName === 'function') {
-          fillRuneDetailOptionsByName(runeName);
-        }
-        if (sel2) {
-          sel2.disabled = false;
-          sel2.value = runeLevel;
+        if (!macroCombos.length) {
+          alert(
+            presetKey === 'elting'
+              ? '엘팅 매크로 조합이 비어 있습니다.'
+              : '일반 매크로 조합이 비어 있습니다.'
+          );
+          return;
         }
 
-        await applyRuneEngraveByNameTag(runeName, runeLevel);
+        if (!macroCombos.length) {
+          alert('매크로 조합이 비어 있습니다.');
+          return;
+        }
+
+        let done = 0;
+        let failed = 0;
+
+        for (const combo of macroCombos) {
+          const armorSet = findSetByName(armorSetsAll, combo.armor);
+          const accSet = findSetByName(accSetsAll, combo.acc);
+          const specSet = findSetByName(specSetsAll, combo.spec);
+
+          if (!armorSet || !accSet || !specSet) {
+            console.warn('[runMacroSetSweep] 세트 찾기 실패:', combo, {
+              armorFound: !!armorSet,
+              accFound: !!accSet,
+              specFound: !!specSet,
+            });
+            failed++;
+            continue;
+          }
+
+          await applyArmorSetToSlots(armorSet);
+          await applyAccSetToSlots(accSet);
+          await applySpecSetToSlots(specSet);
+
+          // ✅ 세트 적용 과정에서 지워질 수 있는 고유효과 상태를 다시 주입
+          restoreCustomOptState(originalCustom);
+
+          // ✅ 룬 각인 설정/세부 설정 적용
+          const forceStatusDmg = !!document.getElementById('chkMacroStatusDmg')?.checked;
+
+          const runeName = forceStatusDmg
+            ? '상변데미지(%)'
+            : String(combo.runeEngraveName || '').trim();
+
+          const runeLevel = forceStatusDmg
+            ? '50'
+            : String(combo.runeEngraveLevel || '').trim();
+
+          if (runeName && runeLevel) {
+            state.runeEngrave = state.runeEngrave || {};
+            state.runeEngrave.name = runeName;
+            state.runeEngrave.level = runeLevel;
+
+            const sel1 = document.getElementById('selRuneEngrave');
+            const sel2 = document.getElementById('selRuneDetail');
+
+            if (sel1) sel1.value = runeName;
+            if (typeof fillRuneDetailOptionsByName === 'function') {
+              fillRuneDetailOptionsByName(runeName);
+            }
+            if (sel2) {
+              sel2.disabled = false;
+              sel2.value = runeLevel;
+            }
+
+            await applyRuneEngraveByNameTag(runeName, runeLevel);
+          }
+
+          try { updateEquipDescPreview?.(); } catch (_) { }
+
+          await computeViaBackend(targetId, p);
+          done++;
+        }
+
+        if (typeof toast === 'function') {
+          const label = (presetKey === 'elting') ? '엘팅 매크로 계산' : '일반 매크로 계산';
+          toast(`${label} 완료 ✅ (성공 ${done}, 실패 ${failed})`);
+        }
+      } catch (e) {
+        console.warn('[runMacroSetSweep] 실패:', e);
+        if (typeof toast === 'function') toast('매크로 계산 중 오류가 발생했습니다.');
+      } finally {
+        try {
+          await restoreSelections(originalSel);
+        } catch (e2) {
+          console.warn('[runMacroSetSweep] 원래 장비 복원 실패:', e2);
+        }
+
+        try {
+          restoreCustomOptState(originalCustom);
+        } catch (e3) {
+          console.warn('[runMacroSetSweep] 고유효과 원복 실패:', e3);
+        }
+
+        try {
+          await restoreRuneEngraveState(originalRuneEngrave);
+        } catch (e4) {
+          console.warn('[runMacroSetSweep] 룬 각인 원복 실패:', e4);
+        }
+
+        isAutoSetSweepRunning = false;
       }
-
-      try { updateEquipDescPreview?.(); } catch (_) {}
-
-      await computeViaBackend(targetId, p);
-      done++;
     }
-
-    if (typeof toast === 'function') {
-  const label = (presetKey === 'elting') ? '엘팅 매크로 계산' : '일반 매크로 계산';
-  toast(`${label} 완료 ✅ (성공 ${done}, 실패 ${failed})`);
-}
-  } catch (e) {
-    console.warn('[runMacroSetSweep] 실패:', e);
-    if (typeof toast === 'function') toast('매크로 계산 중 오류가 발생했습니다.');
-  } finally {
-    try {
-      await restoreSelections(originalSel);
-    } catch (e2) {
-      console.warn('[runMacroSetSweep] 원래 장비 복원 실패:', e2);
-    }
-
-    try {
-      restoreCustomOptState(originalCustom);
-    } catch (e3) {
-      console.warn('[runMacroSetSweep] 고유효과 원복 실패:', e3);
-    }
-
-    try {
-      await restoreRuneEngraveState(originalRuneEngrave);
-    } catch (e4) {
-      console.warn('[runMacroSetSweep] 룬 각인 원복 실패:', e4);
-    }
-
-    isAutoSetSweepRunning = false;
-  }
-}
 
     function _comboKey(a, b, c) {
       return `${String(a ?? '').trim()}||${String(b ?? '').trim()}||${String(c ?? '').trim()}`;
@@ -24975,37 +24999,37 @@ if (!macroCombos.length) {
     });
 
     document.getElementById('btn-sum-all-final')?.setAttribute('data-compute-btn', '');
-document.getElementById('btn-sum-all-final2')?.setAttribute('data-compute-btn', '');
+    document.getElementById('btn-sum-all-final2')?.setAttribute('data-compute-btn', '');
 
-// 버튼: 누를 때만 값 채움
-document.getElementById('btn-sum-all-final')?.addEventListener('click', () => {
-  computeViaBackend('finalDamageValue');
-});
+    // 버튼: 누를 때만 값 채움
+    document.getElementById('btn-sum-all-final')?.addEventListener('click', () => {
+      computeViaBackend('finalDamageValue');
+    });
 
-// 버튼: 누를 때만 값 채움
-document.getElementById('btn-sum-all-final2')?.addEventListener('click', () => {
-  computeViaBackend('finalDamageValue2');
-});
+    // 버튼: 누를 때만 값 채움
+    document.getElementById('btn-sum-all-final2')?.addEventListener('click', () => {
+      computeViaBackend('finalDamageValue2');
+    });
 
-document.getElementById('btnAutoSetSweepSelected')?.addEventListener('click', () => {
-  runAutoSetSweepSelected('finalDamageValue');
-});
+    document.getElementById('btnAutoSetSweepSelected')?.addEventListener('click', () => {
+      runAutoSetSweepSelected('finalDamageValue');
+    });
 
-document.getElementById('btnMacroSetGeneral')?.addEventListener('click', () => {
-  runMacroSetSweep('finalDamageValue', 'general');
-});
+    document.getElementById('btnMacroSetGeneral')?.addEventListener('click', () => {
+      runMacroSetSweep('finalDamageValue', 'general');
+    });
 
-document.getElementById('btnMacroSetElting')?.addEventListener('click', () => {
-  runMacroSetSweep('finalDamageValue', 'elting');
-});
+    document.getElementById('btnMacroSetElting')?.addEventListener('click', () => {
+      runMacroSetSweep('finalDamageValue', 'elting');
+    });
 
-document.getElementById('btnAutoSetSweepMissing')?.addEventListener('click', () => {
-  runAutoSetSweepMissingArmorFixed('finalDamageValue');
-});
+    document.getElementById('btnAutoSetSweepMissing')?.addEventListener('click', () => {
+      runAutoSetSweepMissingArmorFixed('finalDamageValue');
+    });
 
-document.getElementById('btnAutoWeaponSweepSelected')?.addEventListener('click', async () => {
-  await runAutoWeaponCustomSweepSelected('finalDamageValue');
-});
+    document.getElementById('btnAutoWeaponSweepSelected')?.addEventListener('click', async () => {
+      await runAutoWeaponCustomSweepSelected('finalDamageValue');
+    });
 
     (() => {
       window.WEBAPP_URL = 'https://dnf-backend.gogo456654.workers.dev';
@@ -25596,7 +25620,10 @@ document.getElementById('btnAutoWeaponSweepSelected')?.addEventListener('click',
 
 
   </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"c7dcf750b4f043ad8354df3dacbe9a19","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516"
+    integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg=="
+    data-cf-beacon='{"version":"2024.11.0","token":"c7dcf750b4f043ad8354df3dacbe9a19","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
+    crossorigin="anonymous"></script>
 </body>
 
 </html>
