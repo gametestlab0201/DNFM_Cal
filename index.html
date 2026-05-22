@@ -4810,46 +4810,75 @@
       column-gap: 10px;
     }
 
-    /* 블레이드 와플 프리셋 드롭다운 */
-    #skillTreeBladePreset {
-      grid-column: 3;
-      justify-self: end;
+    /* 블레이드 와플 / 남스파 격폭 프리셋 드롭다운 */
+#skillTreeBladePreset,
+#skillTreeBrawlerDetonationPreset {
+  min-width: 110px;
+  height: 42px;
+  padding: 0 12px;
 
-      min-width: 110px;
-      height: 42px;
-      padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: #e6e9ef;
+  font-weight: 700;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+}
 
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(255, 255, 255, 0.06);
-      color: #e6e9ef;
-      font-weight: 700;
-      font-size: 14px;
-      outline: none;
-      cursor: pointer;
-    }
+/* 블레이드 드롭다운은 header grid의 3번 칸에 직접 배치 */
+#skillTreeBladePreset {
+  grid-column: 3;
+  justify-self: end;
+}
+
+/* 남스파 격폭 라벨 + 드롭다운 묶음 */
+#skillTreeBrawlerDetonationWrap {
+  grid-column: 3;
+  justify-self: end;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#skillTreeBrawlerDetonationWrap[hidden] {
+  display: none !important;
+}
+
+#skillTreeBrawlerDetonationLabel {
+  color: #f0e6d2;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
 
     /* 펼쳤을 때 보이는 목록 색상 */
-    #skillTreeBladePreset option {
-      background: #1b1f2a;
-      color: #f3f5f8;
-    }
+    #skillTreeBladePreset option,
+#skillTreeBrawlerDetonationPreset option {
+  background: #1b1f2a;
+  color: #f3f5f8;
+}
 
-    /* 선택된 항목 강조 */
-    #skillTreeBladePreset option:checked {
-      background: #2a3142;
-      color: #ffffff;
-    }
+#skillTreeBladePreset option:checked,
+#skillTreeBrawlerDetonationPreset option:checked {
+  background: #2a3142;
+  color: #ffffff;
+}
 
-    #skillTreeBladePreset:hover,
-    #skillTreeBladePreset:focus {
-      background: rgba(255, 255, 255, 0.10);
-      border-color: rgba(255, 255, 255, 0.22);
-    }
+#skillTreeBladePreset:hover,
+#skillTreeBladePreset:focus,
+#skillTreeBrawlerDetonationPreset:hover,
+#skillTreeBrawlerDetonationPreset:focus {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.22);
+}
 
-    #skillTreeBladePreset[hidden] {
-      display: none !important;
-    }
+#skillTreeBladePreset[hidden],
+#skillTreeBrawlerDetonationPreset[hidden] {
+  display: none !important;
+}
 
     /* ===== Modal-only: big counters aligned to the right ===== */
     #skillTreeModal .st-counters {
@@ -11883,86 +11912,154 @@
         }
       }
 
-      // ✅ PC용 스킬 초기화 버튼 + 블레이드 전용 드롭다운 동적 생성
-      if (stModal) {
-        let resetBtn = document.getElementById('btnSkillTreeReset');
-        let bladePresetSel = document.getElementById('skillTreeBladePreset');
+      // ✅ PC용 스킬 초기화 버튼 + 블레이드/남스파 전용 드롭다운 동적 생성
+if (stModal) {
+let resetBtn = document.getElementById('btnSkillTreeReset');
+let bladePresetSel = document.getElementById('skillTreeBladePreset');
+let brawlerDetonationWrap = document.getElementById('skillTreeBrawlerDetonationWrap');
+let brawlerDetonationLabel = document.getElementById('skillTreeBrawlerDetonationLabel');
+let brawlerDetonationSel = document.getElementById('skillTreeBrawlerDetonationPreset');
 
-        const modalHeader =
-          stModal.querySelector('.dialog > header') ||
-          stModal.querySelector('header');
+  const modalHeader =
+    stModal.querySelector('.dialog > header') ||
+    stModal.querySelector('header');
 
-        const counters = modalHeader?.querySelector('.st-counters');
-        const isBlade = (ownerKey === '여귀검사블레이드');
+  const counters = modalHeader?.querySelector('.st-counters');
+  const isBlade = (ownerKey === '여귀검사블레이드');
+  const isMaleStreetFighter = (ownerKey === '남격투가스트리트파이터');
 
-        if (!resetBtn) {
-          resetBtn = document.createElement('button');
-          resetBtn.id = 'btnSkillTreeReset';
-          resetBtn.type = 'button';
-          resetBtn.className = 'ui-btn';
-          resetBtn.textContent = '스킬 초기화';
-        }
+  if (!resetBtn) {
+    resetBtn = document.createElement('button');
+    resetBtn.id = 'btnSkillTreeReset';
+    resetBtn.type = 'button';
+    resetBtn.className = 'ui-btn';
+    resetBtn.textContent = '스킬 초기화';
+  }
 
-        if (!bladePresetSel) {
-          bladePresetSel = document.createElement('select');
-          bladePresetSel.id = 'skillTreeBladePreset';
-          bladePresetSel.className = 'ui-btn';
+  if (!bladePresetSel) {
+    bladePresetSel = document.createElement('select');
+    bladePresetSel.id = 'skillTreeBladePreset';
+    bladePresetSel.className = 'ui-btn';
 
-          bladePresetSel.innerHTML = `
-            <option value="24와플">24와플</option>
-            <option value="27와플">27와플</option>
-            <option value="30와플">30와플</option>
-            <option value="33와플">33와플</option>
-          `;
-        }
+    bladePresetSel.innerHTML = `
+      <option value="24와플">24와플</option>
+      <option value="27와플">27와플</option>
+      <option value="30와플">30와플</option>
+      <option value="33와플">33와플</option>
+    `;
+  }
 
-        // 현재 선택값 유지용
-        if (!window.state) window.state = {};
-        if (!state.customSkills) state.customSkills = {};
+  // ✅ 남스파 격폭 라벨 + 드롭다운 묶음
+if (!brawlerDetonationWrap) {
+  brawlerDetonationWrap = document.createElement('div');
+  brawlerDetonationWrap.id = 'skillTreeBrawlerDetonationWrap';
+}
 
-        const savedBladePreset =
-          String(state.customSkills.bladeWildFlowerPreset || state.skillTreeBladePreset || '24와플').trim() || '24와플';
+if (!brawlerDetonationLabel) {
+  brawlerDetonationLabel = document.createElement('span');
+  brawlerDetonationLabel.id = 'skillTreeBrawlerDetonationLabel';
+  brawlerDetonationLabel.textContent = '격폭 주기';
+}
 
-        state.skillTreeBladePreset = savedBladePreset;
-        state.customSkills.bladeWildFlowerPreset = savedBladePreset;
-        bladePresetSel.value = savedBladePreset;
+if (!brawlerDetonationSel) {
+  brawlerDetonationSel = document.createElement('select');
+  brawlerDetonationSel.id = 'skillTreeBrawlerDetonationPreset';
+  brawlerDetonationSel.className = 'ui-btn';
 
-        if (!bladePresetSel.dataset.bound) {
-          bladePresetSel.dataset.bound = '1';
-          bladePresetSel.addEventListener('change', (e) => {
-            const v = String(e.target.value || '24와플').trim() || '24와플';
+  brawlerDetonationSel.innerHTML = `
+  <option value="없음">없음</option>
+  <option value="10초">10초</option>
+  <option value="20초">20초</option>
+  <option value="30초">30초</option>
+  <option value="40초">40초</option>
+  <option value="50초">50초</option>
+  <option value="60초">60초</option>
+`;
+}
 
-            state.skillTreeBladePreset = v;
-            if (!state.customSkills) state.customSkills = {};
-            state.customSkills.bladeWildFlowerPreset = v;
+// ✅ wrapper 내부 순서 고정: [격폭 주기] [드롭다운]
+if (brawlerDetonationLabel.parentNode !== brawlerDetonationWrap) {
+  brawlerDetonationWrap.appendChild(brawlerDetonationLabel);
+}
+if (brawlerDetonationSel.parentNode !== brawlerDetonationWrap) {
+  brawlerDetonationWrap.appendChild(brawlerDetonationSel);
+}
 
-            // ✅ 여기서는 값만 저장
-            // 실제 반영은 사용자가 "계산하기"를 눌렀을 때 calc_all/skill_uses 흐름에서 처리
-          });
-        }
+  // 현재 선택값 유지용
+  if (!window.state) window.state = {};
+  if (!state.customSkills) state.customSkills = {};
 
-        // 블레이드일 때만 표시, 아니면 숨김
-        bladePresetSel.hidden = !isBlade;
+  const savedBladePreset =
+    String(state.customSkills.bladeWildFlowerPreset || state.skillTreeBladePreset || '24와플').trim() || '24와플';
 
-        // ✅ header 안 순서:
-        // 제목 | 빈공간 | 드롭다운(블레이드일 때만) | 스킬 초기화 | counters
-        if (modalHeader && counters) {
-          if (bladePresetSel.parentNode !== modalHeader) {
-            modalHeader.insertBefore(bladePresetSel, counters);
-          }
-          if (resetBtn.parentNode !== modalHeader) {
-            modalHeader.insertBefore(resetBtn, counters);
-          }
+  state.skillTreeBladePreset = savedBladePreset;
+  state.customSkills.bladeWildFlowerPreset = savedBladePreset;
+  bladePresetSel.value = savedBladePreset;
 
-          // 드롭다운이 보일 때는 reset 앞에, 아니면 hidden 상태로 counters 앞에 유지
-          modalHeader.insertBefore(bladePresetSel, resetBtn);
-          modalHeader.insertBefore(resetBtn, counters);
-        } else if (modalHeader) {
-          if (bladePresetSel.parentNode !== modalHeader) modalHeader.appendChild(bladePresetSel);
-          if (resetBtn.parentNode !== modalHeader) modalHeader.appendChild(resetBtn);
-        }
+  const savedBrawlerDetonationPreset =
+    String(state.customSkills.brawlerDetonationPreset || state.skillTreeBrawlerDetonationPreset || '없음').trim() || '없음';
 
-        if (!resetBtn.dataset.bound) {
+  state.skillTreeBrawlerDetonationPreset = savedBrawlerDetonationPreset;
+  state.customSkills.brawlerDetonationPreset = savedBrawlerDetonationPreset;
+  brawlerDetonationSel.value = savedBrawlerDetonationPreset;
+
+  if (!bladePresetSel.dataset.bound) {
+    bladePresetSel.dataset.bound = '1';
+    bladePresetSel.addEventListener('change', (e) => {
+      const v = String(e.target.value || '24와플').trim() || '24와플';
+
+      state.skillTreeBladePreset = v;
+      if (!state.customSkills) state.customSkills = {};
+      state.customSkills.bladeWildFlowerPreset = v;
+
+      // ✅ 여기서는 값만 저장
+      // 실제 반영은 사용자가 "계산하기"를 눌렀을 때 calc_all/skill_uses 흐름에서 처리
+    });
+  }
+
+  if (!brawlerDetonationSel.dataset.bound) {
+    brawlerDetonationSel.dataset.bound = '1';
+    brawlerDetonationSel.addEventListener('change', (e) => {
+      const v = String(e.target.value || '없음').trim() || '없음';
+
+      state.skillTreeBrawlerDetonationPreset = v;
+      if (!state.customSkills) state.customSkills = {};
+      state.customSkills.brawlerDetonationPreset = v;
+
+      // ✅ 여기서는 값만 저장
+      // 실제 격폭 계산 반영은 이후 백엔드 calc_all/skill_uses/compute 흐름에 연결
+    });
+  }
+
+// 블레이드는 와플만, 남스파는 격폭 묶음만 표시
+bladePresetSel.hidden = !isBlade;
+brawlerDetonationWrap.hidden = !isMaleStreetFighter;
+
+  // ✅ header 안 순서:
+  // 제목 | 빈공간 | 드롭다운(해당 캐릭터일 때만) | 스킬 초기화 | counters
+  if (modalHeader && counters) {
+  if (bladePresetSel.parentNode !== modalHeader) {
+    modalHeader.insertBefore(bladePresetSel, counters);
+  }
+  if (brawlerDetonationWrap.parentNode !== modalHeader) {
+    modalHeader.insertBefore(brawlerDetonationWrap, counters);
+  }
+  if (resetBtn.parentNode !== modalHeader) {
+    modalHeader.insertBefore(resetBtn, counters);
+  }
+
+  // header grid 입장에서는:
+  // 블레이드 드롭다운 1개 또는 남스파 격폭 wrapper 1개만 reset 앞에 배치한다.
+  modalHeader.insertBefore(bladePresetSel, resetBtn);
+  modalHeader.insertBefore(brawlerDetonationWrap, resetBtn);
+  modalHeader.insertBefore(resetBtn, counters);
+} else if (modalHeader) {
+  if (bladePresetSel.parentNode !== modalHeader) modalHeader.appendChild(bladePresetSel);
+  if (brawlerDetonationWrap.parentNode !== modalHeader) modalHeader.appendChild(brawlerDetonationWrap);
+  if (resetBtn.parentNode !== modalHeader) modalHeader.appendChild(resetBtn);
+}
+
+  if (!resetBtn.dataset.bound) {
           resetBtn.dataset.bound = '1';
           resetBtn.addEventListener('click', () => {
             if (!confirm('현재 캐릭터의 스킬을 모두 초기화할까요?')) return;
