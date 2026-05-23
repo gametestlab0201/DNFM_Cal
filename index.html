@@ -4854,6 +4854,54 @@
   white-space: nowrap;
 }
 
+/* ✅ 남스파 격폭 주기 설명 아이콘 */
+#skillTreeBrawlerDetonationWrap .brawler-detonation-tip {
+  margin-left: -3px;
+  margin-right: 2px;
+  position: relative;
+  z-index: 10050;
+}
+
+/* ✅ 스킬트리 헤더 자체를 스킬 이미지보다 위 레이어로 */
+#skillTreeModal .dialog > header {
+  position: relative;
+  z-index: 10020;
+  overflow: visible;
+}
+
+/* ✅ 격폭 주기 툴팁은 아래쪽으로 표시하되, 스킬 이미지보다 위에 뜨게 */
+#skillTreeBrawlerDetonationWrap .brawler-detonation-tip .info-tip-content {
+  top: calc(100% + 10px);
+  bottom: auto;
+  left: 50%;
+  transform: translate(-50%, 4px);
+
+  width: 620px;
+  max-width: min(620px, calc(100vw - 48px));
+  white-space: normal;
+  text-align: left;
+
+  z-index: 10060;
+}
+
+/* ✅ i에 마우스를 올렸을 때 툴팁 표시 위치 보정 */
+#skillTreeBrawlerDetonationWrap .brawler-detonation-tip:hover .info-tip-content,
+#skillTreeBrawlerDetonationWrap .brawler-detonation-tip:focus-within .info-tip-content {
+  opacity: 1;
+  transform: translate(-50%, 8px);
+  pointer-events: auto;
+}
+
+/* ✅ 격폭 주기 i에 마우스를 올리면 드롭다운 노란색 강조 */
+#skillTreeBrawlerDetonationWrap:has(.brawler-detonation-tip:hover) #skillTreeBrawlerDetonationPreset,
+#skillTreeBrawlerDetonationWrap:has(.brawler-detonation-tip:focus-within) #skillTreeBrawlerDetonationPreset {
+  border-color: #fbbf24;
+  background: rgba(251, 191, 36, 0.12);
+  box-shadow:
+    0 0 0 2px rgba(251, 191, 36, 0.45),
+    0 0 16px rgba(251, 191, 36, 0.28);
+}
+
     /* 펼쳤을 때 보이는 목록 색상 */
     #skillTreeBladePreset option,
 #skillTreeBrawlerDetonationPreset option {
@@ -11921,6 +11969,7 @@ let bladePresetSel = document.getElementById('skillTreeBladePreset');
 let brawlerDetonationWrap = document.getElementById('skillTreeBrawlerDetonationWrap');
 let brawlerDetonationLabel = document.getElementById('skillTreeBrawlerDetonationLabel');
 let brawlerDetonationSel = document.getElementById('skillTreeBrawlerDetonationPreset');
+let brawlerDetonationTip = document.getElementById('skillTreeBrawlerDetonationTip');
 
   const modalHeader =
     stModal.querySelector('.dialog > header') ||
@@ -11979,9 +12028,31 @@ if (!brawlerDetonationSel) {
 `;
 }
 
-// ✅ wrapper 내부 순서 고정: [격폭 주기] [드롭다운]
+// ✅ 남스파 격폭 주기 설명 i 아이콘
+if (!brawlerDetonationTip) {
+  brawlerDetonationTip = document.createElement('span');
+  brawlerDetonationTip.id = 'skillTreeBrawlerDetonationTip';
+  brawlerDetonationTip.className = 'info-tip brawler-detonation-tip';
+  brawlerDetonationTip.tabIndex = 0;
+  brawlerDetonationTip.setAttribute('aria-label', '격폭 주기 설명');
+
+  brawlerDetonationTip.innerHTML = `
+    i
+    <span class="info-tip-content">
+      * 격폭 주기는 남스파의 상태이상데미지를 일정 주기마다 격폭시키는 기능입니다.<br>
+      * 예를 들어 1분딜 기준에서 격폭 주기 10초를 선택하면 10초, 20초, 30초, 40초, 50초, 60초 시점에 격폭이 발생합니다.<br>
+      * '없음' 선택시 격폭 없이 일반 캐릭과 동일하게 시간기준 종료후 +15초 까지의 상태이상데미지까지만 계산합니다.<br>
+      * 격폭 장비로 인한 격폭은 적용되지 않으니 격폭 주기 기능을 통해서만 이용해주세요.
+    </span>
+  `;
+}
+
+// ✅ wrapper 내부 순서 고정: [격폭 주기] [i] [드롭다운]
 if (brawlerDetonationLabel.parentNode !== brawlerDetonationWrap) {
   brawlerDetonationWrap.appendChild(brawlerDetonationLabel);
+}
+if (brawlerDetonationTip.parentNode !== brawlerDetonationWrap) {
+  brawlerDetonationWrap.appendChild(brawlerDetonationTip);
 }
 if (brawlerDetonationSel.parentNode !== brawlerDetonationWrap) {
   brawlerDetonationWrap.appendChild(brawlerDetonationSel);
