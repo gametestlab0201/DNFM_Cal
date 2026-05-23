@@ -5913,6 +5913,7 @@
                   <li>05.08 <span class="notice-badge">'남스트라이커'</span> 캐릭 추가</li>
                   <li>05.11 <span style="color: yellow;">[베가본드]</span> 2각 패시브 적용</li>
                   <li>05.12 <span style="color: yellow;">[마도학자]</span> 2각 패시브 적용</li>
+                  <li>05.23 <span class="notice-badge">'남스트리트파이터'</span> 캐릭 추가</li>
 
                 </ul>
               </div>
@@ -7661,6 +7662,7 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
+          <li>26.05.23 <span class="notice-badge">'남스트리트파이터'</span> 캐릭 추가</li>
           <li>26.05.12 [마도학자] <span style="color: #ff4444;">2각 패시브 적용</li>
           <li>26.05.11 [베가본드] <span style="color: #ff4444;">2각 패시브 적용</li>
           <li>26.05.08 <span class="notice-badge">'남스트라이커'</span> 캐릭 추가</li>
@@ -17086,10 +17088,23 @@ brawlerDetonationWrap.hidden = !isMaleStreetFighter;
       await ensureEnhLoaded();
 
       // ★ DBEnh에서 타입별 강화 리스트 가져오기 (배열 보장)
-      const rawList = window.DBEnh?.byType?.[type];
-      const list = Array.isArray(rawList) ? rawList.slice() : [];
+const rawList = window.DBEnh?.byType?.[type];
+let list = Array.isArray(rawList) ? rawList.slice() : [];
 
-      enhanceListEl.innerHTML = '';
+// ✅ 강화 수치 추출 유틸
+const getEnhLevel = (opt) => {
+  const direct = Number(opt?.level_num ?? opt?.level ?? opt?.levelVal);
+  if (Number.isFinite(direct)) return direct;
+
+  const name = String(opt?.name || '').replace(/\s+/g, '');
+  const m = name.match(/(\d+)강(?!화)/);
+  return m ? Number(m[1]) : -1;
+};
+
+// ✅ 모든 개별 강화 선택 모달: 강화 수치 내림차순
+list = list.sort((a, b) => getEnhLevel(b) - getEnhLevel(a));
+
+enhanceListEl.innerHTML = '';
 
       if (!list.length) {
         const msg = document.createElement('div');
@@ -19203,26 +19218,26 @@ brawlerDetonationWrap.hidden = !isMaleStreetFighter;
         });
       }
 
-      // Build level buttons 12~20
-      if (autoEnhList) {
-        autoEnhList.innerHTML = '';
-        for (let lv = 12; lv <= 20; lv++) {
-          const b = document.createElement('button');
-          b.className = 'opt-btnetc';
-          b.textContent = `${lv}강`;
-          b.addEventListener('click', async () => {
-            b.disabled = true;
-            try {
-              await autoEnhanceApply(lv);
-            } finally {
-              b.disabled = false;
-            }
-            autoEnhModal.classList.remove('show');
-            autoEnhModal.setAttribute('aria-hidden', 'true');
-          });
-          autoEnhList.appendChild(b);
-        }
+      // Build level buttons 20~10
+if (autoEnhList) {
+  autoEnhList.innerHTML = '';
+  for (let lv = 20; lv >= 10; lv--) {
+    const b = document.createElement('button');
+    b.className = 'opt-btnetc';
+    b.textContent = `${lv}강`;
+    b.addEventListener('click', async () => {
+      b.disabled = true;
+      try {
+        await autoEnhanceApply(lv);
+      } finally {
+        b.disabled = false;
       }
+      autoEnhModal.classList.remove('show');
+      autoEnhModal.setAttribute('aria-hidden', 'true');
+    });
+    autoEnhList.appendChild(b);
+  }
+}
 
       // Openers
       document.getElementById('btnAutoEnh')?.addEventListener('click', () => {

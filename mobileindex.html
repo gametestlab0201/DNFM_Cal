@@ -388,16 +388,38 @@
     }
 
     /* ✅ hidden 속성이 있으면 무조건 숨김 */
-    #mobileBladeWafflePreset[hidden] {
-      display: none !important;
-    }
+#mobileBladeWafflePreset[hidden],
+#mobileBrawlerDetonationWrap[hidden] {
+  display: none !important;
+}
 
-    #mobileBladeWafflePreset {
-      min-width: 88px;
-      max-width: 96px;
-      padding-right: 24px;
-      appearance: auto;
-    }
+#mobileBladeWafflePreset {
+  min-width: 88px;
+  max-width: 96px;
+  padding-right: 24px;
+  appearance: auto;
+}
+
+/* ✅ 모바일 남스파 격폭 주기 */
+#mobileBrawlerDetonationWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#mobileBrawlerDetonationWrap .brawler-det-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(233, 238, 247, 0.88);
+  white-space: nowrap;
+}
+
+#mobileBrawlerDetonationPreset {
+  min-width: 86px;
+  max-width: 92px;
+  padding-right: 24px;
+  appearance: auto;
+}
 
     .m-action-btn:active {
       transform: translateY(1px);
@@ -5522,15 +5544,29 @@
                 <div class="skill-topbar-title">스킬</div>
 
                 <div class="skill-topbar-actions">
-                  <select id="mobileBladeWafflePreset" class="m-action-btn" hidden>
-                    <option value="24와플">24와플</option>
-                    <option value="27와플">27와플</option>
-                    <option value="30와플">30와플</option>
-                    <option value="33와플">33와플</option>
-                  </select>
+  <select id="mobileBladeWafflePreset" class="m-action-btn" hidden>
+    <option value="24와플">24와플</option>
+    <option value="27와플">27와플</option>
+    <option value="30와플">30와플</option>
+    <option value="33와플">33와플</option>
+  </select>
 
-                  <button id="btnSkillResetM" type="button" class="btn btn-mini">초기화</button>
-                </div>
+  <!-- ✅ 남격투가 스트리트파이터 전용: 격폭 주기 -->
+  <div id="mobileBrawlerDetonationWrap" hidden>
+    <span class="brawler-det-label">격폭 주기</span>
+    <select id="mobileBrawlerDetonationPreset" class="m-action-btn">
+      <option value="없음">없음</option>
+      <option value="10초">10초</option>
+      <option value="20초">20초</option>
+      <option value="30초">30초</option>
+      <option value="40초">40초</option>
+      <option value="50초">50초</option>
+      <option value="60초">60초</option>
+    </select>
+  </div>
+
+  <button id="btnSkillResetM" type="button" class="btn btn-mini">초기화</button>
+</div>
               </div>
 
               <div id="skillRemainBarM" class="st-counters is-hidden">
@@ -9489,23 +9525,42 @@
       }
 
       // (2) 블레이드 와플수 드롭다운
-      const bladePresetSel = document.getElementById('mobileBladeWafflePreset');
+const bladePresetSel = document.getElementById('mobileBladeWafflePreset');
 
-      if (bladePresetSel) {
-        if (!bladePresetSel.dataset.bound) {
-          bladePresetSel.dataset.bound = '1';
-          bladePresetSel.addEventListener('change', (e) => {
-            const s = (window.state || (window.state = {}));
-            const v = String(e.target.value || '24와플').trim() || '24와플';
+if (bladePresetSel) {
+  if (!bladePresetSel.dataset.bound) {
+    bladePresetSel.dataset.bound = '1';
+    bladePresetSel.addEventListener('change', (e) => {
+      const s = (window.state || (window.state = {}));
+      const v = String(e.target.value || '24와플').trim() || '24와플';
 
-            s.skillTreeBladePreset = v;
-            s.customSkills = s.customSkills || {};
-            s.customSkills.bladeWildFlowerPreset = v;
+      s.skillTreeBladePreset = v;
+      s.customSkills = s.customSkills || {};
+      s.customSkills.bladeWildFlowerPreset = v;
 
-            console.warn('[mobile-blade-wf-preset]', { v });
-          });
-        }
-      }
+      console.warn('[mobile-blade-wf-preset]', { v });
+    });
+  }
+}
+
+// ✅ (2-1) 남스파 격폭 주기 드롭다운
+const brawlerDetonationSel = document.getElementById('mobileBrawlerDetonationPreset');
+
+if (brawlerDetonationSel) {
+  if (!brawlerDetonationSel.dataset.bound) {
+    brawlerDetonationSel.dataset.bound = '1';
+    brawlerDetonationSel.addEventListener('change', (e) => {
+      const s = (window.state || (window.state = {}));
+      const v = String(e.target.value || '없음').trim() || '없음';
+
+      s.skillTreeBrawlerDetonationPreset = v;
+      s.customSkills = s.customSkills || {};
+      s.customSkills.brawlerDetonationPreset = v;
+
+      console.warn('[mobile-brawler-detonation-preset]', { v });
+    });
+  }
+}
 
       // (3) 초기화 버튼
       if (resetBtn && !resetBtn.dataset.bound) {
@@ -9726,32 +9781,60 @@
       const footnote = document.querySelector('#pageSkill .skill-footnote');
 
       const ownerKeyNow = String(charKey || '').trim().replace(/\s+/g, '');
-      const isBlade = (ownerKeyNow === '여귀검사블레이드');
+const isBlade = (ownerKeyNow === '여귀검사블레이드');
 
-      // ✅ 구버전 '격투가스트라이커' + 신버전 '남격투가스트라이커' 둘 다 대응
-      const isStriker = (
-        ownerKeyNow === '격투가스트라이커' ||
-        ownerKeyNow === '남격투가스트라이커'
-      );
+// ✅ 남격투가 스트리트파이터: 격폭 주기 드롭다운 표시 대상
+const isMaleStreetFighter = (
+  ownerKeyNow === '남격투가스트리트파이터' ||
+  ownerKeyNow === '격투가스트리트파이터'
+);
 
-      const isFMech = (ownerKeyNow === '여거너메카닉');
-      const isWildbane = (ownerKeyNow === '워리어와일드베인');
-      const isWindshear = (ownerKeyNow === '워리어윈드시어');
+// ✅ 구버전 '격투가스트라이커' + 신버전 '남격투가스트라이커' 둘 다 대응
+const isStriker = (
+  ownerKeyNow === '격투가스트라이커' ||
+  ownerKeyNow === '남격투가스트라이커'
+);
 
-      const bladePresetSel = document.getElementById('mobileBladeWafflePreset');
-      if (bladePresetSel) {
-        s.customSkills = s.customSkills || {};
+const isFMech = (ownerKeyNow === '여거너메카닉');
+const isWildbane = (ownerKeyNow === '워리어와일드베인');
+const isWindshear = (ownerKeyNow === '워리어윈드시어');
 
-        const savedBladePreset =
-          String(s.customSkills.bladeWildFlowerPreset || s.skillTreeBladePreset || '24와플').trim() || '24와플';
+const bladePresetSel = document.getElementById('mobileBladeWafflePreset');
+if (bladePresetSel) {
+  s.customSkills = s.customSkills || {};
 
-        s.skillTreeBladePreset = savedBladePreset;
-        s.customSkills.bladeWildFlowerPreset = savedBladePreset;
-        bladePresetSel.value = savedBladePreset;
+  const savedBladePreset =
+    String(s.customSkills.bladeWildFlowerPreset || s.skillTreeBladePreset || '24와플').trim() || '24와플';
 
-        // ✅ 여귀검사블레이드일 때만 노출
-        bladePresetSel.hidden = !isBlade;
-      }
+  s.skillTreeBladePreset = savedBladePreset;
+  s.customSkills.bladeWildFlowerPreset = savedBladePreset;
+  bladePresetSel.value = savedBladePreset;
+
+  // ✅ 여귀검사블레이드일 때만 노출
+  bladePresetSel.hidden = !isBlade;
+}
+
+// ✅ 남스파 격폭 주기 UI 동기화
+const brawlerDetonationWrap = document.getElementById('mobileBrawlerDetonationWrap');
+const brawlerDetonationSel = document.getElementById('mobileBrawlerDetonationPreset');
+
+if (brawlerDetonationWrap && brawlerDetonationSel) {
+  s.customSkills = s.customSkills || {};
+
+  const savedBrawlerDetonationPreset =
+    String(
+      s.customSkills.brawlerDetonationPreset ||
+      s.skillTreeBrawlerDetonationPreset ||
+      '없음'
+    ).trim() || '없음';
+
+  s.skillTreeBrawlerDetonationPreset = savedBrawlerDetonationPreset;
+  s.customSkills.brawlerDetonationPreset = savedBrawlerDetonationPreset;
+  brawlerDetonationSel.value = savedBrawlerDetonationPreset;
+
+  // ✅ 남격투가스트리트파이터일 때만 노출
+  brawlerDetonationWrap.hidden = !isMaleStreetFighter;
+}
 
       if (isWildbane) {
         wsBox?.classList.add('is-hidden');
@@ -14354,10 +14437,14 @@
         }
 
         // ✅ 블레이드 와플수도 함께 전달
-        cs.bladeWildFlowerPreset =
-          String(cs.bladeWildFlowerPreset || s.skillTreeBladePreset || '24와플').trim() || '24와플';
+cs.bladeWildFlowerPreset =
+  String(cs.bladeWildFlowerPreset || s.skillTreeBladePreset || '24와플').trim() || '24와플';
 
-        payload.customSkills = cs;
+// ✅ 남스파 격폭 주기도 함께 전달
+cs.brawlerDetonationPreset =
+  String(cs.brawlerDetonationPreset || s.skillTreeBrawlerDetonationPreset || '없음').trim() || '없음';
+
+payload.customSkills = cs;
       }
 
       // 스킬룬 (나중에 모달 붙이면 state에 채워질 구조 그대로 전달)
