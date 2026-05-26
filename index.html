@@ -1692,365 +1692,564 @@
     }
 
     /* ===== 시너지 효과 모달 전용 ===== */
-    .synergy-effect-dialog {
-      width: min(1180px, 96vw);
-      height: min(860px, 94vh);
-    }
+.synergy-effect-dialog {
+  width: min(1280px, 96vw);
+  height: min(780px, 94vh);
+}
 
-    .synergy-effect-catalog {
-      display: grid;
-      gap: 18px;
-      align-content: start;
-    }
+.synergy-effect-catalog {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-content: start;
+}
 
-    .synergy-set-box {
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 10px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01));
-    }
+.synergy-side-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
 
-    .synergy-set-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-      /* ← 제목과 아래칸 사이 간격 */
-    }
+.synergy-set-box {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 10px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01));
+  min-width: 0;
+}
 
-    .synergy-set-head-left {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
+.synergy-set-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
 
-    .synergy-enable-check {
-      width: 16px;
-      height: 16px;
-      accent-color: #cfa24f;
-      cursor: pointer;
-      flex: 0 0 auto;
-    }
+.synergy-set-head-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
 
-    .synergy-reset-btn {
-      height: 30px;
-      padding: 0 12px;
-      border-radius: 999px;
-      border: 1px solid #3a2c21;
-      background: #1a130f;
-      color: #f0e6d2;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-    }
+.synergy-enable-check {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  border-radius: 8px;
+  border: 2px solid rgba(207, 162, 79, 0.75);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(250, 204, 107, 0.20), rgba(0, 0, 0, 0.12)),
+    #120d09;
+  box-shadow:
+    0 0 0 2px rgba(207, 162, 79, 0.12),
+    inset 0 1px 3px rgba(255, 255, 255, 0.10),
+    0 3px 10px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  position: relative;
+  transition:
+    transform .12s ease,
+    box-shadow .16s ease,
+    border-color .16s ease,
+    background .16s ease;
+}
 
-    .synergy-reset-btn:hover {
-      border-color: #cfa24f;
-      box-shadow: 0 0 0 2px rgba(207, 162, 79, .18) inset;
-    }
+.synergy-enable-check:hover {
+  transform: translateY(-1px);
+  border-color: #facc6b;
+  box-shadow:
+    0 0 0 3px rgba(250, 204, 107, 0.20),
+    0 0 18px rgba(250, 204, 107, 0.20),
+    inset 0 1px 3px rgba(255, 255, 255, 0.12);
+}
 
-    .synergy-reset-btn:active {
-      transform: translateY(1px);
-    }
+.synergy-enable-check:checked {
+  border-color: #facc6b;
+  background:
+    linear-gradient(135deg, #facc6b, #cfa24f 45%, #8f6b2b),
+    #1a130f;
+  box-shadow:
+    0 0 0 3px rgba(250, 204, 107, 0.22),
+    0 0 18px rgba(250, 204, 107, 0.35),
+    inset 0 1px 2px rgba(255, 255, 255, 0.28);
+}
 
-    .synergy-top-row {
-      display: grid;
-      grid-template-columns: 1.1fr 1.4fr;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
+.synergy-enable-check:checked::after {
+  content: "✓";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #160d05;
+  font-size: 17px;
+  font-weight: 1000;
+  line-height: 1;
+}
 
-    .synergy-bottom-row {
-      display: grid;
-      grid-template-columns: 0.60fr 1.40fr 1fr 1fr;
-      gap: 10px;
-      align-items: stretch;
-    }
+.synergy-set-head-left .opt-title {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #f0e6d2;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+}
 
-    .synergy-char-box>.btnetc,
-    .synergy-weapon-box>.btnetc,
-    .synergy-equip-box>.btnetc {
-      transform: translateY(10px);
-    }
+/* 제목 앞 작은 포인트만 추가 */
+.synergy-set-head-left .opt-title::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 14px;
+  margin-right: 7px;
+  border-radius: 999px;
+  background: #cfa24f;
+  vertical-align: -2px;
+  box-shadow: 0 0 8px rgba(207, 162, 79, 0.45);
+}
 
-    .synergy-char-box>.synergy-picked-char-wrap,
-    .synergy-weapon-box>.synergy-picked-weapon-wrap,
-    .synergy-equip-box>.synergy-picked-set-wrap {
-      transform: translateY(10px);
-    }
+.synergy-reset-btn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid #3a2c21;
+  background: #1a130f;
+  color: #f0e6d2;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
 
-    .synergy-char-box,
-    .synergy-weapon-box,
-    .synergy-equip-box {
-      padding-bottom: 10px;
-    }
+.synergy-reset-btn:hover {
+  border-color: #cfa24f;
+  box-shadow: 0 0 0 2px rgba(207, 162, 79, .18) inset;
+}
 
-    .synergy-picked-text {
-      font-size: 13px;
-      line-height: 1.45;
-      min-height: 20px;
-    }
+.synergy-reset-btn:active {
+  transform: translateY(1px);
+}
 
-    .synergy-picked-char-wrap {
-      width: 100%;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      margin-top: 2px;
-    }
+/* 핵심: 장비 좌측 / 캐릭터 중앙 / 장비 우측 */
+.synergy-main-layout {
+  display: grid;
+  grid-template-columns: 128px 190px 128px;
+  gap: 10px;
+  align-items: stretch;
+  justify-content: center;
+}
 
-    .synergy-picked-char-img {
-      width: 100%;
-      max-width: 180px;
-      aspect-ratio: 16 / 7;
-      object-fit: cover;
-      border-radius: 10px;
-      border: 1px solid rgba(207, 162, 79, 0.35);
-      background: #0c0a08;
-    }
+.synergy-char-large-box {
+  width: 190px;
+  min-width: 190px;
+  height: 286px;
+  min-height: 286px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  justify-self: center;
+  overflow: hidden;
+}
 
-    .synergy-picked-char-wrap,
-    .synergy-picked-set-wrap {
-      cursor: pointer;
-    }
+/* 캐릭터를 선택한 뒤 이미지가 들어가는 영역 */
+.synergy-picked-char-wrap {
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex: 1 1 auto;
+  margin: 0;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #0c0a08;
+  border: 1px solid rgba(207, 162, 79, 0.35);
+}
 
-    .synergy-picked-char-wrap:hover,
-    .synergy-picked-set-wrap:hover {
-      filter: brightness(1.06);
-    }
+/* 실제 캐릭터 이미지 */
+.synergy-picked-char-img {
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  transform: scale(1.12);
+  transform-origin: center center;
+  border: none;
+  border-radius: 12px;
+  display: block;
+}
 
-    .synergy-picked-set-wrap {
-      width: 100%;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-top: 2px;
-    }
+.synergy-char-pick-btn {
+  width: 120px;
+  height: 34px;
+  margin: auto;
+  align-self: center;
+}
 
-    .synergy-picked-set-item {
-      width: 48px;
-      height: 48px;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid rgba(207, 162, 79, 0.35);
-      background: #0c0a08;
-      position: relative;
-      flex: 0 0 auto;
-    }
+.synergy-equip-column {
+  height: 286px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
 
-    .synergy-picked-set-item .icon {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+.synergy-extra-under {
+  margin-top: 10px;
+}
 
-    .synergy-picked-set-item .set-badge-icon {
-      position: absolute;
-      left: 0px;
-      bottom: 0px;
-      width: 22px;
-      height: 22px;
-      object-fit: contain;
-      pointer-events: none;
-      z-index: 1;
-    }
+.synergy-select-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: center;
+}
 
-    .synergy-select-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-      align-items: center;
-    }
+.synergy-select {
+  width: 100%;
+}
 
+.synergy-picked-text {
+  font-size: 12px;
+  line-height: 1.35;
+  min-height: 18px;
+  text-align: center;
+}
+
+.synergy-picked-char-wrap:hover,
+.synergy-picked-set-wrap:hover,
+.synergy-picked-weapon-wrap:hover {
+  filter: brightness(1.06);
+}
+
+.synergy-picked-set-wrap,
+.synergy-picked-weapon-wrap {
+  width: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.synergy-picked-set-item,
+.synergy-picked-weapon-item {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(207, 162, 79, 0.35);
+  background: #0c0a08;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.synergy-picked-set-item .icon,
+.synergy-picked-weapon-item .icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 방어구 세트 뱃지 유지 */
+.synergy-picked-set-item .set-badge-icon {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 계산 버튼 / 최종데미지 표시란은 최하단 유지 */
+.synergy-calc-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  align-items: center;
+}
+
+/* 각 시너지 칸 내부: 버튼 + 최종데미지 */
+.synergy-calc-pair {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.synergy-compute-btn {
+  width: 210px;
+  min-width: 210px;
+  height: 40px;
+  font-weight: 800;
+}
+
+.synergy-final-box {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(207, 162, 79, 0.25);
+  text-align: right;
+}
+
+.synergy-final-value {
+  font-size: 20px;
+  font-weight: 900;
+  color: #ff5a5a;
+  text-shadow: 0 0 8px rgba(255, 90, 90, 0.28);
+}
+
+/* 장비 선택 상자 공통 */
+.synergy-weapon-box,
+.synergy-equip-box {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* 좌측: 무기 1 / 방어구 3 */
+.synergy-equip-column:first-child .synergy-weapon-box {
+  flex: 1 1 0;
+}
+
+.synergy-equip-column:first-child .synergy-equip-box {
+  flex: 3 1 0;
+}
+
+/* 우측: 악세사리 2 / 특수장비 2 */
+.synergy-equip-column:last-child .synergy-equip-box {
+  flex: 2 1 0;
+}
+
+/* 장비 버튼 공통: 상자 중앙 */
+.synergy-weapon-box .btnetc,
+.synergy-equip-box .btnetc {
+  width: 92%;
+  height: 30px;
+  flex: 0 0 30px;
+  margin: 0 auto 8px;
+  align-self: center;
+  text-align: center;
+}
+
+/* 선택 이미지가 들어오는 영역도 고정 높이 */
+.synergy-picked-set-wrap,
+.synergy-picked-weapon-wrap {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 42px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 0;
+  cursor: pointer;
+}
+
+/* 아이템 아이콘 크기 고정 */
+.synergy-picked-set-item,
+.synergy-picked-weapon-item {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+}
+
+/* 시너지 모달 하단 드롭다운 라벨 */
+/* 착용아바타 / 칭호설정 라벨: 버튼 느낌 제거 */
+.synergy-extra-box .synergy-field .muted {
+  display: block;
+  width: 100%;
+  margin-bottom: 5px !important;
+  padding: 0 2px;
+  border: none;
+  background: transparent;
+  color: #c7b589;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: left;
+  text-shadow: none;
+}
+
+.synergy-extra-box .synergy-field {
+  min-width: 0;
+}
+
+.synergy-extra-box .synergy-select {
+  height: 32px;
+  border-color: rgba(207, 162, 79, 0.28);
+  background: #17100c;
+  color: #f0e6d2;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ================================
+   시너지 선택 상자 전체 클릭형 UI
+================================ */
+
+/* 선택 상자 자체를 클릭 가능한 슬롯처럼 보이게 */
+#synergyEffectModal [data-synergy-pick-box="1"] {
+  position: relative;
+  cursor: pointer;
+  border-color: rgba(207, 162, 79, 0.18);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(207, 162, 79, 0.08), transparent 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+  transition:
+    border-color .16s ease,
+    box-shadow .16s ease,
+    background .16s ease,
+    transform .12s ease,
+    filter .16s ease;
+}
+
+/* 마우스 오버 시 상자 전체 금빛 강조 */
+#synergyEffectModal [data-synergy-pick-box="1"]:hover {
+  border-color: rgba(250, 204, 107, 0.75);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(250, 204, 107, 0.18), transparent 62%),
+    linear-gradient(180deg, rgba(207, 162, 79, 0.11), rgba(255, 255, 255, 0.018));
+  box-shadow:
+    0 0 0 2px rgba(250, 204, 107, 0.16) inset,
+    0 0 18px rgba(250, 204, 107, 0.16),
+    0 8px 22px rgba(0, 0, 0, 0.35);
+  transform: translateY(-1px);
+}
+
+#synergyEffectModal [data-synergy-pick-box="1"]:active {
+  transform: translateY(0);
+  filter: brightness(0.96);
+}
+
+/* 내부의 기존 버튼은 실제 버튼처럼 보이지 않게 */
+#synergyEffectModal [data-synergy-pick-box="1"] > .btnetc,
+#synergyEffectModal .synergy-inner-pick-label {
+  pointer-events: none;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #c7b589 !important;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+
+  width: auto !important;
+  min-width: 0;
+  height: auto;
+  flex: 0 0 auto;
+  margin: 0 auto;
+  padding: 0;
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  text-align: center;
+  line-height: 1.15;
+}
+
+/* 선택 전 안내 문구의 + 아이콘 */
+#synergyEffectModal [data-synergy-pick-box="1"] > .btnetc::before,
+#synergyEffectModal .synergy-inner-pick-label::before {
+  content: "+";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 22px;
+  height: 22px;
+  margin: 0 auto;
+
+  border-radius: 999px;
+  border: 1px solid rgba(207, 162, 79, 0.5);
+  color: #f3d28a;
+  line-height: 1;
+  font-size: 16px;
+  font-weight: 900;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+/* 선택 후 이미지가 떠도 부모 상자 클릭이 먹히게 */
+#synergyEffectModal .synergy-picked-set-wrap,
+#synergyEffectModal .synergy-picked-weapon-wrap,
+#synergyEffectModal .synergy-picked-char-wrap {
+  pointer-events: none;
+}
+
+/* 선택 후에는 안내 버튼이 숨겨지므로 이미지가 상자 중앙을 차지 */
+#synergyEffectModal [data-synergy-pick-box="1"] img {
+  pointer-events: none;
+}
+
+/* 화면이 좁으면 다시 세로로 떨어지게 */
+@media (max-width: 980px) {
     .synergy-calc-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      margin-top: 6px;
-      padding: 12px 4px 2px;
-    }
+    grid-template-columns: 1fr;
+  }
 
-    .synergy-compute-btn {
-      min-width: 220px;
-      height: 40px;
-      border-radius: 12px;
-      font-weight: 800;
-    }
+  .synergy-calc-pair {
+    grid-template-columns: 210px minmax(0, 1fr);
+  }
+  .synergy-side-layout {
+    grid-template-columns: 1fr;
+  }
 
-    .synergy-final-box {
-      flex: 1;
-      min-height: 40px;
-      border: 1px solid rgba(255, 255, 255, .10);
-      border-radius: 12px;
-      background: rgba(255, 255, 255, .03);
-      padding: 8px 12px;
-    }
+  .synergy-main-layout {
+    grid-template-columns: 110px 180px 110px;
+    justify-content: center;
+  }
 
-    .synergy-final-value {
-      font-size: 22px;
-      font-weight: 900;
-      color: #ffd36b;
-      line-height: 1.15;
-    }
+  .synergy-char-large-box {
+    width: 180px;
+    min-width: 180px;
+    height: 270px;
+    min-height: 270px;
+  }
 
-    .synergy-final-value.loading {
-      color: #e6e9ef;
-    }
+  .synergy-equip-column {
+    height: 270px;
+  }
 
-    #synergyPickerList .items {
-      overflow: auto;
-      padding: 10px 6px 14px;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      align-content: start;
-    }
+  .synergy-picked-char-wrap {
+    height: 100%;
+  }
 
-    #synergyPickerList .items>.item-list {
-      grid-column: 1 / -1;
-    }
-
-    #synergyPickerList .set-group-title {
-      grid-column: 1 / -1;
-      margin: 4px 0 0;
-      padding: 4px 2px 2px;
-      color: #b89b63;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .1px;
-    }
-
-    #synergyPickerList .armor-set-card {
-      min-width: 0;
-      background: #15100c;
-      border: 1px solid #3a2c21;
-      border-radius: 12px;
-      padding: 10px;
-      display: grid;
-      gap: 8px;
-      cursor: pointer;
-    }
-
-    #synergyPickerList .armor-set-card:hover {
-      border-color: #7c5b37;
-      box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset;
-    }
-
-    #synergyPickerList .armor-set-header {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 6px;
-      min-height: 20px;
-    }
-
-    #synergyPickerList .armor-set-header-title {
-      color: #f0e6d2;
-      font-weight: 700;
-      font-size: 14px;
-      line-height: 1.35;
-    }
-
-    #synergyPickerList .armor-set-items {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
-      padding-top: 1px;
-    }
-
-    #synergyPickerList .armor-set-card[data-mode="armor"] .armor-set-items,
-    #synergyPickerList .armor-set-card[data-mode="acc"] .armor-set-items,
-    #synergyPickerList .armor-set-card[data-mode="spec"] .armor-set-items {
-      grid-template-columns: none;
-    }
-
-    #synergyPickerList .armor-set-item {
-      background: transparent;
-      border: 0;
-      padding: 0;
-      margin: 0;
-      cursor: pointer;
-    }
-
-    #synergyPickerList .armor-set-item .iconbox {
-      width: 56px;
-      height: 56px;
-      border-radius: 10px;
-      aspect-ratio: auto;
-    }
-
-    .synergy-field {
-      display: block;
-    }
-
-    .synergy-field-full {
-      grid-column: auto;
-    }
-
-    .synergy-select {
-      width: 100%;
-    }
-
-    .synergy-weapon-box {
-      min-width: 0;
-    }
-
-    .synergy-picked-weapon-wrap {
-      width: 100%;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      margin-top: 2px;
-      cursor: pointer;
-    }
-
-    .synergy-picked-weapon-wrap:hover {
-      filter: brightness(1.06);
-    }
-
-    .synergy-picked-weapon-item {
-      width: 48px;
-      height: 48px;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid rgba(207, 162, 79, 0.35);
-      background: #0c0a08;
-      position: relative;
-      flex: 0 0 auto;
-    }
-
-    .synergy-picked-weapon-item .icon {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    @media (max-width: 980px) {
-      .synergy-top-row {
-        grid-template-columns: 1fr;
-      }
-
-      .synergy-bottom-row {
-        grid-template-columns: 1fr;
-      }
-
-      .synergy-select-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .synergy-field-full {
-        grid-column: auto;
-      }
-    }
+  .synergy-picked-char-img {
+    width: 100%;
+    height: 100%;
+    min-width: 100%;
+  }
+}
 
     /* 캐릭터 카탈로그 */
     .catalog {
@@ -6580,239 +6779,257 @@
     <div class="backdrop" data-close></div>
     <div class="dialog synergy-effect-dialog">
       <header>
-        <button class="icon-btn" type="button" data-close aria-label="닫기">✕</button>
         <h2>시너지 효과</h2>
         <div></div>
       </header>
 
-      <div class="catalog synergy-effect-catalog">
+     <div class="catalog synergy-effect-catalog">
 
-        <!-- ===== 1번 세트 ===== -->
-        <section class="synergy-set-box">
-          <div class="synergy-set-head">
-            <div class="synergy-set-head-left">
-              <input id="synergyEnabled1" class="synergy-enable-check" type="checkbox" />
-              <div class="opt-title">시너지 1</div>
+  <div class="synergy-side-layout">
+
+    <!-- ===== 시너지 1 ===== -->
+    <section class="synergy-set-box">
+      <div class="synergy-set-head">
+        <div class="synergy-set-head-left">
+          <input id="synergyEnabled1" class="synergy-enable-check" type="checkbox" />
+          <div class="opt-title">시너지 1</div>
+        </div>
+
+        <button id="btnSynergyReset1" class="synergy-reset-btn" type="button">
+          초기화
+        </button>
+      </div>
+
+      <div class="synergy-main-layout">
+        <!-- 좌측: 무기 / 방어구 -->
+        <div class="synergy-equip-column">
+          <section class="opt-box synergy-weapon-box"
+         data-synergy-pick-box="1"
+         data-pick-mode="weapon">
+            <button id="btnSynergyPickWeapon" class="btnetc synergy-inner-pick-label" type="button">
+  무기
+</button>
+
+            <div id="synergyPickedWeaponWrap" class="synergy-picked-weapon-wrap" style="display:none;">
+              <div class="synergy-picked-weapon-item">
+                <img id="synergyPickedWeaponImg" class="icon" alt="선택 무기">
+              </div>
             </div>
 
-            <button id="btnSynergyReset1" class="synergy-reset-btn" type="button">
-              초기화
-            </button>
+            <div id="synergyPickedWeapon" class="muted synergy-picked-text" style="display:none;"></div>
+          </section>
+
+          <section class="opt-box synergy-equip-box"
+         data-synergy-pick-box="1"
+         data-pick-mode="armor">
+            <button id="btnSynergyPickArmorSet" class="btnetc synergy-inner-pick-label" type="button">
+  방어구
+</button>
+
+            <div id="synergyPickedArmorSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
+            <div id="synergyPickedArmorSet" class="muted synergy-picked-text" style="display:none;"></div>
+          </section>
+        </div>
+
+        <!-- 중앙: 캐릭터 -->
+        <section class="opt-box synergy-char-box synergy-char-large-box"
+         data-synergy-pick-box="1"
+         data-pick-mode="char">
+          <button id="btnSynergyPickChar" class="btnetc synergy-char-pick-btn synergy-inner-pick-label" type="button">
+  캐릭터
+</button>
+
+          <div id="synergyPickedCharWrap" class="synergy-picked-char-wrap" style="display:none;">
+            <img id="synergyPickedCharImg" class="synergy-picked-char-img" alt="선택 캐릭터">
           </div>
 
-          <!-- 윗줄: 캐릭터 + 드롭다운들 -->
-          <div class="synergy-top-row">
-            <section class="opt-box synergy-char-box">
-              <button id="btnSynergyPickChar" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-                캐릭터 선택
-              </button>
-
-              <div id="synergyPickedCharWrap" class="synergy-picked-char-wrap" style="display:none;">
-                <img id="synergyPickedCharImg" class="synergy-picked-char-img" alt="선택 캐릭터">
-              </div>
-
-              <div id="synergyPickedChar" class="muted synergy-picked-text" style="display:none;"></div>
-            </section>
-
-            <section class="opt-box synergy-extra-box">
-              <div class="synergy-select-grid">
-                <label class="synergy-field">
-                  <div class="muted" style="margin-bottom:4px;">착용아바타</div>
-                  <select id="synergyAvatar1" class="input synergy-select">
-                    <option value="없음">없음</option>
-                    <option value="레어" selected>레어</option>
-                    <option value="상급">상급</option>
-                  </select>
-                </label>
-
-                <label class="synergy-field">
-                  <div class="muted" style="margin-bottom:4px;">칭호설정</div>
-                  <select id="synergyTitle1" class="input synergy-select">
-                    <option value="없음">없음</option>
-                    <option value="일반">일반</option>
-                    <option value="종결" selected>종결</option>
-                  </select>
-                </label>
-
-                <label class="synergy-field synergy-field-full">
-                  <div class="muted" style="margin-bottom:4px;">마을지능</div>
-                  <select id="synergyDetail1" class="input synergy-select">
-                    <option value="6000">6,000</option>
-                    <option value="6500">6,500</option>
-                    <option value="7000">7,000</option>
-                    <option value="7500">7,500</option>
-                    <option value="8000" selected>8,000</option>
-                    <option value="8500">8,500</option>
-                    <option value="9000">9,000</option>
-                  </select>
-                </label>
-              </div>
-            </section>
-          </div>
-
-          <!-- 아랫줄: 방어구 / 악세 / 특수 -->
-          <div class="synergy-bottom-row">
-            <section class="opt-box synergy-weapon-box">
-              <button id="btnSynergyPickWeapon" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-                무기 선택
-              </button>
-
-              <div id="synergyPickedWeaponWrap" class="synergy-picked-weapon-wrap" style="display:none;">
-                <div class="synergy-picked-weapon-item">
-                  <img id="synergyPickedWeaponImg" class="icon" alt="선택 무기">
-                </div>
-              </div>
-
-              <div id="synergyPickedWeapon" class="muted synergy-picked-text" style="display:none;"></div>
-            </section>
-
-            <section class="opt-box synergy-equip-box">
-              <button id="btnSynergyPickArmorSet" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-                방어구셋 선택
-              </button>
-
-              <div id="synergyPickedArmorSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
-              <div id="synergyPickedArmorSet" class="muted synergy-picked-text" style="display:none;"></div>
-            </section>
-
-            <section class="opt-box synergy-equip-box">
-              <button id="btnSynergyPickAccSet" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-                악세사리셋 선택
-              </button>
-
-              <div id="synergyPickedAccSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
-              <div id="synergyPickedAccSet" class="muted synergy-picked-text" style="display:none;"></div>
-            </section>
-
-            <section class="opt-box synergy-equip-box">
-              <button id="btnSynergyPickSpecSet" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-                특수장비셋 선택
-              </button>
-
-              <div id="synergyPickedSpecSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
-              <div id="synergyPickedSpecSet" class="muted synergy-picked-text" style="display:none;"></div>
-            </section>
-          </div>
+          <div id="synergyPickedChar" class="muted synergy-picked-text" style="display:none;"></div>
         </section>
 
-        <!-- ===== 2번 세트 ===== -->
-        <section class="synergy-set-box">
-          <div class="synergy-set-head">
-            <div class="synergy-set-head-left">
-              <input id="synergyEnabled2" class="synergy-enable-check" type="checkbox" />
-              <div class="opt-title">시너지 2</div>
-            </div>
-
-            <button id="btnSynergyReset2" class="synergy-reset-btn" type="button">
-              초기화
+        <!-- 우측: 악세 / 특수 -->
+        <div class="synergy-equip-column">
+          <section class="opt-box synergy-equip-box"
+         data-synergy-pick-box="1"
+         data-pick-mode="acc">
+            <button id="btnSynergyPickAccSet" class="btnetc synergy-inner-pick-label" type="button">
+              악세사리
             </button>
-          </div>
 
-          <!-- 윗줄: 캐릭터 + 드롭다운들 -->
-          <div class="synergy-top-row">
-            <section class="opt-box synergy-char-box">
-              <button id="btnSynergyPickChar2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-                캐릭터 선택
-              </button>
+            <div id="synergyPickedAccSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
+            <div id="synergyPickedAccSet" class="muted synergy-picked-text" style="display:none;"></div>
+          </section>
 
-              <div id="synergyPickedCharWrap2" class="synergy-picked-char-wrap" style="display:none;">
-                <img id="synergyPickedCharImg2" class="synergy-picked-char-img" alt="선택 캐릭터">
-              </div>
+          <section class="opt-box synergy-equip-box"
+         data-synergy-pick-box="1"
+         data-pick-mode="spec">
+            <button id="btnSynergyPickSpecSet" class="btnetc synergy-inner-pick-label" type="button">
+              특수장비
+            </button>
 
-              <div id="synergyPickedChar2" class="muted synergy-picked-text" style="display:none;"></div>
-            </section>
-
-            <section class="opt-box synergy-extra-box">
-              <div class="synergy-select-grid">
-                <label class="synergy-field">
-                  <div class="muted" style="margin-bottom:4px;">착용아바타</div>
-                  <select id="synergyAvatar2" class="input synergy-select">
-                    <option value="없음">없음</option>
-                    <option value="레어" selected>레어</option>
-                    <option value="상급">상급</option>
-                  </select>
-                </label>
-
-                <label class="synergy-field">
-                  <div class="muted" style="margin-bottom:4px;">칭호설정</div>
-                  <select id="synergyTitle2" class="input synergy-select">
-                    <option value="없음">없음</option>
-                    <option value="일반">일반</option>
-                    <option value="종결" selected>종결</option>
-                  </select>
-                </label>
-
-                <label class="synergy-field synergy-field-full">
-                  <div class="muted" style="margin-bottom:4px;">마을지능</div>
-                  <select id="synergyDetail2" class="input synergy-select">
-                    <option value="6000">6,000</option>
-                    <option value="6500">6,500</option>
-                    <option value="7000">7,000</option>
-                    <option value="7500">7,500</option>
-                    <option value="8000" selected>8,000</option>
-                    <option value="8500">8,500</option>
-                    <option value="9000">9,000</option>
-                  </select>
-                </label>
-              </div>
-            </section>
-          </div>
-
-          <!-- 아랫줄: 방어구 / 악세 / 특수 -->
-          <div class="synergy-bottom-row">
-            <section class="opt-box synergy-weapon-box">
-              <button id="btnSynergyPickWeapon2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-                무기 선택
-              </button>
-
-              <div id="synergyPickedWeaponWrap2" class="synergy-picked-weapon-wrap" style="display:none;">
-                <div class="synergy-picked-weapon-item">
-                  <img id="synergyPickedWeaponImg2" class="icon" alt="선택 무기">
-                </div>
-              </div>
-
-              <div id="synergyPickedWeapon2" class="muted synergy-picked-text" style="display:none;"></div>
-            </section>
-
-            <section class="opt-box synergy-equip-box">
-              <button id="btnSynergyPickArmorSet2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-                방어구셋 선택
-              </button>
-
-              <div id="synergyPickedArmorSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
-              <div id="synergyPickedArmorSet2" class="muted synergy-picked-text" style="display:none;"></div>
-            </section>
-
-            <section class="opt-box synergy-equip-box">
-              <button id="btnSynergyPickAccSet2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-                악세사리셋 선택
-              </button>
-
-              <div id="synergyPickedAccSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
-              <div id="synergyPickedAccSet2" class="muted synergy-picked-text" style="display:none;"></div>
-            </section>
-
-            <section class="opt-box synergy-equip-box">
-              <button id="btnSynergyPickSpecSet2" class="btnetc" type="button" style="width:100%; margin-bottom:8px;">
-                특수장비셋 선택
-              </button>
-
-              <div id="synergyPickedSpecSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
-              <div id="synergyPickedSpecSet2" class="muted synergy-picked-text" style="display:none;"></div>
-            </section>
-          </div>
-        </section>
-        <div class="synergy-calc-footer">
-          <button id="btnSynergyCompute" class="btnetc synergy-compute-btn" type="button" data-compute-btn>
-            시너지효과 포함 계산하기
-          </button>
-
-          <div class="synergy-final-box">
-            <div class="muted" style="font-size:12px; margin-bottom:4px;">최종데미지</div>
-            <div id="synergyFinalDamageValue" class="synergy-final-value">-</div>
-          </div>
+            <div id="synergyPickedSpecSetWrap" class="synergy-picked-set-wrap" style="display:none;"></div>
+            <div id="synergyPickedSpecSet" class="muted synergy-picked-text" style="display:none;"></div>
+          </section>
         </div>
       </div>
+
+      <!-- 하단: 아바타 / 칭호 -->
+      <section class="opt-box synergy-extra-box synergy-extra-under">
+        <div class="synergy-select-grid">
+          <label class="synergy-field">
+            <div class="muted" style="margin-bottom:4px;">착용아바타</div>
+            <select id="synergyAvatar1" class="input synergy-select">
+              <option value="없음">없음</option>
+              <option value="레어" selected>레어</option>
+              <option value="상급">상급</option>
+            </select>
+          </label>
+
+          <label class="synergy-field">
+            <div class="muted" style="margin-bottom:4px;">칭호설정</div>
+            <select id="synergyTitle1" class="input synergy-select">
+              <option value="없음">없음</option>
+              <option value="일반">일반</option>
+              <option value="종결" selected>종결</option>
+            </select>
+          </label>
+        </div>
+      </section>
+    </section>
+
+    <!-- ===== 시너지 2 ===== -->
+    <section class="synergy-set-box">
+      <div class="synergy-set-head">
+        <div class="synergy-set-head-left">
+          <input id="synergyEnabled2" class="synergy-enable-check" type="checkbox" />
+          <div class="opt-title">시너지 2</div>
+        </div>
+
+        <button id="btnSynergyReset2" class="synergy-reset-btn" type="button">
+          초기화
+        </button>
+      </div>
+
+      <div class="synergy-main-layout">
+        <!-- 좌측: 무기 / 방어구 -->
+        <div class="synergy-equip-column">
+          <section class="opt-box synergy-weapon-box"
+         data-synergy-pick-box="1"
+         data-pick-mode="weapon2">
+            <button id="btnSynergyPickWeapon2" class="btnetc synergy-inner-pick-label" type="button">
+  무기
+</button>
+
+            <div id="synergyPickedWeaponWrap2" class="synergy-picked-weapon-wrap" style="display:none;">
+              <div class="synergy-picked-weapon-item">
+                <img id="synergyPickedWeaponImg2" class="icon" alt="선택 무기">
+              </div>
+            </div>
+
+            <div id="synergyPickedWeapon2" class="muted synergy-picked-text" style="display:none;"></div>
+          </section>
+
+          <section class="opt-box synergy-equip-box"
+         data-synergy-pick-box="1"
+         data-pick-mode="armor2">
+            <button id="btnSynergyPickArmorSet2" class="btnetc synergy-inner-pick-label" type="button">
+  방어구
+</button>
+
+            <div id="synergyPickedArmorSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
+            <div id="synergyPickedArmorSet2" class="muted synergy-picked-text" style="display:none;"></div>
+          </section>
+        </div>
+
+        <!-- 중앙: 캐릭터 -->
+        <section class="opt-box synergy-char-box synergy-char-large-box"
+         data-synergy-pick-box="1"
+         data-pick-mode="char2">
+          <button id="btnSynergyPickChar2" class="btnetc synergy-char-pick-btn synergy-inner-pick-label" type="button">
+  캐릭터
+</button>
+
+          <div id="synergyPickedCharWrap2" class="synergy-picked-char-wrap" style="display:none;">
+            <img id="synergyPickedCharImg2" class="synergy-picked-char-img" alt="선택 캐릭터">
+          </div>
+
+          <div id="synergyPickedChar2" class="muted synergy-picked-text" style="display:none;"></div>
+        </section>
+
+        <!-- 우측: 악세 / 특수 -->
+        <div class="synergy-equip-column">
+          <section class="opt-box synergy-equip-box"
+         data-synergy-pick-box="1"
+         data-pick-mode="acc2">
+            <button id="btnSynergyPickAccSet2" class="btnetc synergy-inner-pick-label" type="button">
+              악세사리
+            </button>
+
+            <div id="synergyPickedAccSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
+            <div id="synergyPickedAccSet2" class="muted synergy-picked-text" style="display:none;"></div>
+          </section>
+
+          <section class="opt-box synergy-equip-box"
+         data-synergy-pick-box="1"
+         data-pick-mode="spec2">
+            <button id="btnSynergyPickSpecSet2" class="btnetc synergy-inner-pick-label" type="button">
+              특수장비
+            </button>
+
+            <div id="synergyPickedSpecSetWrap2" class="synergy-picked-set-wrap" style="display:none;"></div>
+            <div id="synergyPickedSpecSet2" class="muted synergy-picked-text" style="display:none;"></div>
+          </section>
+        </div>
+      </div>
+
+      <!-- 하단: 아바타 / 칭호 -->
+      <section class="opt-box synergy-extra-box synergy-extra-under">
+        <div class="synergy-select-grid">
+          <label class="synergy-field">
+            <div class="muted" style="margin-bottom:4px;">착용아바타</div>
+            <select id="synergyAvatar2" class="input synergy-select">
+              <option value="없음">없음</option>
+              <option value="레어" selected>레어</option>
+              <option value="상급">상급</option>
+            </select>
+          </label>
+
+          <label class="synergy-field">
+            <div class="muted" style="margin-bottom:4px;">칭호설정</div>
+            <select id="synergyTitle2" class="input synergy-select">
+              <option value="없음">없음</option>
+              <option value="일반">일반</option>
+              <option value="종결" selected>종결</option>
+            </select>
+          </label>
+        </div>
+      </section>
+    </section>
+  </div>
+
+  <div class="synergy-calc-footer">
+  <div class="synergy-calc-pair">
+    <button id="btnSynergyCompute" class="btnetc synergy-compute-btn" type="button" data-compute-btn>
+      시너지효과 포함 계산하기
+    </button>
+
+    <div class="synergy-final-box">
+      <div class="muted" style="font-size:12px; margin-bottom:4px;">최종데미지</div>
+      <div id="synergyFinalDamageValue" class="synergy-final-value">-</div>
+    </div>
+  </div>
+
+  <div class="synergy-calc-pair">
+    <button id="btnSynergyCompute2" class="btnetc synergy-compute-btn" type="button" data-compute-btn>
+      시너지효과 포함 계산하기
+    </button>
+
+    <div class="synergy-final-box">
+      <div class="muted" style="font-size:12px; margin-bottom:4px;">최종데미지</div>
+      <div id="synergyFinalDamageValue2" class="synergy-final-value">-</div>
+    </div>
+  </div>
+</div>
+</div>
     </div>
   </div>
 
@@ -22284,40 +22501,39 @@ if (autoEnhList) {
     // 전역 1줄(파일 어딘가 상단): 최신 호출만 반영하기 위한 시퀀스
     window.__computeReqSeq = 0;
     function buildSynergyPayload() {
-      const sy = state.synergy || {};
+  const sy = state.synergy || {};
 
-      const makeOne = (idx) => {
-        const suffix = idx === 1 ? '' : '2';
-        return {
-          enabled: !!sy[`enabled${idx}`],
-          char: sy[`char${suffix}`] || null,
-          weapon: sy[`weapon${suffix}`] || null,
-          armorSet: sy[`armorSet${suffix}`] || null,
-          accSet: sy[`accSet${suffix}`] || null,
-          specSet: sy[`specSet${suffix}`] || null,
-          avatar: String(document.getElementById(`synergyAvatar${idx}`)?.value || '').trim(),
-          title: String(document.getElementById(`synergyTitle${idx}`)?.value || '').trim(),
-          detail: String(document.getElementById(`synergyDetail${idx}`)?.value || '').trim(),
-        };
-      };
+  const makeOne = (idx) => {
+    const suffix = idx === 1 ? '' : '2';
+    return {
+      enabled: !!sy[`enabled${idx}`],
+      char: sy[`char${suffix}`] || null,
+      weapon: sy[`weapon${suffix}`] || null,
+      armorSet: sy[`armorSet${suffix}`] || null,
+      accSet: sy[`accSet${suffix}`] || null,
+      specSet: sy[`specSet${suffix}`] || null,
+      avatar: String(document.getElementById(`synergyAvatar${idx}`)?.value || '').trim(),
+      title: String(document.getElementById(`synergyTitle${idx}`)?.value || '').trim(),
+    };
+  };
 
-      const s1 = makeOne(1);
-      const s2 = makeOne(2);
+  const s1 = makeOne(1);
+  const s2 = makeOne(2);
 
-      console.log('[synergy payload built]', {
-        enabled1: !!s1.enabled,
-        enabled2: !!s2.enabled,
-        s1,
-        s2,
-      });
+  console.log('[synergy payload built]', {
+    enabled1: !!s1.enabled,
+    enabled2: !!s2.enabled,
+    s1,
+    s2,
+  });
 
-      return {
-        enabled1: !!s1.enabled,
-        enabled2: !!s2.enabled,
-        s1,
-        s2,
-      };
-    }
+  return {
+    enabled1: !!s1.enabled,
+    enabled2: !!s2.enabled,
+    s1,
+    s2,
+  };
+}
     // ★ calc_all + compute 기반 최종 계산
     async function computeViaBackend(targetId, p /* 'phys' | 'mag' 생략 가능 */, opts = {}) {
       const box = document.getElementById(targetId);
@@ -24488,12 +24704,10 @@ if (autoEnhList) {
       state.synergy.specSet = null;
 
       const avatarEl = document.getElementById('synergyAvatar1');
-      const titleEl = document.getElementById('synergyTitle1');
-      const detailEl = document.getElementById('synergyDetail1');
+const titleEl = document.getElementById('synergyTitle1');
 
-      if (avatarEl) avatarEl.value = '레어';
-      if (titleEl) titleEl.value = '종결';
-      if (detailEl) detailEl.value = '8000';
+if (avatarEl) avatarEl.value = '레어';
+if (titleEl) titleEl.value = '종결';
 
       renderSynergyPickedTexts();
     }
@@ -24508,12 +24722,10 @@ if (autoEnhList) {
       state.synergy.specSet2 = null;
 
       const avatarEl = document.getElementById('synergyAvatar2');
-      const titleEl = document.getElementById('synergyTitle2');
-      const detailEl = document.getElementById('synergyDetail2');
+const titleEl = document.getElementById('synergyTitle2');
 
-      if (avatarEl) avatarEl.value = '레어';
-      if (titleEl) titleEl.value = '종결';
-      if (detailEl) detailEl.value = '8000';
+if (avatarEl) avatarEl.value = '레어';
+if (titleEl) titleEl.value = '종결';
 
       renderSynergyPickedTexts();
     }
@@ -24631,24 +24843,31 @@ if (autoEnhList) {
           const badgeSrc = String(chars[0]?.type || '').trim();
 
           const cardsHtml = chars.map(r => {
-            const img = r?.thumbSrc || r?.fullSrc || r?.faceSrc || '';
-            const name = String(r?.name || '');
-            const type = String(r?.type || '');
-            const enabled = String(r?.enabled ?? true) !== 'false';
+  // ✅ 선택 목록에서는 썸네일 사용
+  const listImg = r?.thumbSrc || r?.faceSrc || r?.fullSrc || '';
 
-            return `
-          <div class="char-card${enabled ? '' : ' disabled'}"
-               data-synergy-pick="1"
-               data-name="${name.replace(/"/g, '&quot;')}"
-               data-img="${String(img || '').replace(/"/g, '&quot;')}"
-               data-jobgroup="${jobGroup.replace(/"/g, '&quot;')}"
-               data-category=""
-               title="${name}">
-            <img class="char-img" src="${img}" alt="${name}">
-            <div class="char-name">${name}</div>
-          </div>
-        `;
-          }).join('');
+  // ✅ 선택 후 시너지 모달에는 '이미지' 컬럼(fullSrc) 사용
+  const portraitImg = r?.fullSrc || r?.thumbSrc || r?.faceSrc || '';
+
+  const name = String(r?.name || '');
+  const type = String(r?.type || '');
+  const enabled = String(r?.enabled ?? true) !== 'false';
+
+  return `
+    <div class="char-card${enabled ? '' : ' disabled'}"
+         data-synergy-pick="1"
+         data-name="${name.replace(/"/g, '&quot;')}"
+         data-img="${String(portraitImg || '').replace(/"/g, '&quot;')}"
+         data-thumb-img="${String(listImg || '').replace(/"/g, '&quot;')}"
+         data-full-img="${String(portraitImg || '').replace(/"/g, '&quot;')}"
+         data-jobgroup="${jobGroup.replace(/"/g, '&quot;')}"
+         data-category=""
+         title="${name}">
+      <img class="char-img" src="${listImg}" alt="${name}">
+      <div class="char-name">${name}</div>
+    </div>
+  `;
+}).join('');
 
           return `
         <div class="row">
@@ -24668,11 +24887,18 @@ if (autoEnhList) {
             if (btn.classList.contains('disabled')) return;
 
             const picked = {
-              name: btn.dataset.name || '',
-              img: btn.dataset.img || '',
-              jobGroup: btn.dataset.jobgroup || '',
-              category: '캐릭터',
-            };
+  name: btn.dataset.name || '',
+
+  // ✅ 시너지 모달에 크게 표시할 이미지
+  img: btn.dataset.fullImg || btn.dataset.img || '',
+
+  // ✅ 구분 저장용
+  thumbImg: btn.dataset.thumbImg || '',
+  fullImg: btn.dataset.fullImg || btn.dataset.img || '',
+
+  jobGroup: btn.dataset.jobgroup || '',
+  category: '캐릭터',
+};
 
             state.synergy = state.synergy || {
               enabled1: false,
@@ -25103,8 +25329,12 @@ if (autoEnhList) {
 
     // ✅ 버튼 이벤트
     document.getElementById('btnSynergyCompute')?.addEventListener('click', () => {
-      computeViaBackend('synergyFinalDamageValue', null, { useSynergy: true });
-    });
+  computeViaBackend('synergyFinalDamageValue', null, { useSynergy: true });
+});
+
+document.getElementById('btnSynergyCompute2')?.addEventListener('click', () => {
+  computeViaBackend('synergyFinalDamageValue2', null, { useSynergy: true });
+});
 
     document.getElementById('btnSynergyReset2')?.addEventListener('click', () => {
       resetSynergy2Selections();
@@ -25168,6 +25398,8 @@ if (autoEnhList) {
       openSynergyPicker('spec2');
     });
 
+    bindSynergyPickBoxes();
+
     document.getElementById('btnSkillDamageViewer')?.addEventListener('click', () => {
       openSkillDamageViewerModal();
     });
@@ -25204,6 +25436,25 @@ if (autoEnhList) {
     document.getElementById('btnAutoWeaponSweepSelected')?.addEventListener('click', async () => {
       await runAutoWeaponCustomSweepSelected('finalDamageValue');
     });
+
+    function bindSynergyPickBoxes() {
+  document.querySelectorAll('#synergyEffectModal [data-synergy-pick-box="1"]').forEach((box) => {
+    if (box.dataset.boundPickBox === '1') return;
+    box.dataset.boundPickBox = '1';
+
+    box.addEventListener('click', (e) => {
+      // 체크박스, 드롭다운, 초기화 버튼은 상자 클릭으로 처리하면 안 됨
+      if (e.target.closest('select, input, option, #btnSynergyReset1, #btnSynergyReset2')) {
+        return;
+      }
+
+      const mode = String(box.dataset.pickMode || '').trim();
+      if (!mode) return;
+
+      openSynergyPicker(mode);
+    });
+  });
+}
 
     (() => {
       window.WEBAPP_URL = 'https://dnf-backend.gogo456654.workers.dev';
