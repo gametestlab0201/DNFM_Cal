@@ -1757,7 +1757,7 @@
     /* ===== 시너지 효과 모달 전용 ===== */
     .synergy-effect-dialog {
       width: min(1040px, 96vw);
-      height: min(780px, 94vh);
+      height: min(820px, 96vh);
     }
 
     .synergy-effect-catalog {
@@ -2115,7 +2115,7 @@
     #synergyEffectModal .synergy-compute-btn {
       width: 128px;
       min-width: 128px;
-      height: 44px;
+      height: 56px;
       font-size: 12px;
       font-weight: 800;
       padding: 0 6px;
@@ -2126,8 +2126,8 @@
     #synergyEffectModal .synergy-final-box {
       width: 100%;
       min-width: 0;
-      min-height: 44px;
-      padding: 6px 20px 6px 12px;
+      min-height: 56px;
+      padding: 8px 20px 8px 12px;
       display: flex;
       align-items: center;
       justify-content: flex-end;
@@ -6305,6 +6305,7 @@
                   <li>05.22 스킬 초기화 버튼을 통한 총 SP 계산 안정화 패치</li>
                   <li>05.23 <span class="notice-badge">'남스트리트파이터'</span> 캐릭 추가</li>
                   <li>05.24 <span style="color: yellow;">[전캐릭]</span> 2각 패시브 적용 완료</li>
+                  <li>05.27 <span style="color: yellowgreen;">[PC]</span> 시너지 효과 적용 TEST 버전 추가</li>
 
                 </ul>
               </div>
@@ -6504,7 +6505,7 @@
 
             <img id="characterImg" class="character-img" alt="캐릭터" />
             <div id="characterGhost" class="character-ghost">클릭하여 캐릭터 선택</div>
-            <!-- ✅ SPECIAL_USER 전용: 시너지 효과 -->
+            <!-- ✅ 전체 공개: 시너지 효과 설정 -->
             <button id="btnSynergyEffect" class="synergy-card-btn" type="button" style="display:none;">
   <span class="synergy-card-btn-main">시너지 효과 설정</span>
 </button>
@@ -6933,7 +6934,7 @@
     <div class="backdrop" data-close></div>
     <div class="dialog synergy-effect-dialog">
       <header>
-        <h2>시너지 효과</h2>
+        <h2>시너지 효과[TEST]</h2>
         <div></div>
       </header>
 
@@ -7237,11 +7238,11 @@
         </div>
         <div class="synergy-notice-wrap"></div>
         <div class="synergy-notice-text">
-          * 70제 에픽 아이템은 현재 미구현이며 빠른 시일내에 구현하도록 하겠습니다.
+          * 70제 에픽 아이템 일부, 마을암속강, 마을지능 은 현재 미구현이며 빠른 시일내에 구현하도록 하겠습니다.
         </div>
 
         <div class="synergy-notice-text">
-          * 마을암속강, 마을지능은 현재 미구현이며 빠른 시일내에 구현하도록 하겠습니다.
+          * 본 기능은 TEST 버전으로, 추후 계산식이 다소 달라질 수 있습니다.
         </div>
       </div>
 
@@ -8154,6 +8155,7 @@
 
       <div class="patch-log-body">
         <ul class="patch-log-list notice-list">
+          <li>26.05.27 [PC] <span style="color: yellow;">시너지 효과 적용 TEST 버전</span><span style="color: #ff4444;"> 기능 추가</span> 수정</li>
           <li>26.05.24 <span style="color: yellow;">[전캐릭]</span> <span style="color: #ff4444;">2각 패시브 적용</span> 완료</li>
           <li>26.05.23 <span class="notice-badge">'남스트리트파이터'</span> 캐릭 추가</li>
           <li>26.05.22 <span style="color: yellow;">스킬 초기화 버튼</span>을 통한 <span style="color: #ff4444;">총 SP 계산
@@ -8769,6 +8771,35 @@
       return !!lp.researchUser;
     }
 
+function hasSelectedMainCharacter() {
+  const st = (typeof state !== 'undefined' && state) ? state : {};
+  const cs =
+    (typeof CurrentSumStats !== 'undefined' && CurrentSumStats)
+      ? CurrentSumStats
+      : (window.CurrentSumStats || null);
+
+  const charName =
+    st?.currentCharacter?.name ||
+    st?.char?.name ||
+    st?.character?.name ||
+    st?.selectedChar?.name ||
+    st?.CurrentSumStats?.CharName ||
+    cs?.CharName ||
+    '';
+
+  return !!String(charName || '').trim();
+}
+
+function updateSynergyEffectButtonVisibility() {
+  const btnSynergy = document.getElementById('btnSynergyEffect');
+  if (!btnSynergy) return;
+
+  const show = hasSelectedMainCharacter();
+
+  btnSynergy.style.display = show ? 'inline-flex' : 'none';
+  btnSynergy.disabled = !show;
+}
+
     function updateSpecialUserButton() {
       const isSpecialUser = isSpecialUserNow_();
       const isResearchUser = isResearchUserNow_();
@@ -8788,9 +8819,11 @@
         el.disabled = false;
       }
 
-      // ✅ [특정 유저 전용 유지] 아래 버튼들은 special_user / research_user 공통 허용
-      const btnSynergy = document.getElementById('btnSynergyEffect');
-      const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
+      // ✅ [전체 공개] 시너지 효과 설정 버튼
+const btnSynergy = document.getElementById('btnSynergyEffect');
+
+// ✅ [특정 유저 전용 유지] 아래 버튼들은 special_user / research_user 공통 허용
+const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
       const rowDmgOpt = document.getElementById('specialDamageOptRow');
       const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
       const btnMacroSetGeneral = document.getElementById('btnMacroSetGeneral');
@@ -8800,7 +8833,8 @@
       const btnAutoWeapon = document.getElementById('btnAutoWeaponSweepSelected');
       const rowUnique = document.getElementById('uniqueOnOffRow');
 
-      if (btnSynergy) btnSynergy.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      updateSynergyEffectButtonVisibility();
+
       if (btnSkillDamage) btnSkillDamage.style.display = hasSpecialLike ? 'inline-flex' : 'none';
       // ✅ 크리100/투함포 체크박스는 전체 공개
       if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
@@ -16036,6 +16070,7 @@
                 state.currentCharacter.thumb = item.thumbSrc || "";
                 state.currentCharacter.full = item.fullSrc || item.thumbSrc || "";
                 state.currentCharacter.saveFace = item.faceSrc || item.thumbSrc || item.fullSrc || "";
+                updateSynergyEffectButtonVisibility();
 
                 // 3) 캐릭터 이미지 / 고스트 / 라벨 UI 갱신
                 const characterImg = document.getElementById("characterImg");
@@ -21647,44 +21682,49 @@
       }
 
       // 4) 캐릭터 라벨/이미지 반영
-      try {
-        const char = s.currentCharacter || {};
-        const charName = char.name || '';
-        const jobGroup = char.jobGroupLabel || '';
+try {
+  const char = s.currentCharacter || {};
+  const charName = char.name || '';
+  const jobGroup = char.jobGroupLabel || '';
 
-        const $charLabel = document.getElementById('charLabel');
-        if ($charLabel) {
-          if (charName) {
-            $charLabel.textContent = jobGroup
-              ? `${jobGroup} / ${charName}`
-              : charName;
-          } else {
-            $charLabel.textContent = '캐릭터 미선택';
-          }
-        }
+  const $charLabel = document.getElementById('charLabel');
+  if ($charLabel) {
+    if (charName) {
+      $charLabel.textContent = jobGroup
+        ? `${jobGroup} / ${charName}`
+        : charName;
+    } else {
+      $charLabel.textContent = '캐릭터 미선택';
+    }
+  }
 
-        const characterImg = document.getElementById('characterImg');
-        const characterGhost = document.getElementById('characterGhost');
-        if (characterImg) {
-          const srcImg =
-            char.full ||
-            char.thumb ||
-            characterImg.src ||
-            (typeof PLACEHOLDER_IMG !== 'undefined' ? PLACEHOLDER_IMG : '');
-          if (srcImg) {
-            characterImg.src = srcImg;
-            characterImg.style.display = charName ? 'block' : 'none';
-          }
-        }
-        if (characterGhost) {
-          characterGhost.style.display = charName ? 'none' : 'block';
-        }
-      } catch (e) {
-        console.warn('[applyFrontPresetState] 캐릭터 UI 갱신 실패:', e);
-      }
+  const characterImg = document.getElementById('characterImg');
+  const characterGhost = document.getElementById('characterGhost');
+  if (characterImg) {
+    const srcImg =
+      char.full ||
+      char.thumb ||
+      characterImg.src ||
+      (typeof PLACEHOLDER_IMG !== 'undefined' ? PLACEHOLDER_IMG : '');
+    if (srcImg) {
+      characterImg.src = srcImg;
+      characterImg.style.display = charName ? 'block' : 'none';
+    }
+  }
+  if (characterGhost) {
+    characterGhost.style.display = charName ? 'none' : 'block';
+  }
 
-      // 5) 장비 슬롯 타일 UI 반영
-      try {
+  // ✅ 프리셋 불러오기 후 시너지 효과 설정 버튼 표시 갱신
+  if (typeof updateSynergyEffectButtonVisibility === 'function') {
+    updateSynergyEffectButtonVisibility();
+  }
+} catch (e) {
+  console.warn('[applyFrontPresetState] 캐릭터 UI 갱신 실패:', e);
+}
+
+// 5) 장비 슬롯 타일 UI 반영
+try {
         const equipsSnap = (s.equips && typeof s.equips === 'object') ? s.equips : {};
         let selections = (s.selections && typeof s.selections === 'object') ? s.selections : {};
 
@@ -22091,23 +22131,29 @@
         '';
 
       // 상태에 간단히 기록 (ownerKey 계산 등에 사용)
-      if (!window.state || typeof window.state !== 'object') window.state = {};
-      const s = window.state;
-      s.currentCharacter = s.currentCharacter || {};
-      s.currentCharacter.name = charName || '';
-      s.currentCharacter.jobGroupLabel = jobGroup || '';
+      // 상태에 간단히 기록 (ownerKey 계산 등에 사용)
+if (!window.state || typeof window.state !== 'object') window.state = {};
+const s = window.state;
+s.currentCharacter = s.currentCharacter || {};
+s.currentCharacter.name = charName || '';
+s.currentCharacter.jobGroupLabel = jobGroup || '';
 
-      // 라벨 박스 텍스트 갱신
-      const $charLabel = document.getElementById('charLabel');
-      if ($charLabel) {
-        if (charName) {
-          $charLabel.textContent = jobGroup
-            ? `${jobGroup} / ${charName}`
-            : charName;
-        } else {
-          $charLabel.textContent = '캐릭터 미선택';
-        }
-      }
+// ✅ 프리셋 스냅샷 불러오기 후 시너지 효과 설정 버튼 표시 갱신
+if (typeof updateSynergyEffectButtonVisibility === 'function') {
+  updateSynergyEffectButtonVisibility();
+}
+
+// 라벨 박스 텍스트 갱신
+const $charLabel = document.getElementById('charLabel');
+if ($charLabel) {
+  if (charName) {
+    $charLabel.textContent = jobGroup
+      ? `${jobGroup} / ${charName}`
+      : charName;
+  } else {
+    $charLabel.textContent = '캐릭터 미선택';
+  }
+}
 
       // ───────── 2) 캐릭터 이미지 교체 (DBChars 이용) ─────────
       try {
