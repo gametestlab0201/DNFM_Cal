@@ -190,10 +190,50 @@
 
     /* 🔹 패치내역 버튼 작게 */
     .patch-log-btn {
-      font-size: 11px;
-      padding: 4px 8px;
-      white-space: nowrap;
-    }
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(207, 162, 79, 0.65);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 244, 190, 0.22), transparent 42%),
+    linear-gradient(135deg, rgba(250, 204, 107, 0.95), rgba(207, 162, 79, 0.88) 52%, rgba(143, 107, 43, 0.9));
+
+  color: #1b1207;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  text-decoration: none;
+
+  cursor: pointer;
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+
+  transition:
+    transform 0.14s ease,
+    filter 0.14s ease,
+    box-shadow 0.14s ease;
+}
+
+.patch-log-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  text-decoration: none;
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.34),
+    0 0 0 2px rgba(250, 204, 107, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.patch-log-btn:active {
+  transform: translateY(0) scale(0.98);
+}
 
     /* 🔹 패치 모달 내용 영역 */
     .patch-log-body {
@@ -350,8 +390,9 @@
   }
 
   .patch-log-btn {
+    height: 24px;
+    padding: 0 8px;
     font-size: 10px;
-    padding: 3px 7px;
   }
 }
 
@@ -533,19 +574,6 @@
       content: "★";
       font-size: 0.8rem;
       margin-top: -1px;
-    }
-
-    /* 메인 공지는 그대로 두고, 패치내역 모달 안에서만 더 작게 */
-    #patchLogModal .notice-list .notice-badge {
-      font-size: 0.8rem;
-      /* 기존보다 조금 작게 */
-      padding: 1px 8px;
-      /* 필요하면 패딩도 살짝 줄이기 */
-    }
-
-    #patchLogModal .notice-list .notice-badge::before {
-      font-size: 0.7rem;
-      /* 별 아이콘도 같이 줄이고 싶으면 */
     }
 
     /* 공지 모달 항목들 사이 여백 추가 */
@@ -6400,11 +6428,11 @@
               <h3>* 계산기는 계속해서 업데이트될 예정입니다!</h3>
               <div class="box">
                 <div class="notice-top-row">
-                  <div class="badge-danger">25.11.29 시즌5 신규 계산기 배포</div>
-                  <button type="button" id="btnPatchLog" class="btn patch-log-btn">
-                    패치내역 전체보기
-                  </button>
-                </div>
+  <div class="badge-danger">25.11.29 시즌5 신규 계산기 배포</div>
+  <a href="./patch/" class="btn patch-log-btn">
+    패치내역 전체보기
+  </a>
+</div>
                 <ul class="notice-list">
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
@@ -8247,173 +8275,6 @@
       </div>
     </div>
   </div>
-
-
-  <!-- 패치내역 전체보기 모달 -->
-  <div id="patchLogModal" class="modal" aria-hidden="true">
-    <div class="backdrop" data-close></div>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="patchLogTitle"
-      style="width:min(600px,95vw);height:min(600px,85vh);">
-      <header>
-        <div style="width:32px;"></div>
-        <h2 id="patchLogTitle">패치내역 전체보기</h2>
-        <button type="button" class="btn" data-close>
-          닫기
-        </button>
-      </header>
-
-      <div class="patch-log-body">
-        <ul class="patch-log-list notice-list">
-          <li>26.05.29 <span style="color: yellow;">260528</span><span style="color: #ff4444;"> 캐릭 밸런스 / 프리미엄 효과 / 신규마부 패치</span> 적용</li>
-          <li>26.05.28 <span style="color: yellow;">프리미엄 </span> <span style="color: #ff4444;">세트 효과</span> 추가</li>
-          <li>26.05.27 [PC] <span style="color: yellow;">시너지 효과 적용 TEST 버전</span><span style="color: #ff4444;"> 기능 추가</span> 수정</li>
-          <li>26.05.24 <span style="color: yellow;">[전캐릭]</span> <span style="color: #ff4444;">2각 패시브 적용</span> 완료</li>
-          <li>26.05.23 <span class="notice-badge">'남스트리트파이터'</span> 캐릭 추가</li>
-          <li>26.05.22 <span style="color: yellow;">스킬 초기화 버튼</span>을 통한 <span style="color: #ff4444;">총 SP 계산
-              안정화</span> 패치</li>
-          <li>26.05.12 [마도학자] <span style="color: #ff4444;">2각 패시브 적용</li>
-          <li>26.05.11 [베가본드] <span style="color: #ff4444;">2각 패시브 적용</li>
-          <li>26.05.08 <span class="notice-badge">'남스트라이커'</span> 캐릭 추가</li>
-          <li>26.05.06 [무녀] <span style="color: #ff4444;">2각 패시브 적용</li>
-          <li>26.05.05 [여스파] <span style="color: #ff4444;">2각 패시브 적용</li>
-          <li>26.05.04 [남레인저] <span style="color: #ff4444;">2각 패시브 적용</li>
-          <li>26.05.03 [남/여프리스트] <span style="color: #ff4444;">2각 패시브 적용<span style="color: yellow;"> <s>(이단심판관, 무녀
-                  제외)</s></span></li>
-          <li>26.05.02 [마창사] <span style="color: #ff4444;">2각 패시브 적용</li>
-          <li>26.05.01 [워리어] <span style="color: #ff4444;">2각 패시브 적용</li>
-          <li>26.05.01 [남/여마법사] <span style="color: #ff4444;">2각 패시브 적용</span><span style="color: yellow;"><s>(마도학자,인챈트리스 제외)</s></span></li>
-          <li>26.05.01 [남/여거너] <span style="color: #ff4444;">2각 패시브 적용</span><span style="color: yellow;"> <s>(남레인저 제외)</s></span></li>
-          <li>26.05.01 [여격투가] <span style="color: #ff4444;">2각 패시브 적용</span><span style="color: yellow;"> <s>(여스트리트파이터
-                제외)</s></span></li>
-          <li>26.04.30 [남/여귀검사] <span style="color: #ff4444;">2각 패시브 적용</span><span style="color: yellow;"> <s>(베가본드
-                제외)</s></span></li>
-          <li>26.04.25 <span style="color: yellow;">260425</span><span style="color: #ff4444;"> 캐릭터 밸런스 패치</span> 적용</li>
-          <li>26.04.06 <span style="color: yellow;">솔플 ↔ 파티</span><span style="color: #ff4444;"> 시너지 버프/장비 옵션 설정
-              토글버튼</span> 추가</li>
-          <li>26.04.04 [모바일] <span style="color: yellow;">결의: 허영 속 어둠의 피조물 세트</span><span style="color: #ff4444;"> 조건부
-              모든 타입 피해 증가 미적용 버그</span> 수정</li>
-          <li>26.04.03 <span style="color: yellow;">윈드시어</span><span style="color: #ff4444;"> '초초초초파파빨'</span> 삭제, <span
-              style="color: #ff4444;">'초초초초빨'</span> 추가</li>
-          <li>26.04.03 <span style="color: yellow;">버서커</span><span style="color: #ff4444;"> '블러드 임팩트' 미사용 버그</span> 수정
-          </li>
-          <li>26.04.02 [모바일] <span style="color: yellow;">블레이드</span><span style="color: #ff4444;"> 와플 콤보 설정</span> 추가
-          </li>
-          <li>26.04.01 <span style="color: yellow;">스트라이커 본 크러셔</span> <span style="color: #ff4444;">TP 버그</span> 수정
-          </li>
-          <li>26.03.30 <span style="color: yellow;">장비 오브젝트 데미지 </span><span style="color: #ff4444;">수치 개선</span> 적용
-          </li>
-          <li>26.03.27 <span style="color: yellow;">260326</span><span style="color: #ff4444;"> 캐릭터 밸런스 패치</span> 적용
-          </li>
-          <li>26.03.26 <span style="color: yellow;">쿨감룬/스증룬,</span><span style="color: #ff4444;"> 신규 오칭크아, 마부</span> 추가
-          </li>
-          <li>26.03.21 [PC] <span style="color: yellow;">블레이드</span><span style="color: #ff4444;"> 와플 콤보 설정</span> 추가
-          </li>
-          <li>26.03.09 [모바일] <span style="color: yellow;">최종 데미지 계산값</span><span style="color: #ff4444;"> 단순 비교
-              기능</span> 추가</li>
-          <li>26.03.08 <span style="color: yellow;">접두사 장비</span><span style="color: #ff4444;"> 배지 아이콘</span> 추가</li>
-          <li>26.03.06 <span style="color: yellow;">남스핏파이어</span> <span style="color: #ff4444;"> 라스트 슈팅</span> 추가</li>
-          <li>26.03.05 <span style="color: yellow;">빙결사</span> <span style="color: #ff4444;"> 헤일스톰 미적용 버그</span> 수정</li>
-          <li>26.03.02 수련장 <span style="color: yellow;">크리티컬, 투함포 옵션</span> <span style="color: #ff4444;"> 추가</span>
-          </li>
-          <li>26.02.28 [모바일] <span style="color: yellow;">개별, 세트 아이템</span> <span style="color: #ff4444;">상세 설명
-              추가</span></li>
-          <li>26.02.28 [모바일] 밸런스 <span style="color: yellow;">패치전 계산</span><span style="color: #ff4444;"> 기능 추가</span>
-          </li>
-          <li>26.02.27 <strong><u>비정상적인 카운터 데미지 버그 수정(공지참고)</u></strong></li>
-          <li>26.02.27 [PC] <span style="color: yellow;">스킬 초기화 버튼 추가</span> 및 <span style="color: #ff4444;">스킬 버튼 활성화
-              개선</span></li>
-          <li>26.02.26 [PC] <span style="color: yellow;">260226 밸런스 패치 적용</span> 및 <span style="color: #ff4444;">패치전 계산
-              기능
-              추가</span></li>
-          <li>26.02.25 합산스탯 <span style="color: yellow;">물리/마법 공격력 변수</span> <span style="color: #ff4444;">표기 오류</span>
-            수정 </li>
-          <li>26.02.23 [모바일] <span style="color: yellow;">윈드시어 스킬 선택</span> <span style="color: #ff4444;">버그 수정</span>
-          </li>
-          <li>26.02.22 [모바일] <span style="color: yellow;">무기 고유효과, 보장 연마</span> <span style="color: #ff4444;">버그
-              수정</span></li>
-          <li>26.02.21 [모바일] <span style="color: yellow;">남스핏파이어 중복 스킬</span> <span style="color: #ff4444;">버그 수정</span>
-          </li>
-          <li>26.02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-          <li>26.02.19 <span style="color: yellow;">재해</span> 몬스터 <span style="color: #ff4444;">모든 공격 백어택 미적용</span> 패치
-          </li>
-          <li>26.02.19 <span style="color: yellow;">몬스터</span> <span style="color: #ff4444;">방어력 재조정</span></li>
-          <li>26.02.12 <span class="notice-badge">'빙결사'</span> 캐릭 추가</li>
-          <li>26.02.10 쿠노이치 <span style="color: yellow;">'강타'</span> 무기 고유효과 <span style="color: #ff4444;">남은 쿨타임
-              감소</span> 옵션 적용</li>
-          <li>26.02.06 <span style="color: yellow;">오브젝트 데미지</span> <span style="color: #ff4444;">속성부여</span> 적용 조정</li>
-          <li>26.01.31 <span style="color: yellow;">장비세트, 고유효과</span> <span style="color: #ff4444;">일괄 입력</span> 편의성 패치
-            완료</li>
-          <li>26.01.30 <span style="color: yellow;">작열: 콰트로 카시테움 5세트</span> <span style="color: #ff4444;">쿨타임 감소치</span>
-            조정</li>
-          <li>26.01.29 <span class="notice-badge">'스위프트 마스터'</span> 캐릭 추가</li>
-          <li>26.01.23 일부 마법부여, 오라, 크리쳐 추가</li>
-          <li>26.01.21 <span class="notice-badge">'인챈트리스'</span> <span class="notice-badge">'여런처'</span> 캐릭 추가</li>
-          <li>26.01.20 <span class="notice-badge">'마도학자'</span> 캐릭 추가</li>
-          <li>26.01.19 <span class="notice-badge">'쿠노이치'</span> 캐릭 추가</li>
-          <li>26.01.18 <span class="notice-badge">'남메카닉'</span> 캐릭 추가</li>
-          <li>26.01.17 <span class="notice-badge">'윈드시어'</span> 캐릭 추가</li>
-          <li>26.01.17 <span style="color: yellow;">서로 다른 접두사 장비들만 착용</span>시 <span style="color: #ff4444;">기본 장비 세트효과
-              미적용 버그</span> 수정 </li>
-          <li>26.01.16 <span class="notice-badge">'남크루세이더'</span> 캐릭 추가</li>
-          <li>26.01.15 <span class="notice-badge">'여크루세이더'</span> 캐릭 추가</li>
-          <li>26.01.13 <span class="notice-badge">'와일드베인'</span> 캐릭 추가</li>
-          <li>26.01.11 <span class="notice-badge">'다크템플러'</span> 캐릭 추가</li>
-          <li>26.01.09 <span class="notice-badge">'여메카닉'</span> 캐릭 추가</li>
-          <li>26.01.05 <span class="notice-badge">'다크랜서'</span> 캐릭 추가</li>
-          <li>26.01.03 <span class="notice-badge">'그래플러'</span> 캐릭 추가</li>
-          <li>26.01.01 <span class="notice-badge">'로그'</span> 캐릭 추가</li>
-          <li>25.12.30 <span class="notice-badge">'남인파이터'</span> 캐릭 추가</li>
-          <li>25.12.28 일부 세트옵션의 <span style="color: yellow;">'방어력 감소'</span> 옵션 <span style="color: #ff4444;">미적용
-              오류</span> 수정</li>
-          <li>25.12.27 <span class="notice-badge">'무녀'</span> 캐릭 추가</li>
-          <li>25.12.26 여인파이터 <span style="color: yellow;">'하트 브레이커'</span> 스킬 <span style="color: #ff4444;">마스터 레벨
-              오류</span> 수정</li>
-          <li>25.12.25 <span class="notice-badge">'여스핏파이어'</span> 캐릭 추가</li>
-          <li>25.12.24 신규 크리쳐 <span style="color: yellow;">'드래곤테이머 소피아'</span> 외 2종 <span
-              style="color: #ff4444;">추가</span> </li>
-          <li>25.12.22 <span class="notice-badge">'배틀메이지'</span> 캐릭 추가</li>
-          <li>25.12.18 <span class="notice-badge">'스트리트파이터'</span> 캐릭 추가</li>
-          <li>25.12.17 <span style="color: yellow;">'10레벨 스킬 공격력 증가/감소'</span> 옵션이 <span style="color: #ff4444;">평타에도
-              적용되는 버그 수정</span> </li>
-          <li>25.12.16 <span class="notice-badge">'베가본드'</span> 캐릭 추가</li>
-          <li>25.12.15 <span style="color: yellow;">'콰트로 마누스 연산장치'</span> 세트 옵션 <span style="color: #ff4444;">버그
-              수정</span> </li>
-          <li>25.12.14 <span style="color: yellow;">'장비설명'</span> 부위별 <span style="color: #ff4444;">시인성 개선</span> </li>
-          <li>25.12.13 <span class="notice-badge">'여인파이터'</span> 캐릭 추가</li>
-          <li>25.12.12 <span style="color: yellow;">'거대누골'</span> 시즌5 기준으로 <span style="color: #ff4444;">몬스터 레벨, 방어력
-              조절</span> </li>
-          <!--<br>　　　　기존 80렙 거대누골은 <span style="color: yellow;">'(구)거대누골'</span> 로 선택 가능합니다>-->
-          <li>25.12.12 각 장비 <span style="color: yellow;">개별 마법부여 창</span> <span style="color: #ff4444;">크기 조절 및 스크롤 바
-              추가</span></li>
-          <li>25.12.11 <span class="notice-badge">'블레이드'</span> 캐릭 추가</li>
-          <li>25.12.09 <span class="notice-badge">'여레인저'</span> 캐릭 추가</li>
-          <li>25.12.07 <span class="notice-badge">'웨펀마스터'</span> 캐릭 추가</li>
-          <li>25.12.07 <span style="color: yellow;">남스핏</span>, 머스켓 착용시 <span style="color: #ff4444;">평타, 평타(탄버프)
-              미적용</span> 버그 수정</li>
-          <li>25.12.06 <span style="color: yellow;">남스핏</span>, <span style="color: #ff4444;">'얼음 불꽃 보우건'</span> 최고 속성
-            추가 데미지가 암속성 추가 데미지로 적용되던 현상 수정</li>
-          <li>25.12.05 <span class="notice-badge">'스트라이커'</span> 캐릭 추가</li>
-          <li>25.12.04 스킬트리 <span style="color: #ff4444;">MAX 버튼 편의성</span> 개선, TP 불가능 스킬, TP 컨트롤 삭제</li>
-          <li>25.12.03 <span class="notice-badge">'넨마스터'</span> 캐릭 추가</li>
-          <li>25.12.01 <span class="notice-badge">'미스트리스'</span> 캐릭 추가</li>
-          <li>25.11.30 <span style="color: yellow;">남스핏, 아수라,</span> <span style="color: #ff4444;">SP 총량 모자람 현상</span>
-            수정</li>
-          <li>25.11.30 <span style="color: yellow;">남레인저</span> 헤드샷, 웨스턴파이어 <span style="color: #ff4444;">쿨타임 개별
-              적용</span></li>
-          <li>25.11.30 익시드 고유효과 <span style="color: #ff4444;">복리 적용</span> 으로 계산 수정</li>
-          <li>25.11.29 <span style="color: yellow;">아수라</span> <span style="color: #ff4444;">'분쇄'</span> 옵션 오류 패치</li>
-          <li>25.11.29 <span style="color: yellow;">게임실험연구소 계산기</span> <span style="color: #ff4444;"> 오픈!</span></li>
-
-
-
-
-
-
-        </ul>
-      </div>
-    </div>
-  </div>
-
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
@@ -10504,24 +10365,6 @@ const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
     $uniqueEffectModal?.querySelectorAll('[data-close]').forEach(el => {
       el.addEventListener('click', () => showModal($uniqueEffectModal, false));
     });
-
-
-    /* 🔹 패치내역 전체보기 모달 */
-    const $patchLogModal = document.getElementById('patchLogModal');
-    const $btnPatchLog = document.getElementById('btnPatchLog');
-
-    if ($patchLogModal) {
-      // 닫기 (배경/버튼 모두 data-close 달아둠)
-      $patchLogModal.querySelectorAll('[data-close]').forEach(el => {
-        el.addEventListener('click', () => showModal($patchLogModal, false));
-      });
-    }
-
-    if ($btnPatchLog && $patchLogModal) {
-      $btnPatchLog.addEventListener('click', () => {
-        showModal($patchLogModal, true);
-      });
-    }
 
     /* 기존 ENCHANT 모달 코드 */
     $enchantModal?.querySelector('.backdrop[data-close]')?.addEventListener('click', () => showModal($enchantModal, false));
