@@ -239,7 +239,29 @@
 .patch-log-btn:active {
   transform: translateY(0) scale(0.98);
 }
+.erosion-prefix {
+  display: inline-block;
+  font-weight: 900;
 
+  /* 위는 분홍, 아래는 흰색 느낌 */
+  background: linear-gradient(
+    to bottom,
+  #ff5ea0 0%,
+  #ff94bd 38%,
+  #ffd7e7 62%,
+    #fff7fb 82%,
+    #ffffff 100%
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+
+  text-shadow:
+    0 0 3px rgba(255, 120, 173, 0.35),
+    0 0 6px rgba(255, 120, 173, 0.18);
+}
     /* 🔹 패치 모달 내용 영역 */
     .patch-log-body {
       padding: 10px 12px;
@@ -8686,6 +8708,24 @@
     }
 
 
+function escapeHtmlText(v) {
+  return String(v ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function renderErosionWeaponName(name) {
+  const raw = String(name ?? '');
+  const safe = escapeHtmlText(raw);
+
+  return safe.replace(
+    /^\[침식\]/,
+    '<span class="erosion-prefix">[침식]</span>'
+  );
+}
 
     /* ===== 상태/상수 ===== */
     const state = {
@@ -16595,9 +16635,12 @@ const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
     ${badge ? `<span class="badge-lv">${badge}</span>` : ``}
   </div>
   <div class="meta">
-    <div class="meta-top">${lvlLabel ? `<span class="lvl">${lvlLabel}</span>` : ``}<span class="name">${it.name}</span></div>
-    <div class="meta-sub">${it.type || ''}</div>
+  <div class="meta-top">
+    ${lvlLabel ? `<span class="lvl">${lvlLabel}</span>` : ``}
+    <span class="name">${renderErosionWeaponName(it.name)}</span>
   </div>
+  <div class="meta-sub">${it.type || ''}</div>
+</div>
   <div class="right"><span class="rarity-chip ${rarityClass}">${rarityLabel}</span></div>`;
 
         row.onclick = (e) => {
