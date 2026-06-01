@@ -6,11 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="naver-site-verification" content="680b130ec4f9b3289e87133cd10464a98eebf9fd" />
 
-<link rel="icon" type="image/png" href="img/gametestlab.png?v=20260530">
-<link rel="shortcut icon" type="image/png" href="img/gametestlab.png?v=20260530">
-<link rel="apple-touch-icon" href="img/gametestlab.png?v=20260530">
+  <link rel="icon" type="image/png" href="img/gametestlab.png?v=20260530">
+  <link rel="shortcut icon" type="image/png" href="img/gametestlab.png?v=20260530">
+  <link rel="apple-touch-icon" href="img/gametestlab.png?v=20260530">
 
-<title>던파모바일 계산기 | 데미지·세팅·스킬 계산 - 게임실험연구소</title>
+  <title>던파모바일 계산기 | 데미지·세팅·스킬 계산 - 게임실험연구소</title>
   <meta name="description" content="던전앤파이터 모바일(던파모바일) 데미지 계산기. 장비/세트/스킬/버프를 입력해 최종 데미지와 효율을 비교해보세요." />
   <style>
     /*기본 변수 색상*/
@@ -195,73 +195,113 @@
 
     /* 🔹 패치내역 버튼 작게 */
     .patch-log-btn {
-  height: 26px;
-  padding: 0 10px;
-  border-radius: 999px;
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 999px;
 
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
 
-  border: 1px solid rgba(207, 162, 79, 0.65);
-  background:
-    radial-gradient(circle at 30% 20%, rgba(255, 244, 190, 0.22), transparent 42%),
-    linear-gradient(135deg, rgba(250, 204, 107, 0.95), rgba(207, 162, 79, 0.88) 52%, rgba(143, 107, 43, 0.9));
+      border: 1px solid rgba(207, 162, 79, 0.65);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255, 244, 190, 0.22), transparent 42%),
+        linear-gradient(135deg, rgba(250, 204, 107, 0.95), rgba(207, 162, 79, 0.88) 52%, rgba(143, 107, 43, 0.9));
 
-  color: #1b1207;
+      color: #1b1207;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      text-decoration: none;
+
+      cursor: pointer;
+      box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+
+      transition:
+        transform 0.14s ease,
+        filter 0.14s ease,
+        box-shadow 0.14s ease;
+    }
+
+    .patch-log-btn:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+      text-decoration: none;
+      box-shadow:
+        0 6px 14px rgba(0, 0, 0, 0.34),
+        0 0 0 2px rgba(250, 204, 107, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.42);
+    }
+
+    .patch-log-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .erosion-prefix {
+      display: inline-block;
+      font-weight: 900;
+
+      /* 위는 분홍, 아래는 흰색 느낌 */
+      background: linear-gradient(to bottom,
+          #ff5ea0 0%,
+          #ff94bd 38%,
+          #ffd7e7 62%,
+          #fff7fb 82%,
+          #ffffff 100%);
+
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+
+      text-shadow:
+        0 0 3px rgba(255, 120, 173, 0.35),
+        0 0 6px rgba(255, 120, 173, 0.18);
+    }
+
+    /* ✅ 우측 장비 설명란 - 침식 전용 소제목 */
+.slot-tag.slot-erosion {
+  color: #ffffff;
+  font-weight: 900;
+  background: linear-gradient(180deg, #b91c5c 0%, #7f123f 100%);
+  border: 1px solid rgba(255, 150, 190, 0.75);
+  box-shadow:
+    0 0 0 1px rgba(255, 120, 180, 0.18),
+    0 0 8px rgba(255, 90, 160, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* ✅ 침식 설명 본문: 기존 장비 설명과 최대한 동일한 밀도 */
+.stat-preview-line.erosion-preview-line {
+  margin-bottom: 10px;
+}
+
+.stat-preview-line.erosion-preview-line .slot-tag {
+  margin-bottom: 4px;
+}
+
+.erosion-desc-text {
+  color: #e5e7eb;
   font-size: 11px;
+  line-height: 1.7;
+  white-space: normal;
+}
+
+/* [침식의 힘]도 본문 첫 줄처럼 붙여서 표시 */
+.erosion-desc-title {
+  display: inline;
+  color: #ff9fc2;
   font-weight: 900;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  text-decoration: none;
-
-  cursor: pointer;
-  box-shadow:
-    0 4px 10px rgba(0, 0, 0, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
-
-  transition:
-    transform 0.14s ease,
-    filter 0.14s ease,
-    box-shadow 0.14s ease;
 }
 
-.patch-log-btn:hover {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
-  text-decoration: none;
-  box-shadow:
-    0 6px 14px rgba(0, 0, 0, 0.34),
-    0 0 0 2px rgba(250, 204, 107, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+.erosion-desc-text .erosion-point {
+  color: #ffd7e7;
+  font-weight: 700;
 }
 
-.patch-log-btn:active {
-  transform: translateY(0) scale(0.98);
-}
-.erosion-prefix {
-  display: inline-block;
-  font-weight: 900;
-
-  /* 위는 분홍, 아래는 흰색 느낌 */
-  background: linear-gradient(
-    to bottom,
-  #ff5ea0 0%,
-  #ff94bd 38%,
-  #ffd7e7 62%,
-    #fff7fb 82%,
-    #ffffff 100%
-  );
-
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: transparent;
-
-  text-shadow:
-    0 0 3px rgba(255, 120, 173, 0.35),
-    0 0 6px rgba(255, 120, 173, 0.18);
-}
     /* 🔹 패치 모달 내용 영역 */
     .patch-log-body {
       padding: 10px 12px;
@@ -297,131 +337,131 @@
     }
 
 
-/* 반응형 */
-@media (max-width: 980px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
+    /* 반응형 */
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
 
-  .hero {
-    min-height: 0;
-    height: auto;
-    aspect-ratio: 16 / 9;
-  }
+      .hero {
+        min-height: 0;
+        height: auto;
+        aspect-ratio: 16 / 9;
+      }
 
-  .hero-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+      .hero-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
 
-  .login-card {
-    left: 12px;
-    right: 12px;
-    width: auto;
-  }
-  
-  .top-title {
-    font-size: 18px;
-    margin: 4px 0 3px;
-  }
+      .login-card {
+        left: 12px;
+        right: 12px;
+        width: auto;
+      }
 
-  header {
-    padding: 9px 12px !important;
-  }
+      .top-title {
+        font-size: 18px;
+        margin: 4px 0 3px;
+      }
 
-  header .title h1 {
-    font-size: 11px !important;
-  }
+      header {
+        padding: 9px 12px !important;
+      }
 
-  header .title .logo-box {
-    width: 20px !important;
-    height: 20px !important;
-  }
+      header .title h1 {
+        font-size: 11px !important;
+      }
 
-    .header-ads .line .tag {
-    font-size: 8px;
-    padding: 1px 4px;
-    gap: 2px;
-  }
+      header .title .logo-box {
+        width: 20px !important;
+        height: 20px !important;
+      }
 
-  .header-ads .badge-emoji {
-    font-size: 8px;
-  }
-  
-    .notice-list .notice-badge {
-    font-size: 0.6rem !important;
-    padding: 1px 5px !important;
-    gap: 3px !important;
-  }
+      .header-ads .line .tag {
+        font-size: 8px;
+        padding: 1px 4px;
+        gap: 2px;
+      }
 
-  .notice-list .notice-badge::before {
-    font-size: 0.55rem !important;
-  }
+      .header-ads .badge-emoji {
+        font-size: 8px;
+      }
 
-    .header-ads .ad-text {
-    font-size: 10px;
-  }
+      .notice-list .notice-badge {
+        font-size: 0.6rem !important;
+        padding: 1px 5px !important;
+        gap: 3px !important;
+      }
 
-  .header-ads .line .hdrmsg,
-  .hdrmsg {
-    font-size: 10px;
-  }
+      .notice-list .notice-badge::before {
+        font-size: 0.55rem !important;
+      }
 
-  .header-ads .line .tag {
-    font-size: 9px;
-  }
+      .header-ads .ad-text {
+        font-size: 10px;
+      }
 
-  .sub-alert {
-    font-size: 11px;
-    line-height: 1.35;
-    margin-bottom: 6px;
-  }
+      .header-ads .line .hdrmsg,
+      .hdrmsg {
+        font-size: 10px;
+      }
 
-  .main2 {
-    font-size: 8px;
-    line-height: 1.35;
-    margin-bottom: 6px;
-  }
+      .header-ads .line .tag {
+        font-size: 9px;
+      }
 
-  .notice {
-    font-size: 12px;
-  }
+      .sub-alert {
+        font-size: 11px;
+        line-height: 1.35;
+        margin-bottom: 6px;
+      }
 
-  .notice h3 {
-    font-size: 15px;
-  }
+      .main2 {
+        font-size: 8px;
+        line-height: 1.35;
+        margin-bottom: 6px;
+      }
 
-  .notice .box {
-    font-size: 12px;
-    padding: 8px 10px;
-  }
+      .notice {
+        font-size: 12px;
+      }
 
-  .notice ul {
-    font-size: 12px;
-    line-height: 1.45;
-  }
+      .notice h3 {
+        font-size: 15px;
+      }
 
-  .notice-list .notice-badge {
-    font-size: 0.72rem !important;
-    padding: 1px 6px !important;
-  }
+      .notice .box {
+        font-size: 12px;
+        padding: 8px 10px;
+      }
 
-  .notice-list .notice-badge::before {
-    font-size: 0.62rem !important;
-  }
+      .notice ul {
+        font-size: 12px;
+        line-height: 1.45;
+      }
 
-  .notice-list .job-highlight {
-    font-size: 11px !important;
-    padding: 1px 5px !important;
-  }
+      .notice-list .notice-badge {
+        font-size: 0.72rem !important;
+        padding: 1px 6px !important;
+      }
 
-  .patch-log-btn {
-    height: 24px;
-    padding: 0 8px;
-    font-size: 10px;
-  }
-}
+      .notice-list .notice-badge::before {
+        font-size: 0.62rem !important;
+      }
+
+      .notice-list .job-highlight {
+        font-size: 11px !important;
+        padding: 1px 5px !important;
+      }
+
+      .patch-log-btn {
+        height: 24px;
+        padding: 0 8px;
+        font-size: 10px;
+      }
+    }
 
     /*클래스선택자(색상세트)*/
     .shell {
@@ -1716,67 +1756,67 @@
     }
 
     /* ✅ 캐릭터 카드 우측하단 시너지 효과 버튼 */
-#characterCard .synergy-card-btn {
-  position: absolute;
-  right: 14px;
-  bottom: 14px;
-  z-index: 8;
+    #characterCard .synergy-card-btn {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      z-index: 8;
 
-  min-width: 128px;
-  height: 42px;
-  padding: 0 18px;
+      min-width: 128px;
+      height: 42px;
+      padding: 0 18px;
 
-  display: none;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
 
-  border: 1px solid rgba(250, 204, 107, 0.75);
-  border-radius: 999px;
+      border: 1px solid rgba(250, 204, 107, 0.75);
+      border-radius: 999px;
 
-  background:
-    radial-gradient(circle at 30% 20%, rgba(255, 244, 190, 0.30), transparent 42%),
-    linear-gradient(135deg, rgba(250, 204, 107, 0.96), rgba(207, 162, 79, 0.92) 48%, rgba(143, 107, 43, 0.94));
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255, 244, 190, 0.30), transparent 42%),
+        linear-gradient(135deg, rgba(250, 204, 107, 0.96), rgba(207, 162, 79, 0.92) 48%, rgba(143, 107, 43, 0.94));
 
-  color: #1b1207;
-  font-weight: 1000;
-  letter-spacing: -0.03em;
-  cursor: pointer;
+      color: #1b1207;
+      font-weight: 1000;
+      letter-spacing: -0.03em;
+      cursor: pointer;
 
-  box-shadow:
-    0 8px 18px rgba(0, 0, 0, 0.36),
-    0 0 0 3px rgba(250, 204, 107, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.36);
+      box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.36),
+        0 0 0 3px rgba(250, 204, 107, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.36);
 
-  transition:
-    transform 0.16s ease,
-    filter 0.16s ease,
-    box-shadow 0.16s ease;
-}
+      transition:
+        transform 0.16s ease,
+        filter 0.16s ease,
+        box-shadow 0.16s ease;
+    }
 
-#characterCard .synergy-card-btn:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.08);
-  box-shadow:
-    0 10px 22px rgba(0, 0, 0, 0.42),
-    0 0 0 4px rgba(250, 204, 107, 0.22),
-    0 0 18px rgba(250, 204, 107, 0.30),
-    inset 0 1px 0 rgba(255, 255, 255, 0.42);
-}
+    #characterCard .synergy-card-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+      box-shadow:
+        0 10px 22px rgba(0, 0, 0, 0.42),
+        0 0 0 4px rgba(250, 204, 107, 0.22),
+        0 0 18px rgba(250, 204, 107, 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.42);
+    }
 
-#characterCard .synergy-card-btn:active {
-  transform: translateY(0) scale(0.97);
-}
+    #characterCard .synergy-card-btn:active {
+      transform: translateY(0) scale(0.97);
+    }
 
-#characterCard .synergy-card-btn-main {
-  font-size: 13px;
-  line-height: 1;
-  white-space: nowrap;
-}
+    #characterCard .synergy-card-btn-main {
+      font-size: 13px;
+      line-height: 1;
+      white-space: nowrap;
+    }
 
-#characterCard .synergy-card-btn-sub {
-  display: none;
-}
+    #characterCard .synergy-card-btn-sub {
+      display: none;
+    }
 
     .character-ghost {
       width: 80%;
@@ -6455,11 +6495,11 @@
               <h3>* 계산기는 계속해서 업데이트될 예정입니다!</h3>
               <div class="box">
                 <div class="notice-top-row">
-  <div class="badge-danger">25.11.29 시즌5 신규 계산기 배포</div>
-  <a href="./patch/" class="btn patch-log-btn">
-    패치내역 전체보기
-  </a>
-</div>
+                  <div class="badge-danger">25.11.29 시즌5 신규 계산기 배포</div>
+                  <a href="./patch/" class="btn patch-log-btn">
+                    패치내역 전체보기
+                  </a>
+                </div>
                 <ul class="notice-list">
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
@@ -6671,8 +6711,8 @@
             <div id="characterGhost" class="character-ghost">클릭하여 캐릭터 선택</div>
             <!-- ✅ 전체 공개: 시너지 효과 설정 -->
             <button id="btnSynergyEffect" class="synergy-card-btn" type="button" style="display:none;">
-  <span class="synergy-card-btn-main">시너지 효과 설정</span>
-</button>
+              <span class="synergy-card-btn-main">시너지 효과 설정</span>
+            </button>
           </div>
         </div>
         <div class="mini-bar">
@@ -8708,24 +8748,24 @@
     }
 
 
-function escapeHtmlText(v) {
-  return String(v ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+    function escapeHtmlText(v) {
+      return String(v ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
-function renderErosionWeaponName(name) {
-  const raw = String(name ?? '');
-  const safe = escapeHtmlText(raw);
+    function renderErosionWeaponName(name) {
+      const raw = String(name ?? '');
+      const safe = escapeHtmlText(raw);
 
-  return safe.replace(
-    /^\[침식\]/,
-    '<span class="erosion-prefix">[침식]</span>'
-  );
-}
+      return safe.replace(
+        /^\[침식\]/,
+        '<span class="erosion-prefix">[침식]</span>'
+      );
+    }
 
     /* ===== 상태/상수 ===== */
     const state = {
@@ -8785,34 +8825,34 @@ function renderErosionWeaponName(name) {
       return !!lp.researchUser;
     }
 
-function hasSelectedMainCharacter() {
-  const st = (typeof state !== 'undefined' && state) ? state : {};
-  const cs =
-    (typeof CurrentSumStats !== 'undefined' && CurrentSumStats)
-      ? CurrentSumStats
-      : (window.CurrentSumStats || null);
+    function hasSelectedMainCharacter() {
+      const st = (typeof state !== 'undefined' && state) ? state : {};
+      const cs =
+        (typeof CurrentSumStats !== 'undefined' && CurrentSumStats)
+          ? CurrentSumStats
+          : (window.CurrentSumStats || null);
 
-  const charName =
-    st?.currentCharacter?.name ||
-    st?.char?.name ||
-    st?.character?.name ||
-    st?.selectedChar?.name ||
-    st?.CurrentSumStats?.CharName ||
-    cs?.CharName ||
-    '';
+      const charName =
+        st?.currentCharacter?.name ||
+        st?.char?.name ||
+        st?.character?.name ||
+        st?.selectedChar?.name ||
+        st?.CurrentSumStats?.CharName ||
+        cs?.CharName ||
+        '';
 
-  return !!String(charName || '').trim();
-}
+      return !!String(charName || '').trim();
+    }
 
-function updateSynergyEffectButtonVisibility() {
-  const btnSynergy = document.getElementById('btnSynergyEffect');
-  if (!btnSynergy) return;
+    function updateSynergyEffectButtonVisibility() {
+      const btnSynergy = document.getElementById('btnSynergyEffect');
+      if (!btnSynergy) return;
 
-  const show = hasSelectedMainCharacter();
+      const show = hasSelectedMainCharacter();
 
-  btnSynergy.style.display = show ? 'inline-flex' : 'none';
-  btnSynergy.disabled = !show;
-}
+      btnSynergy.style.display = show ? 'inline-flex' : 'none';
+      btnSynergy.disabled = !show;
+    }
 
     function updateSpecialUserButton() {
       const isSpecialUser = isSpecialUserNow_();
@@ -8834,10 +8874,10 @@ function updateSynergyEffectButtonVisibility() {
       }
 
       // ✅ [전체 공개] 시너지 효과 설정 버튼
-const btnSynergy = document.getElementById('btnSynergyEffect');
+      const btnSynergy = document.getElementById('btnSynergyEffect');
 
-// ✅ [특정 유저 전용 유지] 아래 버튼들은 special_user / research_user 공통 허용
-const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
+      // ✅ [특정 유저 전용 유지] 아래 버튼들은 special_user / research_user 공통 허용
+      const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
       const rowDmgOpt = document.getElementById('specialDamageOptRow');
       const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
       const btnMacroSetGeneral = document.getElementById('btnMacroSetGeneral');
@@ -17263,6 +17303,24 @@ const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
         return otherLines; // aura/title/creature/artifact 등
       };
 
+      // ✅ 침식 무기 전용 설명
+// - 무기 설명보다 위에 나오도록 weaponLines의 맨 앞에 먼저 넣는다.
+try {
+  const weaponInfo = selections.weapon || null;
+  const weaponName = String(weaponInfo?.name || '').normalize('NFC').trim();
+
+  if (weaponName.startsWith('[침식]')) {
+    weaponLines.push(
+  `<div class="stat-preview-line erosion-preview-line">
+     <div class="slot-tag slot-erosion">침식</div>
+     <div class="desc-text erosion-desc-text"><span class="erosion-desc-title">[침식의 힘]</span><br>던전 입장시 모든 타입 피해 <span class="erosion-point">10%</span> 증가<br>75레벨 스킬 시전시 15초 동안 <span class="erosion-point">'침식 부여'</span> 상태가 됨 (쿨타임 120초)<br>- 해당 상태 동안 적에게 가한 피해의 <span class="erosion-point">20%</span> 저장<br>- 종료시 <span class="erosion-point">'침식의 일격'</span> 시전하여 <span class="erosion-point">100,000%</span> + 저장된 수치만큼의 피해를 부여</div>
+   </div>`
+);
+  }
+} catch (e) {
+  console.warn('[updateEquipDescPreview] erosion weapon desc failed:', e);
+}
+
       for (const [slotKey, info] of Object.entries(selections)) {
         if (!info) continue;
 
@@ -21681,49 +21739,49 @@ const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
       }
 
       // 4) 캐릭터 라벨/이미지 반영
-try {
-  const char = s.currentCharacter || {};
-  const charName = char.name || '';
-  const jobGroup = char.jobGroupLabel || '';
+      try {
+        const char = s.currentCharacter || {};
+        const charName = char.name || '';
+        const jobGroup = char.jobGroupLabel || '';
 
-  const $charLabel = document.getElementById('charLabel');
-  if ($charLabel) {
-    if (charName) {
-      $charLabel.textContent = jobGroup
-        ? `${jobGroup} / ${charName}`
-        : charName;
-    } else {
-      $charLabel.textContent = '캐릭터 미선택';
-    }
-  }
+        const $charLabel = document.getElementById('charLabel');
+        if ($charLabel) {
+          if (charName) {
+            $charLabel.textContent = jobGroup
+              ? `${jobGroup} / ${charName}`
+              : charName;
+          } else {
+            $charLabel.textContent = '캐릭터 미선택';
+          }
+        }
 
-  const characterImg = document.getElementById('characterImg');
-  const characterGhost = document.getElementById('characterGhost');
-  if (characterImg) {
-    const srcImg =
-      char.full ||
-      char.thumb ||
-      characterImg.src ||
-      (typeof PLACEHOLDER_IMG !== 'undefined' ? PLACEHOLDER_IMG : '');
-    if (srcImg) {
-      characterImg.src = srcImg;
-      characterImg.style.display = charName ? 'block' : 'none';
-    }
-  }
-  if (characterGhost) {
-    characterGhost.style.display = charName ? 'none' : 'block';
-  }
+        const characterImg = document.getElementById('characterImg');
+        const characterGhost = document.getElementById('characterGhost');
+        if (characterImg) {
+          const srcImg =
+            char.full ||
+            char.thumb ||
+            characterImg.src ||
+            (typeof PLACEHOLDER_IMG !== 'undefined' ? PLACEHOLDER_IMG : '');
+          if (srcImg) {
+            characterImg.src = srcImg;
+            characterImg.style.display = charName ? 'block' : 'none';
+          }
+        }
+        if (characterGhost) {
+          characterGhost.style.display = charName ? 'none' : 'block';
+        }
 
-  // ✅ 프리셋 불러오기 후 시너지 효과 설정 버튼 표시 갱신
-  if (typeof updateSynergyEffectButtonVisibility === 'function') {
-    updateSynergyEffectButtonVisibility();
-  }
-} catch (e) {
-  console.warn('[applyFrontPresetState] 캐릭터 UI 갱신 실패:', e);
-}
+        // ✅ 프리셋 불러오기 후 시너지 효과 설정 버튼 표시 갱신
+        if (typeof updateSynergyEffectButtonVisibility === 'function') {
+          updateSynergyEffectButtonVisibility();
+        }
+      } catch (e) {
+        console.warn('[applyFrontPresetState] 캐릭터 UI 갱신 실패:', e);
+      }
 
-// 5) 장비 슬롯 타일 UI 반영
-try {
+      // 5) 장비 슬롯 타일 UI 반영
+      try {
         const equipsSnap = (s.equips && typeof s.equips === 'object') ? s.equips : {};
         let selections = (s.selections && typeof s.selections === 'object') ? s.selections : {};
 
@@ -22131,28 +22189,28 @@ try {
 
       // 상태에 간단히 기록 (ownerKey 계산 등에 사용)
       // 상태에 간단히 기록 (ownerKey 계산 등에 사용)
-if (!window.state || typeof window.state !== 'object') window.state = {};
-const s = window.state;
-s.currentCharacter = s.currentCharacter || {};
-s.currentCharacter.name = charName || '';
-s.currentCharacter.jobGroupLabel = jobGroup || '';
+      if (!window.state || typeof window.state !== 'object') window.state = {};
+      const s = window.state;
+      s.currentCharacter = s.currentCharacter || {};
+      s.currentCharacter.name = charName || '';
+      s.currentCharacter.jobGroupLabel = jobGroup || '';
 
-// ✅ 프리셋 스냅샷 불러오기 후 시너지 효과 설정 버튼 표시 갱신
-if (typeof updateSynergyEffectButtonVisibility === 'function') {
-  updateSynergyEffectButtonVisibility();
-}
+      // ✅ 프리셋 스냅샷 불러오기 후 시너지 효과 설정 버튼 표시 갱신
+      if (typeof updateSynergyEffectButtonVisibility === 'function') {
+        updateSynergyEffectButtonVisibility();
+      }
 
-// 라벨 박스 텍스트 갱신
-const $charLabel = document.getElementById('charLabel');
-if ($charLabel) {
-  if (charName) {
-    $charLabel.textContent = jobGroup
-      ? `${jobGroup} / ${charName}`
-      : charName;
-  } else {
-    $charLabel.textContent = '캐릭터 미선택';
-  }
-}
+      // 라벨 박스 텍스트 갱신
+      const $charLabel = document.getElementById('charLabel');
+      if ($charLabel) {
+        if (charName) {
+          $charLabel.textContent = jobGroup
+            ? `${jobGroup} / ${charName}`
+            : charName;
+        } else {
+          $charLabel.textContent = '캐릭터 미선택';
+        }
+      }
 
       // ───────── 2) 캐릭터 이미지 교체 (DBChars 이용) ─────────
       try {
