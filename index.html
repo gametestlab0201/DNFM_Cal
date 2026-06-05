@@ -2746,6 +2746,60 @@
       gap: 14px;
     }
 
+/* ✅ 시너지 세트 선택 모달: 방어구/악세/특수 세트 카드를 3열로 표시 */
+#synergyPickerList .items.synergy-set-card-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+
+/* ✅ 시너지 세트 선택 모달 구분선 */
+#synergyPickerList .synergy-level-divider {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 2px;
+  color: #facc6b;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+#synergyPickerList .synergy-level-divider::before,
+#synergyPickerList .synergy-level-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(250, 204, 107, 0.65),
+    transparent
+  );
+}
+
+#synergyPickerList .synergy-level-divider span {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(250, 204, 107, 0.45);
+  background: rgba(250, 204, 107, 0.08);
+  white-space: nowrap;
+}
+
+/* 중간 화면에서는 2열 */
+@media (max-width: 1100px) {
+  #synergyPickerList .items.synergy-set-card-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* 좁은 화면에서는 1열 */
+@media (max-width: 760px) {
+  #synergyPickerList .items.synergy-set-card-list {
+    grid-template-columns: 1fr;
+  }
+}
+
     .item-list {
       display: grid;
       grid-template-columns: repeat(2, minmax(280px, 1fr));
@@ -6504,12 +6558,12 @@
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-                  <li>05.23 <span class="notice-badge">'남스트리트파이터'</span> 캐릭 추가</li>
                   <li>05.24 <span style="color: yellow;">[전캐릭]</span> 2각 패시브 적용 완료</li>
                   <li>05.27 <span style="color: yellowgreen;">[PC]</span> 시너지 효과 적용 TEST 버전 추가</li>
                   <li>05.28 프리미엄 세트효과 추가</li>
                   <li>05.29 공식 패치 260528 버전 적용</li>
                   <li>06.01 시로코 침식 무기 전 캐릭 패치 완료</li>
+                  <li>06.05 <span style="color: yellowgreen;">[PC]</span> 시너지 효과 65제 장비 추가</li>
 
                 </ul>
               </div>
@@ -7442,7 +7496,7 @@
         </div>
         <div class="synergy-notice-wrap"></div>
         <div class="synergy-notice-text">
-          * 70제 에픽 아이템 일부, 마을암속강, 마을지능 은 현재 미구현이며 빠른 시일내에 구현하도록 하겠습니다.
+          * 마을암속강, 마을지능 은 현재 미구현이며 빠른 시일내에 구현하도록 하겠습니다.
         </div>
 
         <div class="synergy-notice-text">
@@ -13527,7 +13581,6 @@
         }
       }
 
-
       if (!armorSetByType.size) return [];
 
       // 3) 각 부위 시트에서, 해당 세트 type 과 같은 '종류' 를 가진 장비 찾기
@@ -13641,6 +13694,36 @@
       return cards;
     }
 
+function _synergyOverrideNameBySlot(setRow, slotKey) {
+  const S = (v) => String(v ?? '').trim();
+
+  switch (slotKey) {
+    case 'headshoulder':
+    case 'bracelet':
+    case 'sub':
+      return S(setRow?.slot1Name || setRow?.['머리어깨/팔찌/보조장비']);
+
+    case 'top':
+    case 'necklace':
+    case 'magestone':
+      return S(setRow?.slot2Name || setRow?.['상의/목걸이/마법석']);
+
+    case 'bottom':
+    case 'ring':
+    case 'earring':
+      return S(setRow?.slot3Name || setRow?.['하의/반지/귀걸이']);
+
+    case 'belt':
+      return S(setRow?.slot4Name || setRow?.['허리']);
+
+    case 'shoes':
+      return S(setRow?.slot5Name || setRow?.['신발']);
+
+    default:
+      return '';
+  }
+}
+
     function buildSynergyArmorSetCardsFromSheets() {
       const setRows = Array.isArray(CORE?.lists?.['synergyset:list'])
         ? CORE.lists['synergyset:list']
@@ -13693,23 +13776,52 @@
         return cat === '방어구';
       });
 
-      // 메인과 동일하게 type별 대표행 1개만 선택
-      const pickedByType = new Map();
+      // 기본 세트는 기존처럼 type별 대표행 1개만 선택한다.
+// 단, 새 부위별 이름 컬럼(slot1Name~slot5Name)이 있는 행은
+// 같은 type이어도 혼합 이미지용 별도 세트로 보여야 하므로 버리지 않는다.
+const pickedByType = new Map();
+const overrideRows = [];
 
-      armorRows.forEach((row) => {
-        const type = norm(row?.type || row?.['종류']);
-        if (!type) return;
+function hasSynergySlotOverride(row) {
+  return !!(
+    String(row?.slot1Name || row?.['머리어깨/팔찌/보조장비'] || '').trim() ||
+    String(row?.slot2Name || row?.['상의/목걸이/마법석'] || '').trim() ||
+    String(row?.slot3Name || row?.['하의/반지/귀걸이'] || '').trim() ||
+    String(row?.slot4Name || row?.['허리'] || '').trim() ||
+    String(row?.slot5Name || row?.['신발'] || '').trim()
+  );
+}
 
-        const prev = pickedByType.get(type);
-        const rowNum = Number(row?.num || row?.['세트수'] || 0);
-        const prevNum = Number(prev?.num || prev?.['세트수'] || 0);
+armorRows.forEach((row) => {
+  const type = norm(row?.type || row?.['종류']);
+  if (!type) return;
 
-        if (!prev || rowNum > prevNum) {
-          pickedByType.set(type, row);
-        }
-      });
+  if (hasSynergySlotOverride(row)) {
+    overrideRows.push(row);
+    return;
+  }
 
-      const sets = Array.from(pickedByType.values()).map((setRow) => {
+  const prev = pickedByType.get(type);
+  const rowNum = Number(row?.num || row?.['세트수'] || 0);
+  const prevNum = Number(prev?.num || prev?.['세트수'] || 0);
+
+  if (!prev || rowNum > prevNum) {
+    pickedByType.set(type, row);
+  }
+});
+
+const displayRows = armorRows.filter((row) => {
+  const type = norm(row?.type || row?.['종류']);
+  if (!type) return false;
+
+  // 새 컬럼이 있는 혼합 세트 행은 무조건 표시
+  if (hasSynergySlotOverride(row)) return true;
+
+  // 일반 세트 행은 type별 대표행만 표시
+  return pickedByType.get(type) === row;
+});
+
+const sets = displayRows.map((setRow) => {
         const setType = norm(setRow?.type || setRow?.['종류']);
 
         console.log('[SYNERGY_SET_TYPE]', {
@@ -13729,7 +13841,14 @@
             candidateTypes: rows.slice(0, 30).map(r => String(r?.type || r?.['종류'] || '')),
           });
 
-          const row = rows.find(r => norm(r?.type || r?.['종류']) === setType) || null;
+          const overrideName = _synergyOverrideNameBySlot(setRow, slotKey);
+
+const row =
+  (overrideName
+    ? rows.find(r => S(r?.name || r?.['이름']) === overrideName)
+    : null)
+  || rows.find(r => norm(r?.type || r?.['종류']) === setType)
+  || null;
 
           console.log('[SYNERGY_SLOT_MATCH]', {
             slotKey,
@@ -13760,13 +13879,7 @@
       });
 
       // 메인과 같은 정렬 느낌 유지
-      sets.sort((a, b) => {
-        const an = Number(a?.num || 0);
-        const bn = Number(b?.num || 0);
-        if (bn !== an) return bn - an;
-        return String(a?.name || '').localeCompare(String(b?.name || ''), 'ko');
-      });
-
+       // 시너지세트 시트에 입력된 순서를 그대로 유지
       return sets;
     }
 
@@ -13814,8 +13927,14 @@
 
       return defs.map(({ slotKey, label }) => {
         const rows = _getListArray(slotKey).map(_mapEquipRow);
-        const row = rows.find(r => norm(r?.type) === setType) || null;
+        const overrideName = _synergyOverrideNameBySlot(setRow, slotKey);
 
+const row =
+  (overrideName
+    ? rows.find(r => S(r?.name || r?.['이름']) === overrideName)
+    : null)
+  || rows.find(r => norm(r?.type || r?.['종류']) === setType)
+  || null;
         return {
           slot: slotKey,
           slotLabel: label,
@@ -13871,7 +13990,14 @@
 
       return defs.map(({ slotKey, label }) => {
         const rows = _getListArray(slotKey).map(_mapEquipRow);
-        const row = rows.find(r => norm(r?.type) === setType) || null;
+        const overrideName = _synergyOverrideNameBySlot(setRow, slotKey);
+
+const row =
+  (overrideName
+    ? rows.find(r => S(r?.name || r?.['이름']) === overrideName)
+    : null)
+  || rows.find(r => norm(r?.type || r?.['종류']) === setType)
+  || null;
 
         return {
           slot: slotKey,
@@ -25478,13 +25604,13 @@ try {
       }
 
       // =========================
-      // 세트 모드: synergyset:list만 사용
-      // =========================
-      wrap.innerHTML = '';
+// 세트 모드: synergyset:list만 사용
+// =========================
+wrap.innerHTML = '';
 
-      const listBox = document.createElement('div');
-      listBox.className = 'items';
-      wrap.appendChild(listBox);
+const listBox = document.createElement('div');
+listBox.className = 'items synergy-set-card-list';
+wrap.appendChild(listBox);
 
       function getSynergyBaseName(name) {
         let s = String(name || '').trim();
@@ -25600,13 +25726,146 @@ try {
         return;
       }
 
-      const hardcodedGroups = getSynergyHardcodedGroups(DBSynergy.pickerMode);
+            const hardcodedGroups = getSynergyHardcodedGroups(DBSynergy.pickerMode);
       const cardByName = new Map(
         setCards.map((set) => [String(set?.name || '').trim(), set])
       );
 
       let flatIndex = 0;
       const renderedNames = new Set();
+
+      function renderSynergySetCard(set) {
+        const setName = String(set?.name || '').trim();
+        if (setName) renderedNames.add(setName);
+
+        const card = document.createElement('div');
+        card.className = 'armor-set-card';
+        card.dataset.setIndex = String(flatIndex++);
+        card.dataset.mode =
+          (DBSynergy.pickerMode === 'armor' || DBSynergy.pickerMode === 'armor2') ? 'armor' :
+            (DBSynergy.pickerMode === 'acc' || DBSynergy.pickerMode === 'acc2') ? 'acc' :
+              'spec';
+
+        const header = document.createElement('div');
+        header.className = 'armor-set-header';
+
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'armor-set-header-title';
+        titleSpan.textContent = String(set?.name || '-');
+        header.appendChild(titleSpan);
+
+        card.appendChild(header);
+
+        const itemsRow = document.createElement('div');
+        itemsRow.className = 'armor-set-items';
+
+        const pieces = Array.isArray(set?.pieces) ? set.pieces : [];
+
+        pieces.forEach((piece) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'armor-set-item';
+          btn.title = piece?.slotLabel || piece?.name || '';
+
+          const box = document.createElement('div');
+          box.className = 'iconbox';
+
+          const img = document.createElement('img');
+          img.className = 'icon';
+          img.src = piece?.img || PLACEHOLDER_IMG;
+          img.alt = piece?.slotLabel || piece?.name || '';
+          img.onerror = () => {
+            img.src = PLACEHOLDER_IMG;
+          };
+
+          const setBadgeSrc = getSetBadgeSrc(piece?.item || piece, piece?.slot || '');
+          if (setBadgeSrc) {
+            const setBadgeImg = document.createElement('img');
+            setBadgeImg.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
+            setBadgeImg.src = setBadgeSrc;
+            setBadgeImg.alt = '';
+            box.appendChild(setBadgeImg);
+          }
+
+          box.appendChild(img);
+          btn.appendChild(box);
+          itemsRow.appendChild(btn);
+        });
+
+        card.appendChild(itemsRow);
+
+        card.addEventListener('click', () => {
+          const picked = {
+            name: String(set?.name || ''),
+            img: String(set?.pieces?.[0]?.img || ''),
+            jobGroup: '',
+            category:
+              (DBSynergy.pickerMode === 'armor' || DBSynergy.pickerMode === 'armor2') ? '방어구' :
+                (DBSynergy.pickerMode === 'acc' || DBSynergy.pickerMode === 'acc2') ? '악세' :
+                  '특수',
+            type: String(set?.type || ''),
+            pieces: Array.isArray(set?.pieces)
+              ? set.pieces.map(piece => ({
+                slot: piece?.slot || '',
+                slotLabel: piece?.slotLabel || '',
+                name: piece?.name || '',
+                img: piece?.img || '',
+                item: piece?.item || null
+              }))
+              : []
+          };
+
+          if (DBSynergy.pickerMode === 'armor') state.synergy.armorSet = picked;
+          if (DBSynergy.pickerMode === 'acc') state.synergy.accSet = picked;
+          if (DBSynergy.pickerMode === 'spec') state.synergy.specSet = picked;
+          if (DBSynergy.pickerMode === 'armor2') state.synergy.armorSet2 = picked;
+          if (DBSynergy.pickerMode === 'acc2') state.synergy.accSet2 = picked;
+          if (DBSynergy.pickerMode === 'spec2') state.synergy.specSet2 = picked;
+
+          renderSynergyPickedTexts();
+          showModal(document.getElementById('synergyPickerModal'), false);
+        });
+
+        listBox.appendChild(card);
+      }
+
+            function hasAnyLevel65Item(set) {
+        const pieces = Array.isArray(set?.pieces) ? set.pieces : [];
+
+        return pieces.some((piece) => {
+          const rawLevel =
+            piece?.level ??
+            piece?.item?.level ??
+            piece?.item?.['렙제'] ??
+            piece?.item?.['레벨제한'] ??
+            '';
+
+          const level = Number(String(rawLevel).replace(/[^\d.-]/g, ''));
+          return level === 65;
+        });
+      }
+
+      function appendSynergyLevelDivider(label) {
+        const div = document.createElement('div');
+        div.className = 'synergy-level-divider';
+
+        const span = document.createElement('span');
+        span.textContent = label;
+
+        div.appendChild(span);
+        listBox.appendChild(div);
+      }
+
+      const orderedSets = [];
+      const orderedNames = new Set();
+
+      function pushSynergySet(set) {
+        const name = String(set?.name || '').trim();
+        if (!name || orderedNames.has(name)) return;
+
+        orderedNames.add(name);
+        orderedSets.push(set);
+      }
 
       for (const group of hardcodedGroups) {
         const sets = (group.names || [])
@@ -25615,101 +25874,30 @@ try {
 
         if (!sets.length) continue;
 
-        //const groupTitle = document.createElement('div');
-        //groupTitle.className = 'set-group-title';
-        //groupTitle.textContent = group.title;
-        //listBox.appendChild(groupTitle);
+        // 기존 하드코딩 그룹은 기존 순서대로 먼저 수집
+        sets.forEach(pushSynergySet);
+      }
 
-        sets.forEach((set) => {
-          renderedNames.add(String(set?.name || '').trim());
+      // 하드코딩 목록에 없는 세트도 자동 수집
+      // 시너지세트 시트에 새로 추가한 혼합 세트 행은 여기서 포함됨
+      const extraSets = setCards.filter((set) => {
+        const name = String(set?.name || '').trim();
+        return name && !orderedNames.has(name);
+      });
 
-          const card = document.createElement('div');
-          card.className = 'armor-set-card';
-          card.dataset.setIndex = String(flatIndex++);
-          card.dataset.mode =
-            (DBSynergy.pickerMode === 'armor' || DBSynergy.pickerMode === 'armor2') ? 'armor' :
-              (DBSynergy.pickerMode === 'acc' || DBSynergy.pickerMode === 'acc2') ? 'acc' :
-                'spec';
+      extraSets.forEach(pushSynergySet);
 
-          const header = document.createElement('div');
-          header.className = 'armor-set-header';
+      const level70Sets = orderedSets.filter((set) => !hasAnyLevel65Item(set));
+      const level65Sets = orderedSets.filter((set) => hasAnyLevel65Item(set));
 
-          const titleSpan = document.createElement('span');
-          titleSpan.className = 'armor-set-header-title';
-          titleSpan.textContent = String(set?.name || '-');
-          header.appendChild(titleSpan);
+      // ✅ 70제 장비 구분선은 항상 맨 위에 표시
+      appendSynergyLevelDivider('70제 장비');
+      level70Sets.forEach(renderSynergySetCard);
 
-          card.appendChild(header);
-
-          const itemsRow = document.createElement('div');
-          itemsRow.className = 'armor-set-items';
-
-          const pieces = Array.isArray(set?.pieces) ? set.pieces : [];
-
-          pieces.forEach((piece) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'armor-set-item';
-            btn.title = piece?.slotLabel || piece?.name || '';
-
-            const box = document.createElement('div');
-            box.className = 'iconbox';
-
-            const img = document.createElement('img');
-            img.className = 'icon';
-            img.src = piece?.img || PLACEHOLDER_IMG;
-            img.alt = piece?.slotLabel || piece?.name || '';
-
-            const setBadgeSrc = getSetBadgeSrc(piece?.item || piece, piece?.slot || '');
-            if (setBadgeSrc) {
-              const setBadgeImg = document.createElement('img');
-              setBadgeImg.className = `set-badge-icon ${getSetBadgeExtraClass(setBadgeSrc)}`;
-              setBadgeImg.src = setBadgeSrc;
-              setBadgeImg.alt = '';
-              box.appendChild(setBadgeImg);
-            }
-
-            box.appendChild(img);
-            btn.appendChild(box);
-            itemsRow.appendChild(btn);
-          });
-
-          card.appendChild(itemsRow);
-
-          card.addEventListener('click', () => {
-            const picked = {
-              name: String(set?.name || ''),
-              img: String(set?.pieces?.[0]?.img || ''),
-              jobGroup: '',
-              category:
-                (DBSynergy.pickerMode === 'armor' || DBSynergy.pickerMode === 'armor2') ? '방어구' :
-                  (DBSynergy.pickerMode === 'acc' || DBSynergy.pickerMode === 'acc2') ? '악세' :
-                    '특수',
-              type: String(set?.type || ''),
-              pieces: Array.isArray(set?.pieces)
-                ? set.pieces.map(piece => ({
-                  slot: piece?.slot || '',
-                  slotLabel: piece?.slotLabel || '',
-                  name: piece?.name || '',
-                  img: piece?.img || '',
-                  item: piece?.item || null
-                }))
-                : []
-            };
-
-            if (DBSynergy.pickerMode === 'armor') state.synergy.armorSet = picked;
-            if (DBSynergy.pickerMode === 'acc') state.synergy.accSet = picked;
-            if (DBSynergy.pickerMode === 'spec') state.synergy.specSet = picked;
-            if (DBSynergy.pickerMode === 'armor2') state.synergy.armorSet2 = picked;
-            if (DBSynergy.pickerMode === 'acc2') state.synergy.accSet2 = picked;
-            if (DBSynergy.pickerMode === 'spec2') state.synergy.specSet2 = picked;
-
-            renderSynergyPickedTexts();
-            showModal(document.getElementById('synergyPickerModal'), false);
-          });
-
-          listBox.appendChild(card);
-        });
+      // ✅ 65제 아이템이 하나라도 포함된 세트가 있으면 아래에 표시
+      if (level65Sets.length) {
+        appendSynergyLevelDivider('65제 장비');
+        level65Sets.forEach(renderSynergySetCard);
       }
     }
 
