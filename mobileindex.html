@@ -15985,51 +15985,7 @@ function renderSynergySetCardMobile(listBox, set, mode) {
   titleSpan.textContent = set?.name || '(세트)';
   header.appendChild(titleSpan);
 
-  // 설명 버튼
-  const infoBtn = document.createElement('button');
-  infoBtn.type = 'button';
-  infoBtn.className = 'meq-info-btn';
-  infoBtn.textContent = '설명';
-  infoBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const raw = set?.raw || set || {};
-
-    // 방어구처럼 desc3/desc5가 있으면 우선 사용
-    const d3 = String(raw?.desc3 || raw?.['3세트'] || raw?.['3세트옵션'] || '').trim();
-    const d5 = String(raw?.desc5 || raw?.['5세트'] || raw?.['5세트옵션'] || '').trim();
-
-    const merged =
-      (d3 ? `【3세트】\n${d3}` : '') +
-      (d3 && d5 ? '\n\n' : '') +
-      (d5 ? `【5세트】\n${d5}` : '');
-
-    const fallbackDesc =
-      (typeof _pickDesc_mobile === 'function'
-        ? (_pickDesc_mobile(raw) || _pickDesc_mobile(set))
-        : '') ||
-      String(raw?.desc || raw?.description || raw?.['설명'] || raw?.['세트설명'] || '').trim();
-
-    const finalDesc = merged.trim() || fallbackDesc || '설명이 없습니다.';
-
-    openEquipInfoModal(String(set?.name || '세트 설명'), finalDesc);
-  });
-  header.appendChild(infoBtn);
-
-  // 세트 선택 버튼
-  const applyBtn = document.createElement('button');
-  applyBtn.type = 'button';
-  applyBtn.className = 'set-auto-toggle';
-  applyBtn.textContent = '세트 선택';
-  applyBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    applyAndClose();
-  });
-  header.appendChild(applyBtn);
-
-  card.appendChild(header);
+    card.appendChild(header);
 
   // items
   const itemsRow = document.createElement('div');
