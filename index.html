@@ -6477,6 +6477,167 @@
         white-space: normal;
       }
     }
+    /* ✅ 한마디 변경 버튼 */
+.one-liner-edit-btn {
+  margin-left: 10px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(250, 204, 107, 0.65);
+  background: linear-gradient(135deg, rgba(250, 204, 107, 0.95), rgba(207, 162, 79, 0.85));
+  color: #1b1207;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.one-liner-edit-btn .contact-label {
+  color: #1b1207;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.one-liner-edit-btn:hover .contact-label {
+  color: #1b1207;
+}
+
+.one-liner-edit-btn:hover {
+  filter: brightness(1.08);
+}
+
+.one-liner-edit-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.one-liner-dialog {
+  width: min(440px, 94vw);
+  height: auto;
+  padding: 14px 18px 16px;
+}
+
+.one-liner-body {
+  padding: 12px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.one-liner-guide {
+  font-size: 12px;
+  line-height: 1.55;
+  color: #f5e3c3;
+  background: rgba(207, 162, 79, 0.08);
+  border: 1px solid rgba(207, 162, 79, 0.28);
+  border-radius: 10px;
+  padding: 10px 12px;
+  white-space: normal;
+}
+
+.one-liner-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 11px;
+  border-radius: 12px;
+  border: 1px solid rgba(207, 162, 79, 0.22);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(250, 204, 107, 0.10), transparent 35%),
+    rgba(15, 17, 21, 0.55);
+}
+
+.one-liner-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #facc6b;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.one-liner-label::before {
+  content: "◆";
+  color: rgba(250, 204, 107, 0.85);
+  font-size: 9px;
+}
+
+.one-liner-current {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: 1px solid rgba(245, 227, 195, 0.20);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.025)),
+    #120d09;
+  color: #f5e3c3;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.one-liner-input {
+  width: 100%;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(207, 162, 79, 0.38);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.025)),
+    #0f1115;
+  color: #f5e3c3;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  outline: none;
+}
+
+.one-liner-input::placeholder {
+  color: rgba(245, 227, 195, 0.45);
+  font-weight: 500;
+}
+
+.one-liner-input:focus {
+  border-color: rgba(250, 204, 107, 0.9);
+  box-shadow:
+    0 0 0 3px rgba(250, 204, 107, 0.16),
+    0 0 14px rgba(250, 204, 107, 0.12);
+}
+
+.one-liner-help {
+  color: #a7b0c0;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.one-liner-cooldown {
+  font-size: 12px;
+  color: #a2ffcf;
+  line-height: 1.5;
+}
+
+.one-liner-cooldown.locked {
+  color: #ffb3b3;
+}
+
+.one-liner-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.one-liner-actions .btn {
+  flex: 1;
+  height: 32px;
+  border-radius: 999px;
+}
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -8397,6 +8558,55 @@
     </div>
   </div>
 
+    </div>
+
+  <!-- ✅ 한마디 변경 모달 -->
+  <div id="oneLinerModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-close></div>
+    <div class="dialog one-liner-dialog" role="dialog" aria-modal="true" aria-labelledby="oneLinerTitle">
+      <header>
+        <div style="width:32px;"></div>
+        <h2 id="oneLinerTitle">한마디 변경</h2>
+        <button type="button" class="close" data-close>✕</button>
+      </header>
+
+      <div class="one-liner-body">
+  <div class="one-liner-guide">
+    · 한마디는 수석, 책임 등급부터 이용이 가능합니다.<br>
+    · 모욕적인 언행이나 비방, 비하, 비속어 등 사용시 무통보 삭제 될 수 있습니다.<br>
+    · 한마디는 한달에 한번 변경이 가능합니다.<br>
+    · 불가피하게 변경불가 기간 내에 한마디 변경이 필요할 시 언제든 문의주세요.
+  </div>
+
+  <div id="oneLinerNicknameBox" class="one-liner-field" style="display:none;">
+  <div class="one-liner-label">인게임 닉네임</div>
+  <input id="oneLinerNicknameInput" class="one-liner-input" type="text" maxlength="20"
+    placeholder="인게임 닉네임 입력">
+  <div class="one-liner-help">인게임 닉네임은 최초 1회만 등록할 수 있으며, 이후 수정은 별도 문의 바랍니다.<br>
+  존재하지 않는 닉네임이나 깡통계정 닉네임일 경우 무통보 삭제 될 수 있습니다.</div>
+</div>
+
+<div class="one-liner-field">
+  <div id="oneLinerCurrentTitle" class="one-liner-label">현재 한마디</div>
+  <div id="oneLinerCurrent" class="one-liner-current">-</div>
+</div>
+
+<div class="one-liner-field">
+  <div class="one-liner-label">새 한마디 입력</div>
+  <input id="oneLinerInput" class="one-liner-input" type="text" maxlength="30"
+    placeholder="40자 이하로 입력">
+</div>
+
+        <div id="oneLinerCooldown" class="one-liner-cooldown">확인 중...</div>
+
+        <div class="one-liner-actions">
+          <button id="btnOneLinerSave" class="btn main" type="button">변경하기</button>
+          <button class="btn" type="button" data-close>닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
     window.WEBAPP_URL = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
@@ -8501,8 +8711,22 @@
     window.__loginPingSent = false;
     window.__loginPingResult = null;
 
-    // 🔹 로그인한 이용자의 직책 정보 (0=전임, 1=책임, 2=수석)
-    window.__userRole = window.__userRole || { level: 0, label: '전임' };
+    // 🔹 로그인한 이용자의 직책 정보
+// 비로그인 상태에서는 한마디 변경 버튼이 절대 보이면 안 되므로 isLoggedIn=false를 기본값으로 둔다.
+window.__userRole = window.__userRole || {
+  isLoggedIn: false,
+  level: 0,
+  label: '전임',
+  presetSlots: 0,
+  canEditPhrase: false,
+  canChangePhrase: false,
+  phraseMessage: '',
+  phraseUpdatedAt: '',
+  phraseNextAt: '',
+  phraseCooldownMs: 0,
+  phraseNickname: '',
+  canSetPhraseNickname: false,
+};
 
     // 🔹 직책별 프리셋 사용 가능 최대 슬롯 수
     function getUserPresetLimit() {
@@ -8524,69 +8748,434 @@
     }
 
     async function loginPingOnce() {
-      if (window.__loginPingSent && window.__loginPingResult) {
-        return window.__loginPingResult;
+  if (window.__loginPingSent && window.__loginPingResult) {
+    return window.__loginPingResult;
+  }
+
+  window.__loginPingSent = true;
+
+  try {
+    const data = await apiJSON('login_ping', {
+      ua: navigator.userAgent,
+      screen: `${screen.width}x${screen.height}@${(window.devicePixelRatio || 1)}`,
+      is_mobile: detectIsMobile()
+    });
+
+    // ✅ ok 여부와 무관하게, 탈퇴 안내는 있으면 무조건 1회 노출
+    if (data && data.withdrawn) {
+      window.showWithdrawNoticeOnce(data.withdrawMessage || '');
+    }
+
+    if (data && data.ok) {
+      const lvl = (typeof data.roleLevel === 'number') ? data.roleLevel : 0;
+      const label = data.roleLabel || (lvl >= 2 ? '수석' : (lvl >= 1 ? '책임' : '전임'));
+
+      // ★ 백엔드에서 내려준 사용자별 프리셋 슬롯 수
+      const slots = (typeof data.presetSlots === 'number')
+        ? Math.max(0, Math.min(50, data.presetSlots))
+        : 0;
+
+      // 🔹 전역 직책/슬롯/한마디 상태 저장
+      window.__userRole = {
+        isLoggedIn: true,
+
+        level: lvl,
+        label,
+        presetSlots: slots,
+
+        // ✅ 한마디 변경 기능
+        canEditPhrase: !!data.canEditPhrase,
+        canChangePhrase: !!data.canChangePhrase,
+        phraseMessage: data.phraseMessage || '',
+        phraseUpdatedAt: data.phraseUpdatedAt || '',
+        phraseNextAt: data.phraseNextAt || '',
+        phraseCooldownMs: Number(data.phraseCooldownMs || 0),
+
+        // ✅ 인게임 닉네임
+        phraseNickname: data.phraseNickname || '',
+        canSetPhraseNickname: !!data.canSetPhraseNickname,
+      };
+
+      // 🔹 프리셋 버튼 권한 UI 갱신
+      if (typeof updatePresetButtonsUI === 'function') {
+        try { updatePresetButtonsUI(); } catch (e) {
+          console.warn('[preset UI] update 실패:', e);
+        }
       }
-      window.__loginPingSent = true;
 
-      try {
-        const data = await apiJSON('login_ping', {
-          ua: navigator.userAgent,
-          screen: `${screen.width}x${screen.height}@${(window.devicePixelRatio || 1)}`,
-          is_mobile: detectIsMobile()
-        });
+      // ★ pendingReply 있으면 팝업 띄우기
+      if (data.pendingReply && data.pendingReply.reply) {
+        openReplyPopup(data.pendingReply);
+      }
 
-        // ✅ ok 여부와 무관하게, 탈퇴 안내는 있으면 무조건 1회 노출
-        if (data && data.withdrawn) {
-          window.showWithdrawNoticeOnce(data.withdrawMessage || '');
-        }
+      // 🔹 로그인 성공 후에만 관리자 문의 아이콘 보여주기
+      const contactBtn = document.getElementById('btnContactAdmin');
+      if (contactBtn) {
+        contactBtn.style.display = 'inline-flex';
+      }
 
-        //console.log('login_ping success:', data);
+      const b = document.getElementById('btnFaq');
+      if (b) {
+        b.style.display = 'inline-flex';
+      }
+    } else {
+      // ✅ 로그인 실패 또는 권한 없음 상태에서는 한마디 변경 버튼 숨김
+      window.__userRole = {
+        isLoggedIn: false,
+        level: 0,
+        label: '',
+        presetSlots: 0,
+        canEditPhrase: false,
+        canChangePhrase: false,
+        phraseMessage: '',
+        phraseUpdatedAt: '',
+        phraseNextAt: '',
+        phraseCooldownMs: 0,
+        phraseNickname: '',
+        canSetPhraseNickname: false,
+      };
 
+      const contactBtn = document.getElementById('btnContactAdmin');
+      if (contactBtn) {
+        contactBtn.style.display = 'none';
+      }
 
-        if (data && data.ok) {
-          const lvl = (typeof data.roleLevel === 'number') ? data.roleLevel : 0;
-          const label = data.roleLabel || (lvl >= 2 ? '수석' : (lvl >= 1 ? '책임' : '전임'));
-
-          // ★ 백엔드에서 내려준 사용자별 프리셋 슬롯 수
-          const slots = (typeof data.presetSlots === 'number')
-            ? Math.max(0, Math.min(50, data.presetSlots))        // 0~50 사이로 클램프
-            : 0;
-
-          // 🔹 전역 직책/슬롯 상태 저장
-          window.__userRole = { level: lvl, label, presetSlots: slots };
-
-          // 🔹 프리셋 버튼 권한 UI 갱신
-          if (typeof updatePresetButtonsUI === 'function') {
-            try { updatePresetButtonsUI(); } catch (e) {
-              console.warn('[preset UI] update 실패:', e);
-            }
-          }
-          // ✅ 탈퇴 안내 모달
-          if (data.withdrawn) {
-            window.showWithdrawNoticeOnce(data.withdrawMessage || '');
-          }
-          // ★ 여기! pendingReply 있으면 팝업 띄우기
-          if (data.pendingReply && data.pendingReply.reply) {
-            openReplyPopup(data.pendingReply);
-          }
-          // 🔹 로그인 성공 후에만 관리자 문의 아이콘 보여주기
-          const contactBtn = document.getElementById('btnContactAdmin');
-          if (contactBtn) {
-            contactBtn.style.display = 'inline-flex';
-          }
-          const b = document.getElementById('btnFaq');
-          if (b) b.style.display = 'inline-flex';
-        }
-
-        window.__loginPingResult = data;
-        return data;
-      } catch (e) {
-        console.warn('login_ping failed:', e);
-        window.__loginPingResult = { ok: false, error: e.message };
-        return window.__loginPingResult;
+      const b = document.getElementById('btnFaq');
+      if (b) {
+        b.style.display = 'none';
       }
     }
+
+    if (typeof updateOneLinerButtonUI === 'function') {
+      try { updateOneLinerButtonUI(); } catch (e) {
+        console.warn('[one-liner UI] update 실패:', e);
+      }
+    }
+
+    window.__loginPingResult = data;
+    return data;
+  } catch (e) {
+    console.warn('login_ping failed:', e);
+
+    window.__userRole = {
+      isLoggedIn: false,
+      level: 0,
+      label: '',
+      presetSlots: 0,
+      canEditPhrase: false,
+      canChangePhrase: false,
+      phraseMessage: '',
+      phraseUpdatedAt: '',
+      phraseNextAt: '',
+      phraseCooldownMs: 0,
+      phraseNickname: '',
+      canSetPhraseNickname: false,
+    };
+
+    if (typeof updateOneLinerButtonUI === 'function') {
+      try { updateOneLinerButtonUI(); } catch (err) {
+        console.warn('[one-liner UI] update 실패:', err);
+      }
+    }
+
+    window.__loginPingResult = { ok: false, error: e.message };
+    return window.__loginPingResult;
+  }
+}
+
+    // ==============================
+    //  한마디 변경 UI
+    // ==============================
+    let __oneLinerTimer = null;
+
+    function formatRemainMs(ms) {
+      ms = Math.max(0, Number(ms || 0));
+      if (ms <= 0) return '변경 가능';
+
+      const sec = Math.floor(ms / 1000);
+      const d = Math.floor(sec / 86400);
+      const h = Math.floor((sec % 86400) / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+
+      return `다음 변경 가능까지 ${d}일 ${h}시간 ${m}분 ${s}초`;
+    }
+
+    function getOneLinerRemainMs() {
+      const info = window.__userRole || {};
+      const nextAt = info.phraseNextAt ? Date.parse(info.phraseNextAt) : 0;
+      if (!nextAt) return 0;
+      return Math.max(0, nextAt - Date.now());
+    }
+
+    function canUseOneLinerButton() {
+  const info = window.__userRole || {};
+
+  // ✅ 로그인된 이용자에게만 버튼 노출
+  return !!info.isLoggedIn;
+}
+
+function canEditOneLiner() {
+  const info = window.__userRole || {};
+  return !!info.isLoggedIn && !!info.canEditPhrase;
+}
+
+    function ensureOneLinerButton() {
+  const faqBtn = document.getElementById('btnFaq');
+  if (!faqBtn || !faqBtn.parentNode) return null;
+
+  let btn = document.getElementById('btnOneLinerOpen');
+
+  if (!btn) {
+    btn = document.createElement('button');
+    btn.id = 'btnOneLinerOpen';
+    btn.type = 'button';
+    btn.className = 'contact-btn faq-btn one-liner-edit-btn';
+    btn.title = '한마디 변경';
+    btn.innerHTML = `
+      <span class="contact-label">한마디 변경</span>
+    `;
+    btn.style.display = 'none';
+
+    // ✅ Q&A 버튼 바로 오른쪽에 삽입
+    faqBtn.parentNode.insertBefore(btn, faqBtn.nextSibling);
+
+    btn.addEventListener('click', openOneLinerModal);
+  }
+
+  return btn;
+}
+
+function updateOneLinerButtonUI() {
+  const btn = ensureOneLinerButton();
+  if (!btn) return;
+
+  btn.style.display = canUseOneLinerButton() ? 'inline-flex' : 'none';
+}
+
+    function updateOneLinerCooldownUI() {
+  const cd = document.getElementById('oneLinerCooldown');
+  const save = document.getElementById('btnOneLinerSave');
+  const input = document.getElementById('oneLinerInput');
+  const nickInput = document.getElementById('oneLinerNicknameInput');
+
+  if (!cd || !save) return;
+
+  const remain = getOneLinerRemainMs();
+  const locked = remain > 0;
+  const editable = canEditOneLiner();
+
+  if (!editable) {
+    cd.textContent = '한마디 변경은 수석, 책임 등급부터 이용할 수 있습니다.';
+    cd.classList.add('locked');
+
+    save.disabled = true;
+    if (input) input.disabled = true;
+    if (nickInput) nickInput.disabled = true;
+    return;
+  }
+
+  cd.textContent = locked ? formatRemainMs(remain) : '변경 가능';
+  cd.classList.toggle('locked', locked);
+
+  save.disabled = locked;
+  if (input) input.disabled = locked;
+  if (nickInput) nickInput.disabled = locked;
+}
+
+    async function openOneLinerModal() {
+  const modal = document.getElementById('oneLinerModal');
+  const current = document.getElementById('oneLinerCurrent');
+  const currentTitle = document.getElementById('oneLinerCurrentTitle');
+  const input = document.getElementById('oneLinerInput');
+  const nickBox = document.getElementById('oneLinerNicknameBox');
+  const nickInput = document.getElementById('oneLinerNicknameInput');
+  const save = document.getElementById('btnOneLinerSave');
+
+  if (!modal || !current || !currentTitle || !input || !save) return;
+
+      try {
+        const status = await apiJSON('one_liner_status');
+
+        if (status && status.ok) {
+          window.__userRole = {
+  ...(window.__userRole || {}),
+  canEditPhrase: !!status.canEditPhrase,
+  canChangePhrase: !!status.canChangePhrase,
+  phraseMessage: status.phraseMessage || '',
+  phraseUpdatedAt: status.phraseUpdatedAt || '',
+  phraseNextAt: status.phraseNextAt || '',
+  phraseCooldownMs: Number(status.phraseCooldownMs || 0),
+
+  // ✅ 인게임 닉네임
+  phraseNickname: status.phraseNickname || '',
+  canSetPhraseNickname: !!status.canSetPhraseNickname,
+};
+        }
+      } catch (e) {
+        console.warn('[one_liner_status] 실패:', e);
+      }
+
+      const info = window.__userRole || {};
+const nick = String(info.phraseNickname || '').trim();
+
+currentTitle.textContent = nick ? `${nick} 님의 현재 한마디` : '현재 한마디';
+current.textContent = info.phraseMessage || '등록된 한마디가 없습니다.';
+
+if (nickBox && nickInput) {
+  const needNickname = !nick;
+  nickBox.style.display = needNickname ? 'flex' : 'none';
+  nickInput.value = '';
+}
+
+input.value = '';
+
+const editable = canEditOneLiner();
+input.disabled = !editable;
+if (nickInput) nickInput.disabled = !editable;
+
+modal.classList.add('show');
+modal.setAttribute('aria-hidden', 'false');
+
+updateOneLinerCooldownUI();
+
+if (editable) {
+  if (nickBox && nickInput && nickBox.style.display !== 'none') {
+    nickInput.focus();
+  } else {
+    input.focus();
+  }
+}
+
+      if (__oneLinerTimer) clearInterval(__oneLinerTimer);
+      __oneLinerTimer = setInterval(updateOneLinerCooldownUI, 1000);
+    }
+
+    function closeOneLinerModal() {
+      const modal = document.getElementById('oneLinerModal');
+      if (modal) {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+
+      if (__oneLinerTimer) {
+        clearInterval(__oneLinerTimer);
+        __oneLinerTimer = null;
+      }
+    }
+
+    async function saveOneLiner() {
+  const input = document.getElementById('oneLinerInput');
+  const nickBox = document.getElementById('oneLinerNicknameBox');
+  const nickInput = document.getElementById('oneLinerNicknameInput');
+  const save = document.getElementById('btnOneLinerSave');
+  if (!input || !save) return;
+
+  const message = input.value.trim();
+const needNickname = !!(nickBox && nickBox.style.display !== 'none');
+const nickname = needNickname && nickInput ? nickInput.value.trim() : '';
+
+if (!canEditOneLiner()) {
+  (window.toast || alert)('한마디 변경은 책임, 수석, 관리자 등급부터 이용할 수 있습니다.');
+  return;
+}
+
+      if (!message) {
+  (window.toast || alert)('한마디를 입력해주세요.');
+  return;
+}
+
+if (needNickname && !nickname) {
+  (window.toast || alert)('인게임 닉네임을 입력해주세요.');
+  return;
+}
+
+if (nickname && nickname.length > 20) {
+  (window.toast || alert)('인게임 닉네임은 20자 이하로 입력해주세요.');
+  return;
+}
+
+if (/[\r\n]/.test(nickname)) {
+  (window.toast || alert)('인게임 닉네임에는 줄바꿈을 사용할 수 없습니다.');
+  return;
+}
+
+      if (/[\r\n]/.test(message)) {
+        (window.toast || alert)('한마디에는 줄바꿈을 사용할 수 없습니다.');
+        return;
+      }
+
+      if (message.length > 30) {
+        (window.toast || alert)('한마디는 40자 이하로 입력해주세요.');
+        return;
+      }
+
+      try {
+        save.disabled = true;
+
+        const res = await apiJSON('update_one_liner', {
+  message,
+  ...(needNickname ? { nickname } : {}),
+});
+
+        if (!res || !res.ok) {
+          throw new Error(res?.message || res?.error || 'update_fail');
+        }
+
+        window.__userRole = {
+  ...(window.__userRole || {}),
+  canEditPhrase: !!res.canEditPhrase,
+  canChangePhrase: !!res.canChangePhrase,
+  phraseMessage: res.phraseMessage || message,
+  phraseUpdatedAt: res.phraseUpdatedAt || '',
+  phraseNextAt: res.phraseNextAt || '',
+  phraseCooldownMs: Number(res.phraseCooldownMs || 0),
+
+  // ✅ 인게임 닉네임
+  phraseNickname: res.phraseNickname || nickname || (window.__userRole?.phraseNickname || ''),
+  canSetPhraseNickname: !!res.canSetPhraseNickname,
+};
+
+        closeOneLinerModal();
+(window.toast || alert)('한마디가 변경되었습니다.\n\n변경된 한마디는 페이지 새로고침 후 확인해보실 수 있습니다.');
+
+        // ✅ 상단 한마디 즉시 재조회
+        const ads = document.querySelector('header .header-ads');
+        if (ads) {
+          ads.dataset.inited = '';
+          const text = ads.querySelector('.ad-text');
+          if (text) text.textContent = '불러오는 중…';
+        }
+
+        if (typeof initHeaderAds === 'function') {
+          initHeaderAds(true);
+        }
+
+        updateOneLinerButtonUI();
+      } catch (e) {
+        console.error('[update_one_liner] 실패:', e);
+        (window.toast || alert)(e.message || '한마디 변경에 실패했습니다.');
+      } finally {
+        updateOneLinerCooldownUI();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById('oneLinerModal');
+      const save = document.getElementById('btnOneLinerSave');
+
+      if (save && !save._bound) {
+        save._bound = true;
+        save.addEventListener('click', saveOneLiner);
+      }
+
+      if (modal && !modal._bound) {
+        modal._bound = true;
+        modal.querySelectorAll('[data-close]').forEach(el => {
+          el.addEventListener('click', closeOneLinerModal);
+        });
+      }
+    });
 
     // 문의 전송 세팅
     (function setupContactForm() {
@@ -26231,7 +26820,7 @@ wrap.appendChild(listBox);
       }
 
       // ★ 헤더 광고 — 이 블록으로 교체 (CSV → 백엔드 JSON 사용)
-      async function initHeaderAds() {
+      async function initHeaderAds(force = false) {
         try {
           const header = document.querySelector("header");
           if (!header) return;
@@ -26244,8 +26833,11 @@ wrap.appendChild(listBox);
             header.appendChild(ads);
           }
           const adTextEl = ads.querySelector(".ad-text");
-          if (ads.dataset.inited) return;
-          ads.dataset.inited = "1";
+          if (ads.dataset.inited && !force) return;
+ads.dataset.inited = "1";
+
+ensureOneLinerButton(ads);
+updateOneLinerButtonUI();
 
           // 백엔드에서 목록(JSON) 로드
           // 백엔드에서 한 줄만 받기
@@ -26282,7 +26874,7 @@ wrap.appendChild(listBox);
               const pos = (x.position || '').trim();
               const pos0 = pos.replace(/^\[이벤트\]\s*/, '');
               const msg = (x.message || '').trim();
-              return !!msg && /^(수석|책임)/.test(pos0);
+              return !!msg && /^(관리자|수석|책임)/.test(pos0);
             })
             .map(x => {
               const pos = (x.position || '').trim();
@@ -26290,19 +26882,21 @@ wrap.appendChild(listBox);
               const nick = (x.ingame || '').trim() || (x.youtube || '').trim();
               const msg = (x.message || '').trim();
 
-              const isSenior = /^수석/.test(pos0); // ✅ 이벤트 수석도 수석 처리
-              const roleBadge = isSenior
-                ? '<span class="tag tag-senior" aria-label="수석" title="수석"><span class="badge-emoji">👑</span></span>'
-                : '<span class="tag-lead" aria-hidden="true"></span>';
+              const isAdmin = /^관리자/.test(pos0);
+const isSenior = /^수석/.test(pos0);
 
-              return `
-      <span class="hdrmsg ${isSenior ? 'senior' : 'lead'}">
-        ${roleBadge}
-        ${nick ? `<span class="msg-nick">${escapeHTML(nick)} 님</span>` : ''}
-        <span class="msg-bullet">·</span>
-        <span class="msg-text">${escapeHTML(msg)}</span>
-      </span>
-    `.trim();
+const roleBadge = (isAdmin || isSenior)
+  ? `<span class="tag tag-senior" aria-label="${isAdmin ? '관리자' : '수석'}" title="${isAdmin ? '관리자' : '수석'}"><span class="badge-emoji">${isAdmin ? '🛡️' : '👑'}</span></span>`
+  : '<span class="tag-lead" aria-hidden="true"></span>';
+
+return `
+  <span class="hdrmsg ${(isAdmin || isSenior) ? 'senior' : 'lead'}">
+    ${roleBadge}
+    ${nick ? `<span class="msg-nick">${escapeHTML(nick)} 님</span>` : ''}
+    <span class="msg-bullet">·</span>
+    <span class="msg-text">${escapeHTML(msg)}</span>
+  </span>
+`.trim();
             });
 
           // 중복 제거
