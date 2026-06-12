@@ -85,25 +85,80 @@
 
     /* ===== 왼쪽: 메인 비주얼 + 로그인 카드 ===== */
     .hero {
-      display: flex;
-      align-items: center;
-      /* 세로 가운데 */
-      position: relative;
-      background: #0b0f16;
-      border: 1px solid #1f2633;
-      border-radius: 14px;
-      overflow: hidden;
-      min-height: 460px;
-    }
+  display: flex;
+  align-items: center;
+  /* 세로 가운데 */
+  position: relative;
+  background: #0b0f16;
+  border: 1px solid #1f2633;
+  border-radius: 14px;
+  overflow: hidden;
+  min-height: 460px;
+}
 
-    .hero-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      opacity: .92;
-      filter: saturate(1.05) contrast(1.05);
-    }
+.hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: .92;
+  filter: saturate(1.05) contrast(1.05);
+}
+
+/* ✅ 메인 이미지 + 스노우메이지 버튼 묶음 */
+.main-visual-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ✅ 스노우메이지 이벤트 계산기 이미지 버튼 */
+.snowmage-event-btn {
+  width: 100%;
+  display: block;
+
+  border-radius: 14px;
+  overflow: hidden;
+
+  border: 1px solid rgba(147, 197, 253, 0.45);
+  background: rgba(15, 23, 42, 0.35);
+
+  text-decoration: none;
+  box-sizing: border-box;
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.snowmage-event-btn img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.snowmage-event-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  border-color: rgba(147, 197, 253, 0.8);
+
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.42),
+    0 0 0 3px rgba(147, 197, 253, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.snowmage-event-btn:active {
+  transform: translateY(0) scale(0.985);
+}
 
     /* 오른쪽 컬럼: 공지 + 로그인 세로로 쌓기 */
     .sidebar {
@@ -339,21 +394,25 @@
 
     /* 반응형 */
     @media (max-width: 980px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
+  .grid {
+    grid-template-columns: 1fr;
+  }
 
-      .hero {
-        min-height: 0;
-        height: auto;
-        aspect-ratio: 16 / 9;
-      }
+  .hero {
+    min-height: 0;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
 
-      .hero-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
+  .hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .snowmage-event-btn {
+  border-radius: 12px;
+}
 
       .login-card {
         left: 12px;
@@ -6699,13 +6758,20 @@
           이용을 금하며, 무단수정 및 도용도 엄격히 금지합니다.</div>
 
         <div class="grid">
-          <!-- 왼쪽: 메인 비주얼 -->
-          <section class="hero">
-            <!-- 네가 쓰려는 메인 이미지를 넣어줘 -->
-            <img class="hero-img" src="img/main/main.png" alt="메인 비주얼" />
-          </section>
-          <!-- 오른쪽: 공지/업데이트 -->
-          <div class="sidebar">
+  <!-- 왼쪽: 메인 비주얼 + 이벤트 계산기 버튼 -->
+  <div class="main-visual-col">
+    <section class="hero">
+      <!-- 네가 쓰려는 메인 이미지를 넣어줘 -->
+      <img class="hero-img" src="img/main/main.png" alt="메인 비주얼" />
+    </section>
+
+    <a href="./snowmage/" class="snowmage-event-btn" id="btnSnowMageEvent" aria-label="스노우메이지 이벤트 계산기">
+  <img src="img/event/snowmage/main.png" alt="스노우메이지 이벤트 계산기">
+</a>
+  </div>
+
+  <!-- 오른쪽: 공지/업데이트 -->
+  <div class="sidebar">
             <aside class="notice">
               <h3>* 계산기는 계속해서 업데이트될 예정입니다!</h3>
               <div class="box">

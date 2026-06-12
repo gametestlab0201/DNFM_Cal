@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>스노우메이지 이벤트 계산기</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(1200px 600px at 50% -10%, #1b2130 0%, #0f1115 60%);
+      color: #e6e9ef;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+    }
+
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    .page-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 900;
+      color: #ffffff;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.06);
+      color: #e5e7eb;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .card {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 18px;
+    }
+
+    .placeholder {
+      min-height: 260px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+    /* ✅ 스노우메이지 계산기 카드 */
+.snowmage-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ✅ 티켓 입력 영역 */
+.ticket-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(147, 197, 253, 0.26);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(147, 197, 253, 0.16), transparent 38%),
+    rgba(255, 255, 255, 0.04);
+}
+
+.ticket-img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.ticket-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ticket-label {
+  font-size: 14px;
+  font-weight: 800;
+  color: #e5e7eb;
+  margin-bottom: 4px;
+}
+
+.ticket-count {
+  font-size: 22px;
+  font-weight: 900;
+  color: #93c5fd;
+}
+
+.ticket-input-btn {
+  min-height: 36px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(147, 197, 253, 0.6);
+
+  background:
+    radial-gradient(circle at 30% 20%, rgba(219, 234, 254, 0.25), transparent 40%),
+    linear-gradient(135deg, rgba(96, 165, 250, 0.95), rgba(37, 99, 235, 0.92));
+
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.ticket-input-btn:hover {
+  filter: brightness(1.08);
+}
+
+/* ✅ 보상 아이템 4행 2열 */
+.reward-grid {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 14px;
+  justify-content: center;
+}
+
+/* ✅ 이미지 버튼 */
+.reward-item {
+  position: relative;
+
+  width: 320px;
+  min-height: auto;
+
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background:
+    radial-gradient(circle at 50% 20%, rgba(147, 197, 253, 0.12), transparent 42%),
+    rgba(255, 255, 255, 0.04);
+
+  cursor: pointer;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 4px;
+
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease;
+}
+
+.reward-item img {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+  pointer-events: none;
+  display: block;
+  transition: filter 0.15s ease, opacity 0.15s ease;
+}
+
+/* ✅ 구매완료 선택 시 이미지 흑백 처리 */
+.reward-item.selected img {
+  filter: grayscale(100%);
+  opacity: 0.55;
+}
+
+/* ✅ 선택된 상태 */
+.reward-item.selected {
+  border-color: rgba(250, 204, 21, 0.95);
+  background:
+    radial-gradient(circle at 50% 20%, rgba(250, 204, 21, 0.2), transparent 45%),
+    rgba(250, 204, 21, 0.08);
+
+  box-shadow:
+    0 0 0 3px rgba(250, 204, 21, 0.16),
+    0 10px 24px rgba(0, 0, 0, 0.38);
+}
+
+/* ✅ 선택됨 표시 */
+.selected-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  display: none;
+  padding: 4px 8px;
+  border-radius: 999px;
+
+  background: rgba(250, 204, 21, 0.96);
+  color: #1f1300;
+
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  z-index: 2;
+
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.reward-item.selected .selected-badge {
+  display: inline-flex;
+}
+
+/* ✅ 투함포 남은 필요 개수 표시 */
+.tower-potion-count {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 46px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+
+  background: rgba(59, 130, 246, 0.95);
+  color: #ffffff;
+  border: 1px solid rgba(191, 219, 254, 0.8);
+
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  z-index: 3;
+
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* ✅ 갯수 입력 모달 */
+.quantity-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  place-items: center;
+  z-index: 100;
+}
+
+.quantity-modal.show {
+  display: grid;
+}
+
+.quantity-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(3px);
+}
+
+.quantity-modal-box {
+  position: relative;
+  width: min(360px, calc(100vw - 32px));
+  border-radius: 18px;
+  border: 1px solid rgba(147, 197, 253, 0.32);
+  background:
+    radial-gradient(circle at 30% 10%, rgba(147, 197, 253, 0.16), transparent 42%),
+    #0f172a;
+
+  padding: 18px;
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.quantity-modal-title {
+  font-size: 17px;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.quantity-modal-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #cbd5e1;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.quantity-modal-input {
+  width: 100%;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(147, 197, 253, 0.42);
+  background: rgba(15, 23, 42, 0.92);
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 900;
+  text-align: center;
+  outline: none;
+}
+
+.quantity-modal-input:focus {
+  border-color: rgba(147, 197, 253, 0.9);
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.18);
+}
+
+.quantity-modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.quantity-modal-btn {
+  flex: 1;
+  height: 38px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.quantity-modal-btn.cancel {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #e5e7eb;
+}
+
+.quantity-modal-btn.confirm {
+  border: 1px solid rgba(147, 197, 253, 0.7);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(219, 234, 254, 0.25), transparent 40%),
+    linear-gradient(135deg, rgba(96, 165, 250, 0.95), rgba(37, 99, 235, 0.92));
+  color: #ffffff;
+}
+
+.quantity-modal-btn:hover {
+  filter: brightness(1.08);
+}
+
+/* ✅ 모바일 대응 */
+@media (max-width: 640px) {
+  .ticket-row {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .ticket-img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .ticket-input-btn {
+    width: 100%;
+  }
+
+  .reward-grid {
+    grid-template-columns: repeat(2, max-content);
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .reward-item {
+    width: 140px;
+    padding: 5px;
+  }
+
+  .reward-item img {
+    max-height: 124px;
+  }
+}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="page-head">
+      <h1 class="page-title">스노우메이지 이벤트 계산기</h1>
+      <a href="../" class="back-link">← 메인으로</a>
+    </div>
+
+    <div class="card snowmage-card">
+
+  <!-- ✅ 현재 티켓 갯수 입력 영역 -->
+  <div class="ticket-row">
+    <img
+      src="../img/event/snowmage/신비한티켓.png"
+      alt="신비한 티켓"
+      class="ticket-img"
+    >
+
+    <div class="ticket-info">
+      <div class="ticket-label">신비한 티켓 현재 갯수</div>
+      <div class="ticket-count">
+        <span id="snowTicketCount">0</span>개
+      </div>
+    </div>
+
+    <button type="button" class="ticket-input-btn" id="btnInputSnowTicket">
+      입력하기
+    </button>
+  </div>
+
+  <!-- ✅ 아이템 선택 영역 -->
+  <div class="reward-grid">
+
+    <button type="button" class="reward-item quantity-reward" id="rewardSnowCreature" data-name="스노우메이지 크리쳐 선택상자" data-cost="1000" data-quantity="0" data-max="10">
+  <span class="selected-badge">구매완료</span>
+  <img src="../img/event/snowmage/스노우메이지크리쳐선택상자.png" alt="스노우메이지 크리쳐 선택상자">
+</button>
+
+    <button type="button" class="reward-item" data-name="75레벨 익시드 장비 항아리" data-cost="5000">
+  <span class="selected-badge">구매완료</span>
+  <img src="../img/event/snowmage/75레벨익시드장비항아리.png" alt="75레벨 익시드 장비 항아리">
+</button>
+
+    <button type="button" class="reward-item quantity-reward" id="rewardEpicSelect70" data-name="70레벨 빛이 깃든 에픽 선택상자" data-cost="1000" data-quantity="0" data-max="2">
+  <span class="selected-badge">구매완료</span>
+  <img src="../img/event/snowmage/70레벨빛이깃든에픽선택상자.png" alt="70레벨 빛이 깃든 에픽 선택상자">
+</button>
+
+    <button type="button" class="reward-item" data-name="70레벨 화려한 에픽 항아리" data-cost="3000">
+  <span class="selected-badge">구매완료</span>
+  <img src="../img/event/snowmage/70레벨화려한에픽항아리.png" alt="70레벨 화려한 에픽 항아리">
+</button>
+
+    <button type="button" class="reward-item" data-name="주간던전 추가 입장권 발행기" data-cost="3000">
+  <span class="selected-badge">구매완료</span>
+  <img src="../img/event/snowmage/주간던전추가입장권발행기.png" alt="주간던전 추가 입장권 발행기">
+</button>
+
+    <button type="button" class="reward-item" data-name="촉매제" data-cost="3000">
+  <span class="selected-badge">구매완료</span>
+  <img src="../img/event/snowmage/촉매제.png" alt="촉매제">
+</button>
+
+   <button type="button" class="reward-item quantity-reward" id="rewardSpecialBox" data-name="특산물 상자" data-cost="30" data-quantity="0" data-max="100">
+  <span class="selected-badge">구매완료</span>
+  <img src="../img/event/snowmage/특산물상자.png" alt="특산물 상자">
+</button>
+
+    <button type="button" class="reward-item" data-name="투함포" id="rewardTowerPotion">
+  <span class="tower-potion-count" id="towerPotionCount">210개 구매가능</span>
+  <span class="selected-badge">구매완료</span>
+  <img src="../img/event/snowmage/투함포.png" alt="투함포">
+</button>
+
+  </div>
+
+</div>
+  </div>
+
+<!-- ✅ 수량 입력 공용 모달 -->
+<div class="quantity-modal" id="rewardQuantityModal" aria-hidden="true">
+  <div class="quantity-modal-backdrop" id="rewardQuantityModalBackdrop"></div>
+
+  <div class="quantity-modal-box">
+    <div class="quantity-modal-title" id="rewardQuantityModalTitle">
+      보상 수량 입력
+    </div>
+
+    <div class="quantity-modal-desc" id="rewardQuantityModalDesc">
+      구매한 갯수를 입력하세요.
+    </div>
+
+    <input
+      type="number"
+      id="rewardQuantityInput"
+      class="quantity-modal-input"
+      min="1"
+      step="1"
+      placeholder="갯수 입력"
+    >
+
+    <div class="quantity-modal-actions">
+      <button type="button" class="quantity-modal-btn cancel" id="btnCancelRewardQuantity">
+        취소
+      </button>
+      <button type="button" class="quantity-modal-btn confirm" id="btnConfirmRewardQuantity">
+        확인
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ 신비한 티켓 입력 모달 -->
+<div class="quantity-modal" id="ticketInputModal" aria-hidden="true">
+  <div class="quantity-modal-backdrop" id="ticketInputModalBackdrop"></div>
+
+  <div class="quantity-modal-box">
+    <div class="quantity-modal-title">
+      신비한 티켓 현재 갯수
+    </div>
+
+    <div class="quantity-modal-desc">
+      현재 보유 중인 신비한 티켓 갯수를 입력하세요.<br>
+      신비한 티켓 최대 42,000개, 하루 빠질때 마다 -1,000개
+    </div>
+
+   <input
+  type="number"
+  id="ticketInputValue"
+  class="quantity-modal-input"
+  min="0"
+  max="42000"
+  step="1"
+  placeholder="0~42000"
+>
+
+    <div class="quantity-modal-actions">
+      <button type="button" class="quantity-modal-btn cancel" id="btnCancelTicketInput">
+        취소
+      </button>
+      <button type="button" class="quantity-modal-btn confirm" id="btnConfirmTicketInput">
+        확인
+      </button>
+    </div>
+  </div>
+</div>
+
+  <script>
+ // ✅ 신비한 티켓 현재 갯수 입력
+const btnInputSnowTicket = document.getElementById('btnInputSnowTicket');
+const snowTicketCount = document.getElementById('snowTicketCount');
+const towerPotionCount = document.getElementById('towerPotionCount');
+
+const rewardQuantityModal = document.getElementById('rewardQuantityModal');
+const rewardQuantityModalTitle = document.getElementById('rewardQuantityModalTitle');
+const rewardQuantityModalDesc = document.getElementById('rewardQuantityModalDesc');
+const rewardQuantityInput = document.getElementById('rewardQuantityInput');
+const btnCancelRewardQuantity = document.getElementById('btnCancelRewardQuantity');
+const btnConfirmRewardQuantity = document.getElementById('btnConfirmRewardQuantity');
+const rewardQuantityModalBackdrop = document.getElementById('rewardQuantityModalBackdrop');
+
+const ticketInputModal = document.getElementById('ticketInputModal');
+const ticketInputValue = document.getElementById('ticketInputValue');
+const btnCancelTicketInput = document.getElementById('btnCancelTicketInput');
+const btnConfirmTicketInput = document.getElementById('btnConfirmTicketInput');
+const ticketInputModalBackdrop = document.getElementById('ticketInputModalBackdrop');
+
+let pendingQuantityItem = null;
+const TOWER_POTION_COST = 200;
+
+// ✅ 쉼표가 들어간 숫자도 정상 처리
+function parseTicketInput(value) {
+  return Number(String(value).replaceAll(',', '').trim());
+}
+
+// ✅ 현재 입력된 신비한 티켓 값 가져오기
+function getCurrentSnowTicketValue() {
+  return parseTicketInput(snowTicketCount?.textContent || '0') || 0;
+}
+
+// ✅ 선택된 보상들의 티켓 소모량 합산
+function getSelectedRewardCost() {
+  let totalCost = 0;
+
+  document.querySelectorAll('.reward-item.selected').forEach(item => {
+    if (item.id === 'rewardTowerPotion') return;
+
+    const cost = Number(item.dataset.cost || 0);
+
+    if (item.classList.contains('quantity-reward')) {
+      const quantity = Number(item.dataset.quantity || 0);
+      totalCost += cost * quantity;
+      return;
+    }
+
+    totalCost += cost;
+  });
+
+  return totalCost;
+}
+
+// ✅ 투함포 개수 업데이트
+function updateTowerPotionCount() {
+  const ticketValue = getCurrentSnowTicketValue();
+  const selectedCost = getSelectedRewardCost();
+
+  const remainTicket = Math.max(0, ticketValue - selectedCost);
+  const count = Math.floor(remainTicket / TOWER_POTION_COST);
+
+  if (towerPotionCount) {
+    towerPotionCount.textContent = `${count.toLocaleString('ko-KR')}개 구매가능`;
+  }
+}
+
+// ✅ 스노우메이지 크리쳐 선택상자 구매해제
+function clearQuantityRewardSelection(item) {
+  item.classList.remove('selected');
+  item.dataset.quantity = '0';
+
+  const badge = item.querySelector('.selected-badge');
+
+  if (badge) {
+    badge.textContent = '구매완료';
+  }
+}
+
+// ✅ 스노우메이지 크리쳐 선택상자 구매 갯수 입력
+function handleQuantityRewardClick(item) {
+  pendingQuantityItem = item;
+
+  if (rewardQuantityModalTitle) {
+    rewardQuantityModalTitle.textContent = item.dataset.name || '보상 수량 입력';
+  }
+
+  const max = Number(item.dataset.max || 1);
+
+  if (rewardQuantityModalDesc) {
+    rewardQuantityModalDesc.innerHTML = `구매한 갯수를 입력하세요.<br>최대 ${max.toLocaleString('ko-KR')}개까지 입력할 수 있습니다.`;
+  }
+
+  if (rewardQuantityInput) {
+    rewardQuantityInput.value = '';
+    rewardQuantityInput.max = String(max);
+    rewardQuantityInput.placeholder = `1~${max}`;
+  }
+
+  openRewardQuantityModal();
+}
+
+function openRewardQuantityModal() {
+  if (!rewardQuantityModal) return;
+
+  rewardQuantityModal.classList.add('show');
+  rewardQuantityModal.setAttribute('aria-hidden', 'false');
+
+  setTimeout(() => {
+    rewardQuantityInput?.focus();
+  }, 0);
+}
+
+function closeRewardQuantityModal() {
+  if (!rewardQuantityModal) return;
+
+  rewardQuantityModal.classList.remove('show');
+  rewardQuantityModal.setAttribute('aria-hidden', 'true');
+
+  pendingQuantityItem = null;
+}
+
+function confirmRewardQuantity() {
+  if (!pendingQuantityItem) return;
+
+  const max = Number(pendingQuantityItem.dataset.max || 1);
+  const value = parseTicketInput(rewardQuantityInput?.value || '');
+
+  if (!Number.isFinite(value) || value < 1) {
+    alert('1개 이상 입력해야 합니다.');
+    rewardQuantityInput?.focus();
+    return;
+  }
+
+  const quantity = Math.floor(value);
+
+  if (quantity > max) {
+    alert(`${pendingQuantityItem.dataset.name || '이 보상'}은 최대 ${max.toLocaleString('ko-KR')}개까지 입력할 수 있습니다.`);
+    rewardQuantityInput?.focus();
+    return;
+  }
+
+  pendingQuantityItem.dataset.quantity = String(quantity);
+  pendingQuantityItem.classList.add('selected');
+
+  const badge = pendingQuantityItem.querySelector('.selected-badge');
+
+  if (badge) {
+    badge.textContent = `${quantity.toLocaleString('ko-KR')}개 구매완료`;
+  }
+
+  updateTowerPotionCount();
+  closeRewardQuantityModal();
+}
+
+function openTicketInputModal() {
+  if (!ticketInputModal) return;
+
+  if (ticketInputValue) {
+    const currentValue = snowTicketCount?.textContent?.trim() || '0';
+    ticketInputValue.value = String(parseTicketInput(currentValue) || 0);
+  }
+
+  ticketInputModal.classList.add('show');
+  ticketInputModal.setAttribute('aria-hidden', 'false');
+
+  setTimeout(() => {
+    ticketInputValue?.focus();
+    ticketInputValue?.select();
+  }, 0);
+}
+
+function closeTicketInputModal() {
+  if (!ticketInputModal) return;
+
+  ticketInputModal.classList.remove('show');
+  ticketInputModal.setAttribute('aria-hidden', 'true');
+}
+
+function confirmTicketInput() {
+  const value = parseTicketInput(ticketInputValue?.value || '');
+
+  if (!Number.isFinite(value) || value < 0) {
+    alert('0 이상의 숫자만 입력할 수 있습니다.');
+    ticketInputValue?.focus();
+    return;
+  }
+
+  const finalValue = Math.floor(value);
+
+  if (finalValue > 42000) {
+    alert('신비한 티켓은 최대 42,000개까지만 입력할 수 있습니다.');
+    ticketInputValue?.focus();
+    return;
+  }
+
+  snowTicketCount.textContent = finalValue.toLocaleString('ko-KR');
+
+  updateTowerPotionCount();
+  closeTicketInputModal();
+}
+
+btnInputSnowTicket?.addEventListener('click', () => {
+  openTicketInputModal();
+});
+
+// ✅ 보상 이미지 선택 / 선택 해제
+document.querySelectorAll('.reward-item').forEach(item => {
+  item.addEventListener('click', () => {
+    if (item.id === 'rewardTowerPotion') return;
+
+    if (item.classList.contains('quantity-reward')) {
+      if (item.classList.contains('selected')) {
+        clearQuantityRewardSelection(item);
+      } else {
+        handleQuantityRewardClick(item);
+      }
+
+      updateTowerPotionCount();
+      return;
+    }
+
+    item.classList.toggle('selected');
+    updateTowerPotionCount();
+  });
+});
+
+btnCancelRewardQuantity?.addEventListener('click', closeRewardQuantityModal);
+rewardQuantityModalBackdrop?.addEventListener('click', closeRewardQuantityModal);
+btnConfirmRewardQuantity?.addEventListener('click', confirmRewardQuantity);
+
+btnCancelTicketInput?.addEventListener('click', closeTicketInputModal);
+ticketInputModalBackdrop?.addEventListener('click', closeTicketInputModal);
+btnConfirmTicketInput?.addEventListener('click', confirmTicketInput);
+
+ticketInputValue?.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    confirmTicketInput();
+  }
+
+  if (event.key === 'Escape') {
+    closeTicketInputModal();
+  }
+});
+
+rewardQuantityInput?.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    confirmRewardQuantity();
+  }
+
+  if (event.key === 'Escape') {
+    closeRewardQuantityModal();
+  }
+});
+
+updateTowerPotionCount();
+</script>
+</body>
+
+</html>
