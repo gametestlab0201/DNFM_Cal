@@ -566,6 +566,23 @@ const ticketInputModalBackdrop = document.getElementById('ticketInputModalBackdr
 let pendingQuantityItem = null;
 const TOWER_POTION_COST = 200;
 
+// ✅ 스노우메이지 이용통계 API
+const SNOWMAGE_STATS_API = 'https://dnf-backend.gogo456654.workers.dev?type=snowmage_stats';
+
+function trackSnowmageStats(type) {
+  fetch(SNOWMAGE_STATS_API, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      type
+    })
+  }).catch(() => {
+    // 통계 저장 실패해도 계산기 사용에는 영향 없게 무시
+  });
+}
+
 // ✅ 쉼표가 들어간 숫자도 정상 처리
 function parseTicketInput(value) {
   return Number(String(value).replaceAll(',', '').trim());
@@ -741,8 +758,9 @@ function confirmTicketInput() {
 
   snowTicketCount.textContent = finalValue.toLocaleString('ko-KR');
 
-  updateTowerPotionCount();
-  closeTicketInputModal();
+updateTowerPotionCount();
+trackSnowmageStats('ticket_input');
+closeTicketInputModal();
 }
 
 btnInputSnowTicket?.addEventListener('click', () => {
@@ -799,6 +817,7 @@ rewardQuantityInput?.addEventListener('keydown', (event) => {
 });
 
 updateTowerPotionCount();
+trackSnowmageStats('page_view');
 </script>
 </body>
 
