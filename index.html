@@ -10299,163 +10299,317 @@ if (/[\r\n]/.test(nickname)) {
         const other = activeOtherBtn ? activeOtherBtn.dataset.value : '없음';  // 선봉/의지/이상/없음
 
         if (!window.state) window.state = {};
-        const state = window.state;
-        if (!state.customSkills) state.customSkills = {};
-        const cs = state.customSkills;
+const state = window.state;
+if (!state.customSkills) state.customSkills = {};
+const cs = state.customSkills;
+
+// ✅ 일괄 적용 실패 메시지를 한 번에 모아서 출력
+const uniqueApplyMessages = [];
 
         // ───────────────────────────────
-        // 1) 무기 고유효과 → 무기 커스텀 버튼에 반영
-        //    (btnCustomOpt + state.customSkills.type / weaponName)
-        // ───────────────────────────────
-        {
-          const picked = weapon; // 강타/광채/분쇄/선명/없음
-          const btn = document.getElementById('btnCustomOpt');
-          const allNames = ['강타', '광채', '분쇄', '선명', '없음'];
+// 1) 무기 고유효과 → 무기 커스텀 버튼에 반영
+//    70제 이상 에픽 무기 또는 침식 무기일 때만 적용
+// ───────────────────────────────
+{
+  const picked = weapon; // 강타/광채/분쇄/선명/없음
+  const btn = document.getElementById('btnCustomOpt');
+  const allNames = ['강타', '광채', '분쇄', '선명', '없음'];
 
-          let weaponName = '';
+  let weaponName = '';
+  let weaponLevel = 0;
+  let weaponRarity = '';
+  let canApplyWeaponUnique = false;
 
-          if (picked === '없음') {
-            // 상태 초기화
-            cs.type = '';
-            cs.weaponName = '';
-            if (typeof state.customOptLabel !== 'undefined') {
-              state.customOptLabel = null;
-            }
-          } else {
-            if (typeof getCurrentWeaponName === 'function') {
-              try {
-                weaponName = getCurrentWeaponName() || '';
-              } catch (_) { }
-            }
-            if (!weaponName) {
-              if (typeof toast === 'function') {
-                toast('무기 이름을 찾지 못했습니다. 무기를 다시 선택해 주세요.');
-              }
-              // 무기 부분은 건너뛰고, 기타 고유효과(상의/팔찌/귀걸이)만 적용 계속 진행
-            } else {
-              cs.type = picked;          // 강타/광채/분쇄/선명
-              cs.weaponName = weaponName;
-            }
-          }
+  const selWeapon = state.selections?.weapon || null;
 
-          if (btn) {
-            // 버튼 라벨/색상 업데이트 (기존 무기 커스텀옵 로직과 동일)
-            btn.textContent = picked || '고유효과(무기)';
+  if (selWeapon) {
+    weaponLevel = parseInt(String(selWeapon.level ?? selWeapon.levelVal ?? '').replace(/[^\d.-]/g, ''), 10) || 0;
+    weaponRarity = String(selWeapon.rarity || '').trim();
+    weaponName = String(selWeapon.name || '').normalize('NFC').trim();
+  }
 
-            allNames.forEach(name => {
-              btn.classList.remove('customopt-' + name);
-            });
-            if (picked) {
-              btn.classList.add('customopt-' + picked); // customopt-강타 / customopt-없음 등
-            }
-          }
-        }
+  // 기존 함수가 있으면 이름은 기존 함수 기준으로 한 번 더 보정
+  if (!weaponName && typeof getCurrentWeaponName === 'function') {
+    try {
+      weaponName = String(getCurrentWeaponName() || '').normalize('NFC').trim();
+    } catch (_) { }
+  }
 
-        // ───────────────────────────────
-        // 2) 기타 고유효과 → 상의/팔찌/귀걸이 동시에 반영
-        //    (armorType / braceletType / earringType + 각 버튼 UI)
-        // ───────────────────────────────
-        {
-          const picked = other; // 선봉/의지/이상/없음
-          const armorNames = ['선봉', '의지', '이상', '없음'];
-          const braceletNames = ['선봉', '의지', '이상', '없음'];
-          const earringNames = ['선봉', '의지', '이상', '없음'];
+  const lowR = weaponRarity.toLowerCase();
+  const isEpic = (weaponRarity === '에픽' || lowR === 'epic');
+  const isErosionWeapon = weaponName.startsWith('[침식]');
 
-          // 2-1) customSkills에 반영 (백엔드용)
-          const otherValue = (picked === '없음') ? '' : picked;
-          cs.armorType = otherValue;
-          cs.braceletType = otherValue;
-          cs.earringType = otherValue;
+  canApplyWeaponUnique = !!selWeapon && ((isEpic && weaponLevel >= 70) || isErosionWeapon);
 
-          // 2-2) UI용 상태(state.*Label) 갱신
-          // 상의는 항상 라벨을 그대로 들고감 (없음 포함)
-          state.customArmor = { type: picked };
-          state.customArmorLabel = picked;
+  if (picked === '없음') {
+    // 없음은 무기 조건과 관계없이 초기화 허용
+    cs.type = '';
+    cs.weaponName = '';
+    if (typeof state.customOptLabel !== 'undefined') {
+      state.customOptLabel = null;
+    }
 
-          // 팔찌/귀걸이는 '없음'일 때 null 로 처리 (기존 코드와 동일)
-          state.customBraceletLabel = (picked === '없음') ? null : picked;
-          state.customEarringLabel = (picked === '없음') ? null : picked;
+    if (btn) {
+      btn.textContent = '없음';
 
-          // 2-3) 상의 버튼
-          const btnArmor = document.getElementById('btnCustomOptArmor');
-          if (btnArmor) {
-            btnArmor.textContent = picked || '고유효과(상의)';
+      allNames.forEach(name => {
+        btn.classList.remove('customopt-' + name);
+      });
 
-            armorNames.forEach(name => {
-              btnArmor.classList.remove('armor-customopt-' + name);
-            });
-            if (picked) {
-              btnArmor.classList.add('armor-customopt-' + picked);
-            }
-          }
+      btn.classList.add('customopt-없음');
+    }
+  } else if (!weaponName) {
+  uniqueApplyMessages.push('무기: 정보를 확인할 수 없어 제외되었습니다.');
 
-          // 2-4) 팔찌 버튼
-          const btnBracelet = document.getElementById('btnCustomOptBracelet');
-          if (btnBracelet) {
-            btnBracelet.textContent = picked || '고유효과(팔찌)';
+  // 무기 상태/UI는 기존값 유지, 기타 고유효과만 계속 적용
+} else if (!canApplyWeaponUnique) {
+  uniqueApplyMessages.push('무기: 적용 조건을 충족하지 않아 제외되었습니다.');
 
-            braceletNames.forEach(name => {
-              btnBracelet.classList.remove('bracelet-customopt-' + name);
-            });
-            if (picked) {
-              btnBracelet.classList.add('bracelet-customopt-' + picked);
-            }
-          }
+  // 무기 상태/UI는 기존값 유지, 기타 고유효과만 계속 적용
+} else {
+    cs.type = picked;          // 강타/광채/분쇄/선명
+    cs.weaponName = weaponName;
+    state.customOptLabel = picked;
 
-          // 2-5) 귀걸이 버튼
-          const btnEarring = document.getElementById('btnCustomOptEarring');
-          if (btnEarring) {
-            btnEarring.textContent = picked || '고유효과(귀걸이)';
+    if (btn) {
+      btn.textContent = picked;
 
-            earringNames.forEach(name => {
-              btnEarring.classList.remove('earring-customopt-' + name);
-            });
-            if (picked) {
-              btnEarring.classList.add('earring-customopt-' + picked);
-            }
-          }
-        }
+      allNames.forEach(name => {
+        btn.classList.remove('customopt-' + name);
+      });
 
-        // 3) 장비 설명 프리뷰 갱신
-        if (typeof updateEquipDescPreview === 'function') {
-          updateEquipDescPreview();
-        }
+      btn.classList.add('customopt-' + picked);
+    }
+  }
+}
 
-        // 4) 모달 닫기
-        showModal($uniqueEffectModal, false);
+       // ───────────────────────────────
+// 2) 기타 고유효과 → 상의/팔찌/귀걸이 부위별 조건 확인 후 반영
+//    상의/팔찌/귀걸이는 익시드 아이템일 때만 고유효과 적용
+// ───────────────────────────────
+{
+  const picked = other; // 선봉/의지/이상/없음
+  const armorNames = ['선봉', '의지', '이상', '없음'];
+  const braceletNames = ['선봉', '의지', '이상', '없음'];
+  const earringNames = ['선봉', '의지', '이상', '없음'];
+
+  const otherValue = (picked === '없음') ? '' : picked;
+
+  function isExceedEquip(item) {
+    const rarity = String(item?.rarity || '').trim();
+    const lower = rarity.toLowerCase();
+    return rarity === '익시드' || lower === 'exceed';
+  }
+
+  function resetUniqueButton(btn, classPrefix, names, defaultText) {
+    if (!btn) return;
+
+    btn.textContent = defaultText;
+
+    names.forEach(name => {
+      btn.classList.remove(classPrefix + name);
+    });
+  }
+
+  function applyUniqueButton(btn, classPrefix, names, defaultText, value) {
+    if (!btn) return;
+
+    btn.textContent = value || defaultText;
+
+    names.forEach(name => {
+      btn.classList.remove(classPrefix + name);
+    });
+
+    if (value) {
+      btn.classList.add(classPrefix + value);
+    }
+  }
+
+  const selections = state.selections || {};
+
+  const uniqueParts = [
+    {
+      key: 'top',
+      label: '상의',
+      item: selections.top || null,
+      csKey: 'armorType',
+      labelKey: 'customArmorLabel',
+      btnId: 'btnCustomOptArmor',
+      classPrefix: 'armor-customopt-',
+      names: armorNames,
+      defaultText: '고유효과(상의)',
+      resetExtra() {
+        state.customArmor = { type: '' };
+      },
+      applyExtra(value) {
+        state.customArmor = { type: value };
+      }
+    },
+    {
+      key: 'bracelet',
+      label: '팔찌',
+      item: selections.bracelet || null,
+      csKey: 'braceletType',
+      labelKey: 'customBraceletLabel',
+      btnId: 'btnCustomOptBracelet',
+      classPrefix: 'bracelet-customopt-',
+      names: braceletNames,
+      defaultText: '고유효과(팔찌)'
+    },
+    {
+      key: 'earring',
+      label: '귀걸이',
+      item: selections.earring || null,
+      csKey: 'earringType',
+      labelKey: 'customEarringLabel',
+      btnId: 'btnCustomOptEarring',
+      classPrefix: 'earring-customopt-',
+      names: earringNames,
+      defaultText: '고유효과(귀걸이)'
+    }
+  ];
+
+  uniqueParts.forEach(part => {
+    const btn = document.getElementById(part.btnId);
+
+    // ✅ "없음"은 고유효과 제거 목적이므로 장비 등급과 관계없이 초기화 허용
+    if (picked === '없음') {
+      cs[part.csKey] = '';
+      state[part.labelKey] = null;
+
+      if (typeof part.resetExtra === 'function') {
+        part.resetExtra();
+      }
+
+      applyUniqueButton(
+        btn,
+        part.classPrefix,
+        part.names,
+        part.defaultText,
+        '없음'
+      );
+
+      return;
+    }
+
+    // ✅ 선봉/의지/이상 적용은 익시드 아이템일 때만 허용
+    if (!isExceedEquip(part.item)) {
+      uniqueApplyMessages.push(`${part.label}: 익시드 장비가 아니므로 제외되었습니다.`);
+
+      // 혹시 기존에 남아있던 잘못된 고유효과가 있으면 제거
+      cs[part.csKey] = '';
+      state[part.labelKey] = null;
+
+      if (typeof part.resetExtra === 'function') {
+        part.resetExtra();
+      }
+
+      resetUniqueButton(
+        btn,
+        part.classPrefix,
+        part.names,
+        part.defaultText
+      );
+
+      return;
+    }
+
+    // ✅ 조건 만족 부위만 적용
+    cs[part.csKey] = otherValue;
+    state[part.labelKey] = picked;
+
+    if (typeof part.applyExtra === 'function') {
+      part.applyExtra(picked);
+    }
+
+    applyUniqueButton(
+      btn,
+      part.classPrefix,
+      part.names,
+      part.defaultText,
+      picked
+    );
+  });
+}
+
+        // ✅ 조건 불충족 메시지를 한 번에 출력
+if (uniqueApplyMessages.length > 0) {
+  alert(uniqueApplyMessages.join('\n'));
+}
+
+// 3) 장비 설명 프리뷰 갱신
+if (typeof updateEquipDescPreview === 'function') {
+  updateEquipDescPreview();
+}
+
+// 4) 모달 닫기
+showModal($uniqueEffectModal, false);
       });
     }
 
 
     if ($btnUniqueBulk && $uniqueEffectModal) {
-      $btnUniqueBulk.addEventListener('click', () => {
+  $btnUniqueBulk.addEventListener('click', () => {
 
-        // ✅ 1) 캐릭터 선택 여부 체크
-        const charName = String(state?.currentCharacter?.name || '').trim();
-        if (!charName) {
-          toast('캐릭터를 먼저 선택해 주세요.');
-          return;
-        }
-
-        // ✅ 2) 무기 선택 여부 체크
-        let weaponName = '';
-        if (typeof getCurrentWeaponName === 'function') {
-          try { weaponName = String(getCurrentWeaponName() || '').trim(); } catch (_) { }
-        }
-        if (!weaponName) {
-          toast('무기를 먼저 선택해 주세요.');
-          return;
-        }
-
-        // ✅ 조건 충족 시에만 모달 오픈
-        updateUniqueEffectDescriptions();
-        showModal($uniqueEffectModal, true);
-        // 포커스 이동
-        setTimeout(() => {
-          $uniqueEffectModal.querySelector('[data-close]')?.focus();
-        }, 0);
-      });
+    // ✅ 1) 캐릭터 선택 여부 체크
+    const charName = String(state?.currentCharacter?.name || '').trim();
+    if (!charName) {
+      toast('캐릭터를 먼저 선택해 주세요.');
+      return;
     }
+
+    // ✅ 2) 무기 선택 여부 체크
+    let weaponName = '';
+    if (typeof getCurrentWeaponName === 'function') {
+      try { weaponName = String(getCurrentWeaponName() || '').trim(); } catch (_) { }
+    }
+    if (!weaponName) {
+      toast('무기를 먼저 선택해 주세요.');
+      return;
+    }
+
+    // ✅ 3) 상의 / 팔찌 / 귀걸이 착용 여부 체크
+    function hasEquippedSlot(serverSlotKey, uiSlotCode) {
+      let tile = null;
+
+      if (typeof tileElForSlot === 'function') {
+        tile = tileElForSlot(serverSlotKey);
+      } else {
+        tile = document.querySelector(`.slot[data-slot="${uiSlotCode}"]`);
+      }
+
+      return !!(tile && tile.querySelector('img'));
+    }
+
+    const hasTop = hasEquippedSlot('top', 'L2');
+    const hasBracelet = hasEquippedSlot('bracelet', 'R2');
+    const hasEarring = hasEquippedSlot('earring', 'L6');
+
+    if (!hasTop) {
+      toast('상의 아이템을 먼저 선택해 주세요.');
+      return;
+    }
+
+    if (!hasBracelet) {
+      toast('팔찌를 먼저 선택해 주세요.');
+      return;
+    }
+
+    if (!hasEarring) {
+      toast('귀걸이 아이템을 먼저 선택해 주세요.');
+      return;
+    }
+
+    // ✅ 조건 충족 시에만 모달 오픈
+    updateUniqueEffectDescriptions();
+    showModal($uniqueEffectModal, true);
+
+    // 포커스 이동
+    setTimeout(() => {
+      $uniqueEffectModal.querySelector('[data-close]')?.focus();
+    }, 0);
+  });
+}
 
     // ✅ 현재 방어구 세트 모드 (익시드 / 에픽)
     //   - 지금은 모양만 바꾸고, 나중에 이 값 보고 필터링에 활용 가능
@@ -15543,32 +15697,37 @@ const row =
       let changed = false;
 
       // ─────────────────────────────────────
-      // 1) 무기 커스텀: 렙제 70 이상 + 에픽 아니면 강제 제거
-      // ─────────────────────────────────────
-      {
-        const selWeapon = sels.weapon || null;
-        let wLevel = 0;
-        let wRarity = '';
+// 1) 무기 커스텀: 70제 이상 에픽 무기 또는 침식 무기가 아니면 강제 제거
+// ─────────────────────────────────────
+{
+  const selWeapon = sels.weapon || null;
+  let wLevel = 0;
+  let wRarity = '';
+  let wName = '';
 
-        if (selWeapon) {
-          wLevel = toLevel(selWeapon.level ?? selWeapon.levelVal);
-          wRarity = norm(selWeapon.rarity);
-        }
+  if (selWeapon) {
+    wLevel = toLevel(selWeapon.level ?? selWeapon.levelVal);
+    wRarity = norm(selWeapon.rarity);
+    wName = norm(selWeapon.name).normalize('NFC');
+  }
 
-        const low = wRarity.toLowerCase();
-        const isEpic = (wRarity === '에픽' || low === 'epic');
+  const low = wRarity.toLowerCase();
+  const isEpic = (wRarity === '에픽' || low === 'epic');
 
-        const ok = !!selWeapon && isEpic && wLevel >= 70;
+  // ✅ 침식 무기 허용
+  const isErosionWeapon = wName.startsWith('[침식]');
 
-        if (!ok) {
-          if (cs.type || cs.weaponName || state.customOptLabel) {
-            changed = true;
-          }
-          cs.type = '';
-          cs.weaponName = '';
-          state.customOptLabel = null;   // 모달 하이라이트용
-        }
-      }
+  const ok = !!selWeapon && ((isEpic && wLevel >= 70) || isErosionWeapon);
+
+  if (!ok) {
+    if (cs.type || cs.weaponName || state.customOptLabel) {
+      changed = true;
+    }
+    cs.type = '';
+    cs.weaponName = '';
+    state.customOptLabel = null;   // 모달 하이라이트용
+  }
+}
 
       // ─────────────────────────────────────
       // 2) 상의 커스텀: 레어리티 익시드 아닐 때 제거
@@ -16061,28 +16220,34 @@ const row =
           }
           return;
         }
-        // ★ 커스텀옵 활성 조건: 렙제 70 이상 + 에픽 무기
-        const state = window.state || {};
-        const selections = state.selections || {};
-        const selWeapon = selections.weapon || null;
+        // ★ 커스텀옵 활성 조건: 70제 이상 에픽 무기 또는 침식 무기
+const state = window.state || {};
+const selections = state.selections || {};
+const selWeapon = selections.weapon || null;
 
-        let weaponLevel = 0;
-        let weaponRarity = '';
+let weaponLevel = 0;
+let weaponRarity = '';
+let weaponName = '';
 
-        if (selWeapon) {
-          if (selWeapon.level != null) {
-            weaponLevel = parseInt(String(selWeapon.level), 10) || 0;
-          }
-          weaponRarity = String(selWeapon.rarity || '').trim();
-        }
+if (selWeapon) {
+  if (selWeapon.level != null) {
+    weaponLevel = parseInt(String(selWeapon.level), 10) || 0;
+  }
 
-        const lowR = weaponRarity.toLowerCase();
-        const isEpic = (weaponRarity === '에픽' || lowR === 'epic');
+  weaponRarity = String(selWeapon.rarity || '').trim();
+  weaponName = String(selWeapon.name || '').normalize('NFC').trim();
+}
 
-        if (!(isEpic && weaponLevel >= 70)) {
-          toast('고유효과는 70제 에픽 무기에서만 사용할 수 있습니다.');
-          return;
-        }
+const lowR = weaponRarity.toLowerCase();
+const isEpic = (weaponRarity === '에픽' || lowR === 'epic');
+
+// ✅ 침식 무기 허용
+const isErosionWeapon = weaponName.startsWith('[침식]');
+
+if (!((isEpic && weaponLevel >= 70) || isErosionWeapon)) {
+  toast('고유효과는 70제 에픽 무기 또는 침식 무기에서만 사용할 수 있습니다.');
+  return;
+}
         // 이제는 단순히 모달만 열고,
         // 실제 커스텀옵 적용은 모달 내 "적용" 버튼에서 state.customSkills 에만 기록
         openCustomOptModal();
