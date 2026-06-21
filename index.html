@@ -6697,6 +6697,94 @@
   height: 32px;
   border-radius: 999px;
 }
+
+
+    /* ✅ PIN 로그인 빠른 진입 + 지연 로딩 상태바 */
+    .calc-lazy-status {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      z-index: 10000;
+      width: min(520px, calc(100vw - 28px));
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(110, 168, 255, 0.35);
+      background: rgba(15, 17, 21, 0.92);
+      color: #e6e9ef;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.36);
+      backdrop-filter: blur(8px);
+    }
+
+    .calc-lazy-status[hidden] {
+      display: none !important;
+    }
+
+    .calc-lazy-status-title {
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+
+    .calc-lazy-status-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+      color: rgba(230, 233, 239, 0.86);
+      margin-top: 7px;
+    }
+
+    .calc-lazy-status-bar {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+    }
+
+    .calc-lazy-status-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #6ea8ff, #8fe3ff);
+      transition: width .18s ease;
+    }
+
+    body.calc-data-loading #calc-view {
+      position: relative;
+    }
+
+    body.calc-data-loading #calc-view .layout,
+    body.calc-data-loading #calc-view .save-box,
+    body.calc-data-loading #calc-view .modal,
+    body.calc-data-loading #calc-view .actions,
+    body.calc-data-loading #calc-view .contact-btn,
+    body.calc-data-loading #calc-view .faq-btn {
+      filter: grayscale(0.18);
+      opacity: 0.72;
+    }
+
+    body.calc-data-loading #calc-view::after {
+      content: "데이터 준비 중입니다. 완료 후 선택 버튼이 활성화됩니다.";
+      position: fixed;
+      left: 50%;
+      top: 76px;
+      transform: translateX(-50%);
+      z-index: 9998;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(110, 168, 255, .38);
+      background: rgba(15, 17, 21, .86);
+      color: rgba(230, 233, 239, .92);
+      font-size: 12px;
+      font-weight: 800;
+      pointer-events: none;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .28);
+    }
+
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -9832,6 +9920,14 @@ if (/[\r\n]/.test(nickname)) {
       if (bar) bar.style.width = p + '%';
       if (txt) txt.textContent = p + '%';
       if (lbl && label) lbl.textContent = String(label);
+
+      // ✅ 빠른 진입 + 지연 로딩 상태바도 같은 진행률을 공유
+      const lazyFill = document.getElementById('calcLazyFill');
+      const lazyPct = document.getElementById('calcLazyPct');
+      const lazyLabel = document.getElementById('calcLazyLabel');
+      if (lazyFill) lazyFill.style.width = p + '%';
+      if (lazyPct) lazyPct.textContent = p + '%';
+      if (lazyLabel && label) lazyLabel.textContent = String(label);
     }
     function resetProgress(label) {
       __progressPct = 0;
@@ -9854,6 +9950,78 @@ if (/[\r\n]/.test(nickname)) {
       const ov = document.getElementById('loadingOverlay');
       if (ov) ov.setAttribute('hidden', '');
     }
+
+
+    // ==============================
+    //  빠른 진입 + 지연 로딩 UI 헬퍼
+    //  - 계산기 화면은 먼저 보여주고, 실제 데이터 로딩 완료 전까지 선택/계산 클릭만 잠금
+    // ==============================
+    window.__CALC_DATA_READY__ = !!window.__CALC_DATA_READY__;
+    window.__CALC_LAZY_BOOTING__ = false;
+    // ✅ 기본값은 사용 가능 상태. PIN 지연 로딩 중에만 false로 바뀐다.
+    window.__CALC_DATA_READY__ = true;
+    window.__ADMIN_PIN_LOGIN_MODE__ = !!window.__ADMIN_PIN_LOGIN_MODE__;
+
+    function ensureCalcLazyStatus() {
+      let box = document.getElementById('calcLazyStatus');
+      if (box) return box;
+
+      box = document.createElement('div');
+      box.id = 'calcLazyStatus';
+      box.className = 'calc-lazy-status';
+      box.setAttribute('hidden', '');
+      box.innerHTML = `
+        <div class="calc-lazy-status-title">계산기 화면을 먼저 열었습니다</div>
+        <div class="calc-lazy-status-bar"><div id="calcLazyFill" class="calc-lazy-status-fill" style="width:0%"></div></div>
+        <div class="calc-lazy-status-row">
+          <span id="calcLazyLabel">데이터 준비 중…</span>
+          <span id="calcLazyPct">0%</span>
+        </div>`;
+      document.body.appendChild(box);
+      return box;
+    }
+
+    function showCalcLazyStatus(label) {
+      const box = ensureCalcLazyStatus();
+      box.removeAttribute('hidden');
+      document.body.classList.add('calc-data-loading');
+      window.__CALC_DATA_READY__ = false;
+      setProgressExactMonotonic(0, label || '데이터 준비 중…');
+    }
+
+    function hideCalcLazyStatus() {
+      document.getElementById('calcLazyStatus')?.setAttribute('hidden', '');
+      document.body.classList.remove('calc-data-loading');
+      window.__CALC_DATA_READY__ = true;
+    }
+
+    function isCalcLazyLockedTarget(target) {
+      if (!target || window.__CALC_DATA_READY__) return false;
+      const calc = document.getElementById('calc-view');
+      if (!calc || calc.hasAttribute('hidden')) return false;
+      if (!calc.contains(target)) return false;
+
+      // 헤더/공지/상태바 자체는 막지 않음
+      if (target.closest('#calcLazyStatus, #loadingOverlay, header, #site-header')) return false;
+
+      return !!target.closest('button, input, select, textarea, label, .card, .slot, .preset-btn, .preset-trash, .preset-page-btn, .clickable, [role="button"]');
+    }
+
+    document.addEventListener('click', function (e) {
+      if (!isCalcLazyLockedTarget(e.target)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation?.();
+      (typeof toast === 'function' ? toast : alert)('계산기 데이터를 불러오는 중입니다. 완료 후 이용해주세요.');
+    }, true);
+
+    document.addEventListener('change', function (e) {
+      if (!isCalcLazyLockedTarget(e.target)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation?.();
+      (typeof toast === 'function' ? toast : alert)('계산기 데이터를 불러오는 중입니다. 완료 후 이용해주세요.');
+    }, true);
     function setProgress(pct, label) {
       const bar = document.querySelector('.loading-bar__fill');
       const l = document.getElementById('loadingLabel');
@@ -26895,6 +27063,11 @@ wrap.appendChild(listBox);
       async function onGoogleCredential({ credential }) {
         try {
           if (!credential) throw new Error("ID 토큰 없음");
+          const __credentialForMode = String(credential || '').trim();
+          if (!__credentialForMode.startsWith('ADMINPIN.')) {
+            window.__ADMIN_PIN_LOGIN_MODE__ = false;
+            window.__CALC_DATA_READY__ = true;
+          }
           window.idToken = credential; // 토큰 보관
           document.dispatchEvent(new Event('gsi:issued'));
 
@@ -26987,36 +27160,51 @@ wrap.appendChild(listBox);
               let __booting = false;
 
               btnPC.addEventListener('click', async () => {
-                if (__booting) return;
+                const isPinLogin = !!window.__ADMIN_PIN_LOGIN_MODE__;
+
+                if (__booting || (isPinLogin && window.__CALC_LAZY_BOOTING__)) return;
                 __booting = true;
+                if (isPinLogin) window.__CALC_LAZY_BOOTING__ = true;
 
                 try {
-                  // 로딩 오버레이 띄우기 + 0%로 초기화
-                  showOverlay('데이터 준비 중…');
+                  if (isPinLogin) {
+                    // ✅ PIN 로그인일 때만: 계산기 화면을 먼저 표시하고 데이터는 뒤에서 로딩
+                    showCalcView('pc');
+                    showCalcLazyStatus('기본 레이아웃 표시 완료…');
 
-                  // 1) 기본 init (계정/권한/CORE.lists 세팅)
-                  setProgressExactMonotonic(5, '초기 설정 불러오는 중…');
-                  await initCalculatorOnce();
+                    // 브라우저가 레이아웃을 먼저 그릴 수 있도록 한 틱 양보
+                    await new Promise(resolve => requestAnimationFrame(() => resolve()));
 
-                  // 3) 화면 전환
-                  showCalcView('pc');
+                    setProgressExactMonotonic(5, '초기 설정 불러오는 중…');
+                    await initCalculatorOnce();
+
+                    setProgressExactMonotonic(100, '데이터 준비 완료');
+                    hideCalcLazyStatus();
+                  } else {
+                    // ✅ 일반 Google 로그인은 기존 방식 유지: init 완료 후 계산기 화면 표시
+                    window.__CALC_DATA_READY__ = true;
+                    showOverlay('데이터 준비 중…');
+                    setProgressExactMonotonic(5, '초기 설정 불러오는 중…');
+                    await initCalculatorOnce();
+                    showCalcView('pc');
+                  }
 
                   // ✅ PC 계산기 로딩이 끝난 후 공지 모달 표시
                   if (typeof window.showQuatroNoticeOnce === 'function') {
                     window.showQuatroNoticeOnce();
                   }
-
-                  // 2) 시트/장비 미리 로딩 (여기서 게이지가 5% → 100%까지 움직인다)
-                  //await preloadAllSheets({ weightCore: 35, weightSlots: 65 });
-
-                  // 3) 화면 전환
-                  showCalcView('pc');
                 } catch (e) {
                   console.error('[boot]', e);
+                  if (isPinLogin) {
+                    hideCalcLazyStatus();
+                    window.__CALC_DATA_READY__ = false;
+                    document.body.classList.remove('calc-data-loading');
+                  }
                   (typeof toast === 'function' ? toast : alert)('초기화에 실패했습니다. 새로고침 후 다시 시도해주세요.');
                 } finally {
-                  hideOverlay();
+                  if (!isPinLogin) hideOverlay();
                   __booting = false;
+                  window.__CALC_LAZY_BOOTING__ = false;
                 }
               });
 
@@ -27071,10 +27259,14 @@ wrap.appendChild(listBox);
           window.__loginPingSent = false;
           window.__loginPingResult = null;
 
+          // ✅ 이후 PC 계산기 버튼을 눌렀을 때만 지연 로딩 진입을 사용하기 위한 표시
+          window.__ADMIN_PIN_LOGIN_MODE__ = true;
+
           // Google 로그인 성공 처리와 같은 흐름을 재사용한다.
           // 단, credential에는 Google ID Token이 아니라 백엔드가 발급한 ADMINPIN 세션 토큰이 들어간다.
           await onGoogleCredential({ credential: data.token });
         } catch (err) {
+          window.__ADMIN_PIN_LOGIN_MODE__ = false;
           console.warn('[admin_pin_login] 실패:', err);
           const msg = err?.message || '관리자 PIN 로그인이 실패했습니다.';
           if (typeof toast === 'function') toast(msg);
