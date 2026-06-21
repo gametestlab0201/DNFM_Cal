@@ -27038,6 +27038,122 @@ wrap.appendChild(listBox);
       // GSI에서 호출 가능하도록 전역 노출 유지
       window.onGoogleCredential = onGoogleCredential;
 
+
+      // === 관리자 PIN 로그인: 로그인 메인화면 좌측하단 더블클릭 ===
+      async function adminPinLogin(pin) {
+        const cleanPin = String(pin || '').trim();
+        if (!cleanPin) return;
+
+        const card = document.querySelector('.login-card');
+        if (card) {
+          card.innerHTML = `
+        <div class="login-title">관리자 PIN 확인 중…</div>
+        <div class="login-desc">입력한 PIN 번호로 권한을 확인하고 있습니다.</div>
+        <div class="login-row">
+          <button id="btnPC" class="mode-btn" disabled>PC 계산기 열기</button>
+          <button id="btnM" class="mode-btn" disabled>모바일 계산기 열기</button>
+        </div>`;
+        }
+
+        try {
+          const res = await fetch(`${WEBAPP_URL}?type=admin_pin_login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pin: cleanPin }),
+          });
+
+          const data = await res.json().catch(() => ({ ok: false, message: '응답을 읽지 못했습니다.' }));
+          if (!res.ok || !data.ok || !data.token) {
+            throw new Error(data.message || data.error || '관리자 PIN 로그인이 실패했습니다.');
+          }
+
+          // 기존 login_ping 캐시가 남아있으면 새 관리자 세션 판정이 막힐 수 있으므로 초기화
+          window.__loginPingSent = false;
+          window.__loginPingResult = null;
+
+          // Google 로그인 성공 처리와 같은 흐름을 재사용한다.
+          // 단, credential에는 Google ID Token이 아니라 백엔드가 발급한 ADMINPIN 세션 토큰이 들어간다.
+          await onGoogleCredential({ credential: data.token });
+        } catch (err) {
+          console.warn('[admin_pin_login] 실패:', err);
+          const msg = err?.message || '관리자 PIN 로그인이 실패했습니다.';
+          if (typeof toast === 'function') toast(msg);
+          else alert(msg);
+
+          const card2 = document.querySelector('.login-card');
+          if (card2) {
+            card2.innerHTML = `
+              <div class="login-title">계산기 접근을 위해 구글 계정으로 로그인</div>
+              <div class="login-desc">
+                허용된 계정만 접근 가능합니다. 로그인 후 자동으로 권한을 확인합니다.
+              </div>
+              <div class="login-row">
+                <div id="g_id_onload"
+                  data-client_id="110486887643-3c136grpud2llf2b31d24fqr40s1p44g.apps.googleusercontent.com"
+                  data-callback="onGoogleCredential" data-auto_prompt="true"></div>
+                <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
+                  data-text="signin_with" data-shape="pill" data-logo_alignment="left"></div>
+                <span class="login-hint">허용된 Google 계정만 접근 가능</span>
+              </div>`;
+
+            try {
+              if (window.google?.accounts?.id?.initialize) {
+                window.google.accounts.id.initialize({
+                  client_id: '110486887643-3c136grpud2llf2b31d24fqr40s1p44g.apps.googleusercontent.com',
+                  callback: onGoogleCredential,
+                  auto_select: false,
+                });
+              }
+              if (window.google?.accounts?.id?.renderButton) {
+                const btn = card2.querySelector('.g_id_signin');
+                if (btn) {
+                  window.google.accounts.id.renderButton(btn, {
+                    type: 'standard', size: 'large', theme: 'outline',
+                    text: 'signin_with', shape: 'pill', logo_alignment: 'left',
+                  });
+                }
+              }
+            } catch (e) {
+              console.warn('[admin_pin_login] GSI 버튼 복원 실패:', e);
+            }
+          }
+        }
+      }
+
+      function bindAdminPinEntry() {
+        const area = document.querySelector('.wrap'); // header 제외 메인 영역
+        if (!area || area.dataset.adminPinBound === '1') return;
+        area.dataset.adminPinBound = '1';
+
+        let lastLeftBottomClickAt = 0;
+
+        area.addEventListener('click', (e) => {
+          // 로그인 메인화면에서만 동작
+          if (!document.querySelector('.login-card')) return;
+          if (e.target.closest('button, a, input, textarea, select, .g_id_signin, #g_id_onload')) return;
+
+          const rect = area.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const isLeftBottom = x >= 0 && y >= 0 && x <= rect.width * 0.30 && y >= rect.height * 0.70;
+          if (!isLeftBottom) {
+            lastLeftBottomClickAt = 0;
+            return;
+          }
+
+          const now = Date.now();
+          if (now - lastLeftBottomClickAt <= 450) {
+            lastLeftBottomClickAt = 0;
+            const pin = prompt('관리자 PIN 번호를 입력해주세요.');
+            if (pin != null) adminPinLogin(pin);
+          } else {
+            lastLeftBottomClickAt = now;
+          }
+        });
+      }
+
+      bindAdminPinEntry();
+
       // === 뷰 전환(없으면 추가) ===
       //  - 메인 숨기고 계산기 보여주기 + 모드 클래스 토글
       function hideBlockHard(el) {
