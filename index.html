@@ -3269,6 +3269,57 @@
       /* flex 내부에서 스크롤 되도록 */
     }
 
+    /* ✅ 장비 설명 아래 / 최종데미지 위: 세팅현황 바로가기 버튼 */
+    #btnOpenSettingStatusInline.setting-status-inline-btn {
+      width: 100% !important;
+      height: 36px !important;
+      padding: 0 12px !important;
+      margin: 8px 0 10px !important;
+      border-radius: 999px !important;
+
+      display: none;
+      align-items: center !important;
+      justify-content: center !important;
+
+      border: 1px solid rgba(250, 204, 107, 0.78) !important;
+      background:
+        radial-gradient(circle at 30% 18%, rgba(255, 248, 202, 0.38), transparent 42%),
+        linear-gradient(135deg, #facc6b 0%, #cfa24f 52%, #8f6b2b 100%) !important;
+      color: #1b1207 !important;
+
+      font-size: 13px !important;
+      font-weight: 900 !important;
+      line-height: 1 !important;
+      white-space: nowrap !important;
+      text-align: center !important;
+
+      cursor: pointer;
+      box-shadow:
+        0 6px 14px rgba(0, 0, 0, 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.38) !important;
+      transition: box-shadow .15s, border-color .15s, opacity .15s, transform .15s, filter .15s;
+    }
+
+    #btnOpenSettingStatusInline.setting-status-inline-btn:hover:not(:disabled) {
+      border-color: rgba(255, 223, 120, 0.98) !important;
+      filter: brightness(1.08);
+      box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.38),
+        0 0 0 3px rgba(250, 204, 107, 0.20),
+        inset 0 1px 0 rgba(255, 255, 255, 0.46) !important;
+      transform: translateY(-1px);
+    }
+
+    #btnOpenSettingStatusInline.setting-status-inline-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    #btnOpenSettingStatusInline.setting-status-inline-btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      filter: grayscale(30%);
+    }
+
     .stats-panel h3 {
       margin: 4px 0 0;
       font-size: 14px;
@@ -7456,6 +7507,10 @@
             <div id="statList" class="stat-list"></div>
           </div>
 
+          <button id="btnOpenSettingStatusInline" class="setting-status-inline-btn" type="button" disabled onclick="return window.confirmOpenSettingStatusPageInline?.();">
+            캐릭터 전체 세팅 현황
+          </button>
+
           <!-- ▼ 항상 맨 아래 행(3행 auto) -->
           <div class="final-damage">
             <div class="final-damage-top">
@@ -9499,6 +9554,7 @@ if (/[\r\n]/.test(nickname)) {
 
         // ✅ 로그인한 사용자의 이메일에 따라 전용 버튼 토글
         updateSpecialUserButton();
+        window.refreshSettingStatusInternalButton?.();
 
         setProgressExactMonotonic(79, '성안/버프 상태 반영 중…');
 
@@ -27058,6 +27114,49 @@ wrap.appendChild(listBox);
 
       const DBSkill = { loaded: false, headers: [], rows: [] }; // 스킬 로딩 상태 저장용(원하는 네이밍 사용)
 
+      function openSettingStatusPage() {
+        const token = window.idToken || sessionStorage.getItem('id_token') || '';
+        if (token) sessionStorage.setItem('id_token', token);
+        location.href = 'setting-analyzer/index.html';
+      }
+      window.openSettingStatusPage = openSettingStatusPage;
+
+      window.confirmOpenSettingStatusPageInline = function confirmOpenSettingStatusPageInline() {
+        const ok = confirm('계산기를 종료하고 세팅현황으로 이동하시겠습니까?');
+        if (!ok) return false;
+        openSettingStatusPage();
+        return false;
+      };
+
+      function refreshSettingStatusInternalButton() {
+        const btn = document.getElementById('btnOpenSettingStatusInline');
+        if (!btn) return;
+
+        const canOpen = !!window.__IS_SPECIAL_USER__;
+        btn.classList.add('setting-status-inline-btn');
+        btn.style.display = canOpen ? 'inline-flex' : 'none';
+        btn.disabled = !canOpen;
+
+        // 다른 공통 button CSS가 덮어써도 황금색이 유지되도록 핵심 스타일을 한 번 더 고정
+        btn.style.border = '1px solid rgba(250, 204, 107, 0.78)';
+        btn.style.background = 'radial-gradient(circle at 30% 18%, rgba(255, 248, 202, 0.38), transparent 42%), linear-gradient(135deg, #facc6b 0%, #cfa24f 52%, #8f6b2b 100%)';
+        btn.style.color = '#1b1207';
+        btn.style.fontWeight = '900';
+        btn.style.alignItems = 'center';
+        btn.style.justifyContent = 'center';
+
+        if (!btn.dataset.boundSettingStatus) {
+          btn.dataset.boundSettingStatus = '1';
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.confirmOpenSettingStatusPageInline();
+          });
+        }
+      }
+      window.refreshSettingStatusInternalButton = refreshSettingStatusInternalButton;
+
+      refreshSettingStatusInternalButton();
+
       // === 로그인 성공 콜백(GSI에서 호출) ===
       // ---------- 로그인 처리 ----------
       async function onGoogleCredential({ credential }) {
@@ -27096,6 +27195,7 @@ wrap.appendChild(listBox);
 
           window.__IS_SPECIAL_USER__ = !!(isSpecial || isResearch);
           window.__IS_RESEARCH_USER__ = !!isResearch;
+          refreshSettingStatusInternalButton();
 
           // (선택) 기존 로직들과 같이 쓰고 싶으면 CORE.userEmail도 여기서 미리 채워둠
           window.CORE = window.CORE || {};
@@ -27116,6 +27216,7 @@ wrap.appendChild(listBox);
       <button id="btnPC" class="mode-btn">PC 계산기 열기</button>
       <!-- ★ 모바일은 항상 비활성 + 툴팁 -->
       <button id="btnM" class="mode-btn" disabled title="Comming Soon...">모바일 계산기 열기</button>
+      <button id="btnSettingAnalyzer" class="mode-btn setting-analyzer-btn" type="button" ${isSpecial ? '' : 'style="display:none;"'} disabled>세팅현황 열기</button>
     </div>
       `;
 
@@ -27125,6 +27226,8 @@ wrap.appendChild(listBox);
               style.textContent = `
           .mode-btn{
             height:40px; padding:0 14px; border-radius:999px;
+            display:inline-flex; align-items:center; justify-content:center;
+            line-height:1; vertical-align:middle;
             border:1px solid rgba(255,255,255,.2); background:#111827; color:#e6e9ef; cursor:pointer;
             transition: box-shadow .15s, border-color .15s, opacity .15s;
           }
@@ -27137,10 +27240,12 @@ wrap.appendChild(listBox);
 
             const btnPC = card.querySelector("#btnPC");
             const btnM = card.querySelector("#btnM");
+            const btnSettingAnalyzer = card.querySelector("#btnSettingAnalyzer");
 
             // 기본 잠금
             btnPC?.setAttribute("disabled", "true");
             btnM?.setAttribute("disabled", "true");
+            btnSettingAnalyzer?.setAttribute("disabled", "true");
 
             // ✅ 모바일 버튼: allowed(회원 허용) 이면 모두 활성화
             if (btnM) {
@@ -27155,6 +27260,18 @@ wrap.appendChild(listBox);
             if (allowed) {
               btnPC.removeAttribute("disabled");
               //   btnM.removeAttribute("disabled");
+
+              // ✅ 세팅분석기 버튼은 SPECIAL_USER에게만 노출/활성화
+              if (btnSettingAnalyzer) {
+                if (isSpecial) {
+                  btnSettingAnalyzer.style.display = 'inline-flex';
+                  btnSettingAnalyzer.removeAttribute('disabled');
+                  btnSettingAnalyzer.addEventListener('click', openSettingStatusPage);
+                } else {
+                  btnSettingAnalyzer.style.display = 'none';
+                  btnSettingAnalyzer.setAttribute('disabled', 'true');
+                }
+              }
 
               // 한 번만 부팅되도록 가드
               let __booting = false;
