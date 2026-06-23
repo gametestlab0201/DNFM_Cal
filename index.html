@@ -2882,6 +2882,46 @@
       box-shadow: 0 0 0 2px rgba(207, 162, 79, .25) inset
     }
 
+    .item-tooltip {
+      position: fixed;
+      z-index: 160;
+      width: min(360px, calc(100vw - 28px));
+      max-height: min(360px, 62vh);
+      overflow: auto;
+      display: none;
+      pointer-events: none;
+      padding: 10px 12px;
+      border: 1px solid rgba(207, 162, 79, .42);
+      border-radius: 10px;
+      background: rgba(12, 10, 8, .96);
+      color: #e7dbc7;
+      line-height: 1.55;
+      white-space: normal;
+      box-shadow:
+        0 18px 38px rgba(0, 0, 0, .45),
+        inset 0 1px 0 rgba(255, 255, 255, .08);
+      backdrop-filter: blur(8px);
+    }
+
+    .item-tooltip.show {
+      display: block;
+    }
+
+    .item-tooltip-title {
+      margin-bottom: 6px;
+      color: #ffe8a3;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .item-tooltip-desc {
+      color: #d8cbb8;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: pre-wrap;
+    }
+
     .item-row.is-auto {
       outline: 2px solid rgba(37, 99, 235, .6);
     }
@@ -6924,12 +6964,12 @@
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-                  <li>06.01 시로코 침식 무기 전 캐릭 패치 완료</li>
                   <li>06.05 <span style="color: yellowgreen;">[PC]</span> 시너지 효과 65제 장비 추가</li>
                   <li>06.06 <span style="color: yellowgreen;">[모바일]</span> 시너지 효과 적용 TEST 버전 추가</li>
                   <li>06.07 <span style="color: yellowgreen;">[PC]</span> 한마디 변경 기능 추가</li>
                   <li>06.12 스노우메이지 이벤트 계산기 추가</li>
                   <li>06.20 침식 무기 개별 고유효과 설정 불능 버그 수정</li>
+                  <li>06.23 장비 아이콘 마우스 오버시 설명 추가</li>
 
                 </ul>
               </div>
@@ -7507,7 +7547,7 @@
             <div id="statList" class="stat-list"></div>
           </div>
 
-          <button id="btnOpenSettingStatusInline" class="setting-status-inline-btn" type="button" disabled onclick="return window.confirmOpenSettingStatusPageInline?.();">
+          <button id="btnOpenSettingStatusInline" class="setting-status-inline-btn" type="button" disabled>
             캐릭터 전체 세팅 현황
           </button>
 
@@ -7556,6 +7596,7 @@
       </div>
     </div>
   </div>
+  <div id="itemTooltip" class="item-tooltip" aria-hidden="true"></div>
 
   <!-- ✅ 시너지 효과 모달 -->
   <div id="synergyEffectModal" class="modal" aria-hidden="true">
@@ -17077,9 +17118,25 @@ const characterImg = document.getElementById('characterImg');
     if (!window.DBChars) window.DBChars = { loaded: false, groups: [] };
     // 로그인 토큰이 준비될 때까지 기다리는 유틸 (최대 15초)
     // - 토큰이 없으면 google.accounts.id.prompt()를 호출해서 로그인/재로그인을 띄움
+    function getStoredIdToken() {
+      return sessionStorage.getItem('id_token') || localStorage.getItem('id_token') || '';
+    }
+
+    function rememberIdToken(token) {
+      const clean = String(token || '').trim();
+      if (!clean) return;
+      sessionStorage.setItem('id_token', clean);
+      localStorage.setItem('id_token', clean);
+    }
+
     async function waitForIdToken(timeout = 15000) {
       // 1) 이미 토큰 있으면 바로 반환
       if (window.idToken) return window.idToken;
+      const storedToken = getStoredIdToken();
+      if (storedToken) {
+        window.idToken = storedToken;
+        return storedToken;
+      }
 
       // 2) 없으면 gsi:issued 이벤트를 기다리면서, 필요 시 로그인 프롬프트도 띄움
       return new Promise((resolve, reject) => {
@@ -17585,6 +17642,7 @@ const characterImg = document.getElementById('characterImg');
     /* ===== 아이템 피커 (프론트 전용 / CORE.lists 기반) ===== */
     const itemModal = document.getElementById('itemModal');
     const itemList = document.getElementById('itemList');
+    const itemTooltip = document.getElementById('itemTooltip');
     const itemSearch = document.getElementById('itemSearch');
     const weaponTabs = document.getElementById('weaponTabs');
     const itemDlgTitle = document.getElementById('itemDlgTitle');
@@ -17711,6 +17769,86 @@ const characterImg = document.getElementById('characterImg');
       return (window.DBEquip[cacheKey]?.items || []).slice();
     }
 
+    function normalizeItemDescText(desc) {
+      return String(desc || '')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<\/p>\s*<p>/gi, '\n')
+        .replace(/<\/?[^>]+>/g, '')
+        .replace(/\r\n/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+    }
+
+    function getItemTooltipDesc(item) {
+      return normalizeItemDescText(
+        item?.desc ||
+        item?._raw?.desc ||
+        item?._raw?.description ||
+        item?._raw?.['설명'] ||
+        ''
+      );
+    }
+
+    function itemTooltipHtml(title, desc) {
+      const esc = (typeof escapeHtmlText === 'function')
+        ? escapeHtmlText
+        : (v) => String(v ?? '').replace(/[&<>"']/g, (ch) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+        }[ch]));
+
+      return `<div class="item-tooltip-title">${esc(title || '장비 설명')}</div><div class="item-tooltip-desc">${esc(desc || '설명이 없습니다.')}</div>`;
+    }
+
+    function positionItemTooltip(ev) {
+      if (!itemTooltip || !itemTooltip.classList.contains('show')) return;
+
+      const pad = 14;
+      const gap = 16;
+      const rect = itemTooltip.getBoundingClientRect();
+      const targetRect = ev?.currentTarget?.getBoundingClientRect?.();
+      const baseX = Number.isFinite(ev?.clientX) && ev.clientX > 0
+        ? ev.clientX
+        : (targetRect ? targetRect.right : window.innerWidth / 2);
+      const baseY = Number.isFinite(ev?.clientY) && ev.clientY > 0
+        ? ev.clientY
+        : (targetRect ? targetRect.top : window.innerHeight / 2);
+
+      let left = baseX + gap;
+      let top = baseY + gap;
+
+      if (left + rect.width + pad > window.innerWidth) {
+        left = baseX - rect.width - gap;
+      }
+      if (top + rect.height + pad > window.innerHeight) {
+        top = window.innerHeight - rect.height - pad;
+      }
+
+      itemTooltip.style.left = `${Math.max(pad, left)}px`;
+      itemTooltip.style.top = `${Math.max(pad, top)}px`;
+    }
+
+    function showItemTooltip(ev, title, desc) {
+      if (!itemTooltip) return;
+      const cleanDesc = normalizeItemDescText(desc);
+      if (!cleanDesc) return;
+
+      itemTooltip.innerHTML = itemTooltipHtml(title, cleanDesc);
+      itemTooltip.classList.add('show');
+      itemTooltip.setAttribute('aria-hidden', 'false');
+      positionItemTooltip(ev);
+    }
+
+    function hideItemTooltip() {
+      if (!itemTooltip) return;
+      itemTooltip.classList.remove('show');
+      itemTooltip.setAttribute('aria-hidden', 'true');
+      itemTooltip.innerHTML = '';
+    }
+
     // ✅ 무기 탭도 SumStats.JobGroup 기준으로 불러오도록 고정
     async function renderWeaponTabs(jobGroup) {
       const job = String(
@@ -17773,6 +17911,7 @@ const characterImg = document.getElementById('characterImg');
 
     // ✅ 목록 렌더: 무기일 때도 DBEquip에서만 가져오도록 통일
     function renderItems(slotKey, query = '') {
+      hideItemTooltip();
       itemList.innerHTML = '';
 
       const q = (query || '').trim().toLowerCase();
@@ -17804,6 +17943,11 @@ const characterImg = document.getElementById('characterImg');
       items.forEach(it => {
         const row = document.createElement('button');
         row.className = 'item-row';
+        const tooltipDesc = getItemTooltipDesc(it);
+        if (tooltipDesc) {
+          row.dataset.tooltipTitle = it.name || '';
+          row.dataset.tooltipDesc = tooltipDesc;
+        }
         const isBottom = (slotKey === 'aura' || slotKey === 'title' || slotKey === 'creature' || slotKey === 'artifact');
         const badge = isBottom ? (it.level_text && String(it.level_text).trim()) : `Lv.${it.level ?? 65}`;
         const lvlLabel = isBottom ? (it.level_text && String(it.level_text).trim()) : `${it.level ?? 65}레벨`;
@@ -17885,6 +18029,12 @@ const characterImg = document.getElementById('characterImg');
         const icon = row.querySelector('.icon');
         icon.onerror = () => { icon.src = PLACEHOLDER_IMG; };
 
+        row.addEventListener('mouseenter', (ev) => showItemTooltip(ev, row.dataset.tooltipTitle, row.dataset.tooltipDesc));
+        row.addEventListener('mousemove', positionItemTooltip);
+        row.addEventListener('mouseleave', hideItemTooltip);
+        row.addEventListener('focus', (ev) => showItemTooltip(ev, row.dataset.tooltipTitle, row.dataset.tooltipDesc));
+        row.addEventListener('blur', hideItemTooltip);
+
         itemList.appendChild(row);
       });
     }
@@ -17927,7 +18077,11 @@ const characterImg = document.getElementById('characterImg');
       itemSearch.value = '';
       itemSearch.oninput = () => renderItems(slotKey, itemSearch.value);
     }
-    function closeItemPicker() { itemModal.classList.remove('show'); itemModal.setAttribute('aria-hidden', 'true'); }
+    function closeItemPicker() {
+      hideItemTooltip();
+      itemModal.classList.remove('show');
+      itemModal.setAttribute('aria-hidden', 'true');
+    }
     itemModal.addEventListener('click', (e) => { if (e.target.hasAttribute('data-close') || e.target.classList.contains('backdrop')) closeItemPicker(); });
     // 아이템 선택 후 슬롯에 적용
     async function applyItemToSlot(slotKey, item) {
@@ -27115,8 +27269,9 @@ wrap.appendChild(listBox);
       const DBSkill = { loaded: false, headers: [], rows: [] }; // 스킬 로딩 상태 저장용(원하는 네이밍 사용)
 
       function openSettingStatusPage() {
-        const token = window.idToken || sessionStorage.getItem('id_token') || '';
-        if (token) sessionStorage.setItem('id_token', token);
+        const token = window.idToken || getStoredIdToken();
+        if (token) rememberIdToken(token);
+        sessionStorage.setItem('return_to_calculator', 'pc');
         location.href = 'setting-analyzer/index.html';
       }
       window.openSettingStatusPage = openSettingStatusPage;
@@ -27157,22 +27312,49 @@ wrap.appendChild(listBox);
 
       refreshSettingStatusInternalButton();
 
+      function isReturnToPcRequested() {
+        return sessionStorage.getItem('return_to_calculator') === 'pc' ||
+          new URLSearchParams(location.search).get('view') === 'pc';
+      }
+
+      function clearReturnToPcRequest() {
+        sessionStorage.removeItem('return_to_calculator');
+        if (new URLSearchParams(location.search).get('view') === 'pc') {
+          history.replaceState(null, '', location.pathname + location.hash);
+        }
+      }
+
+      async function bootPcCalculatorDirectly() {
+        window.__CALC_DATA_READY__ = true;
+        showOverlay('계산기로 돌아가는 중…');
+        setProgressExactMonotonic(5, '초기 설정 불러오는 중…');
+        await initCalculatorOnce();
+        showCalcView('pc');
+        clearReturnToPcRequest();
+
+        if (typeof window.showQuatroNoticeOnce === 'function') {
+          window.showQuatroNoticeOnce();
+        }
+      }
+
       // === 로그인 성공 콜백(GSI에서 호출) ===
       // ---------- 로그인 처리 ----------
       async function onGoogleCredential({ credential }) {
         try {
           if (!credential) throw new Error("ID 토큰 없음");
+          const shouldReturnDirectlyToPc = isReturnToPcRequested();
           const __credentialForMode = String(credential || '').trim();
           if (!__credentialForMode.startsWith('ADMINPIN.')) {
             window.__ADMIN_PIN_LOGIN_MODE__ = false;
             window.__CALC_DATA_READY__ = true;
           }
           window.idToken = credential; // 토큰 보관
+          rememberIdToken(credential);
           document.dispatchEvent(new Event('gsi:issued'));
 
           // 로그인 상태 안내 UI
           const card0 = document.querySelector(".login-card");
-          if (card0) {
+          if (card0 && !shouldReturnDirectlyToPc) {
             card0.innerHTML = `
         <div class="login-title">접근 확인 중…</div>
         <div class="login-desc">권한 확인 중입니다. 잠시만 기다려 주세요.</div>
@@ -27202,6 +27384,15 @@ wrap.appendChild(listBox);
           if (loginEmail) CORE.userEmail = loginEmail;
 
           if (!allowed) console.warn("허용 안 됨:", ping);
+
+          if (allowed && shouldReturnDirectlyToPc) {
+            try {
+              await bootPcCalculatorDirectly();
+            } finally {
+              hideOverlay();
+            }
+            return;
+          }
 
           const card = document.querySelector(".login-card");
           if (card) {
@@ -27325,6 +27516,17 @@ wrap.appendChild(listBox);
                 }
               });
 
+              const autoOpenPc =
+                sessionStorage.getItem('return_to_calculator') === 'pc' ||
+                new URLSearchParams(location.search).get('view') === 'pc';
+
+              if (autoOpenPc && !window.__AUTO_RETURN_PC_DONE__) {
+                window.__AUTO_RETURN_PC_DONE__ = true;
+                sessionStorage.removeItem('return_to_calculator');
+                history.replaceState(null, '', location.pathname + location.hash);
+                setTimeout(() => btnPC.click(), 0);
+              }
+
 
               btnM.addEventListener('click', () => {
                 // ✅ 로그인 토큰을 모바일 페이지로 전달(같은 도메인에서만 유효)
@@ -27342,6 +27544,28 @@ wrap.appendChild(listBox);
       }
       // GSI에서 호출 가능하도록 전역 노출 유지
       window.onGoogleCredential = onGoogleCredential;
+
+      async function resumeCalculatorFromStoredTokenIfNeeded() {
+        const autoOpenPc =
+          sessionStorage.getItem('return_to_calculator') === 'pc' ||
+          new URLSearchParams(location.search).get('view') === 'pc';
+        if (!autoOpenPc || window.__RESUME_CALCULATOR_DONE__) return;
+
+        const token = getStoredIdToken();
+        if (!token) return;
+
+        window.__RESUME_CALCULATOR_DONE__ = true;
+        window.__loginPingSent = false;
+        window.__loginPingResult = null;
+        try { showOverlay('계산기로 돌아가는 중…'); } catch (_) { }
+        await onGoogleCredential({ credential: token });
+      }
+
+      setTimeout(() => {
+        resumeCalculatorFromStoredTokenIfNeeded().catch((err) => {
+          console.warn('[resumeCalculatorFromStoredTokenIfNeeded] failed:', err);
+        });
+      }, 0);
 
 
       // === 관리자 PIN 로그인: 로그인 메인화면 좌측하단 더블클릭 ===
