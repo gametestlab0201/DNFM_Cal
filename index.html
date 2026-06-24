@@ -6964,12 +6964,12 @@
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-                  <li>06.05 <span style="color: yellowgreen;">[PC]</span> 시너지 효과 65제 장비 추가</li>
                   <li>06.06 <span style="color: yellowgreen;">[모바일]</span> 시너지 효과 적용 TEST 버전 추가</li>
                   <li>06.07 <span style="color: yellowgreen;">[PC]</span> 한마디 변경 기능 추가</li>
                   <li>06.12 스노우메이지 이벤트 계산기 추가</li>
                   <li>06.20 침식 무기 개별 고유효과 설정 불능 버그 수정</li>
                   <li>06.23 장비 아이콘 마우스 오버시 설명 추가</li>
+                  <li>06.24 <span class="notice-badge">게임실험연구소 전체 캐릭 현황</span> 오픈!</li>
 
                 </ul>
               </div>
@@ -27287,7 +27287,12 @@ wrap.appendChild(listBox);
         const btn = document.getElementById('btnOpenSettingStatusInline');
         if (!btn) return;
 
-        const canOpen = !!window.__IS_SPECIAL_USER__;
+        // ✅ 계산기 내부 "캐릭터 전체 세팅 현황" 버튼은 로그인 허용 유저 전체에게 노출
+        // special_user / research_user 전용이 아니라, login_ping이 ok인 일반 이용자도 사용 가능하다.
+        const ping = window.__loginPingResult || {};
+        const role = window.__userRole || {};
+        const canOpen = !!(ping.ok || role.isLoggedIn);
+
         btn.classList.add('setting-status-inline-btn');
         btn.style.display = canOpen ? 'inline-flex' : 'none';
         btn.disabled = !canOpen;
@@ -27407,7 +27412,7 @@ wrap.appendChild(listBox);
       <button id="btnPC" class="mode-btn">PC 계산기 열기</button>
       <!-- ★ 모바일은 항상 비활성 + 툴팁 -->
       <button id="btnM" class="mode-btn" disabled title="Comming Soon...">모바일 계산기 열기</button>
-      <button id="btnSettingAnalyzer" class="mode-btn setting-analyzer-btn" type="button" ${isSpecial ? '' : 'style="display:none;"'} disabled>세팅현황 열기</button>
+      <button id="btnSettingAnalyzer" class="mode-btn setting-analyzer-btn" type="button" disabled>세팅현황 열기</button>
     </div>
       `;
 
@@ -27452,16 +27457,11 @@ wrap.appendChild(listBox);
               btnPC.removeAttribute("disabled");
               //   btnM.removeAttribute("disabled");
 
-              // ✅ 세팅분석기 버튼은 SPECIAL_USER에게만 노출/활성화
+              // ✅ 세팅현황 버튼은 로그인 허용 유저 전체에게 노출/활성화
               if (btnSettingAnalyzer) {
-                if (isSpecial) {
-                  btnSettingAnalyzer.style.display = 'inline-flex';
-                  btnSettingAnalyzer.removeAttribute('disabled');
-                  btnSettingAnalyzer.addEventListener('click', openSettingStatusPage);
-                } else {
-                  btnSettingAnalyzer.style.display = 'none';
-                  btnSettingAnalyzer.setAttribute('disabled', 'true');
-                }
+                btnSettingAnalyzer.style.display = 'inline-flex';
+                btnSettingAnalyzer.removeAttribute('disabled');
+                btnSettingAnalyzer.addEventListener('click', openSettingStatusPage);
               }
 
               // 한 번만 부팅되도록 가드

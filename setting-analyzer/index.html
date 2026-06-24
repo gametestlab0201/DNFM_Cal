@@ -695,6 +695,170 @@
       }
     }
 
+
+    /* ✅ 모바일 세팅현황 전용 한마디: 모바일 계산기 .m-oneliner 스타일 이식 */
+    .setting-mobile-oneliner { display: none; }
+
+    @media (max-width: 980px) {
+      .site-header .header-ads { display: none !important; }
+
+      .setting-mobile-oneliner {
+        margin: 6px 12px 0 !important;
+        padding: 6px 10px !important;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        display: flex;
+        align-items: center !important;
+        gap: 6px !important;
+        height: 35px !important;
+        min-height: 35px !important;
+        max-height: 35px !important;
+        overflow: hidden !important;
+      }
+
+      .setting-mobile-oneliner .text {
+        min-width: 0;
+        width: 100%;
+        font-size: 12px;
+        line-height: 1.25;
+        color: rgba(233, 238, 247, 0.92);
+        overflow: hidden;
+        opacity: 1;
+        transition: opacity .18s ease;
+      }
+
+      .setting-mobile-oneliner .text.fade-out { opacity: 0; }
+      .setting-mobile-oneliner .text.muted { color: var(--muted); }
+
+      .setting-mobile-oneliner .hdrmsg {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .setting-mobile-oneliner .msg-nick { font-weight: 900; }
+      .setting-mobile-oneliner .msg-bullet { opacity: .7; padding: 0 2px; }
+
+      .setting-mobile-oneliner .msg-text {
+        display: inline-block;
+        position: relative;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 72vw;
+        opacity: 0.95;
+      }
+
+      .setting-mobile-oneliner .msg-text .marquee {
+        display: inline-block;
+        padding-right: 7px;
+      }
+
+      .setting-mobile-oneliner .msg-text.is-marquee {
+        overflow: hidden;
+        text-overflow: clip;
+      }
+
+      .setting-mobile-oneliner .msg-text.is-marquee .marquee {
+        white-space: nowrap;
+        will-change: transform;
+        animation: setting_mobile_one_marquee var(--marquee-dur, 14s) linear infinite;
+      }
+
+      @keyframes setting_mobile_one_marquee {
+        0% { transform: translateX(0); }
+        15% { transform: translateX(0); }
+        70% { transform: translateX(calc(-1px * var(--marquee-dist, 0))); }
+        85% { transform: translateX(calc(-1px * var(--marquee-dist, 0))); }
+        100% { transform: translateX(0); }
+      }
+
+      .setting-mobile-oneliner .tag-senior {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2px 10px;
+        min-width: 32px;
+        height: 20px;
+        border-radius: 999px;
+        font-size: 13px;
+        line-height: 1;
+        background: linear-gradient(135deg, #ffe08a 0%, #ffd257 45%, #ffc63a 100%);
+        border: 1px solid rgba(172, 124, 22, 0.55);
+        color: #2a1b00;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .setting-mobile-oneliner .tag-senior::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, .45) 35%, transparent 70%);
+        transform: translateX(-120%);
+        animation: setting_mobile_one_shimmer 2.4s linear infinite;
+        pointer-events: none;
+      }
+
+      @keyframes setting_mobile_one_shimmer {
+        0% { transform: translateX(-120%); }
+        100% { transform: translateX(120%); }
+      }
+
+      .setting-mobile-oneliner .badge-emoji { transform: translateY(-.5px); }
+
+      .setting-mobile-oneliner .hdrmsg.senior {
+        position: relative;
+        filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.35));
+      }
+
+      .setting-mobile-oneliner .hdrmsg.senior .msg-text {
+        color: #fef9c3;
+        text-shadow:
+          0 0 4px rgba(250, 204, 21, 0.65),
+          0 0 8px rgba(250, 204, 21, 0.82),
+          0 0 14px rgba(250, 204, 21, 0.95);
+      }
+
+      .setting-mobile-oneliner .hdrmsg.senior .msg-nick {
+        color: #e5e7eb;
+        font-weight: 600;
+        text-shadow:
+          0 0 3px rgba(59, 130, 246, 0.55),
+          0 0 7px rgba(59, 130, 246, 0.75);
+        text-decoration: underline;
+        text-decoration-color: rgba(255, 198, 58, .7);
+        text-underline-offset: 2px;
+      }
+
+      .setting-mobile-oneliner .hdrmsg.senior .msg-bullet { color: #facc15; opacity: 0.9; }
+      .setting-mobile-oneliner .hdrmsg.lead .msg-nick { font-weight: 700; }
+      .setting-mobile-oneliner .hdrmsg.lead .msg-bullet { opacity: .7; padding: 0 4px 0 0; }
+
+      .setting-mobile-oneliner .tag-lead {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(120, 120, 120, .75);
+        box-shadow: 0 0 0 1px rgba(120, 120, 120, .28);
+        margin-right: 2px;
+        vertical-align: middle;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .setting-mobile-oneliner .msg-text.is-marquee .marquee {
+        animation: none !important;
+        padding-left: 0 !important;
+        transform: none !important;
+      }
+    }
+
     .topbar {
       display: flex;
       align-items: center;
@@ -1120,6 +1284,11 @@
         flex-basis: 42px;
       }
 
+      /* ✅ 모바일에서는 저장슬롯을 한 페이지에 5개만 표시 */
+      .setting-checks .save-box .preset-slot:nth-of-type(n+6) {
+        display: none;
+      }
+
       .setting-checks .save-box .preset-btn {
         border-radius: 10px;
         font-size: 20px;
@@ -1147,6 +1316,25 @@
       align-self: center;
       white-space: nowrap;
       box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+
+      /* ✅ PC: 현황 저장 버튼은 저장슬롯 아래에서 가운데 정렬하되, 너무 길어지지 않게 1/3 폭으로 제한 */
+      flex: 0 0 33.333%;
+      width: 33.333%;
+      min-width: 110px;
+      max-width: 260px;
+      margin: 2px auto 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ✅ 모바일은 직전처럼 버튼 배치를 유지 */
+    @media (max-width: 980px) {
+      .analyzer-status-save-btn {
+        flex: 0 0 100%;
+        width: fit-content;
+        max-width: none;
+      }
     }
 
     .analyzer-status-save-btn:hover:not(:disabled) {
@@ -2107,6 +2295,229 @@
         left: -6px;
       }
     }
+
+    /* ✅ 모바일 현황 슬롯 4행 배치
+       1행: 캐릭터 / 2행: 무기+방어구 / 3행: 악세+특수 / 4행: 꾸미기·부가 장비
+       - flex-wrap 대신 CSS Grid로 행을 강제해서 캐릭터가 무기/방어구와 같은 행에 섞이지 않게 한다. */
+    @media (max-width: 980px) {
+      .slot-area {
+        padding: 10px;
+        overflow-x: visible;
+      }
+
+      .analyzer-slot {
+        overflow: visible;
+      }
+
+      .slot-row {
+        --mobile-slot-gap: 5px;
+        --mobile-group-gap: 7px;
+        /* ✅ 구분 간격을 넣되 현황슬롯 밖으로 튀어나가지 않도록,
+           캐릭터를 제외한 모든 장비칸이 같은 폭으로 아주 조금씩 줄어들게 계산한다. */
+        --mobile-slot-cell-w: calc((100% - (5 * var(--mobile-slot-gap)) - var(--mobile-group-gap)) / 6);
+        display: grid !important;
+        grid-template-columns: repeat(6, minmax(0, var(--mobile-slot-cell-w)));
+        grid-auto-rows: auto;
+        align-items: stretch;
+        justify-content: start;
+        gap: 8px var(--mobile-slot-gap);
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .slot-row > .slot-cell,
+      .slot-row > .slot-cell:first-child {
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        flex: none !important;
+        flex-basis: auto !important;
+        grid-template-rows: 19px 48px 19px;
+        gap: 3px;
+        margin-left: 0 !important;
+      }
+
+      /* ✅ 1행: 캐릭터는 반드시 단독 1행.
+         전체 6칸 중 2칸만 차지하게 해서 가로폭을 약 1/3로 줄인다. */
+      .slot-row > .slot-cell.mobile-row-character {
+        grid-column: 1 / span 2 !important;
+        grid-row: 1 !important;
+        display: grid !important;
+        grid-template-rows: 48px !important;
+        padding-bottom: 0 !important;
+      }
+
+      .slot-row > .slot-cell.mobile-row-character .setting-box {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        height: 48px !important;
+        grid-row: 1 !important;
+      }
+
+      /* ✅ 2~4행: 각 행마다 6칸씩 자동 배치 */
+      .slot-row > .slot-cell.mobile-row-gear {
+        grid-row: 2 !important;
+      }
+
+      .slot-row > .slot-cell.mobile-row-accessory {
+        grid-row: 3 !important;
+      }
+
+      .slot-row > .slot-cell.mobile-row-special {
+        grid-row: 4 !important;
+      }
+
+      /* ✅ 모바일에서는 PC용 그룹 구분선을 모두 숨긴 뒤, 필요한 3곳만 다시 표시한다. */
+      .slot-row > .slot-cell.group-start::before {
+        display: none !important;
+      }
+
+      /* ✅ 모바일 전용 그룹 간격
+         - 구분선 뒤쪽 "그룹 전체"를 같이 오른쪽으로 민다.
+         - 대신 위에서 모든 장비칸 폭을 동일하게 소폭 축소해 겹침/튀어나감을 방지한다.
+         - 무기와 방어구 사이: 머리어깨~신발 그룹 이동
+         - 악세사리와 특수장비 사이: 보조장비~귀걸이 그룹 이동
+         - 오칭크아와 아바타 사이: 아바타~무기아바타 그룹 이동 */
+      .slot-row > .slot-cell:has(.setting-box[data-slot="shoulder"]),
+      .slot-row > .slot-cell:has(.setting-box[data-slot="top"]),
+      .slot-row > .slot-cell:has(.setting-box[data-slot="bottom"]),
+      .slot-row > .slot-cell:has(.setting-box[data-slot="belt"]),
+      .slot-row > .slot-cell:has(.setting-box[data-slot="shoes"]),
+      .slot-row > .slot-cell:has(.setting-box[data-slot="sub-equipment"]),
+      .slot-row > .slot-cell:has(.setting-box[data-slot="magic-stone"]),
+      .slot-row > .slot-cell:has(.setting-box[data-slot="earring"]),
+      .slot-row > .slot-cell:has(.setting-box[data-slot="avatar"]),
+      .slot-row > .slot-cell:has(.setting-box[data-slot="weapon-avatar"]) {
+        transform: translateX(var(--mobile-group-gap)) !important;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ✅ 구분선은 각 이동 그룹의 첫 칸에만 표시 */
+      .slot-row > .slot-cell:has(.setting-box[data-slot="shoulder"])::before,
+      .slot-row > .slot-cell:has(.setting-box[data-slot="sub-equipment"])::before,
+      .slot-row > .slot-cell:has(.setting-box[data-slot="avatar"])::before {
+        display: block !important;
+        left: calc((var(--mobile-slot-gap) + var(--mobile-group-gap)) / -2 - 1px) !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        width: 1px !important;
+        border-radius: 999px;
+        background:
+          linear-gradient(
+            180deg,
+            transparent,
+            rgba(250, 204, 107, 0.22) 12%,
+            rgba(250, 204, 107, 0.70) 50%,
+            rgba(250, 204, 107, 0.22) 88%,
+            transparent
+          ) !important;
+        box-shadow: 0 0 8px rgba(250, 204, 107, 0.20);
+        pointer-events: none;
+      }
+
+      .setting-box {
+        height: 48px;
+        border-radius: 10px;
+        font-size: clamp(8px, 2.35vw, 10px);
+      }
+
+      .enchant-box,
+      .emblem-box {
+        height: 19px;
+        border-radius: 7px;
+        font-size: clamp(6px, 1.85vw, 7px);
+      }
+
+      .slot-row.hide-enchant-row:not(.hide-emblem-row) .slot-cell:not(.mobile-row-character) {
+        grid-template-rows: 48px 19px;
+      }
+
+      .slot-row.hide-emblem-row:not(.hide-enchant-row) .slot-cell:not(.mobile-row-character) {
+        grid-template-rows: 19px 48px;
+      }
+
+      .slot-row.hide-enchant-row.hide-emblem-row .slot-cell:not(.mobile-row-character) {
+        grid-template-rows: 48px;
+      }
+
+      /* ✅ 모바일 4행 배치에서는 개별 칸이 아니라 행 그룹 단위로 빈 공간을 접는다.
+         - 같은 행 안에 마법부여/엠블렘이 하나라도 남아 있으면 해당 줄 높이를 유지한다.
+         - 같은 행 안의 마법부여/엠블렘이 전부 숨겨졌을 때만 그 행 전체가 빈 공간을 메운다. */
+      .slot-row > .slot-cell:not(.mobile-row-character) > .enchant-box.setting-sub-hidden,
+      .slot-row > .slot-cell:not(.mobile-row-character) > .emblem-box.setting-sub-hidden {
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+
+      /* ===== 2행: 무기 + 방어구 행 ===== */
+      .slot-row.mobile-gear-hide-enchant:not(.mobile-gear-hide-emblem) > .slot-cell.mobile-row-gear {
+        grid-template-rows: 48px 19px !important;
+      }
+      .slot-row.mobile-gear-hide-enchant:not(.mobile-gear-hide-emblem) > .slot-cell.mobile-row-gear > .enchant-box.setting-sub-hidden { display: none !important; }
+      .slot-row.mobile-gear-hide-enchant:not(.mobile-gear-hide-emblem) > .slot-cell.mobile-row-gear > .setting-box { grid-row: 1 !important; }
+      .slot-row.mobile-gear-hide-enchant:not(.mobile-gear-hide-emblem) > .slot-cell.mobile-row-gear > .emblem-box { grid-row: 2 !important; }
+
+      .slot-row.mobile-gear-hide-emblem:not(.mobile-gear-hide-enchant) > .slot-cell.mobile-row-gear {
+        grid-template-rows: 19px 48px !important;
+      }
+      .slot-row.mobile-gear-hide-emblem:not(.mobile-gear-hide-enchant) > .slot-cell.mobile-row-gear > .emblem-box.setting-sub-hidden { display: none !important; }
+      .slot-row.mobile-gear-hide-emblem:not(.mobile-gear-hide-enchant) > .slot-cell.mobile-row-gear > .enchant-box { grid-row: 1 !important; }
+      .slot-row.mobile-gear-hide-emblem:not(.mobile-gear-hide-enchant) > .slot-cell.mobile-row-gear > .setting-box { grid-row: 2 !important; }
+
+      .slot-row.mobile-gear-hide-enchant.mobile-gear-hide-emblem > .slot-cell.mobile-row-gear {
+        grid-template-rows: 48px !important;
+      }
+      .slot-row.mobile-gear-hide-enchant.mobile-gear-hide-emblem > .slot-cell.mobile-row-gear > .enchant-box.setting-sub-hidden,
+      .slot-row.mobile-gear-hide-enchant.mobile-gear-hide-emblem > .slot-cell.mobile-row-gear > .emblem-box.setting-sub-hidden { display: none !important; }
+      .slot-row.mobile-gear-hide-enchant.mobile-gear-hide-emblem > .slot-cell.mobile-row-gear > .setting-box { grid-row: 1 !important; }
+
+      /* ===== 3행: 악세서리 + 특수장비 행 ===== */
+      .slot-row.mobile-accessory-hide-enchant:not(.mobile-accessory-hide-emblem) > .slot-cell.mobile-row-accessory {
+        grid-template-rows: 48px 19px !important;
+      }
+      .slot-row.mobile-accessory-hide-enchant:not(.mobile-accessory-hide-emblem) > .slot-cell.mobile-row-accessory > .enchant-box.setting-sub-hidden { display: none !important; }
+      .slot-row.mobile-accessory-hide-enchant:not(.mobile-accessory-hide-emblem) > .slot-cell.mobile-row-accessory > .setting-box { grid-row: 1 !important; }
+      .slot-row.mobile-accessory-hide-enchant:not(.mobile-accessory-hide-emblem) > .slot-cell.mobile-row-accessory > .emblem-box { grid-row: 2 !important; }
+
+      .slot-row.mobile-accessory-hide-emblem:not(.mobile-accessory-hide-enchant) > .slot-cell.mobile-row-accessory {
+        grid-template-rows: 19px 48px !important;
+      }
+      .slot-row.mobile-accessory-hide-emblem:not(.mobile-accessory-hide-enchant) > .slot-cell.mobile-row-accessory > .emblem-box.setting-sub-hidden { display: none !important; }
+      .slot-row.mobile-accessory-hide-emblem:not(.mobile-accessory-hide-enchant) > .slot-cell.mobile-row-accessory > .enchant-box { grid-row: 1 !important; }
+      .slot-row.mobile-accessory-hide-emblem:not(.mobile-accessory-hide-enchant) > .slot-cell.mobile-row-accessory > .setting-box { grid-row: 2 !important; }
+
+      .slot-row.mobile-accessory-hide-enchant.mobile-accessory-hide-emblem > .slot-cell.mobile-row-accessory {
+        grid-template-rows: 48px !important;
+      }
+      .slot-row.mobile-accessory-hide-enchant.mobile-accessory-hide-emblem > .slot-cell.mobile-row-accessory > .enchant-box.setting-sub-hidden,
+      .slot-row.mobile-accessory-hide-enchant.mobile-accessory-hide-emblem > .slot-cell.mobile-row-accessory > .emblem-box.setting-sub-hidden { display: none !important; }
+      .slot-row.mobile-accessory-hide-enchant.mobile-accessory-hide-emblem > .slot-cell.mobile-row-accessory > .setting-box { grid-row: 1 !important; }
+
+      /* ===== 4행: 오라/칭호/크리쳐/아티팩트/아바타/무기아바타 행 ===== */
+      .slot-row.mobile-special-hide-enchant:not(.mobile-special-hide-emblem) > .slot-cell.mobile-row-special {
+        grid-template-rows: 48px 19px !important;
+      }
+      .slot-row.mobile-special-hide-enchant:not(.mobile-special-hide-emblem) > .slot-cell.mobile-row-special > .enchant-box.setting-sub-hidden { display: none !important; }
+      .slot-row.mobile-special-hide-enchant:not(.mobile-special-hide-emblem) > .slot-cell.mobile-row-special > .setting-box { grid-row: 1 !important; }
+      .slot-row.mobile-special-hide-enchant:not(.mobile-special-hide-emblem) > .slot-cell.mobile-row-special > .emblem-box { grid-row: 2 !important; }
+
+      .slot-row.mobile-special-hide-emblem:not(.mobile-special-hide-enchant) > .slot-cell.mobile-row-special {
+        grid-template-rows: 19px 48px !important;
+      }
+      .slot-row.mobile-special-hide-emblem:not(.mobile-special-hide-enchant) > .slot-cell.mobile-row-special > .emblem-box.setting-sub-hidden { display: none !important; }
+      .slot-row.mobile-special-hide-emblem:not(.mobile-special-hide-enchant) > .slot-cell.mobile-row-special > .enchant-box { grid-row: 1 !important; }
+      .slot-row.mobile-special-hide-emblem:not(.mobile-special-hide-enchant) > .slot-cell.mobile-row-special > .setting-box { grid-row: 2 !important; }
+
+      .slot-row.mobile-special-hide-enchant.mobile-special-hide-emblem > .slot-cell.mobile-row-special {
+        grid-template-rows: 48px !important;
+      }
+      .slot-row.mobile-special-hide-enchant.mobile-special-hide-emblem > .slot-cell.mobile-row-special > .enchant-box.setting-sub-hidden,
+      .slot-row.mobile-special-hide-enchant.mobile-special-hide-emblem > .slot-cell.mobile-row-special > .emblem-box.setting-sub-hidden { display: none !important; }
+      .slot-row.mobile-special-hide-enchant.mobile-special-hide-emblem > .slot-cell.mobile-row-special > .setting-box { grid-row: 1 !important; }
+    }
+
 
 
     /* ===== 선택 모달: 기존 프론트의 modal/dialog 구조를 세팅분석기용으로 축소 적용 ===== */
@@ -3363,6 +3774,10 @@
     </div>
   </header>
 
+  <div id="settingMobileOneLiner" class="setting-mobile-oneliner" aria-live="polite">
+    <div class="text muted" id="settingMobileOneLinerText">한마디 불러오는 중…</div>
+  </div>
+
   <main class="page">
     <section class="panel">
       <div class="panel-head">
@@ -3537,105 +3952,105 @@
         </div>
         <div class="slot-area" aria-label="세팅 선택 상자 목록">
         <div class="slot-row">
-          <div class="slot-cell align-main-slot no-emblem">
+          <div class="slot-cell align-main-slot no-emblem mobile-row-character">
             <button class="setting-box character" type="button" data-slot="character">캐릭터</button>
           </div>
 
-          <div class="slot-cell group-start">
+          <div class="slot-cell group-start mobile-row-gear">
             <button class="enchant-box" type="button" data-enchant-slot="weapon">마법부여</button>
             <button class="setting-box weapon" type="button" data-slot="weapon">무기</button>
             <button class="emblem-box" type="button" data-emblem-slot="weapon">엠블렘</button>
           </div>
 
-          <div class="slot-cell group-start">
+          <div class="slot-cell group-start mobile-row-gear">
             <button class="enchant-box" type="button" data-enchant-slot="shoulder">마법부여</button>
             <button class="setting-box" type="button" data-slot="shoulder">머리<br>어깨</button>
             <button class="emblem-box" type="button" data-emblem-slot="shoulder">엠블렘</button>
           </div>
 
-          <div class="slot-cell">
+          <div class="slot-cell mobile-row-gear">
             <button class="enchant-box" type="button" data-enchant-slot="top">마법부여</button>
             <button class="setting-box" type="button" data-slot="top">상의</button>
             <button class="emblem-box" type="button" data-emblem-slot="top">엠블렘</button>
           </div>
 
-          <div class="slot-cell">
+          <div class="slot-cell mobile-row-gear">
             <button class="enchant-box" type="button" data-enchant-slot="bottom">마법부여</button>
             <button class="setting-box" type="button" data-slot="bottom">하의</button>
             <button class="emblem-box" type="button" data-emblem-slot="bottom">엠블렘</button>
           </div>
 
-          <div class="slot-cell">
+          <div class="slot-cell mobile-row-gear">
             <button class="enchant-box" type="button" data-enchant-slot="belt">마법부여</button>
             <button class="setting-box" type="button" data-slot="belt">벨트</button>
             <button class="emblem-box" type="button" data-emblem-slot="belt">엠블렘</button>
           </div>
 
-          <div class="slot-cell">
+          <div class="slot-cell mobile-row-gear">
             <button class="enchant-box" type="button" data-enchant-slot="shoes">마법부여</button>
             <button class="setting-box" type="button" data-slot="shoes">신발</button>
             <button class="emblem-box" type="button" data-emblem-slot="shoes">엠블렘</button>
           </div>
 
-          <div class="slot-cell group-start">
+          <div class="slot-cell group-start mobile-row-accessory">
             <button class="enchant-box" type="button" data-enchant-slot="bracelet">마법부여</button>
             <button class="setting-box" type="button" data-slot="bracelet">팔찌</button>
             <button class="emblem-box" type="button" data-emblem-slot="bracelet">엠블렘</button>
           </div>
 
-          <div class="slot-cell">
+          <div class="slot-cell mobile-row-accessory">
             <button class="enchant-box" type="button" data-enchant-slot="necklace">마법부여</button>
             <button class="setting-box" type="button" data-slot="necklace">목걸이</button>
             <button class="emblem-box" type="button" data-emblem-slot="necklace">엠블렘</button>
           </div>
 
-          <div class="slot-cell">
+          <div class="slot-cell mobile-row-accessory">
             <button class="enchant-box" type="button" data-enchant-slot="ring">마법부여</button>
             <button class="setting-box" type="button" data-slot="ring">반지</button>
             <button class="emblem-box" type="button" data-emblem-slot="ring">엠블렘</button>
           </div>
 
-          <div class="slot-cell group-start">
+          <div class="slot-cell group-start mobile-row-accessory">
             <button class="enchant-box" type="button" data-enchant-slot="sub-equipment">마법부여</button>
             <button class="setting-box" type="button" data-slot="sub-equipment">보조<br>장비</button>
             <button class="emblem-box" type="button" data-emblem-slot="sub-equipment">엠블렘</button>
           </div>
 
-          <div class="slot-cell">
+          <div class="slot-cell mobile-row-accessory">
             <button class="enchant-box" type="button" data-enchant-slot="magic-stone">마법부여</button>
             <button class="setting-box" type="button" data-slot="magic-stone">마법석</button>
             <button class="emblem-box" type="button" data-emblem-slot="magic-stone">엠블렘</button>
           </div>
 
-          <div class="slot-cell">
+          <div class="slot-cell mobile-row-accessory">
             <button class="enchant-box" type="button" data-enchant-slot="earring">마법부여</button>
             <button class="setting-box" type="button" data-slot="earring">귀걸이</button>
             <button class="emblem-box" type="button" data-emblem-slot="earring">엠블렘</button>
           </div>
 
-          <div class="slot-cell align-main-slot no-emblem group-start">
+          <div class="slot-cell align-main-slot no-emblem group-start mobile-row-special">
             <button class="setting-box" type="button" data-slot="aura">오라</button>
           </div>
 
-          <div class="slot-cell">
+          <div class="slot-cell mobile-row-special">
             <button class="enchant-box" type="button" data-enchant-slot="title">마법부여</button>
             <button class="setting-box" type="button" data-slot="title">칭호</button>
             <button class="emblem-box" type="button" data-emblem-slot="title">엠블렘</button>
           </div>
 
-          <div class="slot-cell align-main-slot no-emblem">
+          <div class="slot-cell align-main-slot no-emblem mobile-row-special">
             <button class="setting-box" type="button" data-slot="creature">크리쳐</button>
           </div>
 
-          <div class="slot-cell align-main-slot no-emblem">
+          <div class="slot-cell align-main-slot no-emblem mobile-row-special">
             <button class="setting-box" type="button" data-slot="artifact">아티<br>팩트</button>
           </div>
 
-          <div class="slot-cell align-main-slot no-emblem group-start">
+          <div class="slot-cell align-main-slot no-emblem group-start mobile-row-special">
             <button class="setting-box" type="button" data-slot="avatar">아바타</button>
           </div>
 
-          <div class="slot-cell align-main-slot no-emblem">
+          <div class="slot-cell align-main-slot no-emblem mobile-row-special">
             <button class="setting-box" type="button" data-slot="weapon-avatar">무기<br>아바타</button>
           </div>
         </div>
@@ -4083,8 +4498,18 @@
     const btnAnalyzerStatusSave = document.getElementById('btnAnalyzerStatusSave');
 
     const PRESET_UI_TOTAL = 50;
-    const PRESET_UI_PER_PAGE = 10;
+    const PRESET_UI_PER_PAGE_DESKTOP = 10;
+    const PRESET_UI_PER_PAGE_MOBILE = 5;
     let analyzerPresetPage = 0;
+    let analyzerPresetPerPageLast = 0;
+
+    function isAnalyzerMobileView() {
+      return !!(window.matchMedia && window.matchMedia('(max-width: 980px)').matches);
+    }
+
+    function getAnalyzerPresetPerPage() {
+      return isAnalyzerMobileView() ? PRESET_UI_PER_PAGE_MOBILE : PRESET_UI_PER_PAGE_DESKTOP;
+    }
 
     function getAnalyzerPresetLimit() {
       const info = window.__userRole || {};
@@ -6259,49 +6684,89 @@
       return arr;
     }
 
-    function buildHeaderOneLinerHtml(item) {
+    function buildHeaderOneLinerHtml(item, opts = {}) {
+      const mobile = !!opts.mobile;
       const pos = String(item?.position || '').trim();
-      const pos0 = pos.replace(/^\[이벤트\]\s*/, '');
+      const normalizedPos = pos.replace(/^\[이벤트\]\s*/, '');
       const msg = String(item?.message || '').trim();
-      const nick = String(item?.ingame || '').trim() || String(item?.youtube || '').trim();
+      const nick = String(item?.ingame || '').trim() || String(item?.youtube || '').trim() || String(item?.google || '').trim();
       if (!msg) return '';
 
-      const isAdmin = /^관리자/.test(pos0);
-      const isSenior = /^수석/.test(pos0);
-      const isLead = /^책임/.test(pos0);
+      const isAdmin = /^관리자/.test(normalizedPos);
+      const isSenior = /^수석/.test(normalizedPos);
+      const isLead = /^책임/.test(normalizedPos);
       if (!isAdmin && !isSenior && !isLead) return '';
 
       const roleBadge = (isAdmin || isSenior)
         ? `<span class="tag-senior" aria-label="${isAdmin ? '관리자' : '수석'}" title="${isAdmin ? '관리자' : '수석'}"><span class="badge-emoji">${isAdmin ? '🛡️' : '👑'}</span></span>`
         : '<span class="tag-lead" aria-hidden="true"></span>';
 
+      const msgHtml = mobile
+        ? `<span class="msg-text"><span class="marquee">${escapeHtml(msg)}</span></span>`
+        : `<span class="msg-text">${escapeHtml(msg)}</span>`;
+
       return `
         <span class="hdrmsg ${(isAdmin || isSenior) ? 'senior' : 'lead'}">
           ${roleBadge}
           ${nick ? `<span class="msg-nick">${escapeHtml(nick)} 님</span>` : ''}
           <span class="msg-bullet">·</span>
-          <span class="msg-text">${escapeHtml(msg)}</span>
+          ${msgHtml}
         </span>
       `.trim();
     }
 
+    function applyMobileOneLinerMarquee(rootEl) {
+      if (!rootEl) return;
+      const msgText = rootEl.querySelector('.msg-text');
+      const inner = msgText ? msgText.querySelector('.marquee') : null;
+      if (!msgText || !inner) return;
+
+      msgText.classList.remove('is-marquee');
+      msgText.style.removeProperty('--marquee-dur');
+      msgText.style.removeProperty('--marquee-dist');
+
+      requestAnimationFrame(() => {
+        const cw = msgText.getBoundingClientRect().width;
+        const sw = inner.scrollWidth;
+        const rawDist = sw - cw;
+        if (rawDist <= 2) return;
+
+        const TRAIL_PX = 7;
+        const dist = Math.max(0, rawDist + TRAIL_PX);
+        const SPEED_PX_PER_SEC = 110;
+        const moveSec = Math.max(1.2, dist / SPEED_PX_PER_SEC);
+        const holdStart = 0.8;
+        const holdEnd = 0.6;
+        const dur = holdStart + moveSec + holdEnd + 0.4;
+
+        msgText.classList.add('is-marquee');
+        msgText.style.setProperty('--marquee-dur', `${dur}s`);
+        msgText.style.setProperty('--marquee-dist', `${dist}`);
+      });
+    }
+
     async function renderHeaderOneLiner() {
-      const target = document.getElementById('headerOneLinerText');
-      if (!target) return;
+      const pcTarget = document.getElementById('headerOneLinerText');
+      const mobileTarget = document.getElementById('settingMobileOneLinerText');
+      if (!pcTarget && !mobileTarget) return;
 
       if (__headerOneLinerRotateTimer) {
         clearInterval(__headerOneLinerRotateTimer);
         __headerOneLinerRotateTimer = null;
       }
 
-      const ads = target.closest('.header-ads');
+      const ads = pcTarget ? pcTarget.closest('.header-ads') : null;
       if (ads && !__headerOneLinerHoverBound) {
         __headerOneLinerHoverBound = true;
         ads.addEventListener('mouseenter', () => { __headerOneLinerPaused = true; });
         ads.addEventListener('mouseleave', () => { __headerOneLinerPaused = false; });
       }
 
-      target.textContent = '불러오는 중…';
+      if (pcTarget) pcTarget.textContent = '불러오는 중…';
+      if (mobileTarget) {
+        mobileTarget.classList.add('muted');
+        mobileTarget.textContent = '한마디 불러오는 중…';
+      }
 
       try {
         const res = await fetch(`${window.WEBAPP_URL}?type=phrase&public=1`, {
@@ -6312,27 +6777,35 @@
         if (!res.ok) throw new Error('phrase_fetch_failed');
 
         const data = await res.json().catch(() => ({ ok: false }));
-        let messages = Array.isArray(data?.items)
-          ? data.items.map(buildHeaderOneLinerHtml).filter(Boolean)
-          : [];
+        const items = Array.isArray(data?.items) ? data.items : [];
+        let pcMessages = items.map(item => buildHeaderOneLinerHtml(item, { mobile: false })).filter(Boolean);
+        let mobileMessages = items.map(item => buildHeaderOneLinerHtml(item, { mobile: true })).filter(Boolean);
 
-        messages = [...new Set(messages)];
+        pcMessages = [...new Set(pcMessages)];
+        mobileMessages = [...new Set(mobileMessages)];
 
-        const seniorMsgs = messages.filter(html => html.includes('hdrmsg senior'));
-        const leadMsgs = messages.filter(html => html.includes('hdrmsg lead'));
+        const weightMessages = (messages) => {
+          const seniorMsgs = messages.filter(html => html.includes('hdrmsg senior'));
+          const leadMsgs = messages.filter(html => html.includes('hdrmsg lead'));
+          if (seniorMsgs.length && leadMsgs.length) {
+            const weighted = [];
+            seniorMsgs.forEach(m => weighted.push(m, m, m));
+            leadMsgs.forEach(m => weighted.push(m, m));
+            return weighted;
+          }
+          return messages;
+        };
 
-        if (seniorMsgs.length && leadMsgs.length) {
-          const weighted = [];
-          seniorMsgs.forEach(m => weighted.push(m, m, m));
-          leadMsgs.forEach(m => weighted.push(m, m));
-          messages = weighted;
-        }
+        pcMessages = shuffleHeaderOneLiners(weightMessages(pcMessages));
+        mobileMessages = shuffleHeaderOneLiners(weightMessages(mobileMessages));
 
-        messages = shuffleHeaderOneLiners(messages);
-
-        if (!messages.length) {
+        if (!pcMessages.length && !mobileMessages.length) {
           const fallback = data && data.ok && data.message ? String(data.message).trim() : '';
-          target.textContent = fallback || '등록된 한마디가 없습니다.';
+          if (pcTarget) pcTarget.textContent = fallback || '등록된 한마디가 없습니다.';
+          if (mobileTarget) {
+            mobileTarget.classList.add('muted');
+            mobileTarget.textContent = fallback || '등록된 한마디가 없습니다.';
+          }
           return;
         }
 
@@ -6340,17 +6813,28 @@
         let emojiIdx = 0;
         let idx = 0;
 
-        function applySeniorEmoji() {
+        function applySeniorEmoji(target) {
+          if (!target) return;
           const node = target.querySelector('.tag-senior .badge-emoji');
           if (node) node.textContent = SENIOR_EMOJIS[emojiIdx];
         }
 
         function show(nextIdx) {
-          target.classList.add('fade-out');
+          if (pcTarget && pcMessages.length) pcTarget.classList.add('fade-out');
+          if (mobileTarget && mobileMessages.length) mobileTarget.classList.add('fade-out');
           setTimeout(() => {
-            target.innerHTML = messages[nextIdx % messages.length];
-            target.classList.remove('fade-out');
-            applySeniorEmoji();
+            if (pcTarget && pcMessages.length) {
+              pcTarget.innerHTML = pcMessages[nextIdx % pcMessages.length];
+              pcTarget.classList.remove('fade-out');
+              applySeniorEmoji(pcTarget);
+            }
+            if (mobileTarget && mobileMessages.length) {
+              mobileTarget.classList.remove('muted');
+              mobileTarget.innerHTML = mobileMessages[nextIdx % mobileMessages.length];
+              applyMobileOneLinerMarquee(mobileTarget);
+              mobileTarget.classList.remove('fade-out');
+              applySeniorEmoji(mobileTarget);
+            }
           }, 200);
         }
 
@@ -6359,12 +6843,16 @@
         __headerOneLinerRotateTimer = setInterval(() => {
           if (__headerOneLinerPaused) return;
           emojiIdx = (emojiIdx + 1) % SENIOR_EMOJIS.length;
-          idx = (idx + 1) % messages.length;
+          idx = idx + 1;
           show(idx);
         }, 6000);
       } catch (e) {
         console.warn('[header phrase] 실패:', e);
-        target.textContent = '등록된 한마디가 없습니다.';
+        if (pcTarget) pcTarget.textContent = '등록된 한마디가 없습니다.';
+        if (mobileTarget) {
+          mobileTarget.classList.add('muted');
+          mobileTarget.textContent = '등록된 한마디가 없습니다.';
+        }
       }
     }
 
@@ -6698,11 +7186,13 @@
     }
     function getAnalyzerPresetMaxPage(maxSlot) {
       const total = Math.max(0, Math.min(PRESET_UI_TOTAL, Number(maxSlot || 0)));
-      return Math.max(0, Math.ceil(total / PRESET_UI_PER_PAGE) - 1);
+      const perPage = getAnalyzerPresetPerPage();
+      return Math.max(0, Math.ceil(total / perPage) - 1);
     }
 
     function applyAnalyzerPresetPageToDom() {
-      const base = analyzerPresetPage * PRESET_UI_PER_PAGE;
+      const perPage = getAnalyzerPresetPerPage();
+      const base = analyzerPresetPage * perPage;
       const wraps = document.querySelectorAll('#analyzerPresetBox .preset-slot');
       wraps.forEach((wrap, i) => {
         const n = base + i + 1;
@@ -6745,6 +7235,7 @@
 
     function updateAnalyzerPresetButtonsUI() {
       const maxSlot = getAnalyzerPresetLimit();
+      analyzerPresetPerPageLast = getAnalyzerPresetPerPage();
       const maxPage = getAnalyzerPresetMaxPage(maxSlot);
       if (analyzerPresetPage > maxPage) analyzerPresetPage = maxPage;
 
@@ -6817,7 +7308,29 @@
     function setAnalyzerPresetPage(p) {
       const maxPage = getAnalyzerPresetMaxPage(getAnalyzerPresetLimit());
       analyzerPresetPage = Math.max(0, Math.min(maxPage, (p | 0)));
+      analyzerPresetPerPageLast = getAnalyzerPresetPerPage();
       updateAnalyzerPresetButtonsUI();
+    }
+
+    function syncAnalyzerPresetPageForViewport() {
+      const nextPerPage = getAnalyzerPresetPerPage();
+      const prevPerPage = analyzerPresetPerPageLast || nextPerPage;
+
+      if (nextPerPage !== prevPerPage) {
+        const firstVisibleSlot = (analyzerPresetPage * prevPerPage) + 1;
+        analyzerPresetPage = Math.floor(Math.max(0, firstVisibleSlot - 1) / nextPerPage);
+      }
+
+      analyzerPresetPerPageLast = nextPerPage;
+      updateAnalyzerPresetButtonsUI();
+    }
+
+    if (!window.__analyzerPresetViewportBound) {
+      window.__analyzerPresetViewportBound = true;
+      window.addEventListener('resize', () => {
+        clearTimeout(window.__analyzerPresetViewportTimer);
+        window.__analyzerPresetViewportTimer = setTimeout(syncAnalyzerPresetPageForViewport, 120);
+      });
     }
 
     async function refreshAnalyzerPresetSlotsFromServer() {
@@ -7794,6 +8307,32 @@
 
           row.classList.toggle('hide-enchant-row', !hasVisibleEnchant);
           row.classList.toggle('hide-emblem-row', !hasVisibleEmblem);
+
+          // ✅ 모바일 4행 배치에서는 개별 칸이 아니라 행 그룹 단위로 빈 공간을 접는다.
+          // 예: 2행에서 무기 마부만 꺼지고 방어구 마부가 켜져 있으면 2행 윗공간 유지.
+          //     무기+방어구 마부가 전부 꺼졌을 때만 2행 전체가 위로 이동.
+          const mobileRowGroups = [
+            ['gear', '.mobile-row-gear'],
+            ['accessory', '.mobile-row-accessory'],
+            ['special', '.mobile-row-special']
+          ];
+
+          mobileRowGroups.forEach(([name, selector]) => {
+            const groupCells = visibleCells.filter(cell => cell.matches(selector));
+
+            const groupHasVisibleEnchant = groupCells.some(cell => {
+              const box = cell.querySelector('.enchant-box');
+              return box && !box.classList.contains('setting-sub-hidden');
+            });
+
+            const groupHasVisibleEmblem = groupCells.some(cell => {
+              const box = cell.querySelector('.emblem-box');
+              return box && !box.classList.contains('setting-sub-hidden');
+            });
+
+            row.classList.toggle(`mobile-${name}-hide-enchant`, !groupHasVisibleEnchant);
+            row.classList.toggle(`mobile-${name}-hide-emblem`, !groupHasVisibleEmblem);
+          });
         });
       };
 
