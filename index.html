@@ -8798,15 +8798,15 @@
   <div id="withdrawModal" class="modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
     <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="withdrawModalTitle"
-      style="width:min(740px,95vw); height:auto; max-height:min(400px,70vh); display:flex; flex-direction:column;">
+      style="width:min(780px,95vw); height:auto; max-height:none; display:flex; flex-direction:column;">
       <header>
         <div style="width:32px;"></div>
         <h2 id="withdrawModalTitle">연구원 만료안내</h2>
         <button type="button" class="btn" data-close>닫기</button>
       </header>
 
-      <div class="patch-log-body" style="flex:1; min-height:0; overflow-y:auto;">
-        <div id="withdrawModalMsg" style="white-space:pre-wrap; line-height:1.55; margin-top:24px; margin-bottom:46px;">
+      <div class="patch-log-body" style="flex:0 0 auto; min-height:0; overflow:visible; padding:14px 18px 20px;">
+        <div id="withdrawModalMsg" style="white-space:pre-wrap; line-height:1.62; margin-top:8px; margin-bottom:22px; word-break:keep-all;">
         </div>
 
         <!-- ✅ 성안의 봉인 '선택 하기'와 동일 스타일(ui-btnetc) 버튼 -->
@@ -27484,6 +27484,26 @@ wrap.appendChild(listBox);
         }
       }
 
+      function ensureModeButtonStyle() {
+        if (document.getElementById("mode-btn-style")) return;
+
+        const style = document.createElement("style");
+        style.id = "mode-btn-style";
+        style.textContent = `
+          .mode-btn{
+            height:40px; padding:0 14px; border-radius:999px;
+            display:inline-flex; align-items:center; justify-content:center;
+            line-height:1; vertical-align:middle;
+            border:1px solid rgba(255,255,255,.2); background:#111827; color:#e6e9ef; cursor:pointer;
+            transition: box-shadow .15s, border-color .15s, opacity .15s;
+          }
+          .mode-btn:hover{ border-color:#6ea8ff; box-shadow:0 0 0 2px rgba(110,168,255,.25) inset; }
+          .mode-btn:disabled{ opacity:.5; cursor:not-allowed; filter: grayscale(30%); }
+          .login-desc a.join-link{ color:#8fbaff; text-decoration: underline; }
+        `;
+        document.head.appendChild(style);
+      }
+
       // === 로그인 성공 콜백(GSI에서 호출) ===
       // ---------- 로그인 처리 ----------
       async function onGoogleCredential({ credential }) {
@@ -27502,12 +27522,13 @@ wrap.appendChild(listBox);
           // 로그인 상태 안내 UI
           const card0 = document.querySelector(".login-card");
           if (card0 && !shouldReturnDirectlyToPc) {
+            ensureModeButtonStyle();
             card0.innerHTML = `
         <div class="login-title">접근 확인 중…</div>
         <div class="login-desc">권한 확인 중입니다. 잠시만 기다려 주세요.</div>
         <div class="login-row">
-          <button id="btnPC" class="mode-btn" disabled>PC 계산기 열기</button>
-          <button id="btnM" class="mode-btn" disabled>모바일 계산기 열기</button>
+          <button id="btnCalcOpen" class="mode-btn" disabled>계산기 열기</button>
+          <button id="btnSettingAnalyzer" class="mode-btn setting-analyzer-btn" type="button" disabled>세팅현황 열기</button>
         </div>`;
           }
 
@@ -27551,9 +27572,7 @@ wrap.appendChild(listBox);
                 : '게임실험연구소 연구원만 이용 가능합니다.<br><a class="join-link" href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank" rel="noopener">게임실험연구소 연구원 가입하기</a>'}
         </div>
         <div class="login-row">
-      <button id="btnPC" class="mode-btn">PC 계산기 열기</button>
-      <!-- ★ 모바일은 항상 비활성 + 툴팁 -->
-      <button id="btnM" class="mode-btn" disabled title="Comming Soon...">모바일 계산기 열기</button>
+      <button id="btnCalcOpen" class="mode-btn">계산기 열기</button>
       <button id="btnSettingAnalyzer" class="mode-btn setting-analyzer-btn" type="button" disabled>세팅현황 열기</button>
     </div>
       `;
@@ -27576,28 +27595,15 @@ wrap.appendChild(listBox);
               document.head.appendChild(style);
             }
 
-            const btnPC = card.querySelector("#btnPC");
-            const btnM = card.querySelector("#btnM");
+            const btnCalcOpen = card.querySelector("#btnCalcOpen");
             const btnSettingAnalyzer = card.querySelector("#btnSettingAnalyzer");
 
             // 기본 잠금
-            btnPC?.setAttribute("disabled", "true");
-            btnM?.setAttribute("disabled", "true");
+            btnCalcOpen?.setAttribute("disabled", "true");
             btnSettingAnalyzer?.setAttribute("disabled", "true");
 
-            // ✅ 모바일 버튼: allowed(회원 허용) 이면 모두 활성화
-            if (btnM) {
-              if (allowed) {
-                btnM.removeAttribute('disabled');
-                btnM.removeAttribute('title'); // 툴팁 제거
-              } else {
-                btnM.setAttribute('disabled', 'true');
-                btnM.setAttribute('title', '로그인 후 이용 가능합니다.');
-              }
-            }
             if (allowed) {
-              btnPC.removeAttribute("disabled");
-              //   btnM.removeAttribute("disabled");
+              btnCalcOpen?.removeAttribute("disabled");
 
               // ✅ 세팅현황 버튼은 로그인 허용 유저 전체에게 노출/활성화
               if (btnSettingAnalyzer) {
@@ -27609,7 +27615,19 @@ wrap.appendChild(listBox);
               // 한 번만 부팅되도록 가드
               let __booting = false;
 
-              btnPC.addEventListener('click', async () => {
+              btnCalcOpen?.addEventListener('click', async () => {
+                const isMobileEnv =
+                  /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent) ||
+                  window.matchMedia('(max-width: 980px)').matches;
+
+                if (isMobileEnv) {
+                  // ✅ 모바일 환경에서는 기존 모바일 계산기로 이동
+                  const token = window.idToken || '';
+                  if (token) sessionStorage.setItem('id_token', token);
+                  location.href = 'mobileindex.html';
+                  return;
+                }
+
                 const isPinLogin = !!window.__ADMIN_PIN_LOGIN_MODE__;
 
                 if (__booting || (isPinLogin && window.__CALC_LAZY_BOOTING__)) return;
@@ -27666,18 +27684,9 @@ wrap.appendChild(listBox);
                 window.__AUTO_RETURN_PC_DONE__ = true;
                 sessionStorage.removeItem('return_to_calculator');
                 history.replaceState(null, '', location.pathname + location.hash);
-                setTimeout(() => btnPC.click(), 0);
+                setTimeout(() => btnCalcOpen?.click(), 0);
               }
 
-
-              btnM.addEventListener('click', () => {
-                // ✅ 로그인 토큰을 모바일 페이지로 전달(같은 도메인에서만 유효)
-                const token = window.idToken || '';
-                if (token) sessionStorage.setItem('id_token', token);
-
-                // ✅ 모바일 전용 HTML로 이동
-                location.href = 'mobileindex.html';
-              });
             }
           }
         } catch (err) {
@@ -27717,12 +27726,13 @@ wrap.appendChild(listBox);
 
         const card = document.querySelector('.login-card');
         if (card) {
+          ensureModeButtonStyle();
           card.innerHTML = `
         <div class="login-title">관리자 PIN 확인 중…</div>
         <div class="login-desc">입력한 PIN 번호로 권한을 확인하고 있습니다.</div>
         <div class="login-row">
-          <button id="btnPC" class="mode-btn" disabled>PC 계산기 열기</button>
-          <button id="btnM" class="mode-btn" disabled>모바일 계산기 열기</button>
+          <button id="btnCalcOpen" class="mode-btn" disabled>계산기 열기</button>
+          <button id="btnSettingAnalyzer" class="mode-btn setting-analyzer-btn" type="button" disabled>세팅현황 열기</button>
         </div>`;
         }
 
