@@ -1037,8 +1037,9 @@
       margin-top: 10px;
       display: flex;
       align-items: stretch;
-      gap: 8px;
-      flex-wrap: wrap;
+  gap: 5px 8px;
+  flex-wrap: wrap;
+  margin-bottom: -6px;
     }
 
     .setting-check-group {
@@ -1310,7 +1311,7 @@
         radial-gradient(circle at 30% 20%, rgba(255, 244, 190, 0.18), transparent 42%),
         linear-gradient(135deg, rgba(250, 204, 107, 0.90), rgba(207, 162, 79, 0.82));
       color: #1b1207;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 1000;
       cursor: pointer;
       align-self: center;
@@ -1345,6 +1346,26 @@
       opacity: 0.45;
       cursor: not-allowed;
       filter: grayscale(0.25);
+    }
+
+    .analyzer-status-save-notice {
+      flex: 0 0 100%;
+      width: 100%;
+      margin: -2px 0 0;
+      color: #f87171;
+      font-size: 11px;
+      font-weight: 850;
+      line-height: 1.35;
+      text-align: center;
+      letter-spacing: -0.03em;
+      word-break: keep-all;
+    }
+
+    @media (max-width: 980px) {
+      .analyzer-status-save-notice {
+        margin-top: -1px;
+        font-size: 10px;
+      }
     }
 
     .setting-check-group.parent-off .setting-check-sub {
@@ -3936,6 +3957,7 @@
               <div class="preset-page-ind" id="presetPageInd" aria-hidden="true"></div>
             </div>
             <button type="button" id="btnAnalyzerStatusSave" class="analyzer-status-save-btn">현황 저장</button>
+            <div class="analyzer-status-save-notice">※ 현황 저장 버튼을 눌러야 현재 현황이 저장됩니다.</div>
 
           </div>
         </div>
