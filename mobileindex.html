@@ -1196,6 +1196,53 @@
       transform: translateY(1px);
     }
 
+    /* ✅ 1페이지 캐릭터 선택 아래: 세팅현황 바로가기 버튼(PC 버튼 스타일 참고) */
+    #btnOpenSettingStatusMobile.setting-status-mobile-btn {
+      width: 100% !important;
+      height: 38px !important;
+      padding: 0 12px !important;
+      margin: 10px 0 2px !important;
+      border-radius: 999px !important;
+
+      display: none;
+      align-items: center !important;
+      justify-content: center !important;
+
+      border: 1px solid rgba(250, 204, 107, 0.78) !important;
+      background:
+        radial-gradient(circle at 30% 18%, rgba(255, 248, 202, 0.38), transparent 42%),
+        linear-gradient(135deg, #facc6b 0%, #cfa24f 52%, #8f6b2b 100%) !important;
+      color: #1b1207 !important;
+
+      font-size: 13px !important;
+      font-weight: 900 !important;
+      line-height: 1 !important;
+      white-space: nowrap !important;
+      text-align: center !important;
+
+      cursor: pointer;
+      box-shadow:
+        0 6px 14px rgba(0, 0, 0, 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.38) !important;
+      transition: box-shadow .15s, border-color .15s, opacity .15s, transform .15s, filter .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #btnOpenSettingStatusMobile.setting-status-mobile-btn:active:not(:disabled) {
+      transform: translateY(1px);
+      filter: brightness(1.06);
+      box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.38),
+        0 0 0 3px rgba(250, 204, 107, 0.20),
+        inset 0 1px 0 rgba(255, 255, 255, 0.46) !important;
+    }
+
+    #btnOpenSettingStatusMobile.setting-status-mobile-btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      filter: grayscale(30%);
+    }
+
     /* ✅ 모바일 캐릭터선택 박스 안 우측상단 솔플/파티 토글 */
     .mobile-solo-party-overlay {
       position: absolute;
@@ -5165,6 +5212,11 @@
               <!-- ✅ 선택 후 표시될 캐릭터 이미지 -->
               <img id="pickedCharImg" class="picked-char-img" alt="" />
             </div>
+
+            <button id="btnOpenSettingStatusMobile" class="setting-status-mobile-btn" type="button" disabled>
+              캐릭터 전체 세팅 현황
+            </button>
+
             <div class="hint">
             </div>
           </div>
@@ -6838,6 +6890,63 @@
     window.idToken = sessionStorage.getItem('id_token') || null;
     window.WEBAPP_URL = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
     const WEBAPP_URL = window.WEBAPP_URL;   // 기존 코드들이 쓰는 식별자 보존
+
+    function getStoredMobileToken() {
+      return (
+        window.idToken ||
+        sessionStorage.getItem('id_token') ||
+        localStorage.getItem('id_token') ||
+        null
+      );
+    }
+
+    function rememberMobileToken(token) {
+      const t = String(token || '').trim();
+      if (!t) return;
+      window.idToken = t;
+      sessionStorage.setItem('id_token', t);
+      localStorage.setItem('id_token', t);
+    }
+
+    function openSettingStatusPageMobile() {
+      const token = getStoredMobileToken();
+      if (token) rememberMobileToken(token);
+      sessionStorage.setItem('return_to_calculator', 'mobile');
+      location.href = 'setting-analyzer/index.html';
+    }
+    window.openSettingStatusPageMobile = openSettingStatusPageMobile;
+
+    window.confirmOpenSettingStatusPageMobile = function confirmOpenSettingStatusPageMobile() {
+      const ok = confirm('계산기를 종료하고 세팅현황으로 이동하시겠습니까?');
+      if (!ok) return false;
+      openSettingStatusPageMobile();
+      return false;
+    };
+
+    function refreshSettingStatusMobileButton() {
+      const btn = document.getElementById('btnOpenSettingStatusMobile');
+      if (!btn) return;
+
+      // ✅ 모바일 1페이지의 "캐릭터 전체 세팅 현황" 버튼은 로그인 허용 유저 전체에게 노출
+      const ping = window.__loginPingResult_mobile || {};
+      const role = window.__userRole || {};
+      const canOpen = !!(ping.ok || role.isLoggedIn || getStoredMobileToken());
+
+      btn.classList.add('setting-status-mobile-btn');
+      btn.style.display = canOpen ? 'inline-flex' : 'none';
+      btn.disabled = !canOpen;
+
+      if (!btn.dataset.boundSettingStatusMobile) {
+        btn.dataset.boundSettingStatusMobile = '1';
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.confirmOpenSettingStatusPageMobile();
+        });
+      }
+    }
+    window.refreshSettingStatusMobileButton = refreshSettingStatusMobileButton;
+
+    document.addEventListener('DOMContentLoaded', refreshSettingStatusMobileButton);
     // ✅ 한마디(헤더 아래) 표시
     // ✅ 한마디(헤더 아래) 표시 - PC 로직 이식(아이콘/배지/순환)
     async function initOneLinerMobile() {
@@ -7223,13 +7332,28 @@
               console.warn('[mobile preset UI] update 실패:', e);
             }
           }
+
+          // ✅ 세팅현황 버튼도 로그인 권한 확인 후 즉시 노출
+          if (typeof refreshSettingStatusMobileButton === 'function') {
+            try { refreshSettingStatusMobileButton(); } catch (e) {
+              console.warn('[mobile setting status button] update 실패:', e);
+            }
+          }
         }
 
         window.__loginPingResult_mobile = data;
+        if (typeof refreshSettingStatusMobileButton === 'function') {
+          try { refreshSettingStatusMobileButton(); } catch (e) {
+            console.warn('[mobile setting status button] final update 실패:', e);
+          }
+        }
         return data;
       } catch (e) {
         console.warn('[mobile] login_ping failed:', e);
         window.__loginPingResult_mobile = { ok: false, error: e.message };
+        if (typeof refreshSettingStatusMobileButton === 'function') {
+          try { refreshSettingStatusMobileButton(); } catch (_) {}
+        }
         return window.__loginPingResult_mobile;
       }
     }

@@ -92,6 +92,28 @@
       white-space: nowrap;
     }
 
+    /* ✅ 세팅현황 제목 클릭 시 메인화면 이동 */
+    .site-header h1#btnGoMain {
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .site-header h1#btnGoMain:hover {
+      color: #ffffff;
+    }
+
+    .site-header h1#btnGoMain:active {
+      transform: translateY(1px);
+      opacity: 0.9;
+    }
+
+    .site-header h1#btnGoMain:focus-visible {
+      outline: 2px solid rgba(110, 168, 255, 0.72);
+      outline-offset: 4px;
+      border-radius: 6px;
+    }
+
     .site-header .contact-btn {
       margin-left: 10px;
       border: none;
@@ -3766,7 +3788,7 @@
       <div class="logo-box">
         <img src="../img/gametestlab.png" alt="게임실험연구소 로고">
       </div>
-      <h1>게임실험연구소 세팅현황 (시즌5)</h1>
+      <h1 id="btnGoMain" role="button" tabindex="0" title="메인화면으로 이동">게임실험연구소 세팅현황 (시즌5)</h1>
 
       <button id="btnContactAdmin" class="contact-btn" type="button" title="게임실험연구소에 문의">
         <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-mail">
@@ -8464,6 +8486,7 @@
 
     function bindHeaderActions() {
       const back = document.getElementById('btnReturnCalculator');
+      const goMainTitle = document.getElementById('btnGoMain');
       const contact = document.getElementById('btnContactAdmin');
       const faq = document.getElementById('btnFaq');
       const one = document.getElementById('btnOneLinerOpen');
@@ -8473,6 +8496,22 @@
       if (back && !back._bound) {
         back._bound = true;
         back.addEventListener('click', returnToCalculator);
+      }
+
+      if (goMainTitle && !goMainTitle._bound) {
+        goMainTitle._bound = true;
+
+        const goMain = () => {
+          location.href = '../index.html';
+        };
+
+        goMainTitle.addEventListener('click', goMain);
+        goMainTitle.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            goMain();
+          }
+        });
       }
       if (contact && !contact._bound) {
         contact._bound = true;
