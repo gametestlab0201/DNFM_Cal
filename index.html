@@ -710,6 +710,88 @@
       /* 항목 사이 간격 */
     }
 
+    /* ✅ PC 계산기 로딩 공지 모달: 1페이지/2페이지 전환 */
+    #noticeModal .notice-page {
+      display: none;
+    }
+
+    #noticeModal .notice-page.active {
+      display: block;
+    }
+
+    #noticeModal .notice-new-page {
+      padding: 4px 2px 2px;
+      color: #f0e6d2;
+      font-size: 14px;
+      line-height: 1.65;
+      word-break: keep-all;
+    }
+
+    #noticeModal .notice-new-title {
+      display: block;
+      margin-bottom: 14px;
+      color: #ffe8a3;
+      font-size: 20px;
+      font-weight: 1000;
+      letter-spacing: -0.04em;
+      text-align: center;
+      text-shadow: 0 0 8px rgba(250, 204, 107, 0.25);
+    }
+
+    #noticeModal .notice-new-box {
+      margin-top: 14px;
+      padding: 13px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(250, 204, 107, 0.28);
+      background:
+        radial-gradient(circle at 28% 15%, rgba(250, 204, 107, 0.12), transparent 42%),
+        rgba(255, 255, 255, 0.035);
+      color: #e5e7eb;
+    }
+
+    #noticeModal .notice-page-controls {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 14px 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(15, 17, 21, 0.92);
+    }
+
+    #noticeModal .notice-page-btn {
+      min-width: 70px;
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(250, 204, 107, 0.55);
+      background: rgba(250, 204, 107, 0.10);
+      color: #ffe8a3;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    #noticeModal .notice-page-btn:hover:not(:disabled) {
+      background: rgba(250, 204, 107, 0.18);
+      border-color: rgba(250, 204, 107, 0.78);
+    }
+
+    #noticeModal .notice-page-btn:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+    }
+
+    #noticeModal .notice-page-indicator {
+      min-width: 58px;
+      text-align: center;
+      color: #e5e7eb;
+      font-size: 12px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
 
 
     /* 로고 아이콘 박스 */
@@ -8748,62 +8830,95 @@
       </header>
 
       <div class="patch-log-body" style="flex:1;min-height:0;overflow-y:auto;">
-        <ul class="patch-log-list notice-list">
-          <li></li>
+        <div class="notice-page active" data-notice-page="1">
+          <div class="notice-new-page">
+            <strong class="notice-new-title">📢 캐릭터 세팅 현황 관리가 추가되었습니다!</strong>
 
-          <strong style="font-size:18px;">🎉 누적 로그인 20,000회 돌파! 감사 기념 <strong style="color: #ff4444;">저장슬롯 3배</strong>
-            이벤트 🎉</strong><br><br>
+            안녕하세요 게임실험연구소 입니다.<br><br>
 
-          <br>안녕하세요 게임실험연구소 입니다.<br><br>
+            이제 계산기에서 저장한 캐릭터 세팅을 한눈에 확인하고 관리할 수 있는<br>
+            <strong style="color: #ff4444;">캐릭터 전체 세팅 현황</strong> 기능이 추가되었습니다.<br><br>
 
-          계산기 오픈 이후 연구원분들의 많은 관심과 이용 덕분에 누적 로그인 <strong style="font-size:1.15em;">20,000회</strong>를 넘겼습니다! <br><br>
+            장비, 마법부여, 엠블렘, 강화, 마법봉인 등 주요 세팅 상태를<br>
+            <strong style="color:#ffe8a3;">캐릭터별로</strong> 정리해서 확인할 수 있으며, 여러 캐릭터의 세팅 현황을 비교하거나<br>
+            부족한 부분을 점검할 때 더욱 편리하게 사용할 수 있습니다.<br><br>
 
-          보내주신 성원에 감사드리며, 감사 기념으로 1개월 이상 장기 이용자분들께 <strong style="font-size:1.15em; color:#ff4444;">저장슬롯 3배
-            이벤트</strong>를 진행합니다.<br><br>
+            PC 계산기에서는 상단의 캐릭터 전체 세팅 현황 버튼을 통해 이동할 수 있으며,<br>
+            모바일 계산기에서도 캐릭터 선택 화면 아래에 추가된 버튼을 통해 이용할 수 있습니다.<br><br>
 
-          더 많은 세팅을 저장하고, 더 편하게 비교해보시길 바랍니다.<br>
-          앞으로도 더욱 좋은 계산기로 보답하겠습니다.<br><br>
+            앞으로도 더 편리하게 세팅을 관리할 수 있도록 계속 개선해 나가겠습니다.<br><br>
 
-          감사합니다.<br><br><br>
-
-          ※ 본 이벤트는 '선임 연구원' 이상 등급에서 연속 2회 이상 이용하고 계신 연구원분들께 자동 적용됩니다.<br>
-          (정확한 이벤트 적용 시점은 2회차 이용이 시작된 뒤 약 2주 후, 총 이용기간 45일 전후로 자동 반영됩니다.)<br><br>
-
-
-          <li class="sign-row">
-            <span class="sign-text">- 게임실험연구소장 드림 -</span>
-            <img src="/img/sign.png" alt="게임실험연구소장 직인" class="seal-stamp">
-          </li>
-
-          <!--
-             저희 <span style="color: yellow;">게임실험연구소</span> <strong style="color: #ff4444; font-size:15px;">'던파모바일 시즌5
-              계산기'</strong> 발전에 함께해주신 모든 연구원 여러분께 깊은 감사드립니다.<br>
-            여러분의 <strong style="color: white;">후원과 관심, 그리고 세심한 오류·버그 제보</strong> 덕분에<br>
-            출시 초기보다 계산기가 훨씬 안정적이고, 성능 또한 크게 향상 되었습니다.<br><br>
-            2026년에는 <strong><u>보다 더 정확하고 편리한 계산 환경</u></strong>을 위해 꾸준히 업데이트를 이어가겠습니다.<br>
-            올 한 해도 게임실험연구소 계산기와 함께, 효율적인 템세팅 해보시길 바랍니다.<br><br>
-          
-          <!--<li>
-               <span style="color: yellow;">'10레벨 스킬 공격력 증가'</span> 옵션이 <strong style="color: #ff4444;">평타 데미지에도 영향을 미치는 버그</strong>를 발견하였습니다.<br> 
+            <li class="sign-row">
+              <span class="sign-text">- 게임실험연구소장 드림 -</span>
+              <img src="/img/sign.png" alt="게임실험연구소장 직인" class="seal-stamp">
             </li>
-            <li>
-              또한 <span style="color: yellow;">'조화: 콰트로 마누스 연산장치'</span> 세트 옵션 중, <br>
-              <span style="color: #ff4444;">'던전 입장 시 악세서리 강화 수치 합이 45이상일 경우, 모든 타입 피해 3% 증가'</span> 옵션이,<br>
-              일반 <span style="color: yellow;">'콰트로 마누스 연산장치'</span> 세트와, <span style="color: yellow;">'가속: 콰트로 마누스 연산장치'</span> 세트에 <br>
-              <strong style="color: #ff4444;">동일하게 적용되는 버그</strong>를 발견하였습니다.
+
+          </div>
+        </div>
+
+        <div class="notice-page" data-notice-page="2">
+          <ul class="patch-log-list notice-list">
+            <li></li>
+
+            <strong style="font-size:18px;">🎉 누적 로그인 20,000회 돌파! 감사 기념 <strong style="color: #ff4444;">저장슬롯 3배</strong>
+              이벤트 🎉</strong><br><br>
+
+            <br>안녕하세요 게임실험연구소 입니다.<br><br>
+
+            계산기 오픈 이후 연구원분들의 많은 관심과 이용 덕분에 누적 로그인 <strong style="font-size:1.15em;">20,000회</strong>를 넘겼습니다! <br><br>
+
+            보내주신 성원에 감사드리며, 감사 기념으로 1개월 이상 장기 이용자분들께 <strong style="font-size:1.15em; color:#ff4444;">저장슬롯 3배
+              이벤트</strong>를 진행합니다.<br><br>
+
+            더 많은 세팅을 저장하고, 더 편하게 비교해보시길 바랍니다.<br>
+            앞으로도 더욱 좋은 계산기로 보답하겠습니다.<br><br>
+
+            감사합니다.<br><br><br>
+
+            ※ 본 이벤트는 '선임 연구원' 이상 등급에서 연속 2회 이상 이용하고 계신 연구원분들께 자동 적용됩니다.<br>
+            (정확한 이벤트 적용 시점은 2회차 이용이 시작된 뒤 약 2주 후, 총 이용기간 45일 전후로 자동 반영됩니다.)<br><br>
+
+
+            <li class="sign-row">
+              <span class="sign-text">- 게임실험연구소장 드림 -</span>
+              <img src="/img/sign.png" alt="게임실험연구소장 직인" class="seal-stamp">
             </li>
-            <li>
-              패치 이전에 해당 세트로 데미지 계산을 진행하신 경우, <br>
-              위 내용을 참고하시어 다시 한번 데미지 값을 계산해 보시기 바랍니다.
-            </li>
-            <li>
-              이용에 혼란을 드려 죄송합니다. <br>
-              조그마한 이상한 점이라도 제보 해 주시면, 빠르게 확인하고 수정조치 진행하도록 하겠습니다.
-            </li>
-            <li>
-              감사합니다.
-            </li>-->
-        </ul>
+
+            <!--
+               저희 <span style="color: yellow;">게임실험연구소</span> <strong style="color: #ff4444; font-size:15px;">'던파모바일 시즌5
+                계산기'</strong> 발전에 함께해주신 모든 연구원 여러분께 깊은 감사드립니다.<br>
+              여러분의 <strong style="color: white;">후원과 관심, 그리고 세심한 오류·버그 제보</strong> 덕분에<br>
+              출시 초기보다 계산기가 훨씬 안정적이고, 성능 또한 크게 향상 되었습니다.<br><br>
+              2026년에는 <strong><u>보다 더 정확하고 편리한 계산 환경</u></strong>을 위해 꾸준히 업데이트를 이어가겠습니다.<br>
+              올 한 해도 게임실험연구소 계산기와 함께, 효율적인 템세팅 해보시길 바랍니다.<br><br>
+            
+            <!--<li>
+                 <span style="color: yellow;">'10레벨 스킬 공격력 증가'</span> 옵션이 <strong style="color: #ff4444;">평타 데미지에도 영향을 미치는 버그</strong>를 발견하였습니다.<br> 
+              </li>
+              <li>
+                또한 <span style="color: yellow;">'조화: 콰트로 마누스 연산장치'</span> 세트 옵션 중, <br>
+                <span style="color: #ff4444;">'던전 입장 시 악세서리 강화 수치 합이 45이상일 경우, 모든 타입 피해 3% 증가'</span> 옵션이,<br>
+                일반 <span style="color: yellow;">'콰트로 마누스 연산장치'</span> 세트와, <span style="color: yellow;">'가속: 콰트로 마누스 연산장치'</span> 세트에 <br>
+                <strong style="color: #ff4444;">동일하게 적용되는 버그</strong>를 발견하였습니다.
+              </li>
+              <li>
+                패치 이전에 해당 세트로 데미지 계산을 진행하신 경우, <br>
+                위 내용을 참고하시어 다시 한번 데미지 값을 계산해 보시기 바랍니다.
+              </li>
+              <li>
+                이용에 혼란을 드려 죄송합니다. <br>
+                조그마한 이상한 점이라도 제보 해 주시면, 빠르게 확인하고 수정조치 진행하도록 하겠습니다.
+              </li>
+              <li>
+                감사합니다.
+              </li>-->
+          </ul>
+        </div>
+      </div>
+      <div class="notice-page-controls">
+        <button type="button" id="noticePrevBtn" class="notice-page-btn">이전</button>
+        <span id="noticePageIndicator" class="notice-page-indicator">1 / 2</span>
+        <button type="button" id="noticeNextBtn" class="notice-page-btn">다음</button>
       </div>
     </div>
   </div>
@@ -11527,6 +11642,32 @@ showModal($uniqueEffectModal, false);
       $noticeModal.querySelectorAll('[data-close]').forEach(el => {
         el.addEventListener('click', () => showModal($noticeModal, false));
       });
+
+      const noticePages = Array.from($noticeModal.querySelectorAll('.notice-page'));
+      const noticePrevBtn = document.getElementById('noticePrevBtn');
+      const noticeNextBtn = document.getElementById('noticeNextBtn');
+      const noticePageIndicator = document.getElementById('noticePageIndicator');
+      const noticeBody = $noticeModal.querySelector('.patch-log-body');
+      let noticePageNow = 1;
+
+      window.setNoticeModalPage = function setNoticeModalPage(page) {
+        const total = Math.max(1, noticePages.length);
+        noticePageNow = Math.min(Math.max(Number(page) || 1, 1), total);
+
+        noticePages.forEach(el => {
+          const pageNo = Number(el.dataset.noticePage || 0);
+          el.classList.toggle('active', pageNo === noticePageNow);
+        });
+
+        if (noticePrevBtn) noticePrevBtn.disabled = noticePageNow <= 1;
+        if (noticeNextBtn) noticeNextBtn.disabled = noticePageNow >= total;
+        if (noticePageIndicator) noticePageIndicator.textContent = `${noticePageNow} / ${total}`;
+        if (noticeBody) noticeBody.scrollTop = 0;
+      };
+
+      noticePrevBtn?.addEventListener('click', () => window.setNoticeModalPage(noticePageNow - 1));
+      noticeNextBtn?.addEventListener('click', () => window.setNoticeModalPage(noticePageNow + 1));
+      window.setNoticeModalPage(1);
     }
 
     // ✅ 탈퇴 안내 모달 닫기
@@ -11555,6 +11696,7 @@ showModal($uniqueEffectModal, false);
     window.showQuatroNoticeOnce = function () {
       const modal = document.getElementById('noticeModal');
       if (!modal) return;
+      if (typeof window.setNoticeModalPage === 'function') window.setNoticeModalPage(1);
       showModal(modal, true);
     };
 
