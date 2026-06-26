@@ -19224,6 +19224,9 @@ function buildSynergyPayloadMobile() {
 
       try {
         await saveToFpresetSlot_mobile(slotNum, label);
+
+        // ✅ 저장 완료 안내
+        (window.toast || alert)('저장되었습니다.');
       } catch (err) {
         console.error(err);
         (window.toast || alert)('저장에 실패했습니다.');
