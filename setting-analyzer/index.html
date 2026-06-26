@@ -4901,6 +4901,29 @@
       }, delay);
     }
 
+
+    let statusFailRedirectTimer = null;
+
+    function redirectToLoginAfterStatusFail(delayMs = 3000) {
+      window.clearTimeout(statusFailRedirectTimer);
+
+      const seconds = Math.max(1, Math.ceil(Number(delayMs || 0) / 1000));
+      setStatusLoading(
+        100,
+        '목록 데이터 불러오기 실패',
+        `로그인 상태 또는 네트워크 상태를 확인해주세요. ${seconds}초 후 로그인 화면으로 이동합니다.`
+      );
+
+      statusFailRedirectTimer = window.setTimeout(() => {
+        try {
+          sessionStorage.removeItem('return_to_calculator');
+        } catch (_) { }
+
+        // 세팅현황은 /setting-analyzer/index.html에서 열리므로 상위의 메인 로그인 화면으로 복귀
+        location.href = '../index.html';
+      }, delayMs);
+    }
+
     function tokenFromStorage() {
       return window.idToken
         || sessionStorage.getItem('id_token')
@@ -8691,7 +8714,7 @@
         const coreOk = await ensureCoreLoaded();
 
         if (!coreOk) {
-          setStatusLoading(100, '목록 데이터 불러오기 실패', '로그인 상태 또는 네트워크 상태를 확인해주세요.');
+          redirectToLoginAfterStatusFail(3000);
           return;
         }
 

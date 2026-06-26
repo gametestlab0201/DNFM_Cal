@@ -7566,6 +7566,40 @@
       ov.style.display = 'none';
     }
 
+    let __mobileAuthFailRedirectTimer = null;
+
+    function isMobileAuthMissingOrDeniedError(e) {
+      const msg = String(e?.message || e || '').toLowerCase();
+      return (
+        msg.includes('no_id_token') ||
+        msg.includes('init_http_401') ||
+        msg.includes('init_http_403') ||
+        msg.includes('login_ping_http_401') ||
+        msg.includes('login_ping_http_403')
+      );
+    }
+
+    function redirectToLoginAfterMobileAuthFail(delayMs = 3000) {
+      window.clearTimeout(__mobileAuthFailRedirectTimer);
+
+      const seconds = Math.max(1, Math.ceil(Number(delayMs || 0) / 1000));
+      setProgressExactMonotonic_mobile(100, `로그인이 필요합니다. ${seconds}초 후 로그인 화면으로 이동합니다.`);
+
+      const ov = document.getElementById('loadingOverlay');
+      if (ov) {
+        ov.removeAttribute('hidden');
+        ov.style.display = '';
+      }
+
+      __mobileAuthFailRedirectTimer = window.setTimeout(() => {
+        try {
+          sessionStorage.removeItem('return_to_calculator');
+        } catch (_) { }
+
+        location.href = 'index.html';
+      }, delayMs);
+    }
+
 
     function startFakeProgress_mobile(from, to, label, intervalMs = 250, step = 2) {
       let cur = from;
@@ -8374,6 +8408,7 @@
       let t80 = null;
       let t90 = null;
       let loaded = false;
+      let keepOverlayForRedirect = false;
 
       // progress가 target 이상이 되거나(=70 도달), 혹은 로딩이 끝나면(loaded) 풀리는 대기
       const waitUntilPctOrLoaded = (targetPct) => new Promise((resolve) => {
@@ -8439,13 +8474,23 @@
 
       } catch (e) {
         console.error(e);
-        toast('초기 데이터 로딩 실패');
+
+        if (isMobileAuthMissingOrDeniedError(e)) {
+          keepOverlayForRedirect = true;
+          redirectToLoginAfterMobileAuthFail(3000);
+        } else {
+          toast('초기 데이터 로딩 실패');
+        }
       } finally {
-        // ✅ 어떤 경우에도 오버레이는 닫는다 + 타이머/가짜진행 정리
+        // ✅ 로딩 실패 시 타이머/가짜진행 정리
         try { if (typeof stopFake === 'function') stopFake(); } catch (_) { }
         try { if (t80) clearTimeout(t80); } catch (_) { }
         try { if (t90) clearTimeout(t90); } catch (_) { }
-        hideOverlay_mobile();
+
+        // ✅ 비로그인/권한 거부는 안내 로딩창을 유지한 채 로그인 화면으로 자동 복귀
+        if (!keepOverlayForRedirect) {
+          hideOverlay_mobile();
+        }
       }
     })();
 
