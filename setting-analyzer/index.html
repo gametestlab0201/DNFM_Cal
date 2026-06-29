@@ -4291,6 +4291,39 @@
     </div>
   </div>
 
+
+  <div id="oneLinerConfirmModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-one-liner-confirm-close></div>
+    <div class="dialog one-liner-dialog" role="dialog" aria-modal="true" aria-labelledby="oneLinerConfirmTitle">
+      <header>
+        <h2 id="oneLinerConfirmTitle">한마디 변경 확인</h2>
+        <button class="modal-close-btn" type="button" data-one-liner-confirm-close aria-label="닫기">×</button>
+      </header>
+
+      <div class="one-liner-body">
+        <div class="one-liner-guide">
+          아래 내용으로 한마디를 변경합니다.<br>
+          변경 후에는 한 달 동안 다시 변경할 수 없으니 한 번 더 확인해주세요.
+        </div>
+
+        <div class="one-liner-field">
+          <div class="one-liner-label">변경할 한마디</div>
+          <div id="oneLinerConfirmMessage" class="one-liner-current">-</div>
+        </div>
+
+        <div id="oneLinerConfirmNicknameBox" class="one-liner-field" style="display:none;">
+          <div class="one-liner-label">등록할 인게임 닉네임</div>
+          <div id="oneLinerConfirmNickname" class="one-liner-current">-</div>
+        </div>
+
+        <div class="one-liner-actions">
+          <button id="btnOneLinerConfirmSave" class="mini-action-btn main" type="button">확인 후 변경</button>
+          <button class="mini-action-btn" type="button" data-one-liner-confirm-close>다시 수정</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     window.WEBAPP_URL = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
     const PLACEHOLDER_IMG = '../img/gametestlab.png';
@@ -6960,6 +6993,7 @@
     }
 
     let __oneLinerTimer = null;
+    let __oneLinerConfirmBusy = false;
 
     function updateOneLinerCooldownUI() {
       const cd = document.getElementById('oneLinerCooldown');
@@ -7139,7 +7173,35 @@
       }
     }
 
-    async function saveOneLiner() {
+    function openOneLinerConfirmModal(message, nickname = '', needNickname = false) {
+      const modal = document.getElementById('oneLinerConfirmModal');
+      const msgEl = document.getElementById('oneLinerConfirmMessage');
+      const nickBox = document.getElementById('oneLinerConfirmNicknameBox');
+      const nickEl = document.getElementById('oneLinerConfirmNickname');
+
+      if (!modal || !msgEl) return false;
+
+      msgEl.textContent = message || '-';
+
+      if (nickBox && nickEl) {
+        nickBox.style.display = needNickname ? 'flex' : 'none';
+        nickEl.textContent = nickname || '-';
+      }
+
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+      return true;
+    }
+
+    function closeOneLinerConfirmModal() {
+      const modal = document.getElementById('oneLinerConfirmModal');
+      if (modal) {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    async function saveOneLiner(skipConfirm = false) {
       const input = document.getElementById('oneLinerInput');
       const nickBox = document.getElementById('oneLinerNicknameBox');
       const nickInput = document.getElementById('oneLinerNicknameInput');
@@ -7175,8 +7237,14 @@
         return;
       }
 
+      if (!skipConfirm) {
+        openOneLinerConfirmModal(message, nickname, needNickname);
+        return;
+      }
+
       try {
         save.disabled = true;
+        __oneLinerConfirmBusy = true;
         const res = await apiJSON('update_one_liner', {
           message,
           ...(needNickname ? { nickname } : {}),
@@ -7203,6 +7271,7 @@
         console.error('[update_one_liner] 실패:', e);
         alert(e.message || '한마디 변경에 실패했습니다.');
       } finally {
+        __oneLinerConfirmBusy = false;
         updateOneLinerCooldownUI();
       }
     }
@@ -8084,45 +8153,51 @@
     }
 
     async function loadAnalyzerStatusStateOnStart() {
-      let saved = null;
+  let saved = null;
+  let serverLoadFailed = false;
 
-      setStatusLoading(46, '저장된 현황 확인 중', '로그인 계정에 저장된 현황을 확인하고 있습니다.');
+  setStatusLoading(46, '저장된 현황 확인 중', '로그인 계정에 저장된 현황을 확인하고 있습니다.');
 
-      try {
-        const res = await apiJSON('setting_status_load', {});
-        if (res && res.ok && res.statusState) {
-          saved = mergeMissingSettingChecksFromLocal(res.statusState);
-          setStatusLoading(58, '저장된 현황 발견', '저장된 현황 슬롯을 복원합니다.');
-        } else {
-          setStatusLoading(58, '저장된 현황 없음', '기본 현황 슬롯으로 시작합니다.');
-        }
-      } catch (err) {
-        console.warn('[setting_status_load] server load failed, trying local backup', err);
-        setStatusLoading(54, '브라우저 임시 저장 확인 중', '계정 저장 정보를 불러오지 못해 임시 저장을 확인합니다.');
-      }
+  try {
+    const res = await apiJSON('setting_status_load', {});
 
-      if (!saved) {
-        const local = getLocalAnalyzerStatusStateBackup();
-        if (local) {
-          saved = local;
-          setStatusLoading(60, '임시 저장 현황 발견', '브라우저에 저장된 현황을 복원합니다.');
-        }
-      }
-
-      if (saved) {
-        await restoreAnalyzerStatusState(saved);
-        return true;
-      }
-
-      setStatusLoading(90, '기본 현황 준비 중', '저장된 현황이 없어 기본 상태로 표시합니다.');
-      updateSettingAnalysis();
-
-      if (typeof window.__applySettingCheckVisibility === 'function') {
-        window.__applySettingCheckVisibility();
-      }
-
-      return false;
+    if (res && res.ok && res.statusState) {
+      saved = mergeMissingSettingChecksFromLocal(res.statusState);
+      setStatusLoading(58, '저장된 현황 발견', '저장된 현황 슬롯을 복원합니다.');
+    } else {
+      // ✅ 서버가 정상 응답했고, 해당 계정에 저장된 현황이 없다는 뜻
+      // 이때는 브라우저 로컬 백업을 복원하면 안 된다.
+      setStatusLoading(58, '저장된 현황 없음', '기본 현황 슬롯으로 시작합니다.');
     }
+  } catch (err) {
+    serverLoadFailed = true;
+    console.warn('[setting_status_load] server load failed, trying local backup', err);
+    setStatusLoading(54, '브라우저 임시 저장 확인 중', '계정 저장 정보를 불러오지 못해 임시 저장을 확인합니다.');
+  }
+
+  // ✅ 서버 통신 자체가 실패했을 때만 로컬 백업 사용
+  if (!saved && serverLoadFailed) {
+    const local = getLocalAnalyzerStatusStateBackup();
+    if (local) {
+      saved = local;
+      setStatusLoading(60, '임시 저장 현황 발견', '브라우저에 저장된 현황을 복원합니다.');
+    }
+  }
+
+  if (saved) {
+    await restoreAnalyzerStatusState(saved);
+    return true;
+  }
+
+  setStatusLoading(90, '기본 현황 준비 중', '저장된 현황이 없어 기본 상태로 표시합니다.');
+  updateSettingAnalysis();
+
+  if (typeof window.__applySettingCheckVisibility === 'function') {
+    window.__applySettingCheckVisibility();
+  }
+
+  return false;
+}
 
     function getAnalyzerSlotDisplayName(root) {
       if (!root) return '';
@@ -8514,6 +8589,7 @@
       const faq = document.getElementById('btnFaq');
       const one = document.getElementById('btnOneLinerOpen');
       const save = document.getElementById('btnOneLinerSave');
+      const confirmSave = document.getElementById('btnOneLinerConfirmSave');
       const send = document.getElementById('btnContactSend');
 
       if (back && !back._bound) {
@@ -8552,7 +8628,15 @@
       }
       if (save && !save._bound) {
         save._bound = true;
-        save.addEventListener('click', saveOneLiner);
+        save.addEventListener('click', () => saveOneLiner(false));
+      }
+
+      if (confirmSave && !confirmSave._bound) {
+        confirmSave._bound = true;
+        confirmSave.addEventListener('click', () => {
+          if (__oneLinerConfirmBusy) return;
+          saveOneLiner(true);
+        });
       }
       if (send && !send._bound) {
         send._bound = true;

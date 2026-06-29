@@ -8972,6 +8972,41 @@
     </div>
   </div>
 
+
+  <!-- ✅ 한마디 변경 확인 모달 -->
+  <div id="oneLinerConfirmModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-one-liner-confirm-close></div>
+    <div class="dialog one-liner-dialog" role="dialog" aria-modal="true" aria-labelledby="oneLinerConfirmTitle">
+      <header>
+        <div style="width:32px;"></div>
+        <h2 id="oneLinerConfirmTitle">한마디 변경 확인</h2>
+        <button type="button" class="close" data-one-liner-confirm-close>✕</button>
+      </header>
+
+      <div class="one-liner-body">
+        <div class="one-liner-guide">
+          아래 내용으로 한마디를 변경합니다.<br>
+          변경 후에는 한 달 동안 다시 변경할 수 없으니 한 번 더 확인해주세요.
+        </div>
+
+        <div class="one-liner-field">
+          <div class="one-liner-label">변경할 한마디</div>
+          <div id="oneLinerConfirmMessage" class="one-liner-current">-</div>
+        </div>
+
+        <div id="oneLinerConfirmNicknameBox" class="one-liner-field" style="display:none;">
+          <div class="one-liner-label">등록할 인게임 닉네임</div>
+          <div id="oneLinerConfirmNickname" class="one-liner-current">-</div>
+        </div>
+
+        <div class="one-liner-actions">
+          <button id="btnOneLinerConfirmSave" class="btn main" type="button">확인 후 변경</button>
+          <button class="btn" type="button" data-one-liner-confirm-close>다시 수정</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
     window.WEBAPP_URL = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
@@ -9252,6 +9287,7 @@ window.__userRole = window.__userRole || {
     //  한마디 변경 UI
     // ==============================
     let __oneLinerTimer = null;
+    let __oneLinerConfirmBusy = false;
 
     function formatRemainMs(ms) {
       ms = Math.max(0, Number(ms || 0));
@@ -9429,7 +9465,35 @@ if (editable) {
       }
     }
 
-    async function saveOneLiner() {
+    function openOneLinerConfirmModal(message, nickname = '', needNickname = false) {
+      const modal = document.getElementById('oneLinerConfirmModal');
+      const msgEl = document.getElementById('oneLinerConfirmMessage');
+      const nickBox = document.getElementById('oneLinerConfirmNicknameBox');
+      const nickEl = document.getElementById('oneLinerConfirmNickname');
+
+      if (!modal || !msgEl) return false;
+
+      msgEl.textContent = message || '-';
+
+      if (nickBox && nickEl) {
+        nickBox.style.display = needNickname ? 'flex' : 'none';
+        nickEl.textContent = nickname || '-';
+      }
+
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+      return true;
+    }
+
+    function closeOneLinerConfirmModal() {
+      const modal = document.getElementById('oneLinerConfirmModal');
+      if (modal) {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    async function saveOneLiner(skipConfirm = false) {
   const input = document.getElementById('oneLinerInput');
   const nickBox = document.getElementById('oneLinerNicknameBox');
   const nickInput = document.getElementById('oneLinerNicknameInput');
@@ -9475,8 +9539,14 @@ if (/[\r\n]/.test(nickname)) {
         return;
       }
 
+      if (!skipConfirm) {
+        openOneLinerConfirmModal(message, nickname, needNickname);
+        return;
+      }
+
       try {
         save.disabled = true;
+        __oneLinerConfirmBusy = true;
 
         const res = await apiJSON('update_one_liner', {
   message,
@@ -9501,6 +9571,7 @@ if (/[\r\n]/.test(nickname)) {
   canSetPhraseNickname: !!res.canSetPhraseNickname,
 };
 
+        closeOneLinerConfirmModal();
         closeOneLinerModal();
 (window.toast || alert)('한마디가 변경되었습니다.\n\n변경된 한마디는 페이지 새로고침 후 확인해보실 수 있습니다.');
 
@@ -9521,23 +9592,41 @@ if (/[\r\n]/.test(nickname)) {
         console.error('[update_one_liner] 실패:', e);
         (window.toast || alert)(e.message || '한마디 변경에 실패했습니다.');
       } finally {
+        __oneLinerConfirmBusy = false;
         updateOneLinerCooldownUI();
       }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       const modal = document.getElementById('oneLinerModal');
+      const confirmModal = document.getElementById('oneLinerConfirmModal');
       const save = document.getElementById('btnOneLinerSave');
+      const confirmSave = document.getElementById('btnOneLinerConfirmSave');
 
       if (save && !save._bound) {
         save._bound = true;
-        save.addEventListener('click', saveOneLiner);
+        save.addEventListener('click', () => saveOneLiner(false));
+      }
+
+      if (confirmSave && !confirmSave._bound) {
+        confirmSave._bound = true;
+        confirmSave.addEventListener('click', () => {
+          if (__oneLinerConfirmBusy) return;
+          saveOneLiner(true);
+        });
       }
 
       if (modal && !modal._bound) {
         modal._bound = true;
         modal.querySelectorAll('[data-close]').forEach(el => {
           el.addEventListener('click', closeOneLinerModal);
+        });
+      }
+
+      if (confirmModal && !confirmModal._bound) {
+        confirmModal._bound = true;
+        confirmModal.querySelectorAll('[data-one-liner-confirm-close]').forEach(el => {
+          el.addEventListener('click', closeOneLinerConfirmModal);
         });
       }
     });
