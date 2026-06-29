@@ -7017,6 +7017,609 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, .28);
     }
 
+    /* ===== 내 이용 정보 모달 - 휘장형 프리미엄 디자인 ===== */
+    .my-usage-dialog {
+      --usage-accent: #74b8ff;
+      --usage-accent-2: #2e6dff;
+      --usage-accent-soft: rgba(116, 184, 255, 0.22);
+      --usage-accent-glow: rgba(116, 184, 255, 0.28);
+      --usage-metal-1: #dbeafe;
+      --usage-metal-2: #93c5fd;
+      --usage-ribbon-1: rgba(255, 255, 255, 0.14);
+      --usage-ribbon-2: rgba(255, 255, 255, 0.06);
+      width: min(760px, 96vw) !important;
+      max-height: min(820px, 92vh) !important;
+      overflow: hidden;
+      position: relative;
+      border-radius: 26px !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      background:
+        radial-gradient(700px 260px at 50% -8%, var(--usage-accent-soft), transparent 62%),
+        radial-gradient(520px 220px at 50% 110%, rgba(255, 255, 255, 0.05), transparent 68%),
+        linear-gradient(180deg, rgba(26, 31, 43, 0.985), rgba(11, 15, 24, 0.985)) !important;
+      box-shadow:
+        0 34px 90px rgba(0, 0, 0, 0.56),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 0 34px var(--usage-accent-glow);
+      isolation: isolate;
+    }
+
+    .my-usage-dialog::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0));
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .my-usage-dialog::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(460px 160px at 50% 0%, rgba(255, 255, 255, 0.08), transparent 60%),
+        radial-gradient(360px 120px at 50% 100%, rgba(255, 255, 255, 0.035), transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+      mix-blend-mode: screen;
+    }
+
+    .my-usage-header,
+    .usage-info-body {
+      position: relative;
+      z-index: 1;
+    }
+
+    .my-usage-header {
+      min-height: 108px;
+      padding: 20px 22px 16px !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10) !important;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 16px;
+    }
+
+    .my-usage-header::after {
+      content: "";
+      position: absolute;
+      left: 26px;
+      right: 26px;
+      bottom: -1px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), var(--usage-accent-soft), rgba(255,255,255,0.10), transparent);
+    }
+
+    .my-usage-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .my-usage-crest {
+      position: relative;
+      width: 122px;
+      height: 84px;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.28));
+    }
+
+    .my-usage-crest::before,
+    .my-usage-crest::after {
+      content: "";
+      position: absolute;
+      top: 16px;
+      width: 34px;
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+      opacity: 0.9;
+    }
+
+    .my-usage-crest::before { left: 0; }
+    .my-usage-crest::after { right: 0; }
+
+    .my-usage-crest .crest-wing {
+      position: absolute;
+      top: 24px;
+      width: 36px;
+      height: 28px;
+      background: linear-gradient(135deg, var(--usage-metal-1), var(--usage-metal-2));
+      clip-path: polygon(0 50%, 48% 0, 100% 16%, 72% 50%, 100% 84%, 48% 100%);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.16) inset,
+        0 4px 10px rgba(0, 0, 0, 0.22);
+      opacity: 0.95;
+    }
+
+    .my-usage-crest .crest-wing.left {
+      left: 12px;
+      transform: scaleX(-1);
+    }
+
+    .my-usage-crest .crest-wing.right { right: 12px; }
+
+    .my-usage-crest .crest-core {
+      position: relative;
+      width: 54px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      clip-path: polygon(50% 0%, 88% 16%, 100% 46%, 82% 84%, 50% 100%, 18% 84%, 0% 46%, 12% 16%);
+      background:
+        radial-gradient(circle at 34% 26%, rgba(255,255,255,0.34), transparent 32%),
+        linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.05)),
+        linear-gradient(135deg, var(--usage-metal-1), var(--usage-metal-2) 50%, var(--usage-accent-2));
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.24) inset,
+        0 10px 24px rgba(0, 0, 0, 0.26),
+        0 0 18px var(--usage-accent-glow);
+    }
+
+    .my-usage-crest .crest-core::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      clip-path: inherit;
+      background: linear-gradient(180deg, rgba(9, 13, 22, 0.18), rgba(9, 13, 22, 0.55));
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .my-usage-crest .crest-gem {
+      position: relative;
+      z-index: 1;
+      width: 16px;
+      height: 16px;
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.75), transparent 42%),
+        linear-gradient(135deg, #ffffff, var(--usage-accent));
+      box-shadow: 0 0 12px rgba(255,255,255,0.38);
+    }
+
+    .my-usage-crest .crest-ribbon {
+      position: absolute;
+      left: 50%;
+      bottom: 5px;
+      transform: translateX(-50%);
+      width: 72px;
+      height: 16px;
+      clip-path: polygon(0 0, 100% 0, 88% 100%, 12% 100%);
+      background: linear-gradient(180deg, var(--usage-ribbon-1), var(--usage-ribbon-2));
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.10) inset;
+    }
+
+    .my-usage-title-text {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .my-usage-eyebrow {
+      color: color-mix(in srgb, var(--usage-metal-1) 78%, white 22%);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .my-usage-header h2 {
+      margin: 0 !important;
+      font-size: 22px !important;
+      font-weight: 950 !important;
+      letter-spacing: -0.04em;
+      color: #f8fafc;
+      text-shadow: 0 0 14px rgba(255,255,255,0.08);
+    }
+
+    .my-usage-header .close {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.07) !important;
+      border: 1px solid rgba(255, 255, 255, 0.14) !important;
+      color: rgba(248, 250, 252, 0.92) !important;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.16);
+    }
+
+    .usage-info-body {
+      padding: 18px 20px 20px;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-y: auto;
+      max-height: calc(min(820px, 92vh) - 108px);
+    }
+
+    .usage-info-notice {
+      margin-bottom: 16px;
+      padding: 13px 15px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      color: rgba(226, 232, 240, 0.92);
+      box-shadow:
+        0 12px 24px rgba(0, 0, 0, 0.18),
+        0 0 0 1px rgba(255,255,255,0.03) inset;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .usage-info-notice::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: linear-gradient(180deg, var(--usage-accent), transparent);
+    }
+
+    .usage-info-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .usage-summary-card,
+    .usage-info-row {
+      position: relative;
+      overflow: hidden;
+      clip-path: polygon(0 14px, 14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px));
+    }
+
+    .usage-summary-card::before,
+    .usage-info-row::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(255,255,255,0.10);
+      clip-path: inherit;
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    .usage-summary-card {
+      padding: 15px 16px;
+      background:
+        radial-gradient(260px 140px at 100% -8%, rgba(255,255,255,0.14), transparent 58%),
+        linear-gradient(135deg, rgba(255,255,255,0.11), rgba(255,255,255,0.045));
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    .usage-summary-card.primary {
+      border-color: rgba(255, 255, 255, 0.08);
+      background:
+        radial-gradient(300px 160px at 102% -8%, var(--usage-accent-soft), transparent 58%),
+        linear-gradient(135deg, rgba(255,255,255,0.11), rgba(255,255,255,0.045));
+    }
+
+    .usage-summary-card.gold {
+      background:
+        radial-gradient(300px 160px at 102% -8%, rgba(255,255,255,0.12), transparent 58%),
+        linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+    }
+
+    .usage-summary-label {
+      color: rgba(226, 232, 240, 0.70);
+      font-size: 12px;
+      font-weight: 850;
+      margin-bottom: 6px;
+    }
+
+    .usage-summary-value {
+      color: color-mix(in srgb, white 75%, var(--usage-metal-1) 25%);
+      font-size: 24px;
+      line-height: 1.1;
+      font-weight: 950;
+      letter-spacing: -0.05em;
+      text-shadow: 0 0 16px rgba(255,255,255,0.06);
+    }
+
+    .usage-summary-sub {
+      margin-top: 7px;
+      color: rgba(226, 232, 240, 0.68);
+      font-size: 12px;
+      font-weight: 650;
+      word-break: keep-all;
+    }
+
+    .usage-info-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .usage-info-row {
+      display: grid;
+      grid-template-columns: 142px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 14px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.085), rgba(255,255,255,0.035));
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.15);
+    }
+
+    .usage-info-row.tone-good {
+      background:
+        radial-gradient(220px 120px at 100% -8%, rgba(34, 197, 94, 0.12), transparent 58%),
+        linear-gradient(135deg, rgba(255,255,255,0.085), rgba(255,255,255,0.035));
+    }
+
+    .usage-info-row.tone-warn {
+      background:
+        radial-gradient(220px 120px at 100% -8%, rgba(250, 204, 21, 0.11), transparent 58%),
+        linear-gradient(135deg, rgba(255,255,255,0.085), rgba(255,255,255,0.035));
+    }
+
+    .usage-info-label {
+      color: rgba(226, 232, 240, 0.62);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+    }
+
+    .usage-info-value {
+      color: #f8fafc;
+      white-space: pre-line;
+      font-weight: 900;
+      word-break: keep-all;
+    }
+
+    .usage-info-sub {
+      margin-top: 4px;
+      color: rgba(203, 213, 225, 0.68);
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1.45;
+      white-space: pre-line;
+    }
+
+    .usage-extra-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .usage-extra-item {
+      display: grid;
+      gap: 3px;
+    }
+
+    .usage-extra-count {
+      color: #f8fafc;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    .usage-extra-reason {
+      color: rgba(203, 213, 225, 0.68);
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1.45;
+    }
+
+    .my-usage-dialog.usage-theme-senior {
+      --usage-accent: #f6d36b;
+      --usage-accent-2: #b9851e;
+      --usage-accent-soft: rgba(246, 211, 107, 0.24);
+      --usage-accent-glow: rgba(246, 211, 107, 0.24);
+      --usage-metal-1: #fff6cf;
+      --usage-metal-2: #f7c95b;
+      --usage-ribbon-1: rgba(255, 236, 179, 0.22);
+      --usage-ribbon-2: rgba(181, 133, 30, 0.18);
+    }
+
+    .my-usage-dialog.usage-theme-lead {
+      --usage-accent: #dce7f6;
+      --usage-accent-2: #9aa7bc;
+      --usage-accent-soft: rgba(220, 231, 246, 0.20);
+      --usage-accent-glow: rgba(220, 231, 246, 0.18);
+      --usage-metal-1: #f8fbff;
+      --usage-metal-2: #bcc8d7;
+      --usage-ribbon-1: rgba(236, 242, 248, 0.18);
+      --usage-ribbon-2: rgba(154, 167, 188, 0.18);
+    }
+
+    .my-usage-dialog.usage-theme-junior {
+      --usage-accent: #d79d67;
+      --usage-accent-2: #935d31;
+      --usage-accent-soft: rgba(215, 157, 103, 0.20);
+      --usage-accent-glow: rgba(215, 157, 103, 0.18);
+      --usage-metal-1: #f8dfc8;
+      --usage-metal-2: #c67d44;
+      --usage-ribbon-1: rgba(248, 223, 200, 0.18);
+      --usage-ribbon-2: rgba(147, 93, 49, 0.18);
+    }
+
+    .my-usage-dialog.usage-theme-senior .usage-summary-value,
+    .my-usage-dialog.usage-theme-lead .usage-summary-value,
+    .my-usage-dialog.usage-theme-junior .usage-summary-value {
+      color: color-mix(in srgb, white 70%, var(--usage-metal-1) 30%);
+    }
+
+    @media (max-width: 760px) {
+      .my-usage-dialog {
+        width: min(96vw, 680px) !important;
+      }
+
+      .my-usage-header {
+        min-height: 96px;
+        padding: 16px 16px 14px !important;
+      }
+
+      .my-usage-crest {
+        width: 104px;
+        height: 76px;
+      }
+
+      .usage-info-body {
+        padding: 14px 14px 16px;
+      }
+
+      .usage-info-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .usage-info-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .my-usage-title-wrap {
+        gap: 12px;
+      }
+
+      .my-usage-header h2 {
+        font-size: 20px !important;
+      }
+
+      .my-usage-eyebrow {
+        letter-spacing: 0.12em;
+      }
+    }
+
+  
+
+    /* ===== 내 이용 정보 휘장 - 직급별 형태 차별화 ===== */
+    .my-usage-dialog .my-usage-crest { overflow: visible; }
+    .my-usage-dialog .crest-crown,
+    .my-usage-dialog .crest-plate { position: absolute; display: none; pointer-events: none; }
+
+    /* 전임: 기본 심볼형 */
+    .my-usage-dialog:not(.usage-theme-senior):not(.usage-theme-lead):not(.usage-theme-junior) .my-usage-crest {
+      width: 78px; height: 64px;
+    }
+    .my-usage-dialog:not(.usage-theme-senior):not(.usage-theme-lead):not(.usage-theme-junior) .crest-wing,
+    .my-usage-dialog:not(.usage-theme-senior):not(.usage-theme-lead):not(.usage-theme-junior) .crest-ribbon,
+    .my-usage-dialog:not(.usage-theme-senior):not(.usage-theme-lead):not(.usage-theme-junior) .crest-crown,
+    .my-usage-dialog:not(.usage-theme-senior):not(.usage-theme-lead):not(.usage-theme-junior) .crest-plate {
+      display: none !important;
+    }
+    .my-usage-dialog:not(.usage-theme-senior):not(.usage-theme-lead):not(.usage-theme-junior) .crest-core {
+      width: 46px; height: 46px;
+      clip-path: polygon(50% 0%, 88% 18%, 100% 50%, 82% 86%, 50% 100%, 18% 86%, 0% 50%, 12% 18%);
+      background: radial-gradient(circle at 34% 25%, rgba(255,255,255,0.34), transparent 34%), linear-gradient(135deg, #dbeafe, #60a5fa 58%, #1d4ed8);
+    }
+    .my-usage-dialog:not(.usage-theme-senior):not(.usage-theme-lead):not(.usage-theme-junior) .crest-gem {
+      width: 12px; height: 12px; border-radius: 50%; clip-path: none;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #93c5fd 62%, #2563eb);
+    }
+
+    /* 수석: 왕관 + 대형 날개 + 보석 + 긴 리본 */
+    .my-usage-dialog.usage-theme-senior .my-usage-crest { width: 150px; height: 104px; }
+    .my-usage-dialog.usage-theme-senior .crest-crown {
+      display: block; left: 50%; top: -1px; transform: translateX(-50%);
+      width: 56px; height: 28px;
+      clip-path: polygon(0 100%, 0 44%, 18% 66%, 30% 8%, 50% 48%, 70% 8%, 82% 66%, 100% 44%, 100% 100%);
+      background: radial-gradient(circle at 50% 18%, rgba(255,255,255,0.85) 0 8%, transparent 9%), linear-gradient(180deg, #fff4bf 0%, #f6d36b 42%, #b9851e 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.30) inset, 0 8px 18px rgba(0,0,0,0.24), 0 0 18px rgba(246,211,107,0.35);
+      z-index: 4;
+    }
+    .my-usage-dialog.usage-theme-senior .crest-wing {
+      display: block; top: 38px; width: 52px; height: 38px;
+      clip-path: polygon(0 50%, 20% 14%, 62% 0, 100% 14%, 75% 50%, 100% 86%, 62% 100%, 20% 86%);
+      background: linear-gradient(135deg, #fff7d6 0%, #f7c95b 48%, #9b6a16 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.22) inset, 0 10px 20px rgba(0,0,0,0.26), 0 0 16px rgba(246,211,107,0.22);
+    }
+    .my-usage-dialog.usage-theme-senior .crest-wing.left { left: 4px; transform: scaleX(-1) rotate(-5deg); }
+    .my-usage-dialog.usage-theme-senior .crest-wing.right { right: 4px; transform: rotate(-5deg); }
+    .my-usage-dialog.usage-theme-senior .crest-core {
+      width: 66px; height: 66px; margin-top: 20px;
+      clip-path: polygon(50% 0%, 88% 14%, 100% 44%, 86% 78%, 50% 100%, 14% 78%, 0% 44%, 12% 14%);
+      background: radial-gradient(circle at 34% 22%, rgba(255,255,255,0.46), transparent 32%), linear-gradient(180deg, #fff6cf 0%, #f7c95b 46%, #b9851e 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.30) inset, 0 14px 30px rgba(0,0,0,0.30), 0 0 24px rgba(246,211,107,0.34);
+      z-index: 3;
+    }
+    .my-usage-dialog.usage-theme-senior .crest-core::before { inset: 9px; clip-path: polygon(50% 0%, 88% 14%, 100% 44%, 86% 78%, 50% 100%, 14% 78%, 0% 44%, 12% 14%); }
+    .my-usage-dialog.usage-theme-senior .crest-gem {
+      width: 18px; height: 18px; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      background: radial-gradient(circle at 30% 28%, #ffffff, transparent 38%), linear-gradient(135deg, #fff7d6, #f6d36b 55%, #d97706);
+    }
+    .my-usage-dialog.usage-theme-senior .crest-ribbon {
+      display: block; bottom: 0; width: 96px; height: 18px;
+      background: linear-gradient(180deg, rgba(255,244,191,0.34), rgba(185,133,30,0.22));
+    }
+
+    /* 책임: 방패형 휘장 + 중형 은빛 금속판 */
+    .my-usage-dialog.usage-theme-lead .my-usage-crest { width: 124px; height: 92px; }
+    .my-usage-dialog.usage-theme-lead .crest-crown { display: none !important; }
+    .my-usage-dialog.usage-theme-lead .crest-wing {
+      display: block; top: 31px; width: 34px; height: 42px;
+      clip-path: polygon(0 50%, 22% 4%, 100% 18%, 78% 50%, 100% 82%, 22% 96%);
+      background: linear-gradient(135deg, #f8fbff 0%, #bcc8d7 52%, #7c8798 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.20) inset, 0 8px 18px rgba(0,0,0,0.24);
+    }
+    .my-usage-dialog.usage-theme-lead .crest-wing.left { left: 12px; transform: scaleX(-1); }
+    .my-usage-dialog.usage-theme-lead .crest-wing.right { right: 12px; }
+    .my-usage-dialog.usage-theme-lead .crest-core {
+      width: 60px; height: 68px;
+      clip-path: polygon(50% 0%, 92% 18%, 82% 76%, 50% 100%, 18% 76%, 8% 18%);
+      background: radial-gradient(circle at 34% 22%, rgba(255,255,255,0.42), transparent 33%), linear-gradient(180deg, #f8fbff 0%, #bcc8d7 50%, #7c8798 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.28) inset, 0 13px 28px rgba(0,0,0,0.28), 0 0 18px rgba(220,231,246,0.20);
+      z-index: 3;
+    }
+    .my-usage-dialog.usage-theme-lead .crest-core::before { inset: 8px; clip-path: polygon(50% 0%, 92% 18%, 82% 76%, 50% 100%, 18% 76%, 8% 18%); }
+    .my-usage-dialog.usage-theme-lead .crest-gem {
+      width: 17px; height: 17px; border-radius: 50%; clip-path: none;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #dce7f6 55%, #9aa7bc);
+    }
+    .my-usage-dialog.usage-theme-lead .crest-ribbon {
+      display: block; bottom: 4px; width: 76px; height: 14px;
+      background: linear-gradient(180deg, rgba(236,242,248,0.24), rgba(154,167,188,0.18));
+    }
+
+    /* 선임: 동빛 메달형 플러스 회원 배지 */
+    .my-usage-dialog.usage-theme-junior .my-usage-crest { width: 100px; height: 82px; }
+    .my-usage-dialog.usage-theme-junior .crest-crown { display: none !important; }
+    .my-usage-dialog.usage-theme-junior .crest-wing {
+      display: block; top: 33px; width: 24px; height: 24px;
+      clip-path: polygon(0 50%, 42% 0, 100% 20%, 70% 50%, 100% 80%, 42% 100%);
+      background: linear-gradient(135deg, #f8dfc8 0%, #c67d44 58%, #7a421f 100%);
+      opacity: 0.92;
+    }
+    .my-usage-dialog.usage-theme-junior .crest-wing.left { left: 14px; transform: scaleX(-1); }
+    .my-usage-dialog.usage-theme-junior .crest-wing.right { right: 14px; }
+    .my-usage-dialog.usage-theme-junior .crest-core {
+      width: 54px; height: 54px; border-radius: 50%; clip-path: none;
+      background: radial-gradient(circle at 34% 22%, rgba(255,255,255,0.38), transparent 33%), linear-gradient(180deg, #f8dfc8 0%, #c67d44 56%, #7a421f 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.24) inset, 0 12px 24px rgba(0,0,0,0.26), 0 0 14px rgba(215,157,103,0.20);
+      z-index: 3;
+    }
+    .my-usage-dialog.usage-theme-junior .crest-core::before { inset: 8px; border-radius: 50%; clip-path: none; }
+    .my-usage-dialog.usage-theme-junior .crest-gem {
+      width: 14px; height: 14px; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      background: radial-gradient(circle at 30% 30%, #ffffff, #d79d67 60%, #935d31);
+    }
+    .my-usage-dialog.usage-theme-junior .crest-plate {
+      display: block; left: 50%; bottom: 4px; transform: translateX(-50%);
+      width: 58px; height: 12px; border-radius: 999px;
+      background: linear-gradient(180deg, rgba(248,223,200,0.22), rgba(147,93,49,0.18));
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.10) inset;
+    }
+    .my-usage-dialog.usage-theme-junior .crest-ribbon { display: none !important; }
+
+    @media (max-width: 760px) {
+      .my-usage-dialog.usage-theme-senior .my-usage-crest { width: 126px; height: 92px; }
+      .my-usage-dialog.usage-theme-senior .crest-wing { width: 44px; height: 32px; }
+      .my-usage-dialog.usage-theme-senior .crest-core { width: 58px; height: 58px; }
+      .my-usage-dialog.usage-theme-lead .my-usage-crest { width: 110px; }
+      .my-usage-dialog.usage-theme-junior .my-usage-crest { width: 92px; }
+    }
+
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -7056,6 +7659,9 @@
             <path d="M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10z"></path>
           </svg>
           <span class="contact-label">Q&amp;A</span>
+        </button>
+        <button id="btnMyUsageInfo" class="contact-btn faq-btn" type="button" title="내 이용 정보" style="display:none;">
+          <span class="contact-label">내 이용 정보</span>
         </button>
       </div>
       <!--span 은 한줄에서 특별히 강조 할때 쓴다. div는 한줄이 강제로 나뉘기때문에 쓴다.-->
@@ -8820,6 +9426,42 @@
     </div>
   </div>
 
+  <!-- 내 이용 정보 모달 -->
+  <div id="myUsageInfoModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-my-usage-close></div>
+    <div class="dialog contact-dialog my-usage-dialog" role="dialog" aria-modal="true" aria-labelledby="myUsageInfoTitle">
+      <header class="my-usage-header">
+        <div class="my-usage-title-wrap">
+          <div class="my-usage-crest" aria-hidden="true">
+            <span class="crest-crown"></span>
+            <span class="crest-wing left"></span>
+            <span class="crest-core"><span class="crest-gem"></span></span>
+            <span class="crest-wing right"></span>
+            <span class="crest-plate"></span>
+            <span class="crest-ribbon"></span>
+          </div>
+          <div class="my-usage-title-text">
+            <div class="my-usage-eyebrow">LAB MEMBERSHIP CREST</div>
+            <h2 id="myUsageInfoTitle">내 이용 정보</h2>
+          </div>
+        </div>
+        <button type="button" class="close" data-my-usage-close>✕</button>
+      </header>
+
+      <div class="usage-info-body">
+        <div class="usage-info-notice">
+          현재 계정에 적용된 등급, 저장슬롯 확장, 한마디 변경 가능 여부를 한눈에 확인할 수 있습니다.
+        </div>
+        <div id="myUsageInfoContent" class="usage-info-grid">
+          <div class="usage-info-row">
+            <div class="usage-info-label">상태</div>
+            <div class="usage-info-value">불러오는 중...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Q&A 답변 모달 -->
   <div id="faqAnswerModal" class="modal" aria-hidden="true">
     <div class="backdrop" data-faqans-close></div>
@@ -9277,6 +9919,10 @@ window.__userRole = window.__userRole || {
         // ✅ 인게임 닉네임
         phraseNickname: data.phraseNickname || '',
         canSetPhraseNickname: !!data.canSetPhraseNickname,
+
+        // ✅ 테스트 기능 노출용 권한
+        specialUser: !!data.specialUser,
+        researchUser: !!data.researchUser,
       };
 
       // 🔹 프리셋 버튼 권한 UI 갱신
@@ -9336,6 +9982,13 @@ window.__userRole = window.__userRole || {
     }
 
     window.__loginPingResult = data;
+
+    if (typeof updateMyUsageInfoButtonUI === 'function') {
+      try { updateMyUsageInfoButtonUI(); } catch (err) {
+        console.warn('[my usage info UI] update 실패:', err);
+      }
+    }
+
     return data;
   } catch (e) {
     console.warn('login_ping failed:', e);
@@ -9362,9 +10015,290 @@ window.__userRole = window.__userRole || {
     }
 
     window.__loginPingResult = { ok: false, error: e.message };
+
+    if (typeof updateMyUsageInfoButtonUI === 'function') {
+      try { updateMyUsageInfoButtonUI(); } catch (err) {
+        console.warn('[my usage info UI] update 실패:', err);
+      }
+    }
+
     return window.__loginPingResult;
   }
 }
+
+
+    // ==============================
+    //  내 이용 정보 UI (special_user 테스트용)
+    // ==============================
+    function canShowMyUsageInfoButton() {
+      const lp = window.__loginPingResult || {};
+      const ur = window.__userRole || {};
+      return !!(lp.specialUser || lp.researchUser || ur.specialUser || ur.researchUser);
+    }
+
+    function updateMyUsageInfoButtonUI() {
+      const btn = document.getElementById('btnMyUsageInfo');
+      if (!btn) return;
+      btn.style.display = canShowMyUsageInfoButton() ? 'inline-flex' : 'none';
+    }
+
+    function openMyUsageInfoModal() {
+      const modal = document.getElementById('myUsageInfoModal');
+      if (!modal) return;
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+      loadMyUsageInfoIntoModal();
+    }
+
+    function closeMyUsageInfoModal() {
+      const modal = document.getElementById('myUsageInfoModal');
+      if (!modal) return;
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function formatMyUsageDate(value) {
+      const s = String(value || '').trim();
+      if (!s) return '';
+      const d = new Date(s);
+      if (Number.isNaN(d.getTime())) return s;
+      return d.toLocaleString('ko-KR', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hour12: false,
+      });
+    }
+
+
+    function formatMyUsageDateOnly(value) {
+      const s = String(value || '').trim();
+      if (!s) return '';
+      const d = new Date(s);
+      if (Number.isNaN(d.getTime())) return s;
+      return d.toLocaleDateString('ko-KR', {
+        year: 'numeric', month: '2-digit', day: '2-digit'
+      });
+    }
+
+    function getMyUsageRoleBase(res) {
+      const raw = String(res?.roleLabelBase || res?.roleLabel || '전임').trim();
+      return (raw.replace(/^\[이벤트\]\s*/, '').replace(/\s*연구원\s*$/, '').trim()) || '전임';
+    }
+
+    function getMyUsageRoleDisplay(res) {
+      return `${getMyUsageRoleBase(res)} 연구원`;
+    }
+
+    function getMyUsageJoinedDateText(res) {
+      return formatMyUsageDateOnly(res?.joinedAt || res?.joinedAtRaw || res?.joinDate || res?.joinedDate || res?.signupDate || '');
+    }
+
+    function getMyUsageBaseSlotSub(res) {
+      const roleBase = getMyUsageRoleBase(res);
+      return `기본 ${roleBase} 연구원 등급 저장 슬롯 갯수`;
+    }
+
+    function getMyUsageSlotExtensionInfo(res) {
+      if (res?.slotEventActive) {
+        return {
+          text: `${Number(res.slotEventMultiplier || 3)}배 확장 적용 중`,
+          sub: res.slotEventUntil ? `종료일: ${formatMyUsageDate(res.slotEventUntil)}` : (res.slotEventDescription || '가입 45일 경과로 저장슬롯 3배 확장이 적용 중입니다.')
+        };
+      }
+
+      const roleLevel = Number(res?.roleLevel || 0);
+      if (roleLevel <= 0) {
+        return {
+          text: '미적용',
+          sub: '선임 연구원 이상 등급부터 혜택이 적용됩니다'
+        };
+      }
+
+      const joinedAtRaw = String(res?.joinedAt || res?.joinedAtRaw || res?.joinDate || res?.joinedDate || res?.signupDate || '').trim();
+      const joinedAtDate = joinedAtRaw ? new Date(joinedAtRaw) : null;
+
+      if (joinedAtDate && !Number.isNaN(joinedAtDate.getTime())) {
+        const expectedAt = new Date(joinedAtDate.getTime());
+        expectedAt.setDate(expectedAt.getDate() + 45);
+
+        return {
+          text: '미적용',
+          sub: `3배 확장 예정일 : ${formatMyUsageDateOnly(expectedAt)}`
+        };
+      }
+
+      return {
+        text: '미적용',
+        sub: '가입일을 확인할 수 없어 45일 확장 여부를 계산하지 못했습니다.'
+      };
+    }
+
+
+    function getMyUsageExtraSlotItems(res) {
+      const eventExtra = Math.max(0, Number(res?.eventExtraSlots || 0));
+      const sheetExtra = Math.max(0, Number(res?.sheetExtraSlots ?? res?.manualExtraSlots ?? 0));
+      const items = [];
+
+      if (eventExtra > 0) {
+        items.push({ count: `+${eventExtra}개`, reason: '저장슬롯 3배 확장 이벤트' });
+      }
+
+      if (sheetExtra > 0) {
+        items.push({ count: `+${sheetExtra}개`, reason: '버그제보 및 기타사유' });
+      }
+
+      return items;
+    }
+
+    function getMyUsageThemeClass(res) {
+      const roleLevel = Number(res?.roleLevel ?? res?.level ?? 0);
+      if (roleLevel >= 3) return 'usage-theme-senior';
+      if (roleLevel === 2) return 'usage-theme-lead';
+      if (roleLevel === 1) return 'usage-theme-junior';
+      return '';
+    }
+
+    function applyMyUsageTheme(res) {
+      const dialog = document.querySelector('#myUsageInfoModal .my-usage-dialog');
+      if (!dialog) return;
+      dialog.classList.remove('usage-theme-senior', 'usage-theme-lead', 'usage-theme-junior');
+      const themeClass = getMyUsageThemeClass(res);
+      if (themeClass) dialog.classList.add(themeClass);
+    }
+
+
+    function escapeMyUsageHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, (ch) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[ch]));
+    }
+
+
+    function usageInfoRow(label, value, sub = '', tone = '') {
+      const v = String(value || '');
+      const toneClass = tone ? ` tone-${tone}` : '';
+      const extra = sub ? `<div class="usage-info-sub">${escapeMyUsageHtml(sub)}</div>` : '';
+      return `
+        <div class="usage-info-row${toneClass}">
+          <div class="usage-info-label">${escapeMyUsageHtml(label)}</div>
+          <div class="usage-info-value">${escapeMyUsageHtml(v)}${extra}</div>
+        </div>
+      `;
+    }
+
+
+    function usageInfoExtraSlotRow(res) {
+      const items = getMyUsageExtraSlotItems(res);
+      const body = items.length
+        ? `<div class="usage-extra-list">${items.map(item => `
+            <div class="usage-extra-item">
+              <div class="usage-extra-count">${escapeMyUsageHtml(item.count)}</div>
+              <div class="usage-extra-reason">${escapeMyUsageHtml(item.reason)}</div>
+            </div>
+          `).join('')}</div>`
+        : '<div class="usage-extra-count">0개</div>';
+
+      return `
+        <div class="usage-info-row">
+          <div class="usage-info-label">추가 저장슬롯</div>
+          <div class="usage-info-value">${body}</div>
+        </div>
+      `;
+    }
+
+    function usageInfoSummary(res, eventText, phraseText) {
+      const role = escapeMyUsageHtml(getMyUsageRoleDisplay(res));
+      const joinedDate = escapeMyUsageHtml(getMyUsageJoinedDateText(res) || '가입일 정보 없음');
+      const totalSlots = Number(res.totalSlots || res.presetSlots || 0);
+      const formula = escapeMyUsageHtml(res.slotFormulaText || `기본 ${Number(res.baseSlots || 0)}개 + 추가 ${Number(res.extraSlots || 0)}개`);
+      const event = escapeMyUsageHtml(eventText || '미적용');
+      const phrase = escapeMyUsageHtml(phraseText || '-');
+
+      return `
+        <div class="usage-info-summary">
+          <div class="usage-summary-card primary">
+            <div class="usage-summary-label">현재 등급</div>
+            <div class="usage-summary-value">${role}</div>
+            <div class="usage-summary-sub">가입일: ${joinedDate}</div>
+          </div>
+          <div class="usage-summary-card gold">
+            <div class="usage-summary-label">현재 사용 가능 슬롯</div>
+            <div class="usage-summary-value">${totalSlots}개</div>
+            <div class="usage-summary-sub">${formula} · 저장슬롯 확장 ${event} · 한마디 ${phrase}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadMyUsageInfoIntoModal() {
+      const box = document.getElementById('myUsageInfoContent');
+      if (!box) return;
+
+      applyMyUsageTheme(null);
+      box.innerHTML = usageInfoRow('상태', '불러오는 중...');
+
+      try {
+        const res = await apiJSON('my_usage_info', {});
+        if (!res || !res.ok) {
+          box.innerHTML = usageInfoRow('상태', res?.message || res?.error || '이용 정보를 불러오지 못했습니다.');
+          return;
+        }
+
+        applyMyUsageTheme(res);
+
+        const extensionInfo = getMyUsageSlotExtensionInfo(res);
+        const eventText = extensionInfo.text;
+        const eventSub = extensionInfo.sub;
+        const roleDisplay = getMyUsageRoleDisplay(res);
+        const joinedDateText = getMyUsageJoinedDateText(res) || '가입일 정보 없음';
+
+        const phraseText = res.canEditPhrase
+          ? (res.canChangePhrase ? '변경 가능' : '변경 대기 중')
+          : '사용 불가';
+
+        const currentPhraseMessage = String(res.phraseMessage || '').trim();
+        const phraseSubParts = [];
+        if (currentPhraseMessage) phraseSubParts.push(currentPhraseMessage);
+        phraseSubParts.push((!res.canChangePhrase && res.phraseNextAt)
+          ? `다음 변경 가능일: ${formatMyUsageDate(res.phraseNextAt)}`
+          : (res.canChangePhrase ? '지금 한마디를 변경할 수 있습니다.' : '책임 등급 이상부터 한마디를 사용할 수 있습니다.'));
+        const phraseSub = phraseSubParts.filter(Boolean).join('\n');
+
+        box.innerHTML = usageInfoSummary(res, eventText, phraseText) + [
+          usageInfoRow('현재 등급', roleDisplay, res.email || ''),
+          usageInfoRow('가입일', joinedDateText),
+          usageInfoRow('기본 저장슬롯', `${Number(res.baseSlots || 0)}개`, getMyUsageBaseSlotSub(res)),
+          usageInfoRow('저장슬롯 확장', eventText, eventSub, res.slotEventActive ? 'good' : ''),
+          usageInfoExtraSlotRow(res),
+          usageInfoRow('현재 사용 가능 슬롯', `${Number(res.totalSlots || res.presetSlots || 0)}개`, res.slotFormulaText || `기본 ${Number(res.baseSlots || 0)}개 + 추가 ${Number(res.extraSlots || 0)}개`, 'warn'),
+          usageInfoRow('한마디 변경', phraseText, phraseSub, res.canChangePhrase ? 'good' : ''),
+        ].join('');
+      } catch (err) {
+        console.warn('[my_usage_info] load failed:', err);
+        box.innerHTML = usageInfoRow('상태', '이용 정보를 불러오는 중 오류가 발생했습니다.');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('btnMyUsageInfo');
+      if (btn && !btn._bound) {
+        btn._bound = true;
+        btn.addEventListener('click', openMyUsageInfoModal);
+      }
+
+      const modal = document.getElementById('myUsageInfoModal');
+      if (modal && !modal._bound) {
+        modal._bound = true;
+        modal.querySelectorAll('[data-my-usage-close]').forEach(el => {
+          el.addEventListener('click', closeMyUsageInfoModal);
+        });
+      }
+    });
+
+    window.updateMyUsageInfoButtonUI = updateMyUsageInfoButtonUI;
 
     // ==============================
     //  한마디 변경 UI
