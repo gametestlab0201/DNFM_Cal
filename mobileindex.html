@@ -4554,6 +4554,18 @@
       text-align: center;
     }
 
+    #presetModal .preset-memo-view {
+      width: 100%;
+      min-height: 18px;
+      margin-top: -2px;
+      color: rgba(229, 231, 235, 0.72);
+      font-size: 12px;
+      line-height: 1.45;
+      text-align: center;
+      white-space: pre-wrap;
+      word-break: keep-all;
+    }
+
     /* 액션: PC처럼 하단 가로 버튼 (presetModal + confirmModal 동일 적용) */
     #presetModal .preset-actions,
     #confirmModal .preset-actions {
@@ -11458,6 +11470,12 @@
         presetNameDefault = '',
         presetNamePlaceholder = '프리셋 이름을 입력하세요',
         presetNameMaxLen = 30,
+
+        // ✅ 저장 시 프리셋 메모 입력
+        presetMemoInput = false,
+        presetMemoDefault = '',
+        presetMemoPlaceholder = '메모를 입력하세요',
+        presetMemoMaxLen = 80,
       } = opts;
 
       const m = document.getElementById('confirmModal');
@@ -11479,9 +11497,11 @@
       const pvImg = m.querySelector('#confirmThumb');
       const pvChar = m.querySelector('#confirmCharName');
 
-      // ✅ (NEW) preset name input elements
+      // ✅ (NEW) preset name/memo input elements
       const nameRow = m.querySelector('#confirmPresetNameRow');
       const nameInput = m.querySelector('#confirmPresetName');
+      const memoRow = m.querySelector('#confirmPresetMemoRow');
+      const memoInput = m.querySelector('#confirmPresetMemo');
 
       if (titleEl) titleEl.textContent = title;
       if (msgEl) msgEl.textContent = message;
@@ -11501,6 +11521,19 @@
         } else {
           nameRow.style.display = 'none';
           nameInput.value = '';
+        }
+      }
+
+      // ✅ 프리셋 메모 입력칸 제어
+      if (memoRow && memoInput) {
+        if (presetMemoInput) {
+          memoRow.style.display = 'block';
+          memoInput.maxLength = Number(presetMemoMaxLen) || 80;
+          memoInput.placeholder = presetMemoPlaceholder || '메모를 입력하세요';
+          memoInput.value = String(presetMemoDefault || '');
+        } else {
+          memoRow.style.display = 'none';
+          memoInput.value = '';
         }
       }
 
@@ -17960,8 +17993,12 @@ function buildSynergyPayloadMobile() {
           btn.classList.add('has-data');
 
           const label = info.label || '';
+          const memo = info.memo || '';
           const charName = meta?.charName || '';
-          btn.title = label || charName || `슬롯 ${slotNum}`;
+          btn.title = [
+            label || charName || `슬롯 ${slotNum}`,
+            memo ? `메모: ${memo}` : ''
+          ].filter(Boolean).join('\n');
 
           const thumb = meta && meta.thumb ? String(meta.thumb) : '';
           if (thumb) {
@@ -18003,6 +18040,7 @@ function buildSynergyPayloadMobile() {
           presetSlots.data[String(n)] = {
             slot: n,
             label: String(it?.label || `프리셋 ${n}`),
+            memo: String(it?.memo || ''),
             savedAt: Number(it?.savedAt || 0) || null,
             meta: it?.meta || null,
           };
@@ -18745,7 +18783,7 @@ function buildSynergyPayloadMobile() {
     syncMobileSoloPartyState();
     updateMobileSoloPartyUI();
 
-    async function saveToFpresetSlot_mobile(slotNum, label) {
+    async function saveToFpresetSlot_mobile(slotNum, label, memo) {
       const st = buildFrontPresetState_mobile();
 
       // ✅ 슬롯 리스트 썸네일(meta.thumb) = "썸네일"로 저장
@@ -18784,7 +18822,9 @@ function buildSynergyPayloadMobile() {
       // ✅ (NEW) label 같이 전송 (빈 값이면 서버가 '프리셋 n' 처리)
       const payload = { slot: slotNum, state: st };
       const labelStr = String(label || '').trim();
+      const memoStr = String(memo || '').trim().slice(0, 80);
       if (labelStr) payload.label = labelStr;
+      payload.memo = memoStr;
 
       const res = await apiJSON('fpreset_save', payload);
       if (!res || !res.ok) throw new Error(res?.error || 'fpreset_save_fail');
@@ -19069,6 +19109,7 @@ function buildSynergyPayloadMobile() {
       const thumb = document.getElementById('presetThumb');
       const charNameEl = document.getElementById('presetCharName');
       const userNameEl = document.getElementById('presetUserName');
+      const memoViewEl = document.getElementById('presetMemoViewM');
 
       _currentPresetSlot = Number(slotNum || 0) || 0;
       _lastPresetFocusEl = document.activeElement;
@@ -19134,10 +19175,15 @@ function buildSynergyPayloadMobile() {
         }
       }
 
-      // 3) 하단 텍스트: 프리셋 이름(label) (빈 슬롯이면 "저장된 이름 없음")
+      // 3) 하단 텍스트: 프리셋 이름(label) / 메모
       if (userNameEl) {
         userNameEl.textContent = info?.label || '저장된 이름 없음';
         userNameEl.style.display = '';
+      }
+      if (memoViewEl) {
+        const memo = String(info?.memo || '').trim();
+        memoViewEl.textContent = memo || '메모 없음';
+        memoViewEl.style.display = '';
       }
 
       // 4) 버튼 라벨/상태
@@ -19192,6 +19238,7 @@ function buildSynergyPayloadMobile() {
 
       const currentCharName = String(window.state?.currentCharacter?.name || '').trim();
       const existingLabel = String(info?.label || '').trim();
+      const existingMemo = String(info?.memo || '').trim();
 
       // ✅ 입력칸 기본값(우선순위: 기존 라벨 → 현재 캐릭명 → 프리셋 n)
       const defaultLabel = existingLabel || currentCharName || `프리셋 ${slotNum}`;
@@ -19212,18 +19259,24 @@ function buildSynergyPayloadMobile() {
         presetNameDefault: defaultLabel,
         presetNamePlaceholder: '프리셋 이름(예: 출혈/수면/광룡)',
         presetNameMaxLen: 30,
+
+        presetMemoInput: true,
+        presetMemoDefault: existingMemo,
+        presetMemoPlaceholder: '메모(예: 투함포 ON / 패치전 비교용)',
+        presetMemoMaxLen: 80,
       });
 
       if (!ok) return;
 
-      // ✅ 사용자가 입력한 프리셋 이름
+      // ✅ 사용자가 입력한 프리셋 이름/메모
       const label = String(document.getElementById('confirmPresetName')?.value || '').trim();
+      const memo = String(document.getElementById('confirmPresetMemo')?.value || '').trim().slice(0, 80);
 
       // ✅ (FIX) 체감 속도 개선: 슬롯 관리 모달을 먼저 닫고 저장을 진행
       closePresetModal_mobile();
 
       try {
-        await saveToFpresetSlot_mobile(slotNum, label);
+        await saveToFpresetSlot_mobile(slotNum, label, memo);
 
         // ✅ 저장 완료 안내
         (window.toast || alert)('저장되었습니다.');
@@ -19541,6 +19594,7 @@ function buildSynergyPayloadMobile() {
 
         <div id="presetCharName" class="preset-char-name"></div>
         <div id="presetUserName" class="preset-user-name"></div>
+        <div id="presetMemoViewM" class="preset-memo-view"></div>
 
         <div class="preset-actions">
           <button id="btnPresetSaveM" type="button" class="btn main">저장하기</button>
@@ -19590,6 +19644,22 @@ function buildSynergyPayloadMobile() {
         font-size:12px;
         outline:none;
       " />
+          </div>
+
+          <div id="confirmPresetMemoRow" style="display:none; width:100%; margin-top:6px;">
+            <textarea id="confirmPresetMemo" maxlength="80" rows="3" placeholder="메모를 입력하세요" style="
+        width:100%;
+        border-radius:10px;
+        border:1px solid rgba(255,255,255,0.14);
+        background:rgba(0,0,0,0.25);
+        color:var(--text);
+        padding:8px 10px;
+        font-weight:700;
+        font-size:12px;
+        line-height:1.45;
+        outline:none;
+        resize:none;
+      "></textarea>
           </div>
         </div>
         <div id="confirmMsg" class="confirm-msg"></div>

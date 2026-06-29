@@ -1167,6 +1167,65 @@
       text-align: center;
     }
 
+    /* ✅ 저장슬롯 메모/프리셋명 입력 */
+    .preset-edit-fields {
+      width: 100%;
+      display: grid;
+      gap: 8px;
+      margin: 8px 0 6px;
+    }
+
+
+
+    #presetInlineSaveFields[hidden],
+    #btnPresetSaveCancel[hidden] {
+      display: none !important;
+    }
+
+    .preset-save-guide {
+      color: rgba(229, 231, 235, 0.72);
+      font-size: 12px;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .preset-field-label {
+      display: grid;
+      gap: 4px;
+      color: rgba(229, 231, 235, 0.9);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .preset-field-label input,
+    .preset-field-label textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--text);
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      outline: none;
+      resize: none;
+    }
+
+    .preset-field-label textarea {
+      line-height: 1.45;
+    }
+
+    .preset-memo-view {
+      width: 100%;
+      min-height: 18px;
+      color: rgba(229, 231, 235, 0.72);
+      font-size: 12px;
+      line-height: 1.45;
+      text-align: center;
+      white-space: pre-wrap;
+      word-break: keep-all;
+    }
+
     .preset-actions {
       margin-top: 12px;
       display: flex;
@@ -7046,12 +7105,12 @@
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-                  <li>06.06 <span style="color: yellowgreen;">[모바일]</span> 시너지 효과 적용 TEST 버전 추가</li>
                   <li>06.07 <span style="color: yellowgreen;">[PC]</span> 한마디 변경 기능 추가</li>
                   <li>06.12 스노우메이지 이벤트 계산기 추가</li>
                   <li>06.20 침식 무기 개별 고유효과 설정 불능 버그 수정</li>
                   <li>06.23 장비 아이콘 마우스 오버시 설명 추가</li>
                   <li>06.24 <span class="notice-badge">게임실험연구소 전체 캐릭 현황</span> 오픈!</li>
+                  <li>06.29 저장슬롯 메모 기능 추가</li>
 
                 </ul>
               </div>
@@ -8673,12 +8732,36 @@
           저장된 이름 없음
         </div>
 
+        <div id="presetMemoView" class="preset-memo-view">
+          메모 없음
+        </div>
+
+        <!-- ✅ PC 저장 입력 영역: 평소에는 숨김, 저장하기 버튼을 눌렀을 때만 이 모달 안에서 펼쳐짐 -->
+        <div id="presetInlineSaveFields" class="preset-edit-fields" hidden>
+          <div class="preset-save-guide">
+            이 슬롯에 저장할 프리셋명과 메모를 입력하세요.
+          </div>
+
+          <label class="preset-field-label">
+            <span>프리셋명</span>
+            <input id="presetSaveNameInput" type="text" maxlength="30" placeholder="예: 광채 실험">
+          </label>
+
+          <label class="preset-field-label">
+            <span>메모</span>
+            <textarea id="presetSaveMemoInput" maxlength="80" rows="3" placeholder="예: 투함포 ON / 패치전 비교용"></textarea>
+          </label>
+        </div>
+
         <div class="preset-actions">
           <button type="button" id="btnPresetSave" class="btn main">
             저장하기
           </button>
           <button type="button" id="btnPresetLoad" class="btn">
             불러오기
+          </button>
+          <button type="button" id="btnPresetSaveCancel" class="btn" hidden>
+            취소
           </button>
         </div>
       </div>
@@ -22567,8 +22650,12 @@ try {
         if (info) {
           btn.classList.add('has-data');
           const label = info.label || '';
+          const memo = info.memo || '';
           const charName = info.meta?.charName || '';
-          btn.title = label || charName || `슬롯 ${slotNum}`;
+          btn.title = [
+            label || charName || `슬롯 ${slotNum}`,
+            memo ? `메모: ${memo}` : ''
+          ].filter(Boolean).join('\n');
 
           const thumb = meta && meta.thumb ? meta.thumb : '';
           if (thumb) {
@@ -23934,6 +24021,7 @@ try {
       const $thumb = document.getElementById('presetCharThumb');
       const $charNm = document.getElementById('presetCharName');
       const $userNm = document.getElementById('presetUserName');
+      const $memoView = document.getElementById('presetMemoView');
 
       if (!$modal) return;
 
@@ -23991,13 +24079,34 @@ try {
         }
       }
 
-      // 3) 슬롯 이름(사용자가 붙인 라벨)은 그대로 유지
+      // 3) 슬롯 이름/메모 표시 및 입력칸 기본값
+      const presetLabel = String(info?.label || '').trim();
+      const presetMemo = String(info?.memo || '').trim();
+
       if ($userNm) {
-        $userNm.textContent = info?.label || '저장된 이름 없음';
+        $userNm.textContent = presetLabel || '저장된 이름 없음';
       }
+      if ($memoView) {
+        $memoView.textContent = presetMemo || '메모 없음';
+      }
+
+      closePresetInlineSaveFields();
 
       $modal.classList.add('show');
       $modal.setAttribute('aria-hidden', 'false');
+    }
+
+    // PC 저장 슬롯 관리 모달 안의 저장 입력 영역 닫기
+    function closePresetInlineSaveFields() {
+      const fields = document.getElementById('presetInlineSaveFields');
+      const saveBtn = document.getElementById('btnPresetSave');
+      const loadBtn = document.getElementById('btnPresetLoad');
+      const cancelBtn = document.getElementById('btnPresetSaveCancel');
+
+      if (fields) fields.hidden = true;
+      if (saveBtn) saveBtn.textContent = '저장하기';
+      if (loadBtn) loadBtn.hidden = false;
+      if (cancelBtn) cancelBtn.hidden = true;
     }
 
     // 모달 닫기
@@ -24007,6 +24116,7 @@ try {
         $modal.classList.remove('show');
         $modal.setAttribute('aria-hidden', 'true');
       }
+      closePresetInlineSaveFields();
       presetSlots.currentSlot = null;
     }
 
@@ -24028,6 +24138,7 @@ try {
           presetSlots.data[key] = {
             slot: it.slot,
             label: it.label || `프리셋 ${it.slot}`,
+            memo: String(it.memo || ''),
             savedAt: it.savedAt || null,
             meta: it.meta || null,
           };
@@ -24039,23 +24150,64 @@ try {
       }
     }
 
-    // "저장하기" 버튼 → 서버에 세션 전체 저장
-    // "저장하기" 버튼 → 프론트 state 전체를 KV 프리셋으로 저장
-    async function handlePresetSave() {
+    // PC 저장 입력 영역 열기: 별도 모달이 아니라 저장 슬롯 관리 모달 안에서 펼쳐짐
+    function openPresetInlineSaveFields() {
       const slot = presetSlots.currentSlot;
       if (!slot) return;
 
-      // 기존 이름 있으면 기본값으로 보여줌
-      const oldLabel = presetSlots.data[String(slot)]?.label || '';
-      const input = window.prompt(
-        `캐릭터 슬롯 ${slot}번의 이름을 입력하세요.`,
-        oldLabel
-      );
+      const key = String(slot);
+      const info = presetSlots.data[key] || null;
+      const currentCharName = String(window.state?.currentCharacter?.name || '').trim();
 
-      // 취소면 아무 것도 안 함
-      if (input === null) return;
+      const fields = document.getElementById('presetInlineSaveFields');
+      const nameInput = document.getElementById('presetSaveNameInput');
+      const memoInput = document.getElementById('presetSaveMemoInput');
+      const saveBtn = document.getElementById('btnPresetSave');
+      const loadBtn = document.getElementById('btnPresetLoad');
+      const cancelBtn = document.getElementById('btnPresetSaveCancel');
 
-      const label = (input || '').trim();
+      if (nameInput) {
+        nameInput.value = String(info?.label || '').trim() || currentCharName || `프리셋 ${slot}`;
+      }
+      if (memoInput) {
+        memoInput.value = String(info?.memo || '').trim();
+      }
+
+      if (fields) fields.hidden = false;
+      if (saveBtn) saveBtn.textContent = '저장 완료';
+      if (loadBtn) loadBtn.hidden = true;
+      if (cancelBtn) cancelBtn.hidden = false;
+
+      setTimeout(() => nameInput?.focus?.(), 0);
+    }
+
+    function isPresetInlineSaveOpen() {
+      const fields = document.getElementById('presetInlineSaveFields');
+      return !!fields && !fields.hidden;
+    }
+
+    // "저장하기" 버튼
+    // 1회 클릭: 현재 저장 슬롯 관리 모달 안에서 프리셋명/메모 입력 영역을 펼침
+    // 입력 후 클릭: 현재 프론트 state 전체를 KV 프리셋으로 저장
+    function handlePresetSave() {
+      if (isPresetInlineSaveOpen()) {
+        handlePresetSaveConfirm();
+        return;
+      }
+      openPresetInlineSaveFields();
+    }
+
+    async function handlePresetSaveConfirm() {
+      const slot = presetSlots.currentSlot;
+      if (!slot) return;
+
+      const currentCharName = String(window.state?.currentCharacter?.name || '').trim();
+      const label = String(
+        document.getElementById('presetSaveNameInput')?.value || ''
+      ).trim() || currentCharName || `프리셋 ${slot}`;
+      const memo = String(
+        document.getElementById('presetSaveMemoInput')?.value || ''
+      ).trim().slice(0, 80);
 
       try {
         const stateSnap = buildFrontPresetState();
@@ -24063,6 +24215,7 @@ try {
         const res = await apiJSON('fpreset_save', {
           slot,
           label,
+          memo,
           state: stateSnap,
         });
 
@@ -24071,8 +24224,6 @@ try {
           return;
         }
 
-        // 로컬 슬롯 메타 갱신
-        // 로컬 슬롯 메타 갱신
         const key = String(slot);
 
         // ★ 현재 프론트 state에서 캐릭터 정보 가져오기
@@ -24090,19 +24241,23 @@ try {
         presetSlots.data[key] = {
           slot,
           label: res.label || label || '',
+          memo: String(res.memo ?? memo ?? ''),
           meta,
           savedAt: res.savedAt || Date.now(),
         };
 
-
-        // 모달 내부 이름(라벨) 갱신
+        // 슬롯 상세 모달의 보기용 이름/메모 갱신
         const $userNm = document.getElementById('presetUserName');
+        const $memoView = document.getElementById('presetMemoView');
         if ($userNm) {
           $userNm.textContent = presetSlots.data[key].label || '저장된 이름 없음';
         }
+        if ($memoView) {
+          $memoView.textContent = presetSlots.data[key].memo || '메모 없음';
+        }
 
-        // 아래 5개 슬롯 버튼 UI 갱신
         updatePresetButtonsUI();
+        closePresetInlineSaveFields();
 
         alert(`캐릭터 슬롯 ${slot}번에 현재 스펙을 저장했습니다.`);
       } catch (err) {
@@ -24319,6 +24474,7 @@ try {
         const $thumb = document.getElementById('presetCharThumb');
         const $charNm = document.getElementById('presetCharName');
         const $userNm = document.getElementById('presetUserName');
+        const $memoView = document.getElementById('presetMemoView');
 
         if ($thumb) {
           $thumb.src = PLACEHOLDER_IMG || '';
@@ -24329,6 +24485,10 @@ try {
         if ($userNm) {
           $userNm.textContent = '저장된 이름 없음';
         }
+        if ($memoView) {
+          $memoView.textContent = '메모 없음';
+        }
+        closePresetInlineSaveFields();
 
         alert(`슬롯 ${slot}의 프리셋을 초기화했습니다.`);
       } catch (err) {
@@ -24364,7 +24524,7 @@ try {
           });
         });
 
-      // 모달 닫기
+      // 슬롯 상세 모달 닫기
       document
         .querySelectorAll('[data-preset-close]')
         .forEach((el) => {
@@ -24372,6 +24532,10 @@ try {
             closePresetModal();
           });
         });
+
+      document.getElementById('btnPresetSaveCancel')?.addEventListener('click', () => {
+        closePresetInlineSaveFields();
+      });
 
       // 모달 내 "저장하기" / "불러오기"
       document.getElementById('btnPresetSave')?.addEventListener('click', () => {
