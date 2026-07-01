@@ -7620,6 +7620,377 @@
       .my-usage-dialog.usage-theme-junior .my-usage-crest { width: 92px; }
     }
 
+
+    /* ✅ 모바일 메인 화면: 모바일 계산기 헤더/한마디 배치와 동일하게 정렬 */
+    @media (max-width: 980px) {
+      body:not(.pc) header,
+      body.mobile header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        justify-content: flex-start !important;
+        gap: 0 !important;
+        padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 2px 12px !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.10) !important;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.15)) !important;
+        backdrop-filter: blur(10px);
+      }
+
+      body:not(.pc) header .title,
+      body.mobile header .title {
+        width: 100%;
+        min-width: 0;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 8px !important;
+        flex-wrap: nowrap !important;
+      }
+
+      body:not(.pc) header .title .logo-box,
+      body.mobile header .title .logo-box {
+        width: 24px !important;
+        height: 24px !important;
+        flex: 0 0 auto;
+        border-radius: 7px;
+      }
+
+      body:not(.pc) header .title h1,
+      body.mobile header .title h1 {
+        min-width: 0;
+        flex: 1 1 auto;
+        margin: 0 !important;
+        color: var(--text);
+        font-size: 15px !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      body:not(.pc) header .title .contact-btn,
+      body.mobile header .title .contact-btn {
+        flex: 0 0 auto;
+        margin-left: 4px !important;
+        gap: 4px !important;
+      }
+
+      body:not(.pc) header .title .contact-btn svg,
+      body.mobile header .title .contact-btn svg {
+        width: 16px !important;
+        height: 16px !important;
+      }
+
+      body:not(.pc) header .title .contact-btn .contact-label,
+      body.mobile header .title .contact-btn .contact-label {
+        font-size: 10px !important;
+        line-height: 1;
+      }
+
+      body:not(.pc) header .actions,
+      body.mobile header .actions {
+        display: none !important;
+      }
+
+      body:not(.pc) header .header-ads,
+      body.mobile header .header-ads {
+        order: 5;
+        width: 100%;
+        max-width: none !important;
+        margin: 6px 0 0 0 !important;
+        padding: 6px 10px !important;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(255, 255, 255, 0.04);
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        height: 35px !important;
+        min-height: 35px !important;
+        max-height: 35px !important;
+        overflow: hidden !important;
+      }
+
+      body:not(.pc) header .header-ads .ad-text,
+      body.mobile header .header-ads .ad-text {
+        display: block;
+        min-width: 0;
+        max-width: 100% !important;
+        width: 100%;
+        color: rgba(233, 238, 247, 0.92);
+        font-size: 12px !important;
+        font-weight: 600;
+        line-height: 1.25;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      body:not(.pc) header .header-ads .hdrmsg,
+      body.mobile header .header-ads .hdrmsg {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px !important;
+        white-space: nowrap;
+        min-width: 0;
+        max-width: 100%;
+        font-size: 12px !important;
+      }
+
+      body:not(.pc) header .header-ads .msg-text,
+      body.mobile header .header-ads .msg-text {
+        display: inline-block;
+        max-width: 72vw;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: bottom;
+      }
+
+      body:not(.pc) header .header-ads .tag-senior,
+      body.mobile header .header-ads .tag-senior {
+        height: 20px;
+        min-width: 32px;
+        padding: 2px 10px;
+        font-size: 13px;
+      }
+
+      body:not(.pc) header .header-ads .tag-lead,
+      body.mobile header .header-ads .tag-lead {
+        width: 6px;
+        height: 6px;
+        margin-right: 2px;
+      }
+    }
+
+  
+
+    /* ✅ 모바일 메인 한마디 길이 증가 시 헤더/화면 높이 증가 방지 최종 보정 */
+    @media (max-width: 980px) {
+      body:not(.pc) header .header-ads,
+      body.mobile header .header-ads {
+        box-sizing: border-box !important;
+        flex: 0 0 35px !important;
+        height: 35px !important;
+        min-height: 35px !important;
+        max-height: 35px !important;
+        overflow: hidden !important;
+      }
+
+      body:not(.pc) header .header-ads .ad-text,
+      body.mobile header .header-ads .ad-text {
+        display: flex !important;
+        align-items: center !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        max-height: 100% !important;
+        line-height: 1.25 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      body:not(.pc) header .header-ads .hdrmsg,
+      body.mobile header .header-ads .hdrmsg {
+        display: inline-flex !important;
+        align-items: center !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        height: 20px !important;
+        line-height: 20px !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+      }
+
+      body:not(.pc) header .header-ads .msg-nick,
+      body:not(.pc) header .header-ads .msg-bullet,
+      body:not(.pc) header .header-ads .tag,
+      body:not(.pc) header .header-ads .tag-lead,
+      body.mobile header .header-ads .msg-nick,
+      body.mobile header .header-ads .msg-bullet,
+      body.mobile header .header-ads .tag,
+      body.mobile header .header-ads .tag-lead {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+      }
+
+      body:not(.pc) header .header-ads .msg-text,
+      body.mobile header .header-ads .msg-text {
+        display: block !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        height: 20px !important;
+        line-height: 20px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+    }
+
+    /* ✅ 모바일 메인 한마디: 넘칠 때만 좌측 이동(마퀴) */
+    @media (max-width: 980px) {
+      body:not(.pc) header .header-ads .msg-text,
+      body.mobile header .header-ads .msg-text {
+        position: relative !important;
+        overflow: hidden !important;
+        text-overflow: clip !important;
+      }
+
+      body:not(.pc) header .header-ads .msg-text .marquee,
+      body.mobile header .header-ads .msg-text .marquee {
+        display: inline-block;
+        white-space: nowrap;
+        padding-right: 10px;
+      }
+
+      body:not(.pc) header .header-ads .msg-text.is-marquee .marquee,
+      body.mobile header .header-ads .msg-text.is-marquee .marquee {
+        will-change: transform;
+        animation: main_one_marquee var(--marquee-dur, 14s) linear infinite;
+      }
+
+      @keyframes main_one_marquee {
+        0% {
+          transform: translateX(0);
+        }
+
+        20% {
+          transform: translateX(0);
+        }
+
+        72% {
+          transform: translateX(calc(-1px * var(--marquee-dist, 0)));
+        }
+
+        88% {
+          transform: translateX(calc(-1px * var(--marquee-dist, 0)));
+        }
+
+        100% {
+          transform: translateX(0);
+        }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body:not(.pc) header .header-ads .msg-text.is-marquee .marquee,
+      body.mobile header .header-ads .msg-text.is-marquee .marquee {
+        animation: none !important;
+        transform: none !important;
+      }
+    }
+
+
+    /* ✅ 모바일 메인 한마디: 레이아웃 고정 + 실제 넘침 거리만 마퀴 이동 */
+    @media (max-width: 980px) {
+      header .header-ads {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 35px !important;
+        height: 35px !important;
+        min-height: 35px !important;
+        max-height: 35px !important;
+        overflow: hidden !important;
+        contain: layout paint !important;
+      }
+
+      header .header-ads .ad-text {
+        box-sizing: border-box !important;
+        display: flex !important;
+        align-items: center !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        max-height: 100% !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        line-height: 20px !important;
+        text-overflow: clip !important;
+      }
+
+      header .header-ads .hdrmsg {
+        box-sizing: border-box !important;
+        display: flex !important;
+        align-items: center !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        flex: 0 1 100% !important;
+        height: 20px !important;
+        min-height: 20px !important;
+        max-height: 20px !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        gap: 6px !important;
+      }
+
+      header .header-ads .tag,
+      header .header-ads .tag-senior,
+      header .header-ads .tag-lead,
+      header .header-ads .msg-bullet {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+      }
+
+      header .header-ads .msg-nick {
+        flex: 0 1 auto !important;
+        max-width: 28vw !important;
+        min-width: 0 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      header .header-ads .msg-text {
+        box-sizing: border-box !important;
+        display: block !important;
+        position: relative !important;
+        flex: 1 1 0 !important;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        height: 20px !important;
+        min-height: 20px !important;
+        max-height: 20px !important;
+        line-height: 20px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: clip !important;
+        contain: paint !important;
+      }
+
+      header .header-ads .msg-text .marquee {
+        display: inline-block !important;
+        width: max-content !important;
+        max-width: none !important;
+        white-space: nowrap !important;
+        will-change: transform;
+        transform: translateX(0);
+      }
+
+      header .header-ads .msg-text.is-marquee .marquee {
+        animation: main_header_one_marquee var(--marquee-dur, 14s) linear infinite !important;
+      }
+
+      @keyframes main_header_one_marquee {
+        0%, 18% { transform: translateX(0); }
+        70%, 86% { transform: translateX(calc(-1px * var(--marquee-dist, 0))); }
+        100% { transform: translateX(0); }
+      }
+    }
+
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -29153,6 +29524,61 @@ return `
             const node = target.querySelector('.tag-senior .badge-emoji');
             if (node) node.textContent = SENIOR_EMOJIS[__emojiIdx];
           }
+          function applyHeaderAdMarquee(target) {
+            try {
+              const isMobileHeader = window.matchMedia && window.matchMedia('(max-width: 980px)').matches;
+              const msgText = target?.querySelector?.('.msg-text');
+              if (!msgText) return;
+
+              const raw = (msgText.textContent || '').trim();
+              msgText.classList.remove('is-marquee');
+              msgText.style.removeProperty('--marquee-dist');
+              msgText.style.removeProperty('--marquee-dur');
+
+              // ✅ 긴 텍스트가 레이아웃 폭을 키우지 못하도록, 항상 이동 전용 span 안에 가둠
+              msgText.innerHTML = `<span class="marquee">${escapeHTML(raw)}</span>`;
+
+              if (!isMobileHeader) return;
+
+              const measureAndApply = () => {
+                const inner = msgText.querySelector('.marquee');
+                if (!inner) return;
+
+                // ✅ msgText는 flex: 1 1 0으로 고정되어 있으므로 이 폭이 실제 표시 가능 영역
+                const boxW = Math.floor(msgText.getBoundingClientRect().width || msgText.clientWidth || 0);
+                const textW = Math.ceil(inner.scrollWidth || inner.getBoundingClientRect().width || 0);
+                const dist = Math.max(0, textW - boxW);
+
+                msgText.classList.remove('is-marquee');
+                msgText.style.removeProperty('--marquee-dist');
+                msgText.style.removeProperty('--marquee-dur');
+
+                if (boxW > 0 && dist > 4) {
+                  msgText.style.setProperty('--marquee-dist', String(dist + 12));
+                  msgText.style.setProperty('--marquee-dur', `${Math.max(13, Math.min(28, 9 + dist / 22))}s`);
+                  // 애니메이션을 매번 처음부터 시작시키기 위해 강제 리플로우
+                  void msgText.offsetWidth;
+                  msgText.classList.add('is-marquee');
+                }
+              };
+
+              requestAnimationFrame(() => requestAnimationFrame(measureAndApply));
+            } catch (err) {
+              console.warn('[header one-liner marquee] 적용 실패:', err);
+            }
+          }
+
+          if (!window.__mainHeaderOneLinerMarqueeResizeBound) {
+            window.__mainHeaderOneLinerMarqueeResizeBound = true;
+            window.addEventListener('resize', () => {
+              clearTimeout(window.__mainHeaderOneLinerMarqueeResizeTimer);
+              window.__mainHeaderOneLinerMarqueeResizeTimer = setTimeout(() => {
+                document.querySelectorAll('header .header-ads .ad-text').forEach(el => applyHeaderAdMarquee(el));
+              }, 120);
+            }, { passive: true });
+          }
+
+
           // 순환 표시
           let i = 0, timer = null, paused = false;
           function show(idx) {
@@ -29162,6 +29588,7 @@ return `
               adTextEl.classList.remove("fade-out");
               // 👇 새 DOM이 들어간 뒤, 해당 라운드의 이모지를 적용
               applySeniorEmoji(adTextEl);
+              applyHeaderAdMarquee(adTextEl);
             }, 200); // 이 값(200ms)은 페이드 시간과 맞추세요
           }
           const DISPLAY_MS = 6000;
@@ -29184,6 +29611,7 @@ return `
 
           ads.addEventListener("mouseenter", () => { paused = true; });
           ads.addEventListener("mouseleave", () => { paused = false; });
+          window.addEventListener("resize", () => applyHeaderAdMarquee(adTextEl), { passive: true });
 
         } catch (e) {
           console.warn("[ADS] 초기화 실패:", e);
