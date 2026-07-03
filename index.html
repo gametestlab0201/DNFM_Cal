@@ -1251,6 +1251,18 @@
       border-color: #facc15;
     }
 
+
+
+    /* ✅ 문의/Q&A/답장/내 이용 정보 모달: 상단 X 닫기 버튼 제거
+       - 하단 확인/목록/전송 버튼으로만 닫기 동작을 유도 */
+    #contactModal > .dialog > header > .close,
+    #faqModal > .dialog > header > .close,
+    #faqAnswerModal > .dialog > header > .close,
+    #replyModal > .dialog > header > .close,
+    #myUsageInfoModal > .dialog > header > .close {
+      display: none !important;
+    }
+
     /* 관리자 문의 모달 */
     .contact-dialog {
       width: min(620px, 95vw);
@@ -1337,19 +1349,76 @@
     .reply-text.answer {
       background: #0f172a;
       border: 1px solid #1d4ed8;
-      min-height: 330px;
-      /* ★ 답변 상자 기본 높이 늘리기 */
+      min-height: 220px;
+    }
+
+    /* ✅ 관리자 답장 팝업: 버튼은 하단 고정, 답변 내용만 스크롤 */
+    #replyModal .dialog {
+      display: flex;
+      flex-direction: column;
+      height: min(820px, 90vh);
+      max-height: min(820px, 90vh);
+      overflow: hidden;
+    }
+
+    #replyModal .dialog > header {
+      flex: 0 0 auto;
+    }
+
+    #replyModal .contact-body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding-right: 10px;
+    }
+
+    #replyModal .reply-text {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    #replyModal .reply-text.original {
+      flex: 0 0 auto;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    #replyModal .reply-block.answer-block {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #replyModal .reply-text.answer {
+      flex: 1;
+      min-height: 160px;
+      max-height: none;
+      overflow-y: auto;
+    }
+
+    #replyModal .reply-actions {
+      flex: 0 0 auto;
+      position: static;
+      margin-top: 6px;
+      padding-top: 6px;
+      padding-bottom: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      background: transparent;
     }
 
     .reply-actions {
-      margin-top: 4px;
-      /* 답변 상자에 꽤 붙게 */
+      margin-top: 2px;
+      /* 답변 상자에 더 붙게 해서 답변란 공간 확보 */
       display: flex;
       flex-direction: column;
       /* 윗줄: 체크박스, 아랫줄: 버튼 */
       align-items: center;
       /* 버튼을 가운데로 */
-      gap: 8px;
+      gap: 4px;
     }
 
     .reply-dontshow {
@@ -1363,13 +1432,18 @@
     }
 
     .reply-dontshow input[type="checkbox"] {
-      width: 14px;
-      height: 14px;
+      width: 13px;
+      height: 13px;
     }
 
-    /* (옵션) 버튼 폭 살짝 키우고 싶으면 */
+    /* ✅ 관리자 답장 확인 버튼: PC/모바일 모두 조금 더 작게 */
     .reply-actions .ui-btnetc {
-      min-width: 120px;
+      min-width: 92px;
+      padding: 8px 22px;
+      margin: 2px auto 0;
+      font-size: 14px;
+      line-height: 1.2;
+      border-radius: 6px;
     }
 
     .reply-actions .btn {
@@ -1377,6 +1451,39 @@
       min-width: 72px;
       height: 30px;
       font-size: 12px;
+    }
+
+    @media (max-width: 980px) {
+      /* ✅ 모바일 반응형: 문의/답변 본문 글자 크기 살짝 축소 */
+      #replyModal .reply-label {
+        font-size: 11px;
+        margin-bottom: 2px;
+      }
+
+      #replyModal .reply-text {
+        font-size: 12px;
+        line-height: 1.55;
+        padding: 6px 7px;
+      }
+
+      #replyModal .reply-text.original {
+        max-height: 125px;
+      }
+
+      #replyModal .reply-actions {
+        margin-top: 5px;
+        padding-top: 5px;
+      }
+
+      #replyModal .reply-dontshow {
+        font-size: 11px;
+      }
+
+      #replyModal .reply-actions .ui-btnetc {
+        min-width: 84px;
+        padding: 7px 18px;
+        font-size: 13px;
+      }
     }
 
     /* ✅ Q&A 답변 모달: 내용만큼만 높이 + 길면 내부 스크롤 */
@@ -1395,6 +1502,65 @@
       /* 내용이 길면 여기만 스크롤 */
     }
 
+    #faqAnswerModal #faqAnswerQ,
+    #faqAnswerModal .faq-answer-text {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+
+
+
+
+    /* ✅ PC 프론트의 모바일 반응형: 문의/Q&A/답장 모달 X 버튼을 과하지 않게 정리 */
+    @media (max-width: 980px) {
+      .contact-dialog > header .close,
+      #contactModal .close,
+      #faqModal .close,
+      #faqAnswerModal .close,
+      #replyModal .close,
+      #myUsageInfoModal .close {
+        width: 30px !important;
+        height: 30px !important;
+        min-width: 30px !important;
+        padding: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: 0 !important;
+        background: transparent !important;
+        color: rgba(233, 238, 247, 0.62) !important;
+        border-radius: 999px !important;
+        box-shadow: none !important;
+        font-size: 0 !important;
+        line-height: 1 !important;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .contact-dialog > header .close::before,
+      #contactModal .close::before,
+      #faqModal .close::before,
+      #faqAnswerModal .close::before,
+      #replyModal .close::before,
+      #myUsageInfoModal .close::before {
+        content: "×";
+        font-size: 20px;
+        font-weight: 400;
+        line-height: 1;
+      }
+
+      .contact-dialog > header .close:active,
+      #contactModal .close:active,
+      #faqModal .close:active,
+      #faqAnswerModal .close:active,
+      #replyModal .close:active,
+      #myUsageInfoModal .close:active {
+        background: rgba(255, 255, 255, 0.06) !important;
+        color: rgba(255, 255, 255, 0.86) !important;
+        transform: scale(0.96);
+      }
+    }
 
 
     #btnRune,
@@ -7991,6 +8157,108 @@
       }
     }
 
+
+    /* ✅ 모바일 메인 한마디 최종 안전핀 + 실제 마퀴 이동 */
+    @media (max-width: 980px) {
+      html,
+      body {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        overscroll-behavior-x: none;
+      }
+
+      .shell,
+      #main-view,
+      #calc-view,
+      .wrap,
+      header {
+        width: 100% !important;
+        max-width: 100vw !important;
+        min-width: 0 !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+      }
+
+      header {
+        left: 0 !important;
+        right: 0 !important;
+      }
+
+      header .title,
+      header .header-ads,
+      header .header-ads .ad-text,
+      header .header-ads .hdrmsg,
+      header .header-ads .msg-text {
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      header .header-ads {
+        width: 100% !important;
+        flex: 0 0 35px !important;
+        height: 35px !important;
+        min-height: 35px !important;
+        max-height: 35px !important;
+        overflow: hidden !important;
+        contain: size layout paint !important;
+      }
+
+      header .header-ads .ad-text {
+        flex: 1 1 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        overflow: hidden !important;
+        contain: layout paint !important;
+      }
+
+      header .header-ads .hdrmsg {
+        flex: 1 1 0 !important;
+        width: 100% !important;
+        height: 20px !important;
+        overflow: hidden !important;
+      }
+
+      header .header-ads .msg-text {
+        position: relative !important;
+        display: block !important;
+        flex: 1 1 0 !important;
+        width: 0 !important;
+        min-width: 0 !important;
+        height: 20px !important;
+        line-height: 20px !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        text-overflow: clip !important;
+        contain: layout paint !important;
+      }
+
+      header .header-ads .msg-text .marquee {
+        position: absolute !important;
+        left: 0;
+        top: 0;
+        display: inline-block !important;
+        width: auto !important;
+        max-width: none !important;
+        height: 20px !important;
+        line-height: 20px !important;
+        white-space: nowrap !important;
+        transform: translate3d(0, 0, 0);
+        will-change: transform;
+      }
+
+      header .header-ads .msg-text.is-marquee .marquee {
+        animation: main_header_one_marquee_clip var(--marquee-dur, 9s) linear infinite !important;
+      }
+
+      @keyframes main_header_one_marquee_clip {
+        0%, 22% { transform: translate3d(0, 0, 0); }
+        72%, 88% { transform: translate3d(calc(-1px * var(--marquee-dist, 0)), 0, 0); }
+        100% { transform: translate3d(0, 0, 0); }
+      }
+    }
+
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -9753,8 +10021,7 @@
       <header>
         <div style="width:32px;"></div>
         <h2 id="contactTitle">게임실험연구소에 문의하기</h2>
-        <button type="button" class="close" data-contact-close>✕</button>
-        </button>
+        <div style="width:32px;"></div>
       </header>
 
       <div class="contact-body">
@@ -9785,7 +10052,7 @@
       <header>
         <div style="width:32px;"></div>
         <h2 id="faqTitle">문의하기 전 자주하는 Q&amp;A</h2>
-        <button type="button" class="close" data-faq-close>✕</button>
+        <div style="width:32px;"></div>
       </header>
 
       <div class="contact-body">
@@ -9816,7 +10083,7 @@
             <h2 id="myUsageInfoTitle">내 이용 정보</h2>
           </div>
         </div>
-        <button type="button" class="close" data-my-usage-close>✕</button>
+        <div style="width:32px;flex:0 0 32px;"></div>
       </header>
 
       <div class="usage-info-body">
@@ -9841,7 +10108,7 @@
       <header>
         <button type="button" class="btn" data-faqans-back style="font-size:12px;padding:4px 8px;">← 목록</button>
         <h2 id="faqAnswerTitle">Q&amp;A</h2>
-        <button type="button" class="close" data-faqans-close>✕</button>
+        <div style="width:32px;"></div>
       </header>
 
       <div class="contact-body">
@@ -9860,8 +10127,7 @@
       <header>
         <div style="width:32px;"></div>
         <h2 id="replyTitle">관리자 답장 도착</h2>
-        <button type="button" class="close" data-reply-close>✕</button>
-        </button>
+        <div style="width:32px;"></div>
       </header>
 
       <div class="contact-body">
@@ -9874,7 +10140,7 @@
           <div class="reply-text original" id="replyOriginal"></div>
         </div>
 
-        <div class="reply-block">
+        <div class="reply-block answer-block">
           <div class="reply-label">관리자 답장</div>
           <div class="reply-text answer" id="replyAnswer"></div>
         </div>
@@ -29524,45 +29790,142 @@ return `
             const node = target.querySelector('.tag-senior .badge-emoji');
             if (node) node.textContent = SENIOR_EMOJIS[__emojiIdx];
           }
+          function measureHeaderOneLinerWidth(text, baseEl) {
+            const probe = document.createElement('span');
+            const cs = window.getComputedStyle(baseEl || document.body);
+            probe.textContent = text || '';
+            probe.style.position = 'fixed';
+            probe.style.left = '-99999px';
+            probe.style.top = '-99999px';
+            probe.style.visibility = 'hidden';
+            probe.style.pointerEvents = 'none';
+            probe.style.whiteSpace = 'nowrap';
+            probe.style.fontFamily = cs.fontFamily;
+            probe.style.fontSize = cs.fontSize;
+            probe.style.fontWeight = cs.fontWeight;
+            probe.style.letterSpacing = cs.letterSpacing;
+            probe.style.lineHeight = cs.lineHeight;
+            document.body.appendChild(probe);
+            const w = Math.ceil(probe.getBoundingClientRect().width || probe.scrollWidth || 0);
+            probe.remove();
+            return w;
+          }
+
+          function resetHeaderAdMarquee(msgText) {
+            if (!msgText) return;
+            try {
+              if (msgText.__mainMarqueeAnim) {
+                msgText.__mainMarqueeAnim.cancel();
+                msgText.__mainMarqueeAnim = null;
+              }
+            } catch (_) {}
+            const inner = msgText.querySelector('.marquee');
+            if (inner) {
+              inner.style.animation = 'none';
+              inner.style.transform = 'translate3d(0,0,0)';
+            }
+            msgText.classList.remove('is-marquee');
+            msgText.style.removeProperty('--marquee-dist');
+            msgText.style.removeProperty('--marquee-dur');
+          }
+
+          function getHeaderAdTextAvailableWidth(adTextEl, msgText) {
+            const hdr = adTextEl?.querySelector?.('.hdrmsg');
+            if (!hdr || !msgText) return 0;
+
+            const hdrRect = hdr.getBoundingClientRect();
+            let available = Math.floor(hdrRect.width || adTextEl.getBoundingClientRect().width || 0);
+
+            // msg-text 이외 형제(배지, 닉네임, 점)가 차지하는 실제 폭을 빼서,
+            // 한마디 본문이 움직일 수 있는 고정 박스 폭을 직접 계산한다.
+            const children = Array.from(hdr.children || []);
+            children.forEach((el) => {
+              if (el === msgText) return;
+              const r = el.getBoundingClientRect();
+              available -= Math.ceil(r.width || 0);
+            });
+
+            const cs = window.getComputedStyle(hdr);
+            const gap = parseFloat(cs.columnGap || cs.gap || '0') || 0;
+            if (children.length > 1) available -= Math.ceil(gap * (children.length - 1));
+
+            // 너무 작게 잡히면 한마디가 아예 안 보이므로 최소 폭 보정
+            return Math.max(80, Math.floor(available));
+          }
+
           function applyHeaderAdMarquee(target) {
             try {
               const isMobileHeader = window.matchMedia && window.matchMedia('(max-width: 980px)').matches;
               const msgText = target?.querySelector?.('.msg-text');
               if (!msgText) return;
 
-              const raw = (msgText.textContent || '').trim();
-              msgText.classList.remove('is-marquee');
-              msgText.style.removeProperty('--marquee-dist');
-              msgText.style.removeProperty('--marquee-dur');
-
-              // ✅ 긴 텍스트가 레이아웃 폭을 키우지 못하도록, 항상 이동 전용 span 안에 가둠
+              const raw = (msgText.dataset.rawText || msgText.textContent || '').trim();
+              msgText.dataset.rawText = raw;
+              resetHeaderAdMarquee(msgText);
               msgText.innerHTML = `<span class="marquee">${escapeHTML(raw)}</span>`;
 
+              const inner = msgText.querySelector('.marquee');
+              if (!inner) return;
+
+              // PC에서는 기존처럼 정적 표시만 유지
               if (!isMobileHeader) return;
 
               const measureAndApply = () => {
-                const inner = msgText.querySelector('.marquee');
-                if (!inner) return;
+                const innerNow = msgText.querySelector('.marquee');
+                if (!innerNow) return;
 
-                // ✅ msgText는 flex: 1 1 0으로 고정되어 있으므로 이 폭이 실제 표시 가능 영역
-                const boxW = Math.floor(msgText.getBoundingClientRect().width || msgText.clientWidth || 0);
-                const textW = Math.ceil(inner.scrollWidth || inner.getBoundingClientRect().width || 0);
+                resetHeaderAdMarquee(msgText);
+
+                const boxW = getHeaderAdTextAvailableWidth(target, msgText);
+
+                // CSS flex 계산에 맡기지 않고, 본문 텍스트 박스 폭을 JS가 직접 고정한다.
+                msgText.style.setProperty('flex', `0 0 ${boxW}px`, 'important');
+                msgText.style.setProperty('width', `${boxW}px`, 'important');
+                msgText.style.setProperty('max-width', `${boxW}px`, 'important');
+                msgText.style.setProperty('min-width', '0', 'important');
+                msgText.style.setProperty('overflow', 'hidden', 'important');
+                msgText.style.setProperty('text-overflow', 'clip', 'important');
+                msgText.style.setProperty('position', 'relative', 'important');
+
+                innerNow.style.position = 'absolute';
+                innerNow.style.left = '0';
+                innerNow.style.top = '0';
+                innerNow.style.whiteSpace = 'nowrap';
+                innerNow.style.maxWidth = 'none';
+                innerNow.style.width = 'max-content';
+                innerNow.style.transform = 'translate3d(0,0,0)';
+
+                const measuredW = measureHeaderOneLinerWidth(raw, innerNow);
+                const innerW = Math.ceil(innerNow.getBoundingClientRect().width || innerNow.scrollWidth || 0);
+                const textW = Math.max(measuredW, innerW);
                 const dist = Math.max(0, textW - boxW);
 
-                msgText.classList.remove('is-marquee');
-                msgText.style.removeProperty('--marquee-dist');
-                msgText.style.removeProperty('--marquee-dur');
-
-                if (boxW > 0 && dist > 4) {
-                  msgText.style.setProperty('--marquee-dist', String(dist + 12));
-                  msgText.style.setProperty('--marquee-dur', `${Math.max(13, Math.min(28, 9 + dist / 22))}s`);
-                  // 애니메이션을 매번 처음부터 시작시키기 위해 강제 리플로우
-                  void msgText.offsetWidth;
+                if (boxW > 0 && dist > 8) {
+                  const move = dist + 18;
+                  const duration = Math.max(9000, Math.min(13000, 8200 + move * 18));
+                  msgText.style.setProperty('--marquee-dist', String(move));
+                  msgText.style.setProperty('--marquee-dur', `${duration}ms`);
                   msgText.classList.add('is-marquee');
+
+                  // CSS 애니메이션이 다른 규칙에 눌리는 경우가 있어서 Web Animations로 직접 이동시킨다.
+                  msgText.__mainMarqueeAnim = innerNow.animate([
+                    { transform: 'translate3d(0,0,0)', offset: 0 },
+                    { transform: 'translate3d(0,0,0)', offset: 0.22 },
+                    { transform: `translate3d(-${move}px,0,0)`, offset: 0.72 },
+                    { transform: `translate3d(-${move}px,0,0)`, offset: 0.88 },
+                    { transform: 'translate3d(0,0,0)', offset: 1 }
+                  ], {
+                    duration,
+                    iterations: Infinity,
+                    easing: 'linear'
+                  });
                 }
               };
 
               requestAnimationFrame(() => requestAnimationFrame(measureAndApply));
+              setTimeout(measureAndApply, 180);
+              setTimeout(measureAndApply, 520);
+              setTimeout(measureAndApply, 1100);
             } catch (err) {
               console.warn('[header one-liner marquee] 적용 실패:', err);
             }
@@ -29591,7 +29954,7 @@ return `
               applyHeaderAdMarquee(adTextEl);
             }, 200); // 이 값(200ms)은 페이드 시간과 맞추세요
           }
-          const DISPLAY_MS = 6000;
+          const DISPLAY_MS = (window.matchMedia && window.matchMedia('(max-width: 980px)').matches) ? 10000 : 6000;
 
           function start() {
             if (timer) clearInterval(timer);

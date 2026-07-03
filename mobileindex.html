@@ -2319,6 +2319,52 @@
       margin-bottom: 12px;
     }
 
+    /* ✅ 모바일 Q&A 답변: 긴 문의/답변도 잘리지 않게 본문 스크롤 */
+    #faqAnswerModal .dialog {
+      display: flex;
+      flex-direction: column;
+      width: min(720px, 94vw);
+      max-height: min(86vh, 720px);
+      overflow: hidden;
+    }
+
+    #faqAnswerModal .dialog header {
+      flex: 0 0 auto;
+      gap: 8px;
+    }
+
+    #faqAnswerModal .dialog header h2 {
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #faqAnswerModal .contact-body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    #faqAnswerModal .faq-answer-question,
+    #faqAnswerModal #faqAnswerText {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    #faqAnswerModal .faq-answer-question {
+      margin-bottom: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(233, 238, 247, 0.94);
+      font-size: 12px;
+      line-height: 1.55;
+      font-weight: 900;
+    }
+
     .contact-textarea {
       width: 100%;
       min-height: 130px;
@@ -7270,6 +7316,7 @@
         <button type="button" class="close" data-faqans-close>닫기</button>
       </header>
       <div class="contact-body">
+        <div id="faqAnswerQuestion" class="faq-answer-question"></div>
         <div id="faqAnswerText" class="contact-notice"></div>
       </div>
     </div>
@@ -12311,8 +12358,10 @@
     }
 
     function openFaqAnswerModal(q, a) {
-      const qEl = document.getElementById('faqAnswerTitle');
+      const titleEl = document.getElementById('faqAnswerTitle');
+      const qEl = document.getElementById('faqAnswerQuestion');
       const aEl = document.getElementById('faqAnswerText');
+      if (titleEl) titleEl.textContent = 'Q&A 답변';
       if (qEl) qEl.textContent = q || '';
 
       function renderFaqAnswer(container, answerText) {
