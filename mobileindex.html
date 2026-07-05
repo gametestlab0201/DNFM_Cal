@@ -125,6 +125,13 @@
     .m-oneliner .text {
       opacity: 1;
       transition: opacity .18s ease;
+
+      /* ✅ 긴 한마디 마퀴가 실제 남은 폭을 기준으로 계산되도록 보정 */
+      display: block;
+      flex: 1 1 auto;
+      min-width: 0;
+      max-width: 100%;
+      white-space: nowrap;
     }
 
     .m-oneliner .hdrmsg {
@@ -135,6 +142,7 @@
       /* ✅ 중요: inline-flex 자식이 줄어들 수 있게 */
       min-width: 0;
       max-width: 100%;
+      width: 100%;
     }
 
     .m-oneliner .msg-nick {
@@ -147,82 +155,33 @@
     }
 
     .m-oneliner .msg-text {
-      /* ✅ 중요: inline(span) 상태면 max-width/overflow 측정이 틀어짐 */
-      display: inline-block;
-
+      display: block;
+      flex: 1 1 auto;
+      min-width: 0;
+      max-width: none;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
-
-      /* 기존 유지 */
-      max-width: 72vw;
-
-      /* (선택) 더 안정적으로 하고 싶으면 아래도 추가 가능
-     vertical-align: bottom; */
-    }
-
-    /* ===== 한마디 마퀴(전광판) ===== */
-    .m-oneliner .msg-text {
+      text-overflow: clip;
       position: relative;
     }
 
-    /* 기본(inner) */
-    .m-oneliner .msg-text .marquee {
+    .m-oneliner .msg-text .msg-track {
       display: inline-block;
-      padding-right: 7px;
-      /* ✅ 항상 동일 여백을 포함시켜 sw 계산과 실제 렌더가 같게 */
-    }
-
-    /* ✅ 넘칠 때만 마퀴 동작 */
-    .m-oneliner .msg-text.is-marquee {
-      overflow: hidden;
-      /* ellipsis 대신 잘라내기 */
-      text-overflow: clip;
-      /* … 사용 안 함 */
-    }
-
-    .m-oneliner .msg-text.is-marquee .marquee {
       white-space: nowrap;
+      transform: translateX(0);
       will-change: transform;
-      /* ✅ 처음에는 그대로(0) 보이고, 이후에만 이동 */
-      animation: m_one_marquee var(--marquee-dur, 14s) linear infinite;
     }
 
-    /* ✅ 0~15%: 정지(보이는 만큼 먼저 보여줌)
-   ✅ 15~70%: 왼쪽으로 스크롤 (넘친 만큼만)
-   ✅ 70~85%: 끝에서 잠깐 정지
-   ✅ 85~100%: 0으로 복귀(다음 루프 준비) */
-    @keyframes m_one_marquee {
-      0% {
-        transform: translateX(0);
-      }
-
-      15% {
-        transform: translateX(0);
-      }
-
-      70% {
-        transform: translateX(calc(-1px * var(--marquee-dist, 0)));
-      }
-
-      85% {
-        transform: translateX(calc(-1px * var(--marquee-dist, 0)));
-      }
-
-      100% {
-        transform: translateX(0);
-      }
+    .m-oneliner .msg-text.is-marquee .msg-track {
+      animation: mOneLinerMarquee var(--m-marquee-dur, 10s) linear 1 forwards;
     }
 
-    /* 접근성: 모션 최소화 설정이면 애니메이션 끔 */
-    @media (prefers-reduced-motion: reduce) {
-      .m-oneliner .msg-text.is-marquee .marquee {
-        animation: none !important;
-        padding-left: 0 !important;
-        transform: none !important;
-      }
+    @keyframes mOneLinerMarquee {
+      0% { transform: translateX(0); }
+      18% { transform: translateX(0); }
+      82% { transform: translateX(calc(-1px * var(--m-marquee-dist, 0))); }
+      100% { transform: translateX(calc(-1px * var(--m-marquee-dist, 0))); }
     }
-
 
     /* ===== 한마디 배지 (PC 수석 스타일 이식) ===== */
 
@@ -340,6 +299,19 @@
       box-shadow: 0 0 0 1px rgba(120, 120, 120, .28);
       margin-right: 2px;
       vertical-align: middle;
+    }
+
+    /* ✅ 모바일 한마디 끝부분 확인용: 닉네임/배지 제외한 남은 폭만 본문이 차지 */
+    .m-oneliner .hdrmsg {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .m-oneliner .msg-nick,
+    .m-oneliner .msg-bullet,
+    .m-oneliner .tag-senior,
+    .m-oneliner .tag-lead {
+      flex: 0 0 auto;
     }
 
 
@@ -7697,7 +7669,11 @@
 
       // PC처럼 fade 효과를 쓰려면(선택)
       const FADE_MS = 200;
-      const DISPLAY_MS = 6000;
+      const DISPLAY_MS = 7000;
+      const MARQUEE_MIN_MS = 9000;
+      const MARQUEE_MAX_MS = 18000;
+      const MARQUEE_SPEED_PX_PER_SEC = 42;
+      const ONE_LINER_DEBUG = localStorage.getItem('mOneLinerDebug') === '1';
 
       function escapeHTML(s = '') {
         return String(s)
@@ -7770,7 +7746,7 @@
     ${prefixMark}
     ${nick ? `<span class="msg-nick">${escapeHTML(nick)} 님</span>` : ''}
     ${midBullet}
-    <span class="msg-text"><span class="marquee">${escapeHTML(msg)}</span></span>
+    <span class="msg-text"><span class="msg-track">${escapeHTML(msg)}</span></span>
   </span>
 `.trim();
           });
@@ -7804,76 +7780,85 @@
           if (node) node.textContent = SENIOR_EMOJIS[emojiIdx];
         }
 
+        function clamp(n, min, max) {
+          return Math.max(min, Math.min(max, n));
+        }
+
+        function applyMobileOneLinerMarquee() {
+          const msgBox = textEl.querySelector('.msg-text');
+          const track = textEl.querySelector('.msg-track');
+          if (!msgBox || !track) return DISPLAY_MS;
+
+          msgBox.classList.remove('is-marquee');
+          msgBox.style.removeProperty('--m-marquee-dist');
+          msgBox.style.removeProperty('--m-marquee-dur');
+          track.style.animation = 'none';
+          track.style.transform = 'translateX(0)';
+          // 강제 reflow: 같은 문구가 다시 나와도 애니메이션이 재시작되게 함
+          void track.offsetWidth;
+          track.style.animation = '';
+
+          const boxW = Math.floor(msgBox.clientWidth || 0);
+          const textW = Math.ceil(track.scrollWidth || 0);
+          const dist = Math.max(0, textW - boxW + 12);
+
+          if (ONE_LINER_DEBUG) {
+            console.log('[oneLiner/mobile]', { boxW, textW, dist, text: track.textContent });
+          }
+
+          if (!boxW || dist <= 6) {
+            return DISPLAY_MS;
+          }
+
+          const durSec = clamp((dist / MARQUEE_SPEED_PX_PER_SEC) + 4.5, MARQUEE_MIN_MS / 1000, MARQUEE_MAX_MS / 1000);
+          msgBox.style.setProperty('--m-marquee-dist', String(dist));
+          msgBox.style.setProperty('--m-marquee-dur', `${durSec}s`);
+          msgBox.classList.add('is-marquee');
+
+          return Math.ceil(durSec * 1000) + 700;
+        }
+
         // 순환 표시
         let i = 0;
         let timer = null;
+
+        function scheduleNext(delayMs = DISPLAY_MS) {
+          if (timer) clearTimeout(timer);
+          timer = setTimeout(() => {
+            i++;
+            emojiIdx = (emojiIdx + 1) % SENIOR_EMOJIS.length;
+            show(i);
+          }, delayMs);
+        }
 
         function show(idx) {
           textEl.classList.remove('muted');
           textEl.classList.add('fade-out');
           setTimeout(() => {
             textEl.innerHTML = messages[idx % messages.length];
-            applyMarqueeIfOverflow(textEl);
             textEl.classList.remove('fade-out');
             applySeniorEmoji(textEl);
+
+            // 렌더링이 끝난 다음 실제 너비를 재서, 넘치는 경우에만 끝부분까지 이동
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                const displayMs = applyMobileOneLinerMarquee();
+                scheduleNext(displayMs);
+              });
+            });
           }, FADE_MS);
-        }
-        function applyMarqueeIfOverflow(rootEl) {
-          const msgText = rootEl.querySelector('.msg-text');
-          const inner = msgText ? msgText.querySelector('.marquee') : null;
-          if (!msgText || !inner) return;
-
-          // 초기화
-          msgText.classList.remove('is-marquee');
-          msgText.style.removeProperty('--marquee-dur');
-          msgText.style.removeProperty('--marquee-dist');
-
-          requestAnimationFrame(() => {
-            const cw = msgText.getBoundingClientRect().width;  // ✅ 더 안정적인 실측
-            const sw = inner.scrollWidth;
-
-            const rawDist = sw - cw;
-            const overflow = rawDist > 2;
-            if (!overflow) return;
-
-            const TRAIL_PX = 7;
-            const dist = Math.max(0, rawDist + TRAIL_PX);
-
-            const SPEED_PX_PER_SEC = 110;
-            const moveSec = Math.max(1.2, dist / SPEED_PX_PER_SEC);
-
-            const holdStart = 0.8;
-            const holdEnd = 0.6;
-            const dur = holdStart + moveSec + holdEnd + 0.4;
-
-            msgText.classList.add('is-marquee');
-            msgText.style.setProperty('--marquee-dur', `${dur}s`);
-            msgText.style.setProperty('--marquee-dist', `${dist}`);
-          });
         }
 
         // 첫 표시
         show(0);
 
-        timer = setInterval(() => {
-          i++;
-          emojiIdx = (emojiIdx + 1) % SENIOR_EMOJIS.length;
-          show(i);
-        }, DISPLAY_MS);
-
         // (선택) 페이지가 백그라운드면 멈추고 다시 오면 재시작
         document.addEventListener('visibilitychange', () => {
           if (document.hidden) {
-            if (timer) clearInterval(timer);
+            if (timer) clearTimeout(timer);
             timer = null;
           } else {
-            if (!timer) {
-              timer = setInterval(() => {
-                i++;
-                emojiIdx = (emojiIdx + 1) % SENIOR_EMOJIS.length;
-                show(i);
-              }, DISPLAY_MS);
-            }
+            if (!timer) scheduleNext();
           }
         }, { passive: true });
 
@@ -12426,12 +12411,12 @@
 
 
     // ==============================
-    //  모바일 내 이용 정보 UI (special_user 테스트용)
+    //  모바일 내 이용 정보 UI (로그인 이용자 전체 공개)
     // ==============================
     function canShowMyUsageInfoButton_mobile() {
       const lp = window.__loginPingResult_mobile || {};
       const ur = window.__userRole || {};
-      return !!(lp.specialUser || lp.researchUser || ur.specialUser || ur.researchUser);
+      return !!(lp.ok || ur.isLoggedIn || ur.email);
     }
 
     function updateMyUsageInfoButtonUI_mobile() {

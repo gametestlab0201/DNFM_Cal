@@ -8350,12 +8350,12 @@
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-                  <li>06.07 <span style="color: yellowgreen;">[PC]</span> 한마디 변경 기능 추가</li>
                   <li>06.12 스노우메이지 이벤트 계산기 추가</li>
                   <li>06.20 침식 무기 개별 고유효과 설정 불능 버그 수정</li>
                   <li>06.23 장비 아이콘 마우스 오버시 설명 추가</li>
                   <li>06.24 <span class="notice-badge">게임실험연구소 전체 캐릭 현황</span> 오픈!</li>
                   <li>06.29 저장슬롯 메모 기능 추가</li>
+                  <li>07.05 내 정보 보기 기능 추가</li>
 
                 </ul>
               </div>
@@ -10665,12 +10665,12 @@ window.__userRole = window.__userRole || {
 
 
     // ==============================
-    //  내 이용 정보 UI (special_user 테스트용)
+    //  내 이용 정보 UI (로그인 이용자 전체 공개)
     // ==============================
     function canShowMyUsageInfoButton() {
       const lp = window.__loginPingResult || {};
       const ur = window.__userRole || {};
-      return !!(lp.specialUser || lp.researchUser || ur.specialUser || ur.researchUser);
+      return !!(lp.ok || ur.isLoggedIn || ur.email);
     }
 
     function updateMyUsageInfoButtonUI() {
