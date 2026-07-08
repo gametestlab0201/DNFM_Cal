@@ -457,6 +457,14 @@
       .notice-list .notice-badge::before {
         font-size: 0.55rem !important;
       }
+      .notice-list .flame-badge {
+    font-size: 0.68rem;
+    padding: 1px 8px;
+  }
+
+  .notice-list .flame-badge::before {
+    font-size: 0.65rem;
+  }
 
       .header-ads .ad-text {
         font-size: 10px;
@@ -701,6 +709,36 @@
       font-size: 0.8rem;
       margin-top: -1px;
     }
+
+        .flame-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 0.82rem;
+  color: #fff3e8;
+  background:
+    radial-gradient(circle at 68% 24%, rgba(255, 235, 120, 0.95), transparent 26%),
+    linear-gradient(135deg, #ff3b1f 0%, #b31312 48%, #5f0507 100%);
+  border: 1px solid rgba(255, 116, 55, 0.9);
+  text-shadow:
+    0 0 5px rgba(255, 220, 120, 0.9),
+    0 0 10px rgba(255, 60, 20, 0.7);
+  box-shadow:
+    0 0 0 1px rgba(255, 120, 40, 0.35),
+    0 0 10px rgba(255, 58, 20, 0.75),
+    0 0 18px rgba(180, 20, 10, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+.flame-badge::before {
+  content: "🔥";
+  font-size: 0.78rem;
+  filter: drop-shadow(0 0 4px rgba(255, 180, 60, 0.9));
+}
 
     /* 공지 모달 항목들 사이 여백 추가 */
     #noticeModal .notice-list li {
@@ -8350,12 +8388,12 @@
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-                  <li>06.12 스노우메이지 이벤트 계산기 추가</li>
                   <li>06.20 침식 무기 개별 고유효과 설정 불능 버그 수정</li>
                   <li>06.23 장비 아이콘 마우스 오버시 설명 추가</li>
                   <li>06.24 <span class="notice-badge">게임실험연구소 전체 캐릭 현황</span> 오픈!</li>
                   <li>06.29 저장슬롯 메모 기능 추가</li>
                   <li>07.05 내 정보 보기 기능 추가</li>
+                  <li>07.08 <span class="flame-badge">데미지 계산 속도 대폭 개선</span></li>
 
                 </ul>
               </div>

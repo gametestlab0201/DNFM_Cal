@@ -135,6 +135,36 @@
       margin-top: -1px;
     }
 
+    .flame-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 0.82rem;
+  color: #fff3e8;
+  background:
+    radial-gradient(circle at 68% 24%, rgba(255, 235, 120, 0.95), transparent 26%),
+    linear-gradient(135deg, #ff3b1f 0%, #b31312 48%, #5f0507 100%);
+  border: 1px solid rgba(255, 116, 55, 0.9);
+  text-shadow:
+    0 0 5px rgba(255, 220, 120, 0.9),
+    0 0 10px rgba(255, 60, 20, 0.7);
+  box-shadow:
+    0 0 0 1px rgba(255, 120, 40, 0.35),
+    0 0 10px rgba(255, 58, 20, 0.75),
+    0 0 18px rgba(180, 20, 10, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+.flame-badge::before {
+  content: "🔥";
+  font-size: 0.78rem;
+  filter: drop-shadow(0 0 4px rgba(255, 180, 60, 0.9));
+}
+
     .patch-footer {
       margin-top: 20px;
       text-align: center;
@@ -193,6 +223,7 @@
 
     <section class="patch-card" aria-label="패치내역 목록">
       <ul class="patch-log-list notice-list">
+        <li>26.07.08 <span class="flame-badge">데미지 계산 속도 대폭 개선</span></li>
         <li>26.07.05 <span style="color: yellow;">내 정보 보기</span><span style="color: #ff4444;"> 기능</span> 추가</li>
         <li>26.06.29 <span style="color: yellow;">저장슬롯 </span> 캐릭 저장시 <span style="color: #ff4444;">한줄 메모 기능</span> 추가</li>
         <li>26.06.24 <span class="notice-badge">게임실험연구소 전체 캐릭 현황</span> 오픈!</li>
