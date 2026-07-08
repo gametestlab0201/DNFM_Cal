@@ -26432,91 +26432,149 @@ try {
           console.log('[computeViaBackend] payload.synergy=', payload.synergy);
         }
 
-        // 3) calc_all: 캐릭터 + 장비를 세션에 반영
-        async function callCalcAllOnce(token) {
-          return fetch(`${WEBAPP_URL}?type=calc_all`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              id_token: token,
-              payload,
-              p: p || null,
-            }),
-          }).then(r => r.json());
-        }
-
-        let resCalc = await callCalcAllOnce(id_token);
-
-        // 🔄 토큰 만료(401)인 경우: 한 번만 자동 재로그인 후 재시도
-        if (
-          !resCalc?.ok &&
-          resCalc?.code === 401 &&
-          (resCalc?.error === 'invalid token' ||
-            resCalc?.error === 'token_verify_fail' ||
-            resCalc?.error === 'missing token')
-        ) {
-          try {
-            const newToken = await forceReissueIdToken();
-            if (newToken) {
-              id_token = newToken;
-              resCalc = await callCalcAllOnce(id_token);
-            }
-          } catch (reErr) {
-            toast('로그인 시간이 만료되었습니다.\n로그인 화면에서 다시 로그인해 주세요.');
-            throw new Error('login_expired');
-          }
-        }
-
-        if (!resCalc?.ok) {
-          throw new Error(resCalc?.message || resCalc?.error || 'calc_all_failed');
-        }
-
-
-
-        // 4) 합산/패널 갱신 (sum_stats 분기 사용)
-        if (typeof recalcAndRenderPanel === 'function') {
-          try {
-            await recalcAndRenderPanel();
-          } catch (e) {
-            console.warn('[computeViaBackend] recalcAndRenderPanel 실패:', e);
-          }
-        }
-
-        await saveSkillSelections();
-        await simulateSkillUsage();
-
-        // 5) 최종 데미지 계산 (compute 분기 호출)
+        // 3) final_compute: 기존 5회 호출을 백엔드 내부 직접 호출 1회로 통합
         const monster = state.monster || null;   // { name } 형태
         const timeKey = (typeof getTimeKey === 'function'
           ? getTimeKey()
-          : '1m');   // 혹시 몰라서 기본값 1분
+          : '1m');
 
         // ✅ SPECIAL_USER 체크박스 상태 (compute 호출 전에 읽기)
         const dmgFlags = _getSpecialDamageFlags();
 
-        async function callComputeOnce(token) {
-          return fetch(`${WEBAPP_URL}?type=compute`, {
+        function buildFinalSkillStatePayload() {
+          const arr = [];
+
+          const clampChargeSecondsForSave = (value) => {
+            const n = Number(value);
+            const safe = Number.isFinite(n) ? n : 0;
+            if (safe < 1) return 0;
+            const clamped = Math.max(1, Math.min(10, safe));
+            return Math.round(clamped * 10) / 10;
+          };
+
+          for (const sk of (ST2.rows || [])) {
+            const lv = Number(state.skillLv?.[sk.id] ?? 0);
+            const tp = Number(state.skillTpLv?.[sk.id] ?? 0);
+
+            if (lv > 0) {
+              const chargeStage = clampChargeSecondsForSave(state.skillChargeStage?.[sk.id] ?? 0);
+
+              arr.push({
+                name: sk.name,
+                lv,
+                tp,
+                chargeStage,
+                chargeStageIndex: Math.round(chargeStage * 10),
+                extremeCharge: state.strikerExtremeChargeSkillId === sk.id,
+              });
+            }
+          }
+
+          let ownerKey = '';
+          if (state.currentCharacter) {
+            const jg = String(state.currentCharacter.jobGroupLabel || state.currentCharacter.jobGroup || '').trim();
+            const nm = String(state.currentCharacter.name || '').trim();
+            if (jg || nm) ownerKey = (jg + nm).replace(/\s+/g, '');
+          }
+
+          if (!ownerKey) {
+            ownerKey = String(state.CurrentSumStats?.ownerKey || '').trim();
+          }
+
+          const patchBefore = !!document.getElementById('chkUsePrePatchSkills')?.checked;
+          const out = { ownerKey, skills: arr, patchBefore };
+
+          if (ownerKey === '워리어윈드시어') {
+            const presetRaw = String(state.windshearTreePreset || 'A').trim() || 'A';
+            out.windshearTreePreset = presetRaw; // A / B / C
+          }
+
+          return out;
+        }
+
+        function buildFinalSkillUsesPayload(ownerKeyFromSkillState) {
+          let ownerKey = String(ownerKeyFromSkillState || '').trim();
+
+          if (!ownerKey) {
+            ownerKey = String(state?.CurrentSumStats?.ownerKey || '').trim();
+          }
+
+          if (!ownerKey) {
+            const k = [state.currentCharacter?.jobGroupLabel, state.currentCharacter?.name]
+              .filter(Boolean).join('');
+            ownerKey = k.replace(/\s+/g, '');
+          }
+
+          const out = { ownerKey, window: timeKey };
+
+          if (state?.customSkills) {
+            out.customSkills = state.customSkills;
+          }
+
+          if (ownerKey === '워리어와일드베인') {
+            out.wildbaneTreePreset = state.wildbaneTreePreset || '파파초';
+
+            const cc = Math.max(0, Math.floor(Number(state.wildbaneCycleCount || 0)));
+            out.wildbaneCycleCount = cc;
+            out.wildbaneCycleEnabled = (cc > 0);
+          }
+
+          if (ownerKey === '워리어윈드시어') {
+            const presetRaw = String(state.windshearTreePreset || 'A').trim() || 'A';
+
+            const wsPresetForUses =
+              (presetRaw === 'A') ? '트리A' :
+                (presetRaw === 'B') ? '트리B' :
+                  (presetRaw === 'C') ? '트리C' :
+                    presetRaw;
+
+            out.windshearTreePreset = wsPresetForUses;
+
+            const cc = Math.max(0, Math.floor(Number(state.windshearCycleCount || 0)));
+            out.windshearCycleCount = cc;
+            out.windshearCycleEnabled = (cc > 0);
+          }
+
+          return out;
+        }
+
+        const skillStatePayload = buildFinalSkillStatePayload();
+        const skillUsesPayload = buildFinalSkillUsesPayload(skillStatePayload.ownerKey);
+
+        const computePayload = {
+          p: p || null,
+          monster,
+          window: timeKey,
+
+          // ✅ 백엔드에서 실제 계산에 반영할 플래그
+          forceCrit100: !!dmgFlags.forceCrit100,
+          tohampo12: !!dmgFlags.tohampo12,
+
+          // ✅ 패치전 시트 사용 여부
+          patchBefore: !!document.getElementById('chkUsePrePatchSkills')?.checked,
+        };
+
+        async function callFinalComputeOnce(token) {
+          return fetch(`${WEBAPP_URL}?type=final_compute`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               id_token: token,
-              p: p || null,
-              monster,
-              window: timeKey,
-
-              // ✅ 백엔드에서 실제 계산에 반영할 플래그
-              forceCrit100: !!dmgFlags.forceCrit100,
-              tohampo12: !!dmgFlags.tohampo12,   // ✅ 추가
-
-              // ✅ 패치전 시트 사용 여부
-              patchBefore: !!document.getElementById('chkUsePrePatchSkills')?.checked,
+              calcPayload: {
+                payload,
+                p: p || null,
+              },
+              sumStatsPayload: {},
+              skillStatePayload,
+              skillUsesPayload,
+              computePayload,
             }),
           }).then(r => r.json());
         }
 
-        let resCompute = await callComputeOnce(id_token);
+        let resCompute = await callFinalComputeOnce(id_token);
 
-        // calc_all 이후에라도 토큰이 만료되었을 수 있으니 한 번 더 방어
+        // 🔄 토큰 만료(401)인 경우: 한 번만 자동 재로그인 후 재시도
         if (
           !resCompute?.ok &&
           resCompute?.code === 401 &&
@@ -26525,17 +26583,10 @@ try {
             resCompute?.error === 'missing token')
         ) {
           try {
-            const newToken2 = await forceReissueIdToken();
-            if (newToken2) {
-              id_token = newToken2;
-
-              // 새 토큰 세션에는 캐릭/장비 정보가 없으므로 calc_all부터 다시 한 번
-              const resCalc2 = await callCalcAllOnce(id_token);
-              if (!resCalc2?.ok) {
-                throw new Error(resCalc2?.message || resCalc2?.error || 'calc_all_failed');
-              }
-
-              resCompute = await callComputeOnce(id_token);
+            const newToken = await forceReissueIdToken();
+            if (newToken) {
+              id_token = newToken;
+              resCompute = await callFinalComputeOnce(id_token);
             }
           } catch (reErr) {
             toast('로그인 시간이 만료되었습니다.\n로그인 화면에서 다시 로그인해 주세요.');
@@ -26544,7 +26595,56 @@ try {
         }
 
         if (!resCompute?.ok) {
-          throw new Error(resCompute?.message || resCompute?.error || 'compute_failed');
+          console.error('[computeViaBackend] final_compute failed:', resCompute);
+          throw new Error(resCompute?.message || resCompute?.error || 'final_compute_failed');
+        }
+
+        // ✅ final_compute 응답으로 합산 스탯 패널 갱신
+        try {
+          const sumRes = resCompute.sumStats || null;
+          const rawSum = sumRes?.sum || null;
+
+          if (rawSum && typeof rawSum === 'object') {
+            state.CurrentSumStats = rawSum;
+
+            if (sumRes.buckets && typeof sumRes.buckets === 'object') {
+              state.SumBuckets = sumRes.buckets;
+            } else {
+              state.SumBuckets = { total: rawSum };
+            }
+
+            let panelSource = rawSum;
+            const buckets = state.SumBuckets;
+            const selBucket = document.getElementById('statBucketSelect');
+            const bucketKey = selBucket?.value || 'total';
+
+            if (bucketKey !== 'total' && buckets && typeof buckets === 'object') {
+              panelSource = buckets[bucketKey] || buckets.total || rawSum;
+            }
+
+            if (typeof renderStats === 'function') {
+              renderStats(panelSource);
+            }
+          }
+        } catch (e) {
+          console.warn('[computeViaBackend] final_compute sumStats 반영 실패:', e);
+        }
+
+        // ✅ final_compute 응답으로 스킬 사용횟수 반영
+        try {
+          const usesObj = resCompute.uses || resCompute.usesResult?.uses || {};
+          state.lastUses = usesObj;
+
+          for (const sk of (ST2.rows || [])) {
+            state.skillDmg[sk.id] ||= {};
+            state.skillDmg[sk.id].uses = Number(usesObj?.[sk.name] || 0);
+          }
+        } catch (e) {
+          console.warn('[computeViaBackend] final_compute uses 반영 실패:', e);
+        }
+
+        if (resCompute.elapsed) {
+          console.log('[final_compute elapsed]', resCompute.elapsed);
         }
 
         const rawTotal = Number(resCompute.total || 0);

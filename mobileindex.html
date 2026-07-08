@@ -17644,50 +17644,124 @@ function buildSynergyPayloadMobile() {
         window.state = window.state || {};
         window.state.lastCalcAllPayload = payload;
 
-        // 1) 장비/옵션/아바타/룬각인/시간기준/몬스터 등 세션 반영
-        const resCalc = await apiJSON('calc_all', { payload, p: null });
-        if (!resCalc?.ok) throw new Error(resCalc?.message || resCalc?.error || 'calc_all_failed');
+        // 1) final_compute: 기존 5회 호출을 백엔드 내부 직접 호출 1회로 통합
+        const s = window.state || {};
+        const timeKey = String(s.timeKey || '180');
 
-        // 2) (선택) sum_stats로 세션 정리/확인
-        const sum = await apiJSON('sum_stats', { wantDbg: false });
+        let ownerKey = '';
+        if (s.currentCharacter) {
+          const jg = String(s.currentCharacter.jobGroupLabel || s.currentCharacter.jobGroup || '').trim();
+          const nm = String(s.currentCharacter.name || s.currentCharacter.charName || '').trim();
+          if (jg || nm) ownerKey = (jg + nm).replace(/\s+/g, '');
+        }
+        if (!ownerKey) ownerKey = String(s.CurrentSumStats?.ownerKey || s.ownerKey || '').trim();
+        if (!ownerKey) throw new Error('missing_owner');
 
-        if (!sum?.ok) {
-          console.warn('[MOBILE sum_stats fail]', sum);
-          // ❗sum_stats가 실패해도 다음 단계 진행은 하되, CurrentSumStats는 최소 객체로 보장
-          window.state.CurrentSumStats = window.state.CurrentSumStats || {};
-        } else {
-          // ✅ 플래티넘 엠블렘 등 특정 케이스에서 sum.sum이 비어오는 경우 방어
-          if (sum.sum && typeof sum.sum === 'object') {
-            window.state.CurrentSumStats = sum.sum; // 정상
-          } else {
-            console.warn('[MOBILE sum_stats ok but missing sum.sum]', sum);
-            window.state.CurrentSumStats = window.state.CurrentSumStats || {};
+        s.ownerKey = ownerKey;
+
+        const charKey = String(s.currentCharacter?.ownerKey || ownerKey || '').trim().replace(/\s+/g, '');
+        const tree = (s.skillTrees && charKey && s.skillTrees[charKey]) ? s.skillTrees[charKey] : {};
+
+        const skills = [];
+        for (const [name, v] of Object.entries(tree)) {
+          const lv = Number(v?.spLv ?? 0);
+          const tp = Number(v?.tpLv ?? 0);
+
+          if (lv > 0 || tp > 0) {
+            const chargeStage = clampChargeSecondsMobile(
+              v?.chargeStage ?? normalizeChargeFromNodeMobile(v)
+            );
+
+            skills.push({
+              name,
+              lv,
+              tp,
+              chargeStage,
+              chargeStageIndex: Math.round(chargeStage * 10),
+              extremeCharge: !!v?.extremeCharge,
+            });
           }
         }
 
-        // 3) ✅ 스킬 상태 저장 (skill_state_set)
-        await saveSkillSelectionsMobile();
+        const patchBefore = getPatchBeforeMobile();
+        window.state.patchBefore = patchBefore;
 
-        // 4) ✅ 스킬 사용횟수 시뮬레이션 (skill_uses)
-        const uses = await simulateSkillUsageMobile();
-        window.state.lastSkillUses = uses;
+        const skillStatePayload = { ownerKey, skills, patchBefore };
 
-        // 5) ✅ 최종 compute
-        const s = window.state || {};
-        const timeKey = String(s.timeKey || '180');
+        if (ownerKey === '워리어윈드시어') {
+          const presetRaw = String(s.windshearTreePreset || 'A').trim() || 'A';
+          skillStatePayload.windshearTreePreset = presetRaw; // A / B / C
+        }
+
+        const skillUsesPayload = {
+          ownerKey,
+          window: timeKey,
+          wantDbg: false,
+        };
+
+        if (ownerKey === '워리어와일드베인') {
+          const preset = String(s.wildbaneTreePreset || '파파초').trim() || '파파초';
+          const cycle = Number.isFinite(+s.wildbaneCycleCount) ? Math.max(0, Math.floor(+s.wildbaneCycleCount)) : 0;
+
+          skillUsesPayload.wildbaneTreePreset = preset;
+          skillUsesPayload.wbTree = preset;
+          skillUsesPayload.wildbaneCycleCount = cycle;
+          skillUsesPayload.wbCycleCount = cycle;
+        }
+
+        if (ownerKey === '워리어윈드시어') {
+          const presetRaw = String(s.windshearTreePreset || 'A').trim() || 'A';
+          const cycle = Number.isFinite(+s.windshearCycleCount) ? Math.max(0, Math.floor(+s.windshearCycleCount)) : 0;
+
+          const wsPresetForUses =
+            (presetRaw === 'A') ? '트리A' :
+              (presetRaw === 'B') ? '트리B' :
+                (presetRaw === 'C') ? '트리C' :
+                  presetRaw;
+
+          skillUsesPayload.windshearTreePreset = wsPresetForUses;
+          skillUsesPayload.wsTree = wsPresetForUses;
+          skillUsesPayload.windshearCycleCount = cycle;
+          skillUsesPayload.wsCycleCount = cycle;
+        }
+
         // ✅ 몬스터는 "현재 드롭다운 선택(monsterName)"을 항상 최우선으로 사용
-        //    (PC프리셋에서 넘어온 s.monster 객체가 남아 있으면 변경이 무시되는 문제 방지)
         const monster = (s.monsterName ? { name: String(s.monsterName).trim() } : (s.monster || null));
 
         const { forceCrit100, tohampo12 } = getSpecialDamageFlagsMobile();
 
-        const resCompute = await apiJSON('compute', {
+        const computePayload = {
           p: null,
           window: timeKey,
           monster,
-          forceCrit100,     // ✅ (추가) 만크리 강제
-          tohampo12,         // ✅ 투함포는 백엔드에서 물공/마공%로 처리
+          forceCrit100,
+          tohampo12,
+          patchBefore,
+        };
+
+        const resCompute = await apiJSON('final_compute', {
+          calcPayload: { payload, p: null },
+          sumStatsPayload: { wantDbg: false },
+          skillStatePayload,
+          skillUsesPayload,
+          computePayload,
         });
+
+        if (!resCompute?.ok) {
+          console.error('[MOBILE final_compute fail]', resCompute);
+          throw new Error(resCompute?.message || resCompute?.error || 'final_compute_failed');
+        }
+
+        const sum = resCompute.sumStats || null;
+        if (sum?.sum && typeof sum.sum === 'object') {
+          window.state.CurrentSumStats = sum.sum;
+        } else {
+          console.warn('[MOBILE final_compute missing sum.sum]', sum);
+          window.state.CurrentSumStats = window.state.CurrentSumStats || {};
+        }
+
+        const uses = resCompute.uses || resCompute.usesResult?.uses || {};
+        window.state.lastSkillUses = uses;
 
         let total = Number(resCompute.total || 0);
 
