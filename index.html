@@ -7903,6 +7903,200 @@
       line-height: 1.45;
     }
 
+
+    /* ===== 내 이용 정보: 등록되지 않은 일반 사용자 전용 화면 ===== */
+    .my-usage-dialog.usage-theme-public {
+      --usage-accent: #8fbaff;
+      --usage-accent-2: #4f7fe8;
+      --usage-accent-soft: rgba(110, 168, 255, 0.20);
+      --usage-accent-glow: rgba(110, 168, 255, 0.18);
+      --usage-metal-1: #e8f1ff;
+      --usage-metal-2: #9fc2ff;
+      --usage-ribbon-1: rgba(143, 186, 255, 0.20);
+      --usage-ribbon-2: rgba(79, 127, 232, 0.14);
+    }
+
+    .usage-public-view {
+      display: grid;
+      gap: 14px;
+    }
+
+    .usage-public-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
+      border-radius: 22px;
+      border: 1px solid rgba(143, 186, 255, 0.24);
+      background:
+        radial-gradient(420px 180px at 100% 0%, rgba(110, 168, 255, 0.22), transparent 62%),
+        linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.035));
+      box-shadow:
+        0 16px 34px rgba(0, 0, 0, 0.24),
+        0 0 0 1px rgba(255,255,255,0.035) inset;
+    }
+
+    .usage-public-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 0 10px;
+      margin-bottom: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(143, 186, 255, 0.38);
+      background: rgba(110, 168, 255, 0.10);
+      color: #cfe2ff;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+    }
+
+    .usage-public-title {
+      color: #f8fafc;
+      font-size: 22px;
+      line-height: 1.3;
+      font-weight: 950;
+      letter-spacing: -0.045em;
+      word-break: keep-all;
+    }
+
+    .usage-public-desc {
+      margin-top: 8px;
+      color: rgba(226, 232, 240, 0.74);
+      font-size: 13px;
+      line-height: 1.65;
+      font-weight: 650;
+      word-break: keep-all;
+    }
+
+    .usage-public-account {
+      margin-top: 12px;
+      padding-top: 11px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      color: rgba(203, 213, 225, 0.66);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .usage-public-benefit-title {
+      margin: 2px 2px -2px;
+      color: #e8f1ff;
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    .usage-public-benefits {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .usage-public-benefit {
+      min-height: 92px;
+      padding: 14px;
+      border-radius: 17px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.075), rgba(255,255,255,0.028));
+      box-shadow: 0 10px 22px rgba(0,0,0,0.15);
+    }
+
+    .usage-public-benefit-icon {
+      margin-bottom: 7px;
+      color: #9fc2ff;
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .usage-public-benefit strong {
+      display: block;
+      color: #f8fafc;
+      font-size: 13px;
+      font-weight: 950;
+      line-height: 1.35;
+    }
+
+    .usage-public-benefit span {
+      display: block;
+      margin-top: 4px;
+      color: rgba(203, 213, 225, 0.64);
+      font-size: 11px;
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    .usage-public-join {
+      padding: 17px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(250, 204, 107, 0.34);
+      background:
+        radial-gradient(320px 130px at 100% 0%, rgba(250, 204, 107, 0.16), transparent 62%),
+        linear-gradient(135deg, rgba(250,204,107,0.09), rgba(255,255,255,0.035));
+      text-align: center;
+    }
+
+    .usage-public-join strong {
+      display: block;
+      color: #ffe8a3;
+      font-size: 16px;
+      font-weight: 950;
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+
+    .usage-public-join p {
+      margin: 6px 0 13px;
+      color: rgba(226, 232, 240, 0.72);
+      font-size: 12px;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .usage-public-join-btn {
+      min-width: 150px;
+      height: 38px;
+      padding: 0 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 232, 163, 0.72);
+      background: linear-gradient(135deg, #facc6b, #cfa24f);
+      color: #1b1207;
+      font-size: 13px;
+      font-weight: 950;
+      text-decoration: none;
+      box-shadow:
+        0 8px 20px rgba(0,0,0,0.28),
+        inset 0 1px 0 rgba(255,255,255,0.38);
+      transition: transform .14s ease, filter .14s ease, box-shadow .14s ease;
+    }
+
+    .usage-public-join-btn:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+      box-shadow:
+        0 10px 24px rgba(0,0,0,0.34),
+        0 0 0 3px rgba(250,204,107,0.12);
+    }
+
+    @media (max-width: 560px) {
+      .usage-public-hero {
+        padding: 17px;
+      }
+
+      .usage-public-title {
+        font-size: 19px;
+      }
+
+      .usage-public-benefits {
+        grid-template-columns: 1fr;
+      }
+
+      .usage-public-benefit {
+        min-height: 0;
+      }
+    }
+
     .my-usage-dialog.usage-theme-senior {
       --usage-accent: #f6d36b;
       --usage-accent-2: #b9851e;
@@ -8587,9 +8781,22 @@
     }
 
 
-    /* ===== 사이트 정책 링크 ===== */
+    /* ===== 메인 화면 / 사이트 정책 링크 ===== */
+    #main-view {
+      min-height: calc(100dvh - 58px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    #main-view > .wrap {
+      width: 100%;
+      flex: 1 0 auto;
+    }
+
     .site-policy-footer {
       width: 100%;
+      flex: 0 0 auto;
+      margin-top: 48px;
       padding: 18px 16px 24px;
       border-top: 1px solid rgba(255,255,255,.08);
       background: rgba(9,12,18,.94);
@@ -8613,13 +8820,16 @@
     .site-policy-copy { color: #70798a; }
 
     @media (max-width: 640px) {
-      /* 모바일 메인에서는 별도 꼬릿말처럼 띄우지 않고 본문 흐름 안에 표시 */
+      #main-view {
+        min-height: calc(100dvh - 48px);
+      }
+
       #main-view .site-policy-footer {
-        width: auto;
-        margin: 14px 0 0;
-        padding: 10px 4px 4px;
+        width: 100%;
+        margin-top: 32px;
+        padding: 14px 12px 18px;
         border-top: 1px solid rgba(255,255,255,.06);
-        background: transparent;
+        background: rgba(9,12,18,.90);
         font-size: 10px;
         line-height: 1.55;
       }
@@ -9281,7 +9491,8 @@
             <div class="login-card">
               <div class="login-title">계산기 접근을 위해 구글 계정으로 로그인</div>
               <div class="login-desc">
-                Google 로그인 후 누구나 계산기를 이용할 수 있습니다. 등록 계정은 광고 없이 저장 기능을 이용합니다.
+                Google 로그인 후 누구나 손쉽게 계산기를 이용할 수 있습니다. <br>
+                연구원 계정은 저장 기능을 포함한 다양한 혜택을 이용할 수 있습니다.
               </div>
 
               <div class="login-row">
@@ -9303,12 +9514,13 @@
           </div>
         </div>
 
-        <!-- 메인 본문 안의 정책 안내 -->
-        <footer class="site-policy-footer" aria-label="사이트 정책">
-          <a class="site-policy-link" href="/policy.html">개인정보처리방침 및 이용정책</a>
-          <div class="site-policy-copy">게임실험연구소 · 본 사이트는 비공식 팬 제작 도구이며 게임 제공사와 관련이 없습니다.</div>
-        </footer>
       </div>
+
+      <!-- 메인 화면 최하단 정책 안내 -->
+      <footer class="site-policy-footer" aria-label="사이트 정책">
+        <a class="site-policy-link" href="/policy.html">개인정보처리방침 및 이용정책</a>
+        <div class="site-policy-copy">게임실험연구소 · 본 사이트는 비공식 팬 제작 도구이며 게임 제공사와 관련이 없습니다.</div>
+      </footer>
   </div>
   </section>
   <section id="calc-view" hidden>
@@ -11049,7 +11261,7 @@
 
       <div class="usage-info-body">
         <div class="usage-info-notice">
-          현재 계정에 적용된 등급, 저장슬롯 확장, 한마디 변경 가능 여부를 한눈에 확인할 수 있습니다.
+          현재 계정의 이용 상태와 적용 중인 혜택을 확인할 수 있습니다.
         </div>
         <div id="myUsageInfoContent" class="usage-info-grid">
           <div class="usage-info-row">
@@ -11588,6 +11800,7 @@ window.__userRole = window.__userRole || {
       // 🔹 전역 직책/슬롯/한마디 상태 저장
       window.__userRole = {
         isLoggedIn: true,
+        email: String(data.email || '').trim().toLowerCase(),
 
         level: lvl,
         label,
@@ -11859,9 +12072,87 @@ window.__userRole = window.__userRole || {
     function applyMyUsageTheme(res) {
       const dialog = document.querySelector('#myUsageInfoModal .my-usage-dialog');
       if (!dialog) return;
-      dialog.classList.remove('usage-theme-senior', 'usage-theme-lead', 'usage-theme-junior');
+      dialog.classList.remove('usage-theme-senior', 'usage-theme-lead', 'usage-theme-junior', 'usage-theme-public');
       const themeClass = getMyUsageThemeClass(res);
       if (themeClass) dialog.classList.add(themeClass);
+    }
+
+    function isPublicMyUsageUser(res = null) {
+      // 1순위: my_usage_info가 명시적으로 내려준 등록 여부
+      if (typeof res?.isRegistered === 'boolean') {
+        return res.isRegistered !== true;
+      }
+
+      // 2순위: login_ping 원본 응답
+      const ping = window.__loginPingResult || {};
+      if (typeof ping.isRegistered === 'boolean') {
+        return ping.isRegistered !== true;
+      }
+      if (ping.accessTier) {
+        return String(ping.accessTier).toLowerCase() !== 'member';
+      }
+
+      // 3순위: 프론트에 저장한 사용자 권한
+      const role = window.__userRole || {};
+      if (typeof role.isRegistered === 'boolean') {
+        return role.isRegistered !== true;
+      }
+      if (role.accessTier) {
+        return String(role.accessTier).toLowerCase() !== 'member';
+      }
+
+      return true;
+    }
+
+    function usageInfoPublicView(res) {
+      const email = escapeMyUsageHtml(res?.email || window.__userRole?.email || '로그인 계정');
+      const joinUrl = 'https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join';
+
+      return `
+        <div class="usage-public-view">
+          <section class="usage-public-hero">
+            <div class="usage-public-badge">일반 이용자</div>
+            <div class="usage-public-title">현재 Google 로그인으로 일반 계산기를 이용하고 있습니다.</div>
+            <div class="usage-public-desc">
+              캐릭터·장비 세팅 비교와 데미지 계산 기능은 이용할 수 있으며,
+              연구원 가입 시 저장과 관리 기능을 포함한 추가 혜택이 제공됩니다.
+            </div>
+            <div class="usage-public-account">로그인 계정 · ${email}</div>
+          </section>
+
+          <div class="usage-public-benefit-title">연구원 가입 혜택</div>
+          <div class="usage-public-benefits">
+            <div class="usage-public-benefit">
+              <div class="usage-public-benefit-icon">◆</div>
+              <strong>광고 없이 이용</strong>
+              <span>등록 연구원은 계산기를 보다 깔끔한 화면으로 이용할 수 있습니다.</span>
+            </div>
+            <div class="usage-public-benefit">
+              <div class="usage-public-benefit-icon">▣</div>
+              <strong>등급별 저장슬롯</strong>
+              <span>자주 사용하는 캐릭터와 장비 세팅을 저장하고 다시 불러올 수 있습니다.</span>
+            </div>
+            <div class="usage-public-benefit">
+              <div class="usage-public-benefit-icon">◎</div>
+              <strong>세팅 현황 기능</strong>
+              <span>여러 캐릭터의 장비와 세팅 상태를 한눈에 관리할 수 있습니다.</span>
+            </div>
+            <div class="usage-public-benefit">
+              <div class="usage-public-benefit-icon">✦</div>
+              <strong>등급별 추가 기능</strong>
+              <span>등급에 따라 저장슬롯 확장과 한마디 기능 등의 혜택이 적용됩니다.</span>
+            </div>
+          </div>
+
+          <section class="usage-public-join">
+            <strong>더 많은 혜택을 누리려면 연구원으로 가입해 보세요!</strong>
+            <p>가입 후 승인이 완료되면 계정 등급에 맞는 전용 기능을 이용해보실 수 있습니다.</p>
+            <a class="usage-public-join-btn" href="${joinUrl}" target="_blank" rel="noopener noreferrer">
+              연구원 가입하기
+            </a>
+          </section>
+        </div>
+      `;
     }
 
 
@@ -11937,11 +12228,43 @@ window.__userRole = window.__userRole || {
       if (!box) return;
 
       applyMyUsageTheme(null);
+
       box.innerHTML = usageInfoRow('상태', '불러오는 중...');
 
       try {
         const res = await apiJSON('my_usage_info', {});
+
+        // 백엔드가 일반 사용자 정보를 정상 응답으로 내려주면
+        // 등록 사용자용 등급 화면 대신 가입 안내 화면을 표시한다.
+        if (res && isPublicMyUsageUser(res)) {
+          const dialog = document.querySelector('#myUsageInfoModal .my-usage-dialog');
+          if (dialog) dialog.classList.add('usage-theme-public');
+
+          box.innerHTML = usageInfoPublicView({
+            email:
+              res.email ||
+              window.__userRole?.email ||
+              window.__loginPingResult?.email ||
+              ''
+          });
+          return;
+        }
+
+        // 이전 백엔드가 user_not_found를 반환하더라도 일반 사용자로 처리하는 호환 분기
         if (!res || !res.ok) {
+          if (res?.error === 'user_not_found') {
+            const dialog = document.querySelector('#myUsageInfoModal .my-usage-dialog');
+            if (dialog) dialog.classList.add('usage-theme-public');
+
+            box.innerHTML = usageInfoPublicView({
+              email:
+                window.__userRole?.email ||
+                window.__loginPingResult?.email ||
+                ''
+            });
+            return;
+          }
+
           box.innerHTML = usageInfoRow('상태', res?.message || res?.error || '이용 정보를 불러오지 못했습니다.');
           return;
         }
@@ -31812,6 +32135,263 @@ return `
         toast('캐릭터와 장비 선택을 초기화했습니다.');
       }
     });
+  </script>
+
+  <script>
+    /* =========================================================
+       마지막 계산기 설정 자동 저장 / 자동 복원
+       - 현재 브라우저의 localStorage에 저장
+       - 로그인 이메일별로 저장 데이터를 분리
+       - 기존 프리셋 저장/복원 함수를 재사용
+       ========================================================= */
+    (() => {
+      const LAST_STATE_PREFIX = 'dnfm:last-calculator-state:v1:';
+      const SAVE_DELAY_MS = 700;
+      const CHECK_INTERVAL_MS = 2500;
+
+      let saveTimer = 0;
+      let restoreStarted = false;
+      let restoreFinished = false;
+      let applyingSavedState = false;
+      let dirty = false;
+      let lastSavedStateJson = '';
+
+      function getLoginEmailForLastState() {
+        return String(
+          window.__userRole?.email ||
+          window.__loginPingResult?.email ||
+          ''
+        ).trim().toLowerCase();
+      }
+
+      function getLastStateStorageKey() {
+        const email = getLoginEmailForLastState();
+        return email ? `${LAST_STATE_PREFIX}${email}` : '';
+      }
+
+      function isCalculatorViewVisible() {
+        const calcView = document.getElementById('calc-view');
+        return !!calcView && calcView.hidden !== true;
+      }
+
+      function areLastStateFunctionsReady() {
+        return (
+          window.state &&
+          typeof window.state === 'object' &&
+          typeof buildFrontPresetState === 'function' &&
+          typeof applyFrontPresetState === 'function'
+        );
+      }
+
+      function saveCurrentCalculatorState(force = false) {
+        if (applyingSavedState || !restoreFinished) return;
+        if (!force && !dirty) return;
+        if (!isCalculatorViewVisible() || !areLastStateFunctionsReady()) return;
+
+        const key = getLastStateStorageKey();
+        if (!key) return;
+
+        try {
+          const snapshot = buildFrontPresetState();
+          const stateJson = JSON.stringify(snapshot);
+
+          if (!force && stateJson === lastSavedStateJson) {
+            dirty = false;
+            return;
+          }
+
+          localStorage.setItem(key, JSON.stringify({
+            version: 1,
+            savedAt: Date.now(),
+            state: snapshot
+          }));
+
+          lastSavedStateJson = stateJson;
+          dirty = false;
+        } catch (error) {
+          console.warn('[마지막 설정 자동 저장] 실패:', error);
+        }
+      }
+
+      function scheduleCurrentCalculatorStateSave() {
+        if (!restoreFinished || applyingSavedState) return;
+        if (!isCalculatorViewVisible()) return;
+
+        dirty = true;
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+          saveCurrentCalculatorState(false);
+        }, SAVE_DELAY_MS);
+      }
+
+      async function restoreLastCalculatorState() {
+        if (restoreStarted || restoreFinished) return;
+        if (!isCalculatorViewVisible()) return;
+        if (!areLastStateFunctionsReady()) return;
+
+        const key = getLastStateStorageKey();
+        if (!key) return;
+
+        restoreStarted = true;
+
+        try {
+          const raw = localStorage.getItem(key);
+
+          if (!raw) {
+            restoreFinished = true;
+            dirty = false;
+            return;
+          }
+
+          const saved = JSON.parse(raw);
+          const snapshot = saved?.state;
+
+          if (!snapshot || typeof snapshot !== 'object') {
+            localStorage.removeItem(key);
+            restoreFinished = true;
+            return;
+          }
+
+          applyingSavedState = true;
+          applyFrontPresetState(snapshot);
+
+          /*
+           * applyFrontPresetState 안에서 대부분의 UI가 복원되지만,
+           * 스킬트리처럼 데이터 준비 시점 영향을 받는 부분은 한 번 더 갱신한다.
+           */
+          try {
+            if (typeof renderSkillTreeBands === 'function') {
+              await renderSkillTreeBands();
+            }
+          } catch (error) {
+            console.warn('[마지막 설정 자동 복원] 스킬트리 갱신 실패:', error);
+          }
+
+          try { refreshEnhLabelsFromState?.(); } catch (_) {}
+          try { refreshSealLabelsFromState?.(); } catch (_) {}
+          try { refreshSealCaptionsFromState?.(); } catch (_) {}
+          try { refreshAllDots?.(); } catch (_) {}
+          try { updateSynergyEffectButtonVisibility?.(); } catch (_) {}
+          try { renderSumPanel?.(); } catch (_) {}
+          try { renderFinalDamage?.(); } catch (_) {}
+          try { updateSpTpCounters?.(); } catch (_) {}
+          try { updateEquipDescPreview?.(); } catch (_) {}
+
+          lastSavedStateJson = JSON.stringify(snapshot);
+          restoreFinished = true;
+          dirty = false;
+
+        } catch (error) {
+          console.warn('[마지막 설정 자동 복원] 실패:', error);
+          try { localStorage.removeItem(key); } catch (_) {}
+          restoreFinished = true;
+        } finally {
+          applyingSavedState = false;
+          restoreStarted = false;
+        }
+      }
+
+      function tryRestoreLastState(attempt = 0) {
+        if (restoreFinished) return;
+
+        if (
+          getLastStateStorageKey() &&
+          isCalculatorViewVisible() &&
+          areLastStateFunctionsReady()
+        ) {
+          restoreLastCalculatorState();
+          return;
+        }
+
+        if (attempt < 60) {
+          setTimeout(() => tryRestoreLastState(attempt + 1), 250);
+        }
+      }
+
+      /*
+       * 계산기 내부의 클릭·선택·입력값 변경을 감지한다.
+       * 실제 저장은 짧은 지연 후 한 번만 실행한다.
+       */
+      document.addEventListener('click', (event) => {
+        if (event.target?.closest?.('#calc-view')) {
+          scheduleCurrentCalculatorStateSave();
+        }
+      }, true);
+
+      document.addEventListener('change', (event) => {
+        if (event.target?.closest?.('#calc-view')) {
+          scheduleCurrentCalculatorStateSave();
+        }
+      }, true);
+
+      document.addEventListener('input', (event) => {
+        if (event.target?.closest?.('#calc-view')) {
+          scheduleCurrentCalculatorStateSave();
+        }
+      }, true);
+
+      /*
+       * 버튼 클릭 이외에 코드로 직접 변경되는 state도 감지하기 위한 보조 확인.
+       */
+      setInterval(() => {
+        if (!restoreFinished || !isCalculatorViewVisible()) return;
+
+        try {
+          const currentJson = JSON.stringify(buildFrontPresetState());
+          if (currentJson !== lastSavedStateJson) {
+            dirty = true;
+            saveCurrentCalculatorState(false);
+          }
+        } catch (_) {}
+      }, CHECK_INTERVAL_MS);
+
+      /*
+       * 로그인 완료 및 계산기 화면 전환 후 자동 복원.
+       */
+      document.addEventListener('gsi:issued', () => {
+        restoreStarted = false;
+        restoreFinished = false;
+        lastSavedStateJson = '';
+        tryRestoreLastState();
+      });
+
+      const calcView = document.getElementById('calc-view');
+      if (calcView) {
+        new MutationObserver(() => {
+          if (calcView.hidden !== true) {
+            tryRestoreLastState();
+          }
+        }).observe(calcView, {
+          attributes: true,
+          attributeFilter: ['hidden']
+        });
+      }
+
+      /*
+       * 탭 종료·백그라운드 전환 전에 마지막 상태를 한 번 더 저장한다.
+       */
+      window.addEventListener('pagehide', () => {
+        saveCurrentCalculatorState(true);
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          saveCurrentCalculatorState(true);
+        }
+      });
+
+      window.addEventListener('pageshow', () => {
+        tryRestoreLastState();
+      });
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          tryRestoreLastState();
+        });
+      } else {
+        tryRestoreLastState();
+      }
+    })();
   </script>
 
 </body>
