@@ -1080,6 +1080,89 @@
       color: rgba(255,255,255,0.24);
     }
 
+
+    /* 광고 승인 전 임시 홍보 이미지 */
+    .temporary-promo-banner {
+      width: 100%;
+      height: auto;
+      min-height: 0;
+      display: block;
+      object-fit: contain;
+      object-position: center top;
+      border-radius: 11px;
+    }
+
+    .public-left-column-ad .temporary-promo-banner,
+    .public-right-column-ad .temporary-promo-banner {
+      flex: 0 0 auto;
+      width: 100%;
+      height: auto;
+      min-height: 0;
+      align-self: flex-start;
+    }
+
+    .public-left-column-ad {
+      gap: 10px;
+      padding-top: 0;
+    }
+
+    .public-right-column-ad {
+      padding-top: 0;
+    }
+
+    .public-left-column-ad .temporary-promo-banner:first-child,
+    .public-right-column-ad .temporary-promo-banner:first-child {
+      margin-top: 0;
+    }
+
+    /* 로그인 메인 하단 가로형 유튜브 홍보 배너 */
+    .login-bottom-promo {
+      width: 100%;
+      display: block;
+      margin-top: 16px;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid rgba(207, 162, 79, 0.38);
+      background: #0b0f16;
+      box-shadow:
+        0 10px 26px rgba(0, 0, 0, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    }
+
+    .login-bottom-promo img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* 최초 진입 팝업 홍보 이미지 */
+    .public-entry-ad-content.promo-image-mode {
+      min-height: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #080d17;
+    }
+
+    .public-entry-ad-content.promo-image-mode img {
+      width: 100%;
+      max-height: calc(92vh - 126px);
+      display: block;
+      object-fit: contain;
+      object-position: center;
+    }
+
+    @media (max-width: 980px) {
+      .login-bottom-promo {
+        margin-top: 12px;
+        border-radius: 10px;
+      }
+
+      .public-entry-ad-content.promo-image-mode img {
+        max-height: calc(90vh - 120px);
+      }
+    }
+
     /* 헤더의 세팅 현황 버튼 */
     .setting-status-header-btn {
       margin-left: 10px;
@@ -9514,6 +9597,11 @@
           </div>
         </div>
 
+        <!-- 광고 승인 전: 로그인 메인 하단 유튜브 홍보 배너 -->
+        <div class="login-bottom-promo" aria-label="게임실험연구소 유튜브 채널 홍보">
+          <img src="img/bottom.png" alt="게임실험연구소 유튜브 채널 홍보 배너" />
+        </div>
+
       </div>
 
       <!-- 메인 화면 최하단 정책 안내 -->
@@ -9526,12 +9614,9 @@
   <section id="calc-view" hidden>
     <section class="layout">
       <!-- 일반 로그인 사용자 전용: 새 1열 광고 영역 -->
-      <aside id="publicLeftColumnAd" class="public-left-column-ad" aria-label="광고 영역">
-        <div class="public-ad-label">ADVERTISEMENT</div>
-        <div class="public-ad-placeholder">
-          <span>광고 영역</span>
-          <small>AdSense 광고 코드는 승인 후 이 위치에 연결합니다.</small>
-        </div>
+      <aside id="publicLeftColumnAd" class="public-left-column-ad" aria-label="게임실험연구소 유튜브 채널 홍보">
+        <img class="temporary-promo-banner" src="img/left.png" alt="게임실험연구소 유튜브 채널 홍보 배너" />
+        <img class="temporary-promo-banner" src="img/left.png" alt="게임실험연구소 유튜브 채널 홍보 배너" />
       </aside>
 
       <div class="column left">
@@ -10100,12 +10185,8 @@
         </div>
 
         <!-- 일반 로그인 사용자 전용: PC 계산기 5열 광고 영역 -->
-        <div id="publicRightColumnAd" class="public-right-column-ad" aria-label="광고 영역">
-          <div class="public-ad-label">ADVERTISEMENT</div>
-          <div class="public-ad-placeholder">
-            <span>광고 영역</span>
-            <small>AdSense 광고 코드는 승인 후 이 위치에 연결합니다.</small>
-          </div>
+        <div id="publicRightColumnAd" class="public-right-column-ad" aria-label="계산기 연구원 가입 홍보">
+          <img class="temporary-promo-banner" src="img/right.png" alt="계산기 연구원 가입 홍보 배너" />
         </div>
       </aside>
 
@@ -10117,11 +10198,10 @@
     <div class="public-entry-ad-backdrop"></div>
     <div class="public-entry-ad-dialog" role="dialog" aria-modal="true" aria-labelledby="publicEntryAdTitle">
       <div class="public-entry-ad-head">
-        <span id="publicEntryAdTitle">ADVERTISEMENT</span>
+        <span id="publicEntryAdTitle">GAME LAB PROMOTION</span>
       </div>
-      <div id="publicEntryAdContent" class="public-entry-ad-content">
-        <span>팝업 광고 영역</span>
-        <small>AdSense 광고 코드는 승인 후 이 위치에 연결합니다.</small>
+      <div id="publicEntryAdContent" class="public-entry-ad-content promo-image-mode">
+        <img src="img/popup.png" alt="게임실험연구소 홍보 팝업" />
       </div>
       <div class="public-entry-ad-actions">
         <button id="btnPublicAdHideToday" type="button">오늘 다시 보지 않기</button>
