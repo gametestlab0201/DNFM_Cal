@@ -5,6 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="naver-site-verification" content="680b130ec4f9b3289e87133cd10464a98eebf9fd" />
+    <meta name="google-adsense-account"
+        content="ca-pub-5885176179413133" />
 
   <link rel="icon" type="image/png" href="img/gametestlab.png?v=20260530">
   <link rel="shortcut icon" type="image/png" href="img/gametestlab.png?v=20260530">
@@ -968,6 +970,231 @@
 
     .save-box .preset-btn:hover {
       background: rgba(255, 255, 255, 0.2);
+    }
+
+
+    /* 일반 로그인 사용자: 저장슬롯 대신 표시되는 안내 */
+    .public-save-notice {
+      display: none;
+      width: 100%;
+      min-height: 72px;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(250, 204, 107, 0.35);
+      background: rgba(250, 204, 107, 0.07);
+      color: #e5e7eb;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .public-save-notice strong {
+      display: block;
+      color: #ffe8a3;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    body.access-public .save-box .preset-slot,
+    body.access-public .save-box .preset-page-btn,
+    body.access-public .save-box .preset-page-ind {
+      display: none !important;
+    }
+
+    body.access-public .save-box .public-save-notice {
+      display: flex;
+    }
+
+    .public-ad-slot {
+      display: none;
+    }
+
+    body.access-public .public-ad-slot {
+      display: block;
+    }
+
+    /* =========================================================
+       일반 로그인 사용자 전용 PC 5열 광고
+       - 등록 사용자는 기존 5열(stats-panel)을 그대로 사용
+       - 일반 사용자는 기존 5열 내용을 숨기고 광고 영역으로 교체
+       ========================================================= */
+    .public-right-column-ad {
+      display: none;
+      min-height: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    body.access-public.pc .stats > .stats-panel {
+      display: none !important;
+    }
+
+    body.access-public.pc .stats > .public-right-column-ad {
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.access-member .stats > .public-right-column-ad {
+      display: none !important;
+    }
+
+    .public-ad-label {
+      flex: 0 0 auto;
+      color: rgba(255,255,255,0.38);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-align: center;
+      padding: 2px 0 8px;
+    }
+
+    .public-ad-placeholder {
+      flex: 1 1 auto;
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,0.16);
+      background: rgba(0,0,0,0.12);
+      color: rgba(255,255,255,0.34);
+      text-align: center;
+      padding: 16px;
+    }
+
+    .public-ad-placeholder span {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .public-ad-placeholder small {
+      max-width: 210px;
+      font-size: 10px;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.24);
+    }
+
+    /* 헤더의 세팅 현황 버튼 */
+    .setting-status-header-btn {
+      margin-left: 10px;
+      min-height: 28px;
+      padding: 0 10px !important;
+      border-radius: 999px !important;
+      line-height: 1 !important;
+    }
+
+    /* 일반 사용자 전용 최초 진입 팝업 광고 */
+    .public-entry-ad-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .public-entry-ad-modal.show {
+      display: flex;
+    }
+
+    .public-entry-ad-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.76);
+      backdrop-filter: blur(3px);
+    }
+
+    .public-entry-ad-dialog {
+      position: relative;
+      z-index: 1;
+      width: min(520px, 94vw);
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: #151922;
+      box-shadow: 0 22px 70px rgba(0,0,0,0.62);
+    }
+
+    .public-entry-ad-head {
+      flex: 0 0 auto;
+      padding: 10px 14px;
+      text-align: center;
+      color: rgba(255,255,255,0.42);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+    }
+
+    .public-entry-ad-content {
+      min-height: 360px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 18px;
+      color: rgba(255,255,255,0.40);
+      text-align: center;
+      background: rgba(0,0,0,0.12);
+    }
+
+    .public-entry-ad-content span {
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .public-entry-ad-content small {
+      font-size: 11px;
+      color: rgba(255,255,255,0.28);
+    }
+
+    .public-entry-ad-actions {
+      flex: 0 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid rgba(255,255,255,0.09);
+    }
+
+    .public-entry-ad-actions button {
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.07);
+      color: #e5e7eb;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .public-entry-ad-actions button:hover {
+      background: rgba(255,255,255,0.12);
+    }
+
+    #btnPublicAdClose {
+      border-color: rgba(250,204,107,0.42);
+      color: #ffe8a3;
+      background: rgba(250,204,107,0.10);
+    }
+
+    @media (max-width: 980px) {
+      .public-entry-ad-content {
+        min-height: 300px;
+      }
+      .setting-status-header-btn .contact-label {
+        font-size: 10px;
+      }
     }
 
     /* 저장 슬롯 상태 표시 */
@@ -2829,7 +3056,7 @@
       border: none;
       background: transparent;
       color: #c7b589;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       letter-spacing: -0.02em;
       text-align: left;
@@ -5205,17 +5432,27 @@
       font-weight: 600;
     }
 
-    /* ✅ 캐릭터 카드 안 우측 상단 솔플/파티 토글 */
+    /* ✅ 캐릭터 카드 상단: 좌측 솔플/파티, 우측 초기화 */
     .character-card {
       position: relative;
     }
 
-    .solo-party-overlay {
+    .solo-party-overlay,
+    .calculator-reset-overlay {
       position: absolute;
       top: 10px;
-      right: 10px;
       z-index: 3;
       pointer-events: none;
+    }
+
+    .solo-party-overlay {
+      left: 10px;
+      right: auto;
+    }
+
+    .calculator-reset-overlay {
+      right: 10px;
+      left: auto;
     }
 
     .solo-party-overlay #soloPartyToggle {
@@ -5225,6 +5462,31 @@
       font-size: 12px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
       backdrop-filter: blur(4px);
+    }
+
+    #btnCalculatorReset {
+      pointer-events: auto;
+      height: 30px;
+      min-width: 66px;
+      padding: 0 12px;
+      border: 1px solid rgba(248, 113, 113, 0.62);
+      border-radius: 9px;
+      background: linear-gradient(180deg, rgba(127, 29, 29, 0.92), rgba(69, 10, 10, 0.94));
+      color: #fee2e2;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(4px);
+    }
+
+    #btnCalculatorReset:hover {
+      filter: brightness(1.12);
+      border-color: rgba(252, 165, 165, 0.9);
+    }
+
+    #btnCalculatorReset:active {
+      transform: translateY(1px);
     }
 
     .armor-toggle.mode-solo {
@@ -5502,6 +5764,28 @@
       overflow: hidden;
       text-overflow: ellipsis;
       pointer-events: none;
+    }
+
+
+
+    /* 칭호 엠블렘 속성 텍스트: 엠블렘 아래가 아닌 오른쪽에 배치 */
+    .title-emblem-stack {
+      flex-direction: row !important;
+      gap: 5px !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    .title-emblem-stack .emblem-caption {
+      margin-top: 0 !important;
+      margin-right: 0 !important;
+      max-width: 42px !important;
+      min-width: 18px;
+      text-align: left !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      white-space: nowrap !important;
+      line-height: 1 !important;
     }
 
     /* === Seal text captions inside slots === */
@@ -6547,6 +6831,11 @@
       min-height: 0 !important;
       margin: 0 !important;
       padding: 0 !important;
+    }
+
+    /* 정책 링크는 메인 화면에서만 표시 */
+    body:is(.pc, .mobile) .site-policy-footer {
+      display: none !important;
     }
 
     /* 2) .shell은 컨테이너 박스 제거(자식만 흐르게) */
@@ -8297,7 +8586,588 @@
       }
     }
 
-  </style>
+
+    /* ===== 사이트 정책 링크 ===== */
+    .site-policy-footer {
+      width: 100%;
+      padding: 18px 16px 24px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      background: rgba(9,12,18,.94);
+      color: #8f98a8;
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .site-policy-link {
+      display: inline-block;
+      margin-bottom: 6px;
+      color: #cbd5e1;
+      text-decoration: none;
+    }
+    .site-policy-link:hover,
+    .site-policy-link:focus-visible {
+      color: #ffe19a;
+      text-decoration: underline;
+      outline: none;
+    }
+    .site-policy-copy { color: #70798a; }
+
+    @media (max-width: 640px) {
+      /* 모바일 메인에서는 별도 꼬릿말처럼 띄우지 않고 본문 흐름 안에 표시 */
+      #main-view .site-policy-footer {
+        width: auto;
+        margin: 14px 0 0;
+        padding: 10px 4px 4px;
+        border-top: 1px solid rgba(255,255,255,.06);
+        background: transparent;
+        font-size: 10px;
+        line-height: 1.55;
+      }
+
+      #main-view .site-policy-link {
+        margin-bottom: 3px;
+      }
+    }
+
+  
+
+    /* =========================================================
+       PC 계산기 헤더 메뉴 정렬 보정
+       - 제목과 메뉴가 한 줄에서 안정적으로 유지되도록 구성
+       - 각 메뉴의 기존 제각각 margin/padding을 통일
+       ========================================================= */
+    .shell > header {
+      min-height: 0;
+      gap: 12px;
+      padding: 12px 18px;
+    }
+
+    .shell > header > .title {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 7px;
+      overflow: hidden;
+    }
+
+    .shell > header > .title .logo-box {
+      flex: 0 0 24px;
+    }
+
+    .shell > header > .title h1 {
+      flex: 0 1 auto;
+      min-width: 0;
+      margin-right: 6px;
+      font-size: clamp(12px, 1.05vw, 16px);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 문의 / Q&A / 한마디 / 내 이용 정보 / 세팅 현황 공통 */
+    .shell > header > .title .contact-btn,
+    .shell > header > .title .faq-btn,
+    .shell > header > .title .one-liner-edit-btn,
+    .shell > header > .title .setting-status-header-btn {
+      flex: 0 0 auto;
+      width: auto !important;
+      min-width: 0 !important;
+      min-height: 24px;
+      height: 24px;
+      margin: 0 !important;
+      padding: 0 7px !important;
+      gap: 4px;
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 8px !important;
+      background: rgba(255,255,255,0.045);
+      line-height: 1 !important;
+      white-space: nowrap;
+      box-shadow: none;
+    }
+
+    .shell > header > .title .contact-btn:hover,
+    .shell > header > .title .faq-btn:hover,
+    .shell > header > .title .one-liner-edit-btn:hover {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(255,255,255,0.24);
+    }
+
+    .shell > header > .title .contact-btn svg {
+      flex: 0 0 auto;
+      width: 14px;
+      height: 14px;
+    }
+
+    .shell > header > .title .contact-btn .contact-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    /* 세팅 현황은 다른 메뉴보다 살짝만 강조하되 폭은 짧게 유지 */
+    .shell > header > .title #btnOpenSettingStatusInline.setting-status-header-btn {
+      max-width: 82px;
+      height: 22px;
+      min-height: 22px;
+      padding: 0 7px !important;
+      border-color: rgba(207,162,79,0.58);
+      background: rgba(207,162,79,0.11);
+      color: #ffe8a3;
+    }
+
+    .shell > header > .title #btnOpenSettingStatusInline.setting-status-header-btn:hover:not(:disabled) {
+      border-color: rgba(250,204,107,0.82);
+      background: rgba(207,162,79,0.19);
+      transform: none;
+      filter: none;
+      box-shadow: none;
+    }
+
+    .shell > header > .title #btnOpenSettingStatusInline.setting-status-header-btn:disabled {
+      opacity: .48;
+    }
+
+    .shell > header > .actions {
+      flex: 0 0 auto;
+      margin-left: auto;
+    }
+
+    /* 폭이 줄어드는 PC 구간에서는 메뉴를 조금 더 압축 */
+    @media (max-width: 1320px) and (min-width: 981px) {
+      .shell > header {
+        padding: 12px 18px;
+        gap: 8px;
+      }
+
+      .shell > header > .title {
+        gap: 4px;
+      }
+
+      .shell > header > .title h1 {
+        max-width: 220px;
+        margin-right: 2px;
+        font-size: 13px;
+      }
+
+      .shell > header > .title .contact-btn,
+      .shell > header > .title .faq-btn,
+      .shell > header > .title .one-liner-edit-btn,
+      .shell > header > .title .setting-status-header-btn {
+        height: 23px;
+        min-height: 23px;
+        padding: 0 6px !important;
+      }
+
+      .shell > header > .title .contact-btn .contact-label {
+        font-size: 10px;
+      }
+
+      .shell > header > .title .contact-btn svg {
+        width: 13px;
+        height: 13px;
+      }
+
+      .shell > header > .title #btnOpenSettingStatusInline.setting-status-header-btn {
+        max-width: 72px;
+        height: 21px;
+        min-height: 21px;
+      }
+    }
+
+
+
+
+
+    /* PC 헤더: 라이브 사이트의 기존 한마디 영역 폭으로 복구 */
+    @media (min-width: 981px) {
+      .shell > header .header-ads,
+      header .header-ads {
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+        max-width: 40vw;
+        margin-left: auto;
+        margin-right: 40px;
+        overflow: hidden;
+      }
+
+      .shell > header .header-ads .ad-text,
+      header .header-ads .ad-text {
+        max-width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+    }
+
+
+
+
+
+    /* PC 헤더 한마디: 확보된 영역을 5열 방향까지 실제로 사용 */
+    @media (min-width: 981px) {
+      .shell > header .header-ads,
+      header .header-ads {
+        flex: 0 1 40vw !important;
+        width: 40vw !important;
+        max-width: 40vw !important;
+        min-width: 0 !important;
+        justify-content: flex-end !important;
+      }
+
+      .shell > header .header-ads .ad-text,
+      header .header-ads .ad-text {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        text-align: right !important;
+      }
+
+      .shell > header .header-ads .line,
+      header .header-ads .line,
+      .shell > header .header-ads .hdrmsg,
+      header .header-ads .hdrmsg {
+        justify-content: flex-end !important;
+        max-width: 100% !important;
+      }
+    }
+
+    /* 로그인 후 세팅 현황 헤더 버튼 높이 안전 고정 */
+    @media (min-width: 981px) {
+      .shell > header > .title #btnOpenSettingStatusInline.setting-status-header-btn {
+        width: auto !important;
+        max-width: 82px !important;
+        height: 22px !important;
+        min-height: 22px !important;
+        max-height: 22px !important;
+        margin: 0 !important;
+        padding: 0 7px !important;
+      }
+    }
+
+
+    
+
+
+    
+
+
+    /* =========================================================
+       일반 로그인 사용자 전용 PC 6열 레이아웃
+       - 등록 사용자(access-member)는 기존 5열 구조를 전혀 변경하지 않음
+       - 일반 사용자(access-public)만 새 1열 광고를 추가
+       - 기존 1~5열은 각각 2~6열로 이동
+       ========================================================= */
+    .public-left-column-ad {
+      display: none;
+      grid-area: public-left-ad;
+      min-width: 0;
+      min-height: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    @media (min-width: 981px) {
+      body.access-public.pc .layout {
+        /* 새 광고열 / 기존 왼쪽 / 캐릭터 / 기존 오른쪽 / 옵션 / 기존 5열 광고 */
+        grid-template-columns:
+          minmax(150px, 1fr)
+          255px
+          minmax(250px, 27vw)
+          255px
+          280px
+          280px !important;
+        grid-template-areas:
+          "public-left-ad left char right options stats"
+          "public-left-ad save save right options stats" !important;
+        column-gap: 10px !important;
+      }
+
+      body.access-public.pc .public-left-column-ad {
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* 2·3열, 3·4열, 4·5열 사이를 모두 동일한 10px로 맞춤 */
+      body.access-public.pc .layout > .column.left,
+      body.access-public.pc .layout > .center,
+      body.access-public.pc .layout > .column.right,
+      body.access-public.pc .layout > .column.options {
+        min-width: 0 !important;
+        max-width: none !important;
+        justify-self: stretch !important;
+      }
+
+      body.access-public.pc .layout > .column.left,
+      body.access-public.pc .layout > .column.right {
+        width: 255px !important;
+      }
+
+      body.access-public.pc .layout > .center,
+      body.access-public.pc .layout > .column.options {
+        width: 100% !important;
+      }
+
+      body.access-member .public-left-column-ad {
+        display: none !important;
+      }
+
+      /* 일반 사용자에서만 캐릭터 열의 불필요한 좌우 여백 축소 */
+      body.access-public.pc .layout > .center {
+        min-width: 0;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+
+      body.access-public.pc .center .center-top-row,
+      body.access-public.pc .center .auto-box-wide,
+      body.access-public.pc .center .mini-bar,
+      body.access-public.pc .center .save-box {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+      }
+
+      /* 칭호 영역: 위쪽 엠블렘 / 아래쪽 마법부여, 칭호 슬롯은 오른쪽 */
+      body.access-public.pc .center .mini-bar .mini-cell {
+        display: grid !important;
+        grid-template-columns: clamp(52px, 8vh, 96px) auto !important;
+        grid-template-rows: 32px 32px !important;
+        column-gap: 5px !important;
+        row-gap: 5px !important;
+        align-items: center !important;
+      }
+
+      body.access-public.pc .center .mini-bar .mini-cell > .emblem-stack {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        align-self: center !important;
+        justify-self: center !important;
+      }
+
+      body.access-public.pc .center .mini-bar .mini-cell > .outer-rects {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+        display: flex !important;
+        width: clamp(52px, 8vh, 96px) !important;
+        height: 32px !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+
+      body.access-public.pc .center .mini-bar .mini-cell > .outer-rects .rect {
+        width: clamp(52px, 8vh, 96px) !important;
+        min-width: clamp(52px, 8vh, 96px) !important;
+        height: clamp(18px, 3vh, 28px) !important;
+        min-height: clamp(18px, 3vh, 28px) !important;
+        padding: 0 4px !important;
+        font-size: 10px !important;
+        line-height: 1.15 !important;
+        white-space: nowrap !important;
+      }
+
+      body.access-public.pc .center .mini-bar .mini-cell > .slot.mini[data-slot="C2"] {
+        grid-column: 2 !important;
+        grid-row: 1 / span 2 !important;
+      }
+
+      /* 중앙 하단 4개 슬롯 사이 간격도 일반 사용자에서만 조금 축소 */
+      body.access-public.pc .center .mini-bar {
+        gap: 5px !important;
+      }
+
+      body.access-public.pc .center .slot.mini {
+        width: clamp(58px, 8.5vh, 98px) !important;
+      }
+    }
+
+
+
+    /* =========================================================
+       일반 사용자 6열 추가 보정
+       1) 1열과 6열의 너비를 동일하게 맞춤
+       2) 칭호·오라·크리쳐·아티팩트 슬롯을 일반 슬롯 크기로 복원
+       ========================================================= */
+    @media (min-width: 981px) {
+      body.access-public.pc .layout {
+        grid-template-columns:
+          minmax(160px, 1fr)
+          255px
+          minmax(250px, 27vw)
+          255px
+          280px
+          minmax(160px, 1fr) !important;
+      }
+
+      /* 양끝 열이 콘텐츠 최소폭 때문에 서로 달라지지 않도록 보정 */
+      body.access-public.pc .layout > .public-left-column-ad,
+      body.access-public.pc .layout > .stats {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        justify-self: stretch !important;
+      }
+
+      /* 칭호·오라·크리쳐·아티팩트 선택 상자를 일반 장비 슬롯과 동일하게 복원 */
+      body.access-public.pc .center .mini-bar .slot.mini {
+        width: clamp(64px, 10vh, 120px) !important;
+        min-width: clamp(64px, 10vh, 120px) !important;
+        max-width: clamp(64px, 10vh, 120px) !important;
+        aspect-ratio: 1 / 1 !important;
+        height: auto !important;
+        flex: 0 0 auto !important;
+      }
+    }
+
+
+    /* =========================================================
+       일반 사용자 6열 후속 보정
+       - 1열·6열 높이를 2열 실제 높이와 동일하게 동기화
+       - 3열 하단 저장슬롯 대신 연구원 가입 안내 표시
+       - 등록 사용자 5열 및 저장슬롯에는 영향 없음
+       ========================================================= */
+    @media (min-width: 981px) {
+      body.access-public.pc .layout > .public-left-column-ad,
+      body.access-public.pc .layout > .stats {
+        align-self: start !important;
+        min-height: 0 !important;
+        height: var(--public-edge-column-height, auto) !important;
+        max-height: var(--public-edge-column-height, none) !important;
+        overflow: hidden !important;
+      }
+
+      body.access-public.pc .center .save-box {
+        min-height: 94px !important;
+        padding: 12px 18px !important;
+      }
+
+      body.access-public.pc .public-save-notice {
+        display: flex !important;
+        min-height: 70px !important;
+        padding: 10px 14px !important;
+      }
+
+      body.access-public.pc .public-join-card {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      body.access-public.pc .public-join-card strong {
+        margin: 0 !important;
+        color: #ffe8a3;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      body.access-public.pc .public-join-btn {
+        flex: 0 0 auto;
+        min-width: 84px;
+        height: 32px;
+        padding: 0 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        border: 1px solid rgba(250, 204, 107, 0.72);
+        background: linear-gradient(135deg, #facc6b, #cfa24f);
+        color: #1b1207;
+        font-size: 12px;
+        font-weight: 900;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,.28);
+      }
+
+      body.access-public.pc .public-join-btn:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+      }
+    }
+
+
+    /* =========================================================
+       일반 사용자 6열: 3열 높이 동기화만 유지
+       - 3열 높이를 2열 실제 높이와 동일하게 동기화
+       - 캐릭터·특수슬롯·가입안내 간격은 이전 값으로 복원
+       - 등록 사용자 5열에는 영향 없음
+       ========================================================= */
+    @media (min-width: 981px) {
+      body.access-public.pc .layout > .center {
+        align-self: start !important;
+        min-height: 0 !important;
+        height: var(--public-edge-column-height, auto) !important;
+        max-height: var(--public-edge-column-height, none) !important;
+        overflow: hidden !important;
+      }
+    }
+
+
+    /* 일반 사용자 6열: 가입 안내 칸만 소폭 축소 */
+    @media (min-width: 981px) {
+      body.access-public.pc .center .save-box {
+        min-height: 78px !important;
+        padding: 8px 14px !important;
+      }
+
+      body.access-public.pc .public-save-notice {
+        min-height: 56px !important;
+        padding: 7px 11px !important;
+      }
+
+      body.access-public.pc .public-join-card {
+        gap: 10px !important;
+      }
+
+      body.access-public.pc .public-join-card strong {
+        font-size: 13px !important;
+        line-height: 1.3 !important;
+      }
+
+      body.access-public.pc .public-join-btn {
+        min-width: 76px !important;
+        height: 28px !important;
+        padding: 0 13px !important;
+        font-size: 11px !important;
+      }
+    }
+
+
+    /* ===== 모바일 메인: 헤더 고정, 본문만 스크롤 =====
+       로그인 전 메인 화면에만 적용하며 계산기 화면에는 영향 없음 */
+    @media (max-width: 980px) {
+      body:not(.pc):not(.mobile) .shell {
+        height: auto !important;
+        min-height: 100dvh !important;
+        grid-template-rows: auto auto !important;
+        overflow: visible !important;
+      }
+
+      body:not(.pc):not(.mobile) .shell > header {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000 !important;
+        flex: 0 0 auto !important;
+        background: rgba(15, 17, 21, 0.97) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+      }
+
+      body:not(.pc):not(.mobile) #main-view {
+        min-height: 0 !important;
+        overflow: visible !important;
+      }
+    }
+</style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <body>
@@ -8339,6 +9209,10 @@
         </button>
         <button id="btnMyUsageInfo" class="contact-btn faq-btn" type="button" title="내 이용 정보" style="display:none;">
           <span class="contact-label">내 이용 정보</span>
+        </button>
+        <button id="btnOpenSettingStatusInline" class="contact-btn faq-btn setting-status-header-btn" type="button"
+          title="캐릭터 전체 세팅 현황" style="display:none;" disabled>
+          <span class="contact-label">세팅 현황</span>
         </button>
       </div>
       <!--span 은 한줄에서 특별히 강조 할때 쓴다. div는 한줄이 강제로 나뉘기때문에 쓴다.-->
@@ -8407,7 +9281,7 @@
             <div class="login-card">
               <div class="login-title">계산기 접근을 위해 구글 계정으로 로그인</div>
               <div class="login-desc">
-                허용된 계정만 접근 가능합니다. 로그인 후 자동으로 권한을 확인합니다.
+                Google 로그인 후 누구나 계산기를 이용할 수 있습니다. 등록 계정은 광고 없이 저장 기능을 이용합니다.
               </div>
 
               <div class="login-row">
@@ -8428,11 +9302,26 @@
             </div>
           </div>
         </div>
+
+        <!-- 메인 본문 안의 정책 안내 -->
+        <footer class="site-policy-footer" aria-label="사이트 정책">
+          <a class="site-policy-link" href="/policy.html">개인정보처리방침 및 이용정책</a>
+          <div class="site-policy-copy">게임실험연구소 · 본 사이트는 비공식 팬 제작 도구이며 게임 제공사와 관련이 없습니다.</div>
+        </footer>
       </div>
   </div>
   </section>
   <section id="calc-view" hidden>
     <section class="layout">
+      <!-- 일반 로그인 사용자 전용: 새 1열 광고 영역 -->
+      <aside id="publicLeftColumnAd" class="public-left-column-ad" aria-label="광고 영역">
+        <div class="public-ad-label">ADVERTISEMENT</div>
+        <div class="public-ad-placeholder">
+          <span>광고 영역</span>
+          <small>AdSense 광고 코드는 승인 후 이 위치에 연결합니다.</small>
+        </div>
+      </aside>
+
       <div class="column left">
         <div class="auto-box">
           <h4>
@@ -8591,6 +9480,10 @@
               </div>
             </div>
 
+            <div class="calculator-reset-overlay">
+              <button id="btnCalculatorReset" type="button" aria-label="현재 계산기 설정 초기화">초기화</button>
+            </div>
+
             <img id="characterImg" class="character-img" alt="캐릭터" />
             <div id="characterGhost" class="character-ghost">클릭하여 캐릭터 선택</div>
             <!-- ✅ 전체 공개: 시너지 효과 설정 -->
@@ -8612,6 +9505,13 @@
           <div class="slot mini" data-slot="C4"><span class="slot-label">아티팩트</span></div>
         </div>
         <div class="save-box">
+          <div class="public-save-notice" id="publicSaveNotice">
+            <div class="public-join-card">
+              <strong>게임실험연구소 연구원으로 가입하고 더 많은 혜택을 누려보세요!</strong>
+              <a class="public-join-btn" href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join"
+                target="_blank" rel="noopener noreferrer">가입하기</a>
+            </div>
+          </div>
           <div class="preset-slot">
             <button type="button" class="preset-btn" data-slot="1">+</button>
             <button type="button" class="preset-trash" data-slot="1" aria-label="슬롯 1 초기화">🗑</button>
@@ -8971,10 +9871,6 @@
             <div id="statList" class="stat-list"></div>
           </div>
 
-          <button id="btnOpenSettingStatusInline" class="setting-status-inline-btn" type="button" disabled>
-            캐릭터 전체 세팅 현황
-          </button>
-
           <!-- ▼ 항상 맨 아래 행(3행 auto) -->
           <div class="final-damage">
             <div class="final-damage-top">
@@ -8990,11 +9886,38 @@
             <button id="btn-sum-all-final" type="button">계산하기</button>
           </div>
         </div>
+
+        <!-- 일반 로그인 사용자 전용: PC 계산기 5열 광고 영역 -->
+        <div id="publicRightColumnAd" class="public-right-column-ad" aria-label="광고 영역">
+          <div class="public-ad-label">ADVERTISEMENT</div>
+          <div class="public-ad-placeholder">
+            <span>광고 영역</span>
+            <small>AdSense 광고 코드는 승인 후 이 위치에 연결합니다.</small>
+          </div>
+        </div>
       </aside>
 
     </section>
   </section>
   </div>
+  <!-- 일반 로그인 사용자 전용: 계산기 최초 진입 팝업 광고 -->
+  <div id="publicEntryAdModal" class="public-entry-ad-modal" aria-hidden="true">
+    <div class="public-entry-ad-backdrop"></div>
+    <div class="public-entry-ad-dialog" role="dialog" aria-modal="true" aria-labelledby="publicEntryAdTitle">
+      <div class="public-entry-ad-head">
+        <span id="publicEntryAdTitle">ADVERTISEMENT</span>
+      </div>
+      <div id="publicEntryAdContent" class="public-entry-ad-content">
+        <span>팝업 광고 영역</span>
+        <small>AdSense 광고 코드는 승인 후 이 위치에 연결합니다.</small>
+      </div>
+      <div class="public-entry-ad-actions">
+        <button id="btnPublicAdHideToday" type="button">오늘 다시 보지 않기</button>
+        <button id="btnPublicAdClose" type="button">닫기</button>
+      </div>
+    </div>
+  </div>
+
   <!--ㅇ-->
   <div id="charModal" class="modal" aria-hidden="true">
     <div class="backdrop" data-close></div><!--모달 뒤 배경 검정, data-close 속성 붙은 요소 클릭하면 모달 닫힘-->
@@ -10407,6 +11330,8 @@
     </div>
   </div>
 
+
+
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
     window.WEBAPP_URL = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
@@ -10518,6 +11443,11 @@ window.__userRole = window.__userRole || {
   level: 0,
   label: '전임',
   presetSlots: 0,
+  accessTier: 'public',
+  isRegistered: false,
+  adsEnabled: true,
+  canUsePreset: false,
+  membershipExpired: false,
   canEditPhrase: false,
   canChangePhrase: false,
   phraseMessage: '',
@@ -10531,6 +11461,10 @@ window.__userRole = window.__userRole || {
     // 🔹 직책별 프리셋 사용 가능 최대 슬롯 수
     function getUserPresetLimit() {
       const info = window.__userRole || {};
+
+      if (info.canUsePreset === false || info.accessTier === 'public') {
+        return 0;
+      }
 
       // 1순위: 계산기목록 시트의 '슬롯' 컬럼 값
       if (typeof info.presetSlots === 'number' && info.presetSlots >= 0) {
@@ -10546,6 +11480,82 @@ window.__userRole = window.__userRole || {
       if (lvl === 1) return 1; // 선임
       return 0;                // 전임
     }
+
+    function applyCalculatorAccessUI(access) {
+      const tier = access?.accessTier === 'member' ? 'member' : 'public';
+      document.body.classList.toggle('access-member', tier === 'member');
+      document.body.classList.toggle('access-public', tier === 'public');
+
+      // 광고 실제 삽입은 AdSense 승인 후 이 이벤트를 받아 처리한다.
+      window.dispatchEvent(new CustomEvent('calculator-access-ready', {
+        detail: {
+          accessTier: tier,
+          adsEnabled: tier === 'public' && access?.adsEnabled !== false,
+          isRegistered: tier === 'member',
+        }
+      }));
+
+      // 계산기 화면이 이미 열린 상태에서 권한 판정이 끝난 경우 팝업 광고 확인
+      setTimeout(openPublicEntryAdIfNeeded, 0);
+    }
+
+    const PUBLIC_ENTRY_AD_HIDE_KEY = 'gamelab_public_entry_ad_hide_date';
+
+    function getLocalDateKey() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function shouldShowPublicEntryAd() {
+      const role = window.__userRole || {};
+      if (role.accessTier !== 'public' || role.adsEnabled === false) return false;
+      try {
+        return localStorage.getItem(PUBLIC_ENTRY_AD_HIDE_KEY) !== getLocalDateKey();
+      } catch (_) {
+        return true;
+      }
+    }
+
+    function openPublicEntryAdIfNeeded() {
+      const calc = document.getElementById('calc-view');
+      const modal = document.getElementById('publicEntryAdModal');
+      if (!calc || calc.hidden || calc.style.display === 'none' || !modal) return;
+      if (!shouldShowPublicEntryAd()) return;
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePublicEntryAd() {
+      const modal = document.getElementById('publicEntryAdModal');
+      if (!modal) return;
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function hidePublicEntryAdToday() {
+      try {
+        localStorage.setItem(PUBLIC_ENTRY_AD_HIDE_KEY, getLocalDateKey());
+      } catch (_) {}
+      closePublicEntryAd();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('btnPublicAdClose')?.addEventListener('click', closePublicEntryAd);
+      document.getElementById('btnPublicAdHideToday')?.addEventListener('click', hidePublicEntryAdToday);
+
+      // 광고 자체를 닫는 동작은 하단 버튼으로만 제공한다.
+      // 배경 클릭으로 실수로 닫히지 않게 유지한다.
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.getElementById('publicEntryAdModal')?.classList.contains('show')) {
+          closePublicEntryAd();
+        }
+      });
+    });
 
     async function loginPingOnce() {
   if (window.__loginPingSent && window.__loginPingResult) {
@@ -10582,6 +11592,11 @@ window.__userRole = window.__userRole || {
         level: lvl,
         label,
         presetSlots: slots,
+        accessTier: data.accessTier || (data.isRegistered ? 'member' : 'public'),
+        isRegistered: !!data.isRegistered,
+        adsEnabled: data.adsEnabled !== false,
+        canUsePreset: !!data.canUsePreset,
+        membershipExpired: !!data.membershipExpired,
 
         // ✅ 한마디 변경 기능
         canEditPhrase: !!data.canEditPhrase,
@@ -10599,6 +11614,8 @@ window.__userRole = window.__userRole || {
         specialUser: !!data.specialUser,
         researchUser: !!data.researchUser,
       };
+
+      applyCalculatorAccessUI(window.__userRole);
 
       // 🔹 프리셋 버튼 권한 UI 갱신
       if (typeof updatePresetButtonsUI === 'function') {
@@ -10629,6 +11646,11 @@ window.__userRole = window.__userRole || {
         level: 0,
         label: '',
         presetSlots: 0,
+        accessTier: 'public',
+        isRegistered: false,
+        adsEnabled: true,
+        canUsePreset: false,
+        membershipExpired: false,
         canEditPhrase: false,
         canChangePhrase: false,
         phraseMessage: '',
@@ -10638,6 +11660,8 @@ window.__userRole = window.__userRole || {
         phraseNickname: '',
         canSetPhraseNickname: false,
       };
+
+      applyCalculatorAccessUI(window.__userRole);
 
       const contactBtn = document.getElementById('btnContactAdmin');
       if (contactBtn) {
@@ -21898,7 +22922,7 @@ try {
             if (btns[1]) btns[1].remove(); // 아래 버튼 제거
           }
           const stack = document.createElement('div');
-          stack.className = 'emblem-stack';
+          stack.className = 'emblem-stack title-emblem-stack';
           const dot = document.createElement('button'); dot.type = 'button'; dot.className = 'emblem-dot empty';
           dot.setAttribute('data-slot', 'title'); dot.setAttribute('data-sock', '0');
           dot.onclick = (e) => { e.stopPropagation(); openEmblemPicker('title', 0); };
@@ -25799,6 +26823,10 @@ try {
     // 1회 클릭: 현재 저장 슬롯 관리 모달 안에서 프리셋명/메모 입력 영역을 펼침
     // 입력 후 클릭: 현재 프론트 state 전체를 KV 프리셋으로 저장
     function handlePresetSave() {
+      if (window.__userRole?.canUsePreset === false || window.__userRole?.accessTier === 'public') {
+        alert('저장 슬롯은 게임실험연구소 등록 계정에 제공됩니다.');
+        return;
+      }
       if (isPresetInlineSaveOpen()) {
         handlePresetSaveConfirm();
         return;
@@ -25807,6 +26835,10 @@ try {
     }
 
     async function handlePresetSaveConfirm() {
+      if (window.__userRole?.canUsePreset === false || window.__userRole?.accessTier === 'public') {
+        alert('저장 슬롯은 게임실험연구소 등록 계정에 제공됩니다.');
+        return;
+      }
       const slot = presetSlots.currentSlot;
       if (!slot) return;
 
@@ -25877,6 +26909,10 @@ try {
 
     // "불러오기" 버튼 → KV에 저장된 프론트 state 프리셋을 불러와 적용
     async function handlePresetLoad() {
+      if (window.__userRole?.canUsePreset === false || window.__userRole?.accessTier === 'public') {
+        alert('저장 슬롯은 게임실험연구소 등록 계정에 제공됩니다.');
+        return;
+      }
       const slot = presetSlots.currentSlot;
       if (!slot) return;
 
@@ -26049,6 +27085,10 @@ try {
     // "초기화" → 해당 슬롯의 프리셋 삭제
     // 현재 선택된 프리셋 슬롯의 저장된 스펙을 초기화
     async function handlePresetClear() {
+      if (window.__userRole?.canUsePreset === false || window.__userRole?.accessTier === 'public') {
+        alert('저장 슬롯은 게임실험연구소 등록 계정에 제공됩니다.');
+        return;
+      }
       const slot = presetSlots.currentSlot;
       if (!slot) return;
 
@@ -29373,10 +30413,17 @@ wrap.appendChild(listBox);
       const DBSkill = { loaded: false, headers: [], rows: [] }; // 스킬 로딩 상태 저장용(원하는 네이밍 사용)
 
       function openSettingStatusPage() {
+        const role = window.__userRole || {};
+        if (role.accessTier !== 'member' || role.isRegistered !== true) {
+          alert('세팅 현황은 게임실험연구소 등록 이용자만 사용할 수 있습니다.');
+          return false;
+        }
+
         const token = window.idToken || getStoredIdToken();
         if (token) rememberIdToken(token);
         sessionStorage.setItem('return_to_calculator', 'pc');
         location.href = 'setting-analyzer/index.html';
+        return true;
       }
       window.openSettingStatusPage = openSettingStatusPage;
 
@@ -29391,13 +30438,17 @@ wrap.appendChild(listBox);
         const btn = document.getElementById('btnOpenSettingStatusInline');
         if (!btn) return;
 
-        // ✅ 계산기 내부 "캐릭터 전체 세팅 현황" 버튼은 로그인 허용 유저 전체에게 노출
-        // special_user / research_user 전용이 아니라, login_ping이 ok인 일반 이용자도 사용 가능하다.
-        const ping = window.__loginPingResult || {};
+        // 계산기 내부 세팅 현황 버튼은 계산기목록에 등록된 이용자에게만 노출한다.
         const role = window.__userRole || {};
-        const canOpen = !!(ping.ok || role.isLoggedIn);
+        const canOpen = !!(
+          role.isLoggedIn &&
+          role.accessTier === 'member' &&
+          role.isRegistered === true
+        );
 
-        btn.classList.add('setting-status-inline-btn');
+        // 헤더 버튼에는 과거 5열 내부 버튼용 클래스를 사용하지 않는다.
+        // 해당 클래스에는 height:36px !important가 있어 로그인 후 헤더 높이를 키운다.
+        btn.classList.remove('setting-status-inline-btn');
         btn.style.display = canOpen ? 'inline-flex' : 'none';
         btn.disabled = !canOpen;
 
@@ -29461,6 +30512,7 @@ wrap.appendChild(listBox);
           }
           .mode-btn:hover{ border-color:#6ea8ff; box-shadow:0 0 0 2px rgba(110,168,255,.25) inset; }
           .mode-btn:disabled{ opacity:.5; cursor:not-allowed; filter: grayscale(30%); }
+          .setting-analyzer-btn:disabled{ opacity:.38; }
           .login-desc a.join-link{ color:#8fbaff; text-decoration: underline; }
         `;
         document.head.appendChild(style);
@@ -29567,11 +30619,22 @@ wrap.appendChild(listBox);
             if (allowed) {
               btnCalcOpen?.removeAttribute("disabled");
 
-              // ✅ 세팅현황 버튼은 로그인 허용 유저 전체에게 노출/활성화
+              // 세팅 현황은 계산기목록에 등록된 이용자에게만 활성화한다.
+              const canUseSettingStatus = !!(
+                window.__userRole?.accessTier === 'member' &&
+                window.__userRole?.isRegistered === true
+              );
+
               if (btnSettingAnalyzer) {
                 btnSettingAnalyzer.style.display = 'inline-flex';
-                btnSettingAnalyzer.removeAttribute('disabled');
-                btnSettingAnalyzer.addEventListener('click', openSettingStatusPage);
+                btnSettingAnalyzer.disabled = !canUseSettingStatus;
+                btnSettingAnalyzer.title = canUseSettingStatus
+                  ? '세팅 현황 열기'
+                  : '세팅 현황은 등록 이용자만 사용할 수 있습니다.';
+
+                if (canUseSettingStatus) {
+                  btnSettingAnalyzer.addEventListener('click', openSettingStatusPage);
+                }
               }
 
               // 한 번만 부팅되도록 가드
@@ -29732,7 +30795,7 @@ wrap.appendChild(listBox);
             card2.innerHTML = `
               <div class="login-title">계산기 접근을 위해 구글 계정으로 로그인</div>
               <div class="login-desc">
-                허용된 계정만 접근 가능합니다. 로그인 후 자동으로 권한을 확인합니다.
+                Google 로그인 후 누구나 계산기를 이용할 수 있습니다. 등록 계정은 광고 없이 저장 기능을 이용합니다.
               </div>
               <div class="login-row">
                 <div id="g_id_onload"
@@ -30154,6 +31217,9 @@ return `
             calcInited = true;
           }
           window.scrollTo(0, 0);
+
+          // 일반 로그인 사용자는 계산기 최초 진입 시 팝업 광고 표시
+          setTimeout(openPublicEntryAdIfNeeded, 0);
         };
       }
 
@@ -30393,11 +31459,361 @@ return `
     });
 
 
+
+
+
   </script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516"
     integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg=="
     data-cf-beacon='{"version":"2024.11.0","token":"c7dcf750b4f043ad8354df3dacbe9a19","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
     crossorigin="anonymous"></script>
+
+<script>
+(() => {
+  let publicEdgeResizeObserver = null;
+
+  function syncPublicEdgeColumnHeight() {
+    const body = document.body;
+    const layout = document.querySelector('#calc-view .layout');
+    const secondColumn = layout?.querySelector(':scope > .column.left');
+
+    if (!body?.classList.contains('access-public') ||
+        !body.classList.contains('pc') ||
+        window.innerWidth < 981 ||
+        !layout || !secondColumn) {
+      layout?.style.removeProperty('--public-edge-column-height');
+      return;
+    }
+
+    const height = Math.ceil(secondColumn.getBoundingClientRect().height);
+    if (height > 0) {
+      layout.style.setProperty('--public-edge-column-height', `${height}px`);
+    }
+  }
+
+  function bindPublicEdgeHeightSync() {
+    const secondColumn = document.querySelector('#calc-view .layout > .column.left');
+    if (!secondColumn) return;
+
+    publicEdgeResizeObserver?.disconnect();
+    publicEdgeResizeObserver = new ResizeObserver(syncPublicEdgeColumnHeight);
+    publicEdgeResizeObserver.observe(secondColumn);
+    syncPublicEdgeColumnHeight();
+  }
+
+  window.addEventListener('calculator-access-ready', () => {
+    requestAnimationFrame(() => {
+      bindPublicEdgeHeightSync();
+      syncPublicEdgeColumnHeight();
+    });
+  });
+
+  window.addEventListener('resize', syncPublicEdgeColumnHeight);
+  window.addEventListener('load', bindPublicEdgeHeightSync);
+})();
+</script>
+
+  <script>
+    // ✅ 현재 계산기 작업 초기화
+    // - 페이지 이동/새로고침 없음
+    // - 로그인과 접근 등급 유지
+    // - 저장 슬롯 데이터는 삭제하지 않음
+    // - 캐릭터와 모든 장비 선택 상자만 '미선택' 상태로 복원
+    function clearCurrentCalculatorSelections() {
+      const s = window.state || (window.state = {});
+
+      // 1) 캐릭터·장비·세부 설정 상태를 모두 비운다.
+      s.currentCharacter = {
+        jobGroup: null,
+        jobGroupLabel: null,
+        name: null,
+        imgSrc: null,
+        power: null,
+        sp: 0,
+        tp: 0,
+        base: null,
+      };
+      s.selections = {};
+      s.equip = {};
+      s.equips = {};
+      s.enh = {};
+      s.seals = {};
+      s.enchants = {};
+      s.emblems = {};
+      s.customOptions = {};
+      s.customSkills = {};
+      s.customOptLabel = null;
+      s.customArmor = { type: '' };
+      s.customBracelet = { type: '' };
+      s.customEarring = { type: '' };
+      s.customArmorLabel = null;
+      s.customBraceletLabel = null;
+      s.customEarringLabel = null;
+      s.CurrentSumStats = null;
+      s.SumBuckets = null;
+      s.currentSlotKey = null;
+
+      // 1-1) 스킬룬 설정 전체 초기화
+      // 일반 스킬룬(각성/마력/허상/숙련/기교)과 특수 룬을 모두 0으로 되돌린다.
+      const resetRuneLevels = [15, 20, 25, 30, 35, 40, 45, 65];
+      const resetRuneCats = ['awakening', 'magic', 'illusion', 'training', 'technique'];
+      const resetRunes = {};
+      resetRuneCats.forEach((cat) => {
+        resetRunes[cat] = {};
+        resetRuneLevels.forEach((lv) => { resetRunes[cat][lv] = 0; });
+      });
+      s.runes = resetRunes;
+      s.skillrune = s.runes;
+      s.specialRunes = {
+        cooldown: 0,
+        skillDmg: 0,
+        gaho: 0,
+        jihe: 0,
+        waegok: 0,
+      };
+      s.runeEngrave = { name: null, level: null };
+
+      // 서버에서 예전 룬값을 다시 불러오지 않고, 현재 초기화된 상태를 기준으로 유지한다.
+      try { __runesLoaded = true; } catch (_) {}
+      try { __runesSnapshot = JSON.stringify(s.runes); } catch (_) {}
+
+      document.querySelectorAll('#runeModal .rune-select').forEach((sel) => {
+        sel.value = '0';
+      });
+      ['specialRune_cooldown', 'specialRune_skillDmg', 'specialRune_gaho', 'specialRune_jihe', 'specialRune_waegok']
+        .forEach((id) => {
+          const sel = document.getElementById(id);
+          if (sel) sel.value = '0';
+        });
+      const runeCountLabel = document.getElementById('runeCountLabel');
+      const runeCount = document.getElementById('runeCount');
+      if (runeCountLabel) runeCountLabel.textContent = '0';
+      if (runeCount) runeCount.textContent = '0';
+
+      const runeEngraveSel = document.getElementById('selRuneEngrave');
+      if (runeEngraveSel) {
+        const emptyOpt = Array.from(runeEngraveSel.options || []).find((opt) => !String(opt.value || '').trim());
+        if (emptyOpt) runeEngraveSel.value = '';
+        else runeEngraveSel.selectedIndex = 0;
+      }
+
+      // 1-2) 스킬트리 전체 초기화
+      // 현재 캐릭터가 해제되므로 캐릭터별 스킬 저장값과 전용 설정도 함께 비운다.
+      s.skillLv = {};
+      s.skillTpLv = {};
+      s.skillTrees = {};
+      s.skillDmg = {};
+      s.leveling = {};
+      s.skillChargeStage = {};
+      s.strikerExtremeChargeSkillId = null;
+      s._stOwnerKey = '';
+      s.stUsedSP = 0;
+      s.stUsedTP = 0;
+      s.sp = { total: 0, left: 0 };
+      s.tp = { total: 0, left: 0 };
+
+      // 캐릭터 전용 스킬트리 옵션도 최초값으로 되돌린다.
+      s.skillTreeBladePreset = '24와플';
+      s.skillTreeBrawlerDetonationPreset = '없음';
+      s.wildbaneTreePreset = 'A';
+      s.wildbaneCycleCount = 0;
+      s.wildbaneCycleEnabled = false;
+      s.windshearTreePreset = 'A';
+      s.windshearCycleCount = 0;
+      s.windshearCycleEnabled = false;
+
+      const bladePreset = document.getElementById('skillTreeBladePreset');
+      if (bladePreset) bladePreset.value = '24와플';
+      const brawlerPreset = document.getElementById('skillTreeBrawlerDetonationPreset');
+      if (brawlerPreset) brawlerPreset.value = '없음';
+      const skillTreeGrid = document.getElementById('skillTreeGrid')
+        || document.querySelector('#skillTreeModal .st-grid')
+        || document.querySelector('#skillTreeModal .skill-tree-grid');
+      if (skillTreeGrid) skillTreeGrid.innerHTML = '';
+
+      if (s.ui && typeof s.ui === 'object') {
+        s.ui.enhTargetSlot = null;
+        s.ui.enhTargetBtn = null;
+        s.ui.sealTemp = null;
+      }
+
+      // 2) 캐릭터 표시를 선택 전 상태로 복원
+      const charLabel = document.getElementById('charLabel');
+      if (charLabel) charLabel.textContent = '캐릭터 미선택';
+
+      const characterImg = document.getElementById('characterImg');
+      if (characterImg) {
+        characterImg.src = (typeof PLACEHOLDER_IMG !== 'undefined' ? PLACEHOLDER_IMG : '');
+        characterImg.style.display = 'none';
+      }
+
+      const characterGhost = document.getElementById('characterGhost');
+      if (characterGhost) characterGhost.style.display = '';
+
+      // 3) 각 장비 상자는 최초 HTML에 기록된 부위명으로 복원한다.
+      //    SLOT_BASE_LABELS는 페이지 시작 시 '무기/상의/하의...'를 백업한 객체다.
+      document.querySelectorAll('#calc-view .slot[data-slot]').forEach((slotEl) => {
+        const domKey = String(slotEl.dataset.slot || '');
+        const baseLabel =
+          (typeof SLOT_BASE_LABELS === 'object' && SLOT_BASE_LABELS && SLOT_BASE_LABELS[domKey])
+            ? SLOT_BASE_LABELS[domKey]
+            : (slotEl.dataset.baseLabel || '');
+
+        const labelEl = document.createElement('span');
+        labelEl.className = 'slot-label';
+        labelEl.textContent = baseLabel;
+
+        slotEl.innerHTML = '';
+        slotEl.appendChild(labelEl);
+        slotEl.classList.remove('selected', 'has-item', 'active');
+        slotEl.removeAttribute('title');
+      });
+
+      // 4) 강화·마봉·마법부여 버튼을 선택 전 문구로 복원한다.
+      document.querySelectorAll('#calc-view .slot-row').forEach((row) => {
+        const rects = row.querySelectorAll('.outer-rects .rect');
+        if (rects[0]) {
+          rects[0].textContent = '강화 설정';
+          rects[0].classList.remove('selected', 'active');
+        }
+        if (rects[1]) {
+          rects[1].textContent = '마봉 설정';
+          rects[1].classList.remove('selected', 'active');
+        }
+        if (rects[2] && !rects[2].hasAttribute('data-unused')) {
+          rects[2].textContent = '마법 부여';
+          rects[2].classList.remove('selected', 'active');
+        }
+
+        row.querySelectorAll('.seal-captions, .enh-caption, .enchant-caption').forEach((el) => el.remove());
+      });
+
+      // 5) 엠블렘 도트 상태와 이미지까지 완전히 제거한다.
+      //    refreshAllDots()는 state.emblems의 키만 순회하므로, state를 {}로 만든 뒤에는
+      //    기존 DOM에 남은 배경 이미지가 지워지지 않는다. 따라서 DOM을 직접 비운다.
+      document.querySelectorAll('#calc-view .emblem-dot').forEach((dot) => {
+        dot.innerHTML = '';
+        dot.classList.remove(
+          'selected', 'active', 'filled', 'has-emblem', 'has-img'
+        );
+        dot.classList.add('empty');
+        dot.style.removeProperty('--emblem');
+        dot.removeAttribute('title');
+
+        const cap = dot.nextElementSibling;
+        if (cap?.classList?.contains('emblem-caption')) {
+          cap.textContent = '';
+          cap.style.display = 'none';
+        }
+      });
+      document.querySelectorAll(
+        '#calc-view [data-emblem-slot], #calc-view .emblem-socket'
+      ).forEach((el) => {
+        el.classList.remove('selected', 'active', 'filled', 'has-emblem', 'has-img');
+        el.style.removeProperty('--emblem');
+        el.removeAttribute('title');
+      });
+
+      // 엠블렘 모달 내부에 남은 선택 표시도 함께 제거
+      document.querySelectorAll('#emblemModal .active, #emblemModal .selected, #autoEmblemModal .active, #autoEmblemModal .selected')
+        .forEach((el) => el.classList.remove('active', 'selected'));
+
+      // 6) 고유효과 상태와 버튼을 최초 문구로 완전히 복원
+      try { __customOptSelected = null; } catch (_) {}
+      try { __armorCustomOptSelected = null; } catch (_) {}
+      try { __braceletCustomOptSelected = null; } catch (_) {}
+      try { __earringCustomOptSelected = null; } catch (_) {}
+
+      const customButtonDefaults = {
+        btnCustomOpt: '고유효과(무기)',
+        btnCustomOptArmor: '고유효과(상의)',
+        btnCustomOptBracelet: '고유효과(팔찌)',
+        btnCustomOptEarring: '고유효과(귀걸이)',
+      };
+      const customButtonClassPrefixes = {
+        btnCustomOpt: ['customopt-'],
+        btnCustomOptArmor: ['armor-customopt-', 'customopt-'],
+        btnCustomOptBracelet: ['bracelet-customopt-', 'customopt-'],
+        btnCustomOptEarring: ['earring-customopt-', 'customopt-'],
+      };
+
+      Object.entries(customButtonDefaults).forEach(([id, label]) => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+
+        btn.textContent = label;
+        btn.classList.remove('selected', 'active');
+
+        const prefixes = customButtonClassPrefixes[id] || ['customopt-'];
+        Array.from(btn.classList).forEach((cls) => {
+          if (prefixes.some((prefix) => cls.startsWith(prefix))) {
+            btn.classList.remove(cls);
+          }
+        });
+      });
+
+      // 상의·팔찌·귀걸이는 무기와 서로 다른 색상 클래스 접두사를 사용한다.
+      // 상태를 비운 뒤 기존 공용 렌더 함수를 다시 실행해 텍스트와 색상을 최종 동기화한다.
+      try { applyCustomOptUIFromState?.(); } catch (_) {}
+
+      document.querySelectorAll(
+        '#customOptModal .active, #armorCustomOptModal .active, #braceletCustomOptModal .active, #earringCustomOptModal .active, #uniqueEffectModal .is-selected, #uniqueEffectModal .active'
+      ).forEach((el) => el.classList.remove('active', 'is-selected'));
+
+      // 6-1) 칭호 마법부여는 일반 slot-row가 아니라 mini-cell 안에 있으므로 별도 복원
+      const titleCell = document.querySelector('#calc-view .slot.mini[data-slot="C2"]')?.closest('.mini-cell');
+      if (titleCell) {
+        const titleEnchantBtn = titleCell.querySelector('.outer-rects .rect[data-role="enchant"]')
+          || titleCell.querySelector('.outer-rects .rect:nth-child(1)');
+        if (titleEnchantBtn) {
+          titleEnchantBtn.textContent = '마법 부여';
+          titleEnchantBtn.classList.remove('selected', 'active', 'disabled', 'is-disabled');
+          titleEnchantBtn.disabled = false;
+          titleEnchantBtn.style.pointerEvents = '';
+          titleEnchantBtn.dataset.role = 'enchant';
+        }
+        titleCell.querySelectorAll('.enchant-caption').forEach((el) => el.remove());
+      }
+
+      // 7) 선택형 입력 요소를 첫 상태로 복원
+      document.querySelectorAll('#calc-view select').forEach((el) => {
+        const emptyOption = Array.from(el.options || []).find((opt) => !String(opt.value || '').trim());
+        if (emptyOption) el.value = '';
+        else el.selectedIndex = 0;
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      // 8) 상태 기반 보조 UI를 다시 그린다.
+      try { refreshEnhLabelsFromState?.(); } catch (_) {}
+      try { refreshSealLabelsFromState?.(); } catch (_) {}
+      try { refreshSealCaptionsFromState?.(); } catch (_) {}
+      try { refreshAllDots?.(); } catch (_) {}
+      try { updateSynergyEffectButtonVisibility?.(); } catch (_) {}
+      try { refreshSettingStatusInternalButton?.(); } catch (_) {}
+      try { renderSumPanel?.(); } catch (_) {}
+      try { renderFinalDamage?.(); } catch (_) {}
+      try { updateSpTpCounters?.(); } catch (_) {}
+      try { updateEquipDescPreview?.(); } catch (_) {}
+
+      document.querySelectorAll(
+        '#calc-view [data-current-item-name], #calc-view .selected-item-name'
+      ).forEach((el) => { el.textContent = ''; });
+    }
+
+    document.getElementById('btnCalculatorReset')?.addEventListener('click', () => {
+      const ok = window.confirm(
+        '현재 선택한 캐릭터와 모든 장비를 선택하지 않은 상태로 초기화할까요?\n저장 슬롯에 저장된 데이터는 삭제되지 않습니다.'
+      );
+      if (!ok) return;
+
+      clearCurrentCalculatorSelections();
+
+      if (typeof toast === 'function') {
+        toast('캐릭터와 장비 선택을 초기화했습니다.');
+      }
+    });
+  </script>
+
 </body>
 
 </html>
