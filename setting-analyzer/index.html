@@ -3130,11 +3130,13 @@
 
     .setting-box .picked-name {
       -webkit-line-clamp: 3;
+      line-clamp: 3;
     }
 
     .enchant-box .picked-name {
       display: block;
       -webkit-line-clamp: unset;
+      line-clamp: unset;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -3766,6 +3768,1279 @@
       font-size: 12px;
     }
 
+  
+    /* ===== 내 이용 정보 모달 - 휘장형 프리미엄 디자인 ===== */
+    .my-usage-dialog {
+      --usage-accent: #74b8ff;
+      --usage-accent-2: #2e6dff;
+      --usage-accent-soft: rgba(116, 184, 255, 0.22);
+      --usage-accent-glow: rgba(116, 184, 255, 0.28);
+      --usage-metal-1: #dbeafe;
+      --usage-metal-2: #93c5fd;
+      --usage-ribbon-1: rgba(255, 255, 255, 0.14);
+      --usage-ribbon-2: rgba(255, 255, 255, 0.06);
+      width: min(760px, 96vw) !important;
+      max-height: min(820px, 92vh) !important;
+      overflow: hidden;
+      position: relative;
+      border-radius: 26px !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      background:
+        radial-gradient(700px 260px at 50% -8%, var(--usage-accent-soft), transparent 62%),
+        radial-gradient(520px 220px at 50% 110%, rgba(255, 255, 255, 0.05), transparent 68%),
+        linear-gradient(180deg, rgba(26, 31, 43, 0.985), rgba(11, 15, 24, 0.985)) !important;
+      box-shadow:
+        0 34px 90px rgba(0, 0, 0, 0.56),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 0 34px var(--usage-accent-glow);
+      isolation: isolate;
+    }
+
+    .my-usage-dialog::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0));
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .my-usage-dialog::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(460px 160px at 50% 0%, rgba(255, 255, 255, 0.08), transparent 60%),
+        radial-gradient(360px 120px at 50% 100%, rgba(255, 255, 255, 0.035), transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+      mix-blend-mode: screen;
+    }
+
+    .my-usage-header,
+    .usage-info-body {
+      position: relative;
+      z-index: 1;
+    }
+
+    .my-usage-header {
+      min-height: 108px;
+      padding: 20px 22px 16px !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10) !important;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 16px;
+    }
+
+    .my-usage-header::after {
+      content: "";
+      position: absolute;
+      left: 26px;
+      right: 26px;
+      bottom: -1px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), var(--usage-accent-soft), rgba(255,255,255,0.10), transparent);
+    }
+
+    .my-usage-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .my-usage-crest {
+      position: relative;
+      width: 122px;
+      height: 84px;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.28));
+    }
+
+    .my-usage-crest::before,
+    .my-usage-crest::after {
+      content: "";
+      position: absolute;
+      top: 16px;
+      width: 34px;
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+      opacity: 0.9;
+    }
+
+    .my-usage-crest::before { left: 0; }
+    .my-usage-crest::after { right: 0; }
+
+    .my-usage-crest .crest-wing {
+      position: absolute;
+      top: 24px;
+      width: 36px;
+      height: 28px;
+      background: linear-gradient(135deg, var(--usage-metal-1), var(--usage-metal-2));
+      clip-path: polygon(0 50%, 48% 0, 100% 16%, 72% 50%, 100% 84%, 48% 100%);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.16) inset,
+        0 4px 10px rgba(0, 0, 0, 0.22);
+      opacity: 0.95;
+    }
+
+    .my-usage-crest .crest-wing.left {
+      left: 12px;
+      transform: scaleX(-1);
+    }
+
+    .my-usage-crest .crest-wing.right { right: 12px; }
+
+    .my-usage-crest .crest-core {
+      position: relative;
+      width: 54px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      clip-path: polygon(50% 0%, 88% 16%, 100% 46%, 82% 84%, 50% 100%, 18% 84%, 0% 46%, 12% 16%);
+      background:
+        radial-gradient(circle at 34% 26%, rgba(255,255,255,0.34), transparent 32%),
+        linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.05)),
+        linear-gradient(135deg, var(--usage-metal-1), var(--usage-metal-2) 50%, var(--usage-accent-2));
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.24) inset,
+        0 10px 24px rgba(0, 0, 0, 0.26),
+        0 0 18px var(--usage-accent-glow);
+    }
+
+    .my-usage-crest .crest-core::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      clip-path: inherit;
+      background: linear-gradient(180deg, rgba(9, 13, 22, 0.18), rgba(9, 13, 22, 0.55));
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .my-usage-crest .crest-gem {
+      position: relative;
+      z-index: 1;
+      width: 16px;
+      height: 16px;
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.75), transparent 42%),
+        linear-gradient(135deg, #ffffff, var(--usage-accent));
+      box-shadow: 0 0 12px rgba(255,255,255,0.38);
+    }
+
+    .my-usage-crest .crest-ribbon {
+      position: absolute;
+      left: 50%;
+      bottom: 5px;
+      transform: translateX(-50%);
+      width: 72px;
+      height: 16px;
+      clip-path: polygon(0 0, 100% 0, 88% 100%, 12% 100%);
+      background: linear-gradient(180deg, var(--usage-ribbon-1), var(--usage-ribbon-2));
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.10) inset;
+    }
+
+    .my-usage-title-text {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .my-usage-eyebrow {
+      color: color-mix(in srgb, var(--usage-metal-1) 78%, white 22%);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .my-usage-header h2 {
+      margin: 0 !important;
+      font-size: 22px !important;
+      font-weight: 950 !important;
+      letter-spacing: -0.04em;
+      color: #f8fafc;
+      text-shadow: 0 0 14px rgba(255,255,255,0.08);
+    }
+
+    .my-usage-header .close {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.07) !important;
+      border: 1px solid rgba(255, 255, 255, 0.14) !important;
+      color: rgba(248, 250, 252, 0.92) !important;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.16);
+    }
+
+    .usage-info-body {
+      padding: 18px 20px 20px;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-y: auto;
+      max-height: calc(min(820px, 92vh) - 108px);
+    }
+
+    .usage-info-notice {
+      margin-bottom: 16px;
+      padding: 13px 15px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      color: rgba(226, 232, 240, 0.92);
+      box-shadow:
+        0 12px 24px rgba(0, 0, 0, 0.18),
+        0 0 0 1px rgba(255,255,255,0.03) inset;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .usage-info-notice::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: linear-gradient(180deg, var(--usage-accent), transparent);
+    }
+
+    .usage-info-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .usage-summary-card,
+    .usage-info-row {
+      position: relative;
+      overflow: hidden;
+      clip-path: polygon(0 14px, 14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px));
+    }
+
+    .usage-summary-card::before,
+    .usage-info-row::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(255,255,255,0.10);
+      clip-path: inherit;
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    .usage-summary-card {
+      padding: 15px 16px;
+      background:
+        radial-gradient(260px 140px at 100% -8%, rgba(255,255,255,0.14), transparent 58%),
+        linear-gradient(135deg, rgba(255,255,255,0.11), rgba(255,255,255,0.045));
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    .usage-summary-card.primary {
+      border-color: rgba(255, 255, 255, 0.08);
+      background:
+        radial-gradient(300px 160px at 102% -8%, var(--usage-accent-soft), transparent 58%),
+        linear-gradient(135deg, rgba(255,255,255,0.11), rgba(255,255,255,0.045));
+    }
+
+    .usage-summary-card.gold {
+      background:
+        radial-gradient(300px 160px at 102% -8%, rgba(255,255,255,0.12), transparent 58%),
+        linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+    }
+
+    .usage-summary-label {
+      color: rgba(226, 232, 240, 0.70);
+      font-size: 12px;
+      font-weight: 850;
+      margin-bottom: 6px;
+    }
+
+    .usage-summary-value {
+      color: color-mix(in srgb, white 75%, var(--usage-metal-1) 25%);
+      font-size: 24px;
+      line-height: 1.1;
+      font-weight: 950;
+      letter-spacing: -0.05em;
+      text-shadow: 0 0 16px rgba(255,255,255,0.06);
+    }
+
+    .usage-summary-sub {
+      margin-top: 7px;
+      color: rgba(226, 232, 240, 0.68);
+      font-size: 12px;
+      font-weight: 650;
+      word-break: keep-all;
+    }
+
+    .usage-info-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .usage-info-row {
+      display: grid;
+      grid-template-columns: 142px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 14px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.085), rgba(255,255,255,0.035));
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.15);
+    }
+
+    .usage-info-row.tone-good {
+      background:
+        radial-gradient(220px 120px at 100% -8%, rgba(34, 197, 94, 0.12), transparent 58%),
+        linear-gradient(135deg, rgba(255,255,255,0.085), rgba(255,255,255,0.035));
+    }
+
+    .usage-info-row.tone-warn {
+      background:
+        radial-gradient(220px 120px at 100% -8%, rgba(250, 204, 21, 0.11), transparent 58%),
+        linear-gradient(135deg, rgba(255,255,255,0.085), rgba(255,255,255,0.035));
+    }
+
+    .usage-info-label {
+      color: rgba(226, 232, 240, 0.62);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+    }
+
+    .usage-info-value {
+      color: #f8fafc;
+      white-space: pre-line;
+      font-weight: 900;
+      word-break: keep-all;
+    }
+
+    .usage-info-sub {
+      margin-top: 4px;
+      color: rgba(203, 213, 225, 0.68);
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1.45;
+      white-space: pre-line;
+    }
+
+    .usage-extra-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .usage-extra-item {
+      display: grid;
+      gap: 3px;
+    }
+
+    .usage-extra-count {
+      color: #f8fafc;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    .usage-extra-reason {
+      color: rgba(203, 213, 225, 0.68);
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1.45;
+    }
+
+
+    /* ===== 내 이용 정보: 등록되지 않은 일반 사용자 전용 화면 ===== */
+    .my-usage-dialog.usage-theme-public {
+      --usage-accent: #8fbaff;
+      --usage-accent-2: #4f7fe8;
+      --usage-accent-soft: rgba(110, 168, 255, 0.20);
+      --usage-accent-glow: rgba(110, 168, 255, 0.18);
+      --usage-metal-1: #e8f1ff;
+      --usage-metal-2: #9fc2ff;
+      --usage-ribbon-1: rgba(143, 186, 255, 0.20);
+      --usage-ribbon-2: rgba(79, 127, 232, 0.14);
+    }
+
+    .usage-public-view {
+      display: grid;
+      gap: 14px;
+    }
+
+    .usage-public-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
+      border-radius: 22px;
+      border: 1px solid rgba(143, 186, 255, 0.24);
+      background:
+        radial-gradient(420px 180px at 100% 0%, rgba(110, 168, 255, 0.22), transparent 62%),
+        linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.035));
+      box-shadow:
+        0 16px 34px rgba(0, 0, 0, 0.24),
+        0 0 0 1px rgba(255,255,255,0.035) inset;
+    }
+
+    .usage-public-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 0 10px;
+      margin-bottom: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(143, 186, 255, 0.38);
+      background: rgba(110, 168, 255, 0.10);
+      color: #cfe2ff;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+    }
+
+    .usage-public-title {
+      color: #f8fafc;
+      font-size: 22px;
+      line-height: 1.3;
+      font-weight: 950;
+      letter-spacing: -0.045em;
+      word-break: keep-all;
+    }
+
+    .usage-public-desc {
+      margin-top: 8px;
+      color: rgba(226, 232, 240, 0.74);
+      font-size: 13px;
+      line-height: 1.65;
+      font-weight: 650;
+      word-break: keep-all;
+    }
+
+    .usage-public-account {
+      margin-top: 12px;
+      padding-top: 11px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      color: rgba(203, 213, 225, 0.66);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .usage-public-benefit-title {
+      margin: 2px 2px -2px;
+      color: #e8f1ff;
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    .usage-public-benefits {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .usage-public-benefit {
+      min-height: 92px;
+      padding: 14px;
+      border-radius: 17px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.075), rgba(255,255,255,0.028));
+      box-shadow: 0 10px 22px rgba(0,0,0,0.15);
+    }
+
+    .usage-public-benefit-icon {
+      margin-bottom: 7px;
+      color: #9fc2ff;
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .usage-public-benefit strong {
+      display: block;
+      color: #f8fafc;
+      font-size: 13px;
+      font-weight: 950;
+      line-height: 1.35;
+    }
+
+    .usage-public-benefit span {
+      display: block;
+      margin-top: 4px;
+      color: rgba(203, 213, 225, 0.64);
+      font-size: 11px;
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    .usage-public-join {
+      padding: 17px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(250, 204, 107, 0.34);
+      background:
+        radial-gradient(320px 130px at 100% 0%, rgba(250, 204, 107, 0.16), transparent 62%),
+        linear-gradient(135deg, rgba(250,204,107,0.09), rgba(255,255,255,0.035));
+      text-align: center;
+    }
+
+    .usage-public-join strong {
+      display: block;
+      color: #ffe8a3;
+      font-size: 16px;
+      font-weight: 950;
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+
+    .usage-public-join p {
+      margin: 6px 0 13px;
+      color: rgba(226, 232, 240, 0.72);
+      font-size: 12px;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .usage-public-join-btn {
+      min-width: 150px;
+      height: 38px;
+      padding: 0 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 232, 163, 0.72);
+      background: linear-gradient(135deg, #facc6b, #cfa24f);
+      color: #1b1207;
+      font-size: 13px;
+      font-weight: 950;
+      text-decoration: none;
+      box-shadow:
+        0 8px 20px rgba(0,0,0,0.28),
+        inset 0 1px 0 rgba(255,255,255,0.38);
+      transition: transform .14s ease, filter .14s ease, box-shadow .14s ease;
+    }
+
+    .usage-public-join-btn:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+      box-shadow:
+        0 10px 24px rgba(0,0,0,0.34),
+        0 0 0 3px rgba(250,204,107,0.12);
+    }
+
+    @media (max-width: 560px) {
+      .usage-public-hero {
+        padding: 17px;
+      }
+
+      .usage-public-title {
+        font-size: 19px;
+      }
+
+      .usage-public-benefits {
+        grid-template-columns: 1fr;
+      }
+
+      .usage-public-benefit {
+        min-height: 0;
+      }
+    }
+
+    .my-usage-dialog.usage-theme-senior {
+      --usage-accent: #f6d36b;
+      --usage-accent-2: #b9851e;
+      --usage-accent-soft: rgba(246, 211, 107, 0.24);
+      --usage-accent-glow: rgba(246, 211, 107, 0.24);
+      --usage-metal-1: #fff6cf;
+      --usage-metal-2: #f7c95b;
+      --usage-ribbon-1: rgba(255, 236, 179, 0.22);
+      --usage-ribbon-2: rgba(181, 133, 30, 0.18);
+    }
+
+    .my-usage-dialog.usage-theme-lead {
+      --usage-accent: #dce7f6;
+      --usage-accent-2: #9aa7bc;
+      --usage-accent-soft: rgba(220, 231, 246, 0.20);
+      --usage-accent-glow: rgba(220, 231, 246, 0.18);
+      --usage-metal-1: #f8fbff;
+      --usage-metal-2: #bcc8d7;
+      --usage-ribbon-1: rgba(236, 242, 248, 0.18);
+      --usage-ribbon-2: rgba(154, 167, 188, 0.18);
+    }
+
+    .my-usage-dialog.usage-theme-junior {
+      --usage-accent: #d79d67;
+      --usage-accent-2: #935d31;
+      --usage-accent-soft: rgba(215, 157, 103, 0.20);
+      --usage-accent-glow: rgba(215, 157, 103, 0.18);
+      --usage-metal-1: #f8dfc8;
+      --usage-metal-2: #c67d44;
+      --usage-ribbon-1: rgba(248, 223, 200, 0.18);
+      --usage-ribbon-2: rgba(147, 93, 49, 0.18);
+    }
+
+    .my-usage-dialog.usage-theme-senior .usage-summary-value,
+    .my-usage-dialog.usage-theme-lead .usage-summary-value,
+    .my-usage-dialog.usage-theme-junior .usage-summary-value {
+      color: color-mix(in srgb, white 70%, var(--usage-metal-1) 30%);
+    }
+
+    @media (max-width: 760px) {
+      .my-usage-dialog {
+        width: min(96vw, 680px) !important;
+      }
+
+      .my-usage-header {
+        min-height: 96px;
+        padding: 16px 16px 14px !important;
+      }
+
+      .my-usage-crest {
+        width: 104px;
+        height: 76px;
+      }
+
+      .usage-info-body {
+        padding: 14px 14px 16px;
+      }
+
+      .usage-info-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .usage-info-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .my-usage-title-wrap {
+        gap: 12px;
+      }
+
+      .my-usage-header h2 {
+        font-size: 20px !important;
+      }
+
+      .my-usage-eyebrow {
+        letter-spacing: 0.12em;
+      }
+    }
+
+  
+
+    /* ===== 내 이용 정보 휘장 - 직급별 형태 차별화 ===== */
+    .my-usage-dialog .my-usage-crest { overflow: visible; }
+    .my-usage-dialog .crest-crown,
+    .my-usage-dialog .crest-plate { position: absolute; display: none; pointer-events: none; }
+
+    /* 전임: 기본 심볼형 */
+    .my-usage-dialog:not(.usage-theme-senior):not(.usage-theme-lead):not(.usage-theme-junior) .my-usage-crest {
+      width: 78px; height: 64px;
+    }
+    .my-usage-dialog:not(.usage-theme-senior):not(.usage-theme-lead):not(.usage-theme-junior) .crest-wing,
+    .my-usage-dialog:not(.usage-theme-senior):not(.usage-theme-lead):not(.usage-theme-junior) .crest-ribbon,
+    .my-usage-dialog:not(.usage-theme-senior):not(.usage-theme-lead):not(.usage-theme-junior) .crest-crown,
+    .my-usage-dialog:not(.usage-theme-senior):not(.usage-theme-lead):not(.usage-theme-junior) .crest-plate {
+      display: none !important;
+    }
+    .my-usage-dialog:not(.usage-theme-senior):not(.usage-theme-lead):not(.usage-theme-junior) .crest-core {
+      width: 46px; height: 46px;
+      clip-path: polygon(50% 0%, 88% 18%, 100% 50%, 82% 86%, 50% 100%, 18% 86%, 0% 50%, 12% 18%);
+      background: radial-gradient(circle at 34% 25%, rgba(255,255,255,0.34), transparent 34%), linear-gradient(135deg, #dbeafe, #60a5fa 58%, #1d4ed8);
+    }
+    .my-usage-dialog:not(.usage-theme-senior):not(.usage-theme-lead):not(.usage-theme-junior) .crest-gem {
+      width: 12px; height: 12px; border-radius: 50%; clip-path: none;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #93c5fd 62%, #2563eb);
+    }
+
+    /* 수석: 왕관 + 대형 날개 + 보석 + 긴 리본 */
+    .my-usage-dialog.usage-theme-senior .my-usage-crest { width: 150px; height: 104px; }
+    .my-usage-dialog.usage-theme-senior .crest-crown {
+      display: block; left: 50%; top: -1px; transform: translateX(-50%);
+      width: 56px; height: 28px;
+      clip-path: polygon(0 100%, 0 44%, 18% 66%, 30% 8%, 50% 48%, 70% 8%, 82% 66%, 100% 44%, 100% 100%);
+      background: radial-gradient(circle at 50% 18%, rgba(255,255,255,0.85) 0 8%, transparent 9%), linear-gradient(180deg, #fff4bf 0%, #f6d36b 42%, #b9851e 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.30) inset, 0 8px 18px rgba(0,0,0,0.24), 0 0 18px rgba(246,211,107,0.35);
+      z-index: 4;
+    }
+    .my-usage-dialog.usage-theme-senior .crest-wing {
+      display: block; top: 38px; width: 52px; height: 38px;
+      clip-path: polygon(0 50%, 20% 14%, 62% 0, 100% 14%, 75% 50%, 100% 86%, 62% 100%, 20% 86%);
+      background: linear-gradient(135deg, #fff7d6 0%, #f7c95b 48%, #9b6a16 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.22) inset, 0 10px 20px rgba(0,0,0,0.26), 0 0 16px rgba(246,211,107,0.22);
+    }
+    .my-usage-dialog.usage-theme-senior .crest-wing.left { left: 4px; transform: scaleX(-1) rotate(-5deg); }
+    .my-usage-dialog.usage-theme-senior .crest-wing.right { right: 4px; transform: rotate(-5deg); }
+    .my-usage-dialog.usage-theme-senior .crest-core {
+      width: 66px; height: 66px; margin-top: 20px;
+      clip-path: polygon(50% 0%, 88% 14%, 100% 44%, 86% 78%, 50% 100%, 14% 78%, 0% 44%, 12% 14%);
+      background: radial-gradient(circle at 34% 22%, rgba(255,255,255,0.46), transparent 32%), linear-gradient(180deg, #fff6cf 0%, #f7c95b 46%, #b9851e 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.30) inset, 0 14px 30px rgba(0,0,0,0.30), 0 0 24px rgba(246,211,107,0.34);
+      z-index: 3;
+    }
+    .my-usage-dialog.usage-theme-senior .crest-core::before { inset: 9px; clip-path: polygon(50% 0%, 88% 14%, 100% 44%, 86% 78%, 50% 100%, 14% 78%, 0% 44%, 12% 14%); }
+    .my-usage-dialog.usage-theme-senior .crest-gem {
+      width: 18px; height: 18px; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      background: radial-gradient(circle at 30% 28%, #ffffff, transparent 38%), linear-gradient(135deg, #fff7d6, #f6d36b 55%, #d97706);
+    }
+    .my-usage-dialog.usage-theme-senior .crest-ribbon {
+      display: block; bottom: 0; width: 96px; height: 18px;
+      background: linear-gradient(180deg, rgba(255,244,191,0.34), rgba(185,133,30,0.22));
+    }
+
+    /* 책임: 방패형 휘장 + 중형 은빛 금속판 */
+    .my-usage-dialog.usage-theme-lead .my-usage-crest { width: 124px; height: 92px; }
+    .my-usage-dialog.usage-theme-lead .crest-crown { display: none !important; }
+    .my-usage-dialog.usage-theme-lead .crest-wing {
+      display: block; top: 31px; width: 34px; height: 42px;
+      clip-path: polygon(0 50%, 22% 4%, 100% 18%, 78% 50%, 100% 82%, 22% 96%);
+      background: linear-gradient(135deg, #f8fbff 0%, #bcc8d7 52%, #7c8798 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.20) inset, 0 8px 18px rgba(0,0,0,0.24);
+    }
+    .my-usage-dialog.usage-theme-lead .crest-wing.left { left: 12px; transform: scaleX(-1); }
+    .my-usage-dialog.usage-theme-lead .crest-wing.right { right: 12px; }
+    .my-usage-dialog.usage-theme-lead .crest-core {
+      width: 60px; height: 68px;
+      clip-path: polygon(50% 0%, 92% 18%, 82% 76%, 50% 100%, 18% 76%, 8% 18%);
+      background: radial-gradient(circle at 34% 22%, rgba(255,255,255,0.42), transparent 33%), linear-gradient(180deg, #f8fbff 0%, #bcc8d7 50%, #7c8798 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.28) inset, 0 13px 28px rgba(0,0,0,0.28), 0 0 18px rgba(220,231,246,0.20);
+      z-index: 3;
+    }
+    .my-usage-dialog.usage-theme-lead .crest-core::before { inset: 8px; clip-path: polygon(50% 0%, 92% 18%, 82% 76%, 50% 100%, 18% 76%, 8% 18%); }
+    .my-usage-dialog.usage-theme-lead .crest-gem {
+      width: 17px; height: 17px; border-radius: 50%; clip-path: none;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #dce7f6 55%, #9aa7bc);
+    }
+    .my-usage-dialog.usage-theme-lead .crest-ribbon {
+      display: block; bottom: 4px; width: 76px; height: 14px;
+      background: linear-gradient(180deg, rgba(236,242,248,0.24), rgba(154,167,188,0.18));
+    }
+
+    /* 선임: 동빛 메달형 플러스 회원 배지 */
+    .my-usage-dialog.usage-theme-junior .my-usage-crest { width: 100px; height: 82px; }
+    .my-usage-dialog.usage-theme-junior .crest-crown { display: none !important; }
+    .my-usage-dialog.usage-theme-junior .crest-wing {
+      display: block; top: 33px; width: 24px; height: 24px;
+      clip-path: polygon(0 50%, 42% 0, 100% 20%, 70% 50%, 100% 80%, 42% 100%);
+      background: linear-gradient(135deg, #f8dfc8 0%, #c67d44 58%, #7a421f 100%);
+      opacity: 0.92;
+    }
+    .my-usage-dialog.usage-theme-junior .crest-wing.left { left: 14px; transform: scaleX(-1); }
+    .my-usage-dialog.usage-theme-junior .crest-wing.right { right: 14px; }
+    .my-usage-dialog.usage-theme-junior .crest-core {
+      width: 54px; height: 54px; border-radius: 50%; clip-path: none;
+      background: radial-gradient(circle at 34% 22%, rgba(255,255,255,0.38), transparent 33%), linear-gradient(180deg, #f8dfc8 0%, #c67d44 56%, #7a421f 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.24) inset, 0 12px 24px rgba(0,0,0,0.26), 0 0 14px rgba(215,157,103,0.20);
+      z-index: 3;
+    }
+    .my-usage-dialog.usage-theme-junior .crest-core::before { inset: 8px; border-radius: 50%; clip-path: none; }
+    .my-usage-dialog.usage-theme-junior .crest-gem {
+      width: 14px; height: 14px; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      background: radial-gradient(circle at 30% 30%, #ffffff, #d79d67 60%, #935d31);
+    }
+    .my-usage-dialog.usage-theme-junior .crest-plate {
+      display: block; left: 50%; bottom: 4px; transform: translateX(-50%);
+      width: 58px; height: 12px; border-radius: 999px;
+      background: linear-gradient(180deg, rgba(248,223,200,0.22), rgba(147,93,49,0.18));
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.10) inset;
+    }
+    .my-usage-dialog.usage-theme-junior .crest-ribbon { display: none !important; }
+
+    @media (max-width: 760px) {
+      .my-usage-dialog.usage-theme-senior .my-usage-crest { width: 126px; height: 92px; }
+      .my-usage-dialog.usage-theme-senior .crest-wing { width: 44px; height: 32px; }
+      .my-usage-dialog.usage-theme-senior .crest-core { width: 58px; height: 58px; }
+      .my-usage-dialog.usage-theme-lead .my-usage-crest { width: 110px; }
+      .my-usage-dialog.usage-theme-junior .my-usage-crest { width: 92px; }
+    }
+
+
+    /* ✅ 모바일 메인 화면: 모바일 계산기 헤더/한마디 배치와 동일하게 정렬 */
+    @media (max-width: 980px) {
+      body:not(.pc) header,
+      body.mobile header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        justify-content: flex-start !important;
+        gap: 0 !important;
+        padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 2px 12px !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.10) !important;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.15)) !important;
+        backdrop-filter: blur(10px);
+      }
+
+      body:not(.pc) header .title,
+      body.mobile header .title {
+        width: 100%;
+        min-width: 0;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 8px !important;
+        flex-wrap: nowrap !important;
+      }
+
+      body:not(.pc) header .title .logo-box,
+      body.mobile header .title .logo-box {
+        width: 24px !important;
+        height: 24px !important;
+        flex: 0 0 auto;
+        border-radius: 7px;
+      }
+
+      body:not(.pc) header .title h1,
+      body.mobile header .title h1 {
+        min-width: 0;
+        flex: 1 1 auto;
+        margin: 0 !important;
+        color: var(--text);
+        font-size: 15px !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      body:not(.pc) header .title .contact-btn,
+      body.mobile header .title .contact-btn {
+        flex: 0 0 auto;
+        margin-left: 4px !important;
+        gap: 4px !important;
+      }
+
+      body:not(.pc) header .title .contact-btn svg,
+      body.mobile header .title .contact-btn svg {
+        width: 16px !important;
+        height: 16px !important;
+      }
+
+      body:not(.pc) header .title .contact-btn .contact-label,
+      body.mobile header .title .contact-btn .contact-label {
+        font-size: 10px !important;
+        line-height: 1;
+      }
+
+      body:not(.pc) header .actions,
+      body.mobile header .actions {
+        display: none !important;
+      }
+
+      body:not(.pc) header .header-ads,
+      body.mobile header .header-ads {
+        order: 5;
+        width: 100%;
+        max-width: none !important;
+        margin: 6px 0 0 0 !important;
+        padding: 6px 10px !important;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(255, 255, 255, 0.04);
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        height: 35px !important;
+        min-height: 35px !important;
+        max-height: 35px !important;
+        overflow: hidden !important;
+      }
+
+      body:not(.pc) header .header-ads .ad-text,
+      body.mobile header .header-ads .ad-text {
+        display: block;
+        min-width: 0;
+        max-width: 100% !important;
+        width: 100%;
+        color: rgba(233, 238, 247, 0.92);
+        font-size: 12px !important;
+        font-weight: 600;
+        line-height: 1.25;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      body:not(.pc) header .header-ads .hdrmsg,
+      body.mobile header .header-ads .hdrmsg {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px !important;
+        white-space: nowrap;
+        min-width: 0;
+        max-width: 100%;
+        font-size: 12px !important;
+      }
+
+      body:not(.pc) header .header-ads .msg-text,
+      body.mobile header .header-ads .msg-text {
+        display: inline-block;
+        max-width: 72vw;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: bottom;
+      }
+
+      body:not(.pc) header .header-ads .tag-senior,
+      body.mobile header .header-ads .tag-senior {
+        height: 20px;
+        min-width: 32px;
+        padding: 2px 10px;
+        font-size: 13px;
+      }
+
+      body:not(.pc) header .header-ads .tag-lead,
+      body.mobile header .header-ads .tag-lead {
+        width: 6px;
+        height: 6px;
+        margin-right: 2px;
+      }
+    }
+
+  
+
+    /* ✅ 모바일 메인 한마디 길이 증가 시 헤더/화면 높이 증가 방지 최종 보정 */
+    @media (max-width: 980px) {
+      body:not(.pc) header .header-ads,
+      body.mobile header .header-ads {
+        box-sizing: border-box !important;
+        flex: 0 0 35px !important;
+        height: 35px !important;
+        min-height: 35px !important;
+        max-height: 35px !important;
+        overflow: hidden !important;
+      }
+
+      body:not(.pc) header .header-ads .ad-text,
+      body.mobile header .header-ads .ad-text {
+        display: flex !important;
+        align-items: center !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        max-height: 100% !important;
+        line-height: 1.25 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      body:not(.pc) header .header-ads .hdrmsg,
+      body.mobile header .header-ads .hdrmsg {
+        display: inline-flex !important;
+        align-items: center !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        height: 20px !important;
+        line-height: 20px !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+      }
+
+      body:not(.pc) header .header-ads .msg-nick,
+      body:not(.pc) header .header-ads .msg-bullet,
+      body:not(.pc) header .header-ads .tag,
+      body:not(.pc) header .header-ads .tag-lead,
+      body.mobile header .header-ads .msg-nick,
+      body.mobile header .header-ads .msg-bullet,
+      body.mobile header .header-ads .tag,
+      body.mobile header .header-ads .tag-lead {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+      }
+
+      body:not(.pc) header .header-ads .msg-text,
+      body.mobile header .header-ads .msg-text {
+        display: block !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        height: 20px !important;
+        line-height: 20px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+    }
+
+    /* ✅ 모바일 메인 한마디: 넘칠 때만 좌측 이동(마퀴) */
+    @media (max-width: 980px) {
+      body:not(.pc) header .header-ads .msg-text,
+      body.mobile header .header-ads .msg-text {
+        position: relative !important;
+        overflow: hidden !important;
+        text-overflow: clip !important;
+      }
+
+      body:not(.pc) header .header-ads .msg-text .marquee,
+      body.mobile header .header-ads .msg-text .marquee {
+        display: inline-block;
+        white-space: nowrap;
+        padding-right: 10px;
+      }
+
+      body:not(.pc) header .header-ads .msg-text.is-marquee .marquee,
+      body.mobile header .header-ads .msg-text.is-marquee .marquee {
+        will-change: transform;
+        animation: main_one_marquee var(--marquee-dur, 14s) linear infinite;
+      }
+
+      @keyframes main_one_marquee {
+        0% {
+          transform: translateX(0);
+        }
+
+        20% {
+          transform: translateX(0);
+        }
+
+        72% {
+          transform: translateX(calc(-1px * var(--marquee-dist, 0)));
+        }
+
+        88% {
+          transform: translateX(calc(-1px * var(--marquee-dist, 0)));
+        }
+
+        100% {
+          transform: translateX(0);
+        }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body:not(.pc) header .header-ads .msg-text.is-marquee .marquee,
+      body.mobile header .header-ads .msg-text.is-marquee .marquee {
+        animation: none !important;
+        transform: none !important;
+      }
+    }
+
+
+    /* ✅ 모바일 메인 한마디: 레이아웃 고정 + 실제 넘침 거리만 마퀴 이동 */
+    @media (max-width: 980px) {
+      header .header-ads {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 35px !important;
+        height: 35px !important;
+        min-height: 35px !important;
+        max-height: 35px !important;
+        overflow: hidden !important;
+        contain: layout paint !important;
+      }
+
+      header .header-ads .ad-text {
+        box-sizing: border-box !important;
+        display: flex !important;
+        align-items: center !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        max-height: 100% !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        line-height: 20px !important;
+        text-overflow: clip !important;
+      }
+
+      header .header-ads .hdrmsg {
+        box-sizing: border-box !important;
+        display: flex !important;
+        align-items: center !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        flex: 0 1 100% !important;
+        height: 20px !important;
+        min-height: 20px !important;
+        max-height: 20px !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        gap: 6px !important;
+      }
+
+      header .header-ads .tag,
+      header .header-ads .tag-senior,
+      header .header-ads .tag-lead,
+      header .header-ads .msg-bullet {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+      }
+
+      header .header-ads .msg-nick {
+        flex: 0 1 auto !important;
+        max-width: 28vw !important;
+        min-width: 0 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      header .header-ads .msg-text {
+        box-sizing: border-box !important;
+        display: block !important;
+        position: relative !important;
+        flex: 1 1 0 !important;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        height: 20px !important;
+        min-height: 20px !important;
+        max-height: 20px !important;
+        line-height: 20px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: clip !important;
+        contain: paint !important;
+      }
+
+      header .header-ads .msg-text .marquee {
+        display: inline-block !important;
+        width: max-content !important;
+        max-width: none !important;
+        white-space: nowrap !important;
+        will-change: transform;
+        transform: translateX(0);
+      }
+
+      header .header-ads .msg-text.is-marquee .marquee {
+        animation: main_header_one_marquee var(--marquee-dur, 14s) linear infinite !important;
+      }
+
+      @keyframes main_header_one_marquee {
+        0%, 18% { transform: translateX(0); }
+        70%, 86% { transform: translateX(calc(-1px * var(--marquee-dist, 0))); }
+        100% { transform: translateX(0); }
+      }
+    }
+
+
+    /* ✅ 모바일 메인 한마디 최종 안전핀 + 실제 마퀴 이동 */
+    @media (max-width: 980px) {
+      html,
+      body {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        overscroll-behavior-x: none;
+      }
+
+      .shell,
+      #main-view,
+      #calc-view,
+      .wrap,
+      header {
+        width: 100% !important;
+        max-width: 100vw !important;
+        min-width: 0 !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+      }
+
+      header {
+        left: 0 !important;
+        right: 0 !important;
+      }
+
+      header .title,
+      header .header-ads,
+      header .header-ads .ad-text,
+      header .header-ads .hdrmsg,
+      header .header-ads .msg-text {
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      header .header-ads {
+        width: 100% !important;
+        flex: 0 0 35px !important;
+        height: 35px !important;
+        min-height: 35px !important;
+        max-height: 35px !important;
+        overflow: hidden !important;
+        contain: size layout paint !important;
+      }
+
+      header .header-ads .ad-text {
+        flex: 1 1 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        overflow: hidden !important;
+        contain: layout paint !important;
+      }
+
+      header .header-ads .hdrmsg {
+        flex: 1 1 0 !important;
+        width: 100% !important;
+        height: 20px !important;
+        overflow: hidden !important;
+      }
+
+      header .header-ads .msg-text {
+        position: relative !important;
+        display: block !important;
+        flex: 1 1 0 !important;
+        width: 0 !important;
+        min-width: 0 !important;
+        height: 20px !important;
+        line-height: 20px !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        text-overflow: clip !important;
+        contain: layout paint !important;
+      }
+
+      header .header-ads .msg-text .marquee {
+        position: absolute !important;
+        left: 0;
+        top: 0;
+        display: inline-block !important;
+        width: auto !important;
+        max-width: none !important;
+        height: 20px !important;
+        line-height: 20px !important;
+        white-space: nowrap !important;
+        transform: translate3d(0, 0, 0);
+        will-change: transform;
+      }
+
+      header .header-ads .msg-text.is-marquee .marquee {
+        animation: main_header_one_marquee_clip var(--marquee-dur, 9s) linear infinite !important;
+      }
+
+      @keyframes main_header_one_marquee_clip {
+        0%, 22% { transform: translate3d(0, 0, 0); }
+        72%, 88% { transform: translate3d(calc(-1px * var(--marquee-dist, 0)), 0, 0); }
+        100% { transform: translate3d(0, 0, 0); }
+      }
+    }
+
+
+
   </style>
 </head>
 
@@ -3809,6 +5084,10 @@
 
       <button id="btnOneLinerOpen" class="contact-btn faq-btn one-liner-edit-btn" type="button" title="한마디 변경">
         <span class="contact-label">한마디 변경</span>
+      </button>
+
+      <button id="btnMyUsageInfo" class="contact-btn faq-btn" type="button" title="내 이용 정보">
+        <span class="contact-label">내 이용 정보</span>
       </button>
     </div>
 
@@ -4122,6 +5401,42 @@
   </main>
 
 
+
+  <!-- 내 이용 정보 모달 -->
+  <div id="myUsageInfoModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-my-usage-close></div>
+    <div class="dialog contact-dialog my-usage-dialog" role="dialog" aria-modal="true" aria-labelledby="myUsageInfoTitle">
+      <header class="my-usage-header">
+        <div class="my-usage-title-wrap">
+          <div class="my-usage-crest" aria-hidden="true">
+            <span class="crest-crown"></span>
+            <span class="crest-wing left"></span>
+            <span class="crest-core"><span class="crest-gem"></span></span>
+            <span class="crest-wing right"></span>
+            <span class="crest-plate"></span>
+            <span class="crest-ribbon"></span>
+          </div>
+          <div class="my-usage-title-text">
+            <div class="my-usage-eyebrow">LAB MEMBERSHIP CREST</div>
+            <h2 id="myUsageInfoTitle">내 이용 정보</h2>
+          </div>
+        </div>
+        <div style="width:32px;flex:0 0 32px;"></div>
+      </header>
+
+      <div class="usage-info-body">
+        <div class="usage-info-notice">
+          현재 계정의 이용 상태와 적용 중인 혜택을 확인할 수 있습니다.
+        </div>
+        <div id="myUsageInfoContent" class="usage-info-grid">
+          <div class="usage-info-row">
+            <div class="usage-info-label">상태</div>
+            <div class="usage-info-value">불러오는 중...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- 캐릭터 선택 모달 -->
   <div id="charModal" class="modal" aria-hidden="true">
@@ -4981,7 +6296,104 @@
       return res.json();
     }
 
+    // =========================================================
+    // 세팅현황 직접 주소 접근 권한 확인
+    // - 계산기목록의 구글계정 컬럼에 등록된 사용자만 통과
+    // - 미등록/탈퇴/로그인 만료 사용자는 목록 데이터를 불러오기 전에 차단
+    // =========================================================
+    async function requireRegisteredSettingAnalyzerAccess() {
+      const token = tokenFromStorage();
+
+      if (!token) {
+        setStatusLoading(
+          100,
+          '로그인이 필요합니다',
+          '세팅현황은 등록된 연구원 계정만 이용할 수 있습니다. 잠시 후 로그인 화면으로 이동합니다.'
+        );
+        return {
+          ok: false,
+          reason: 'no_token'
+        };
+      }
+
+      try {
+        const res = await apiJSON('login_ping', {});
+
+        const isRegistered =
+          res?.ok === true &&
+          (
+            res?.isRegistered === true ||
+            String(res?.accessTier || '').toLowerCase() === 'member'
+          ) &&
+          res?.membershipExpired !== true;
+
+        if (!isRegistered) {
+          setStatusLoading(
+            100,
+            '세팅현황 이용 권한이 없습니다',
+            '세팅현황은 계산기목록에 등록된 연구원 계정만 이용할 수 있습니다. 잠시 후 메인 화면으로 이동합니다.'
+          );
+
+          return {
+            ok: false,
+            reason: res?.membershipExpired === true ? 'membership_expired' : 'not_registered',
+            response: res
+          };
+        }
+
+        window.__settingAnalyzerAccess = {
+          checked: true,
+          isRegistered: true,
+          accessTier: 'member',
+          email: String(res?.email || '').trim().toLowerCase()
+        };
+
+        window.__loginPingResult = res;
+        window.__userRole = {
+          ...(window.__userRole || {}),
+          isLoggedIn: true,
+          email: String(res?.email || '').trim().toLowerCase(),
+          isRegistered: true,
+          accessTier: 'member',
+          membershipExpired: false,
+          roleLabel: res?.roleLabel || '',
+          roleLevel: Number(res?.roleLevel || 0),
+          presetSlots: Number(res?.presetSlots || 0),
+          canEditPhrase: !!res?.canEditPhrase,
+          canChangePhrase: !!res?.canChangePhrase
+        };
+
+        if (typeof updateMyUsageInfoButtonUI === 'function') {
+          updateMyUsageInfoButtonUI();
+        }
+
+        return {
+          ok: true,
+          response: res
+        };
+      } catch (err) {
+        console.error('[setting analyzer access check]', err);
+
+        setStatusLoading(
+          100,
+          '로그인 정보를 확인하지 못했습니다',
+          '로그인 상태를 다시 확인해주세요. 잠시 후 메인 화면으로 이동합니다.'
+        );
+
+        return {
+          ok: false,
+          reason: 'access_check_failed',
+          error: err
+        };
+      }
+    }
+
     async function ensureCoreLoaded() {
+      if (window.__settingAnalyzerAccess?.isRegistered !== true) {
+        console.warn('[setting-analyzer] 등록 사용자 권한 확인 전에는 목록을 불러올 수 없습니다.');
+        return false;
+      }
+
       if (DB.ready && window.CORE?.lists) return true;
 
       try {
@@ -8792,7 +10204,14 @@
 
     (async () => {
       try {
-        setStatusLoading(8, '기본 화면 준비 중', '세팅현황 화면을 준비하고 있습니다.');
+        setStatusLoading(8, '이용 권한 확인 중', '세팅현황 이용 가능 계정인지 확인하고 있습니다.');
+
+        const access = await requireRegisteredSettingAnalyzerAccess();
+
+        if (!access.ok) {
+          redirectToLoginAfterStatusFail(2600);
+          return;
+        }
 
         setStatusLoading(28, '목록 데이터 확인 중', '캐릭터, 장비, 마법부여, 엠블렘 목록을 불러오고 있습니다.');
         const coreOk = await ensureCoreLoaded();
@@ -8820,5 +10239,392 @@
       }
     })();
   </script>
+
+
+  <script>
+    // ==============================
+    //  내 이용 정보 UI (로그인 이용자 전체 공개)
+    // ==============================
+    function canShowMyUsageInfoButton() {
+      return window.__settingAnalyzerAccess?.isRegistered === true;
+    }
+
+    function updateMyUsageInfoButtonUI() {
+      const btn = document.getElementById('btnMyUsageInfo');
+      if (!btn) return;
+      btn.style.display = canShowMyUsageInfoButton() ? 'inline-flex' : 'none';
+    }
+
+    function openMyUsageInfoModal() {
+      const modal = document.getElementById('myUsageInfoModal');
+      if (!modal) return;
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+      loadMyUsageInfoIntoModal();
+    }
+
+    function closeMyUsageInfoModal() {
+      const modal = document.getElementById('myUsageInfoModal');
+      if (!modal) return;
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function formatMyUsageDate(value) {
+      const s = String(value || '').trim();
+      if (!s) return '';
+      const d = new Date(s);
+      if (Number.isNaN(d.getTime())) return s;
+      return d.toLocaleString('ko-KR', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hour12: false,
+      });
+    }
+
+
+    function formatMyUsageDateOnly(value) {
+      const s = String(value || '').trim();
+      if (!s) return '';
+      const d = new Date(s);
+      if (Number.isNaN(d.getTime())) return s;
+      return d.toLocaleDateString('ko-KR', {
+        year: 'numeric', month: '2-digit', day: '2-digit'
+      });
+    }
+
+    function getMyUsageRoleBase(res) {
+      const raw = String(res?.roleLabelBase || res?.roleLabel || '전임').trim();
+      return (raw.replace(/^\[이벤트\]\s*/, '').replace(/\s*연구원\s*$/, '').trim()) || '전임';
+    }
+
+    function getMyUsageRoleDisplay(res) {
+      return `${getMyUsageRoleBase(res)} 연구원`;
+    }
+
+    function getMyUsageJoinedDateText(res) {
+      return formatMyUsageDateOnly(res?.joinedAt || res?.joinedAtRaw || res?.joinDate || res?.joinedDate || res?.signupDate || '');
+    }
+
+    function getMyUsageBaseSlotSub(res) {
+      const roleBase = getMyUsageRoleBase(res);
+      return `기본 ${roleBase} 연구원 등급 저장 슬롯 갯수`;
+    }
+
+    function getMyUsageSlotExtensionInfo(res) {
+      if (res?.slotEventActive) {
+        return {
+          text: `${Number(res.slotEventMultiplier || 3)}배 확장 적용 중`,
+          sub: res.slotEventUntil ? `종료일: ${formatMyUsageDate(res.slotEventUntil)}` : (res.slotEventDescription || '가입 45일 경과로 저장슬롯 3배 확장이 적용 중입니다.')
+        };
+      }
+
+      const roleLevel = Number(res?.roleLevel || 0);
+      if (roleLevel <= 0) {
+        return {
+          text: '미적용',
+          sub: '선임 연구원 이상 등급부터 혜택이 적용됩니다'
+        };
+      }
+
+      const joinedAtRaw = String(res?.joinedAt || res?.joinedAtRaw || res?.joinDate || res?.joinedDate || res?.signupDate || '').trim();
+      const joinedAtDate = joinedAtRaw ? new Date(joinedAtRaw) : null;
+
+      if (joinedAtDate && !Number.isNaN(joinedAtDate.getTime())) {
+        const expectedAt = new Date(joinedAtDate.getTime());
+        expectedAt.setDate(expectedAt.getDate() + 45);
+
+        return {
+          text: '미적용',
+          sub: `3배 확장 예정일 : ${formatMyUsageDateOnly(expectedAt)}`
+        };
+      }
+
+      return {
+        text: '미적용',
+        sub: '가입일을 확인할 수 없어 45일 확장 여부를 계산하지 못했습니다.'
+      };
+    }
+
+
+    function getMyUsageExtraSlotItems(res) {
+      const eventExtra = Math.max(0, Number(res?.eventExtraSlots || 0));
+      const sheetExtra = Math.max(0, Number(res?.sheetExtraSlots ?? res?.manualExtraSlots ?? 0));
+      const items = [];
+
+      if (eventExtra > 0) {
+        items.push({ count: `+${eventExtra}개`, reason: '저장슬롯 3배 확장 이벤트' });
+      }
+
+      if (sheetExtra > 0) {
+        items.push({ count: `+${sheetExtra}개`, reason: '버그제보 및 기타사유' });
+      }
+
+      return items;
+    }
+
+    function getMyUsageThemeClass(res) {
+      const roleLevel = Number(res?.roleLevel ?? res?.level ?? 0);
+      if (roleLevel >= 3) return 'usage-theme-senior';
+      if (roleLevel === 2) return 'usage-theme-lead';
+      if (roleLevel === 1) return 'usage-theme-junior';
+      return '';
+    }
+
+    function applyMyUsageTheme(res) {
+      const dialog = document.querySelector('#myUsageInfoModal .my-usage-dialog');
+      if (!dialog) return;
+      dialog.classList.remove('usage-theme-senior', 'usage-theme-lead', 'usage-theme-junior', 'usage-theme-public');
+      const themeClass = getMyUsageThemeClass(res);
+      if (themeClass) dialog.classList.add(themeClass);
+    }
+
+    function isPublicMyUsageUser(res = null) {
+      // 1순위: my_usage_info가 명시적으로 내려준 등록 여부
+      if (typeof res?.isRegistered === 'boolean') {
+        return res.isRegistered !== true;
+      }
+
+      // 2순위: login_ping 원본 응답
+      const ping = window.__loginPingResult || {};
+      if (typeof ping.isRegistered === 'boolean') {
+        return ping.isRegistered !== true;
+      }
+      if (ping.accessTier) {
+        return String(ping.accessTier).toLowerCase() !== 'member';
+      }
+
+      // 3순위: 프론트에 저장한 사용자 권한
+      const role = window.__userRole || {};
+      if (typeof role.isRegistered === 'boolean') {
+        return role.isRegistered !== true;
+      }
+      if (role.accessTier) {
+        return String(role.accessTier).toLowerCase() !== 'member';
+      }
+
+      return true;
+    }
+
+    function usageInfoPublicView(res) {
+      const email = escapeMyUsageHtml(res?.email || window.__userRole?.email || '로그인 계정');
+      const joinUrl = 'https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join';
+
+      return `
+        <div class="usage-public-view">
+          <section class="usage-public-hero">
+            <div class="usage-public-badge">일반 이용자</div>
+            <div class="usage-public-title">현재 Google 로그인으로 일반 계산기를 이용하고 있습니다.</div>
+            <div class="usage-public-desc">
+              캐릭터·장비 세팅 비교와 데미지 계산 기능은 이용할 수 있으며,
+              연구원 가입 시 저장과 관리 기능을 포함한 추가 혜택이 제공됩니다.
+            </div>
+            <div class="usage-public-account">로그인 계정 · ${email}</div>
+          </section>
+
+          <div class="usage-public-benefit-title">연구원 가입 혜택</div>
+          <div class="usage-public-benefits">
+            <div class="usage-public-benefit">
+              <div class="usage-public-benefit-icon">◆</div>
+              <strong>광고 없이 이용</strong>
+              <span>등록 연구원은 계산기를 보다 깔끔한 화면으로 이용할 수 있습니다.</span>
+            </div>
+            <div class="usage-public-benefit">
+              <div class="usage-public-benefit-icon">▣</div>
+              <strong>등급별 저장슬롯</strong>
+              <span>자주 사용하는 캐릭터와 장비 세팅을 저장하고 다시 불러올 수 있습니다.</span>
+            </div>
+            <div class="usage-public-benefit">
+              <div class="usage-public-benefit-icon">◎</div>
+              <strong>세팅 현황 기능</strong>
+              <span>여러 캐릭터의 장비와 세팅 상태를 한눈에 관리할 수 있습니다.</span>
+            </div>
+            <div class="usage-public-benefit">
+              <div class="usage-public-benefit-icon">✦</div>
+              <strong>등급별 추가 기능</strong>
+              <span>등급에 따라 저장슬롯 확장과 한마디 기능 등의 혜택이 적용됩니다.</span>
+            </div>
+          </div>
+
+          <section class="usage-public-join">
+            <strong>더 많은 혜택을 누리려면 연구원으로 가입해 보세요!</strong>
+            <p>가입 후 승인이 완료되면 계정 등급에 맞는 전용 기능을 이용해보실 수 있습니다.</p>
+            <a class="usage-public-join-btn" href="${joinUrl}" target="_blank" rel="noopener noreferrer">
+              연구원 가입하기
+            </a>
+          </section>
+        </div>
+      `;
+    }
+
+
+    function escapeMyUsageHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, (ch) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[ch]));
+    }
+
+
+    function usageInfoRow(label, value, sub = '', tone = '') {
+      const v = String(value || '');
+      const toneClass = tone ? ` tone-${tone}` : '';
+      const extra = sub ? `<div class="usage-info-sub">${escapeMyUsageHtml(sub)}</div>` : '';
+      return `
+        <div class="usage-info-row${toneClass}">
+          <div class="usage-info-label">${escapeMyUsageHtml(label)}</div>
+          <div class="usage-info-value">${escapeMyUsageHtml(v)}${extra}</div>
+        </div>
+      `;
+    }
+
+
+    function usageInfoExtraSlotRow(res) {
+      const items = getMyUsageExtraSlotItems(res);
+      const body = items.length
+        ? `<div class="usage-extra-list">${items.map(item => `
+            <div class="usage-extra-item">
+              <div class="usage-extra-count">${escapeMyUsageHtml(item.count)}</div>
+              <div class="usage-extra-reason">${escapeMyUsageHtml(item.reason)}</div>
+            </div>
+          `).join('')}</div>`
+        : '<div class="usage-extra-count">0개</div>';
+
+      return `
+        <div class="usage-info-row">
+          <div class="usage-info-label">추가 저장슬롯</div>
+          <div class="usage-info-value">${body}</div>
+        </div>
+      `;
+    }
+
+    function usageInfoSummary(res, eventText, phraseText) {
+      const role = escapeMyUsageHtml(getMyUsageRoleDisplay(res));
+      const joinedDate = escapeMyUsageHtml(getMyUsageJoinedDateText(res) || '가입일 정보 없음');
+      const totalSlots = Number(res.totalSlots || res.presetSlots || 0);
+      const formula = escapeMyUsageHtml(res.slotFormulaText || `기본 ${Number(res.baseSlots || 0)}개 + 추가 ${Number(res.extraSlots || 0)}개`);
+      const event = escapeMyUsageHtml(eventText || '미적용');
+      const phrase = escapeMyUsageHtml(phraseText || '-');
+
+      return `
+        <div class="usage-info-summary">
+          <div class="usage-summary-card primary">
+            <div class="usage-summary-label">현재 등급</div>
+            <div class="usage-summary-value">${role}</div>
+            <div class="usage-summary-sub">가입일: ${joinedDate}</div>
+          </div>
+          <div class="usage-summary-card gold">
+            <div class="usage-summary-label">현재 사용 가능 슬롯</div>
+            <div class="usage-summary-value">${totalSlots}개</div>
+            <div class="usage-summary-sub">${formula} · 저장슬롯 확장 ${event} · 한마디 ${phrase}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadMyUsageInfoIntoModal() {
+      const box = document.getElementById('myUsageInfoContent');
+      if (!box) return;
+
+      applyMyUsageTheme(null);
+
+      box.innerHTML = usageInfoRow('상태', '불러오는 중...');
+
+      try {
+        const res = await apiJSON('my_usage_info', {});
+
+        // 백엔드가 일반 사용자 정보를 정상 응답으로 내려주면
+        // 등록 사용자용 등급 화면 대신 가입 안내 화면을 표시한다.
+        if (res && isPublicMyUsageUser(res)) {
+          const dialog = document.querySelector('#myUsageInfoModal .my-usage-dialog');
+          if (dialog) dialog.classList.add('usage-theme-public');
+
+          box.innerHTML = usageInfoPublicView({
+            email:
+              res.email ||
+              window.__userRole?.email ||
+              window.__loginPingResult?.email ||
+              ''
+          });
+          return;
+        }
+
+        // 이전 백엔드가 user_not_found를 반환하더라도 일반 사용자로 처리하는 호환 분기
+        if (!res || !res.ok) {
+          if (res?.error === 'user_not_found') {
+            const dialog = document.querySelector('#myUsageInfoModal .my-usage-dialog');
+            if (dialog) dialog.classList.add('usage-theme-public');
+
+            box.innerHTML = usageInfoPublicView({
+              email:
+                window.__userRole?.email ||
+                window.__loginPingResult?.email ||
+                ''
+            });
+            return;
+          }
+
+          box.innerHTML = usageInfoRow('상태', res?.message || res?.error || '이용 정보를 불러오지 못했습니다.');
+          return;
+        }
+
+        applyMyUsageTheme(res);
+
+        const extensionInfo = getMyUsageSlotExtensionInfo(res);
+        const eventText = extensionInfo.text;
+        const eventSub = extensionInfo.sub;
+        const roleDisplay = getMyUsageRoleDisplay(res);
+        const joinedDateText = getMyUsageJoinedDateText(res) || '가입일 정보 없음';
+
+        const phraseText = res.canEditPhrase
+          ? (res.canChangePhrase ? '변경 가능' : '변경 대기 중')
+          : '사용 불가';
+
+        const currentPhraseMessage = String(res.phraseMessage || '').trim();
+        const phraseSubParts = [];
+        if (currentPhraseMessage) phraseSubParts.push(currentPhraseMessage);
+        phraseSubParts.push((!res.canChangePhrase && res.phraseNextAt)
+          ? `다음 변경 가능일: ${formatMyUsageDate(res.phraseNextAt)}`
+          : (res.canChangePhrase ? '지금 한마디를 변경할 수 있습니다.' : '책임 등급 이상부터 한마디를 사용할 수 있습니다.'));
+        const phraseSub = phraseSubParts.filter(Boolean).join('\n');
+
+        box.innerHTML = usageInfoSummary(res, eventText, phraseText) + [
+          usageInfoRow('현재 등급', roleDisplay, res.email || ''),
+          usageInfoRow('가입일', joinedDateText),
+          usageInfoRow('기본 저장슬롯', `${Number(res.baseSlots || 0)}개`, getMyUsageBaseSlotSub(res)),
+          usageInfoRow('저장슬롯 확장', eventText, eventSub, res.slotEventActive ? 'good' : ''),
+          usageInfoExtraSlotRow(res),
+          usageInfoRow('현재 사용 가능 슬롯', `${Number(res.totalSlots || res.presetSlots || 0)}개`, res.slotFormulaText || `기본 ${Number(res.baseSlots || 0)}개 + 추가 ${Number(res.extraSlots || 0)}개`, 'warn'),
+          usageInfoRow('한마디 변경', phraseText, phraseSub, res.canChangePhrase ? 'good' : ''),
+        ].join('');
+      } catch (err) {
+        console.warn('[my_usage_info] load failed:', err);
+        box.innerHTML = usageInfoRow('상태', '이용 정보를 불러오는 중 오류가 발생했습니다.');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('btnMyUsageInfo');
+      if (btn && !btn._bound) {
+        btn._bound = true;
+        btn.addEventListener('click', openMyUsageInfoModal);
+      }
+
+      const modal = document.getElementById('myUsageInfoModal');
+      if (modal && !modal._bound) {
+        modal._bound = true;
+        modal.querySelectorAll('[data-my-usage-close]').forEach(el => {
+          el.addEventListener('click', closeMyUsageInfoModal);
+        });
+      }
+    });
+
+    window.updateMyUsageInfoButtonUI = updateMyUsageInfoButtonUI;
+
+
+  </script>
+
 </body>
 </html>
