@@ -9503,10 +9503,6 @@
         <button id="btnMyUsageInfo" class="contact-btn faq-btn" type="button" title="내 이용 정보" style="display:none;">
           <span class="contact-label">내 이용 정보</span>
         </button>
-        <button id="btnOpenSettingStatusInline" class="contact-btn faq-btn setting-status-header-btn" type="button"
-          title="캐릭터 전체 세팅 현황" style="display:none;" disabled>
-          <span class="contact-label">세팅 현황</span>
-        </button>
       </div>
       <!--span 은 한줄에서 특별히 강조 할때 쓴다. div는 한줄이 강제로 나뉘기때문에 쓴다.-->
       <div class="actions">
@@ -10167,6 +10163,10 @@
             <div id="equipDescPreview" class="stat-preview"></div>
             <div id="statList" class="stat-list"></div>
           </div>
+
+          <button id="btnOpenSettingStatusInline" class="setting-status-inline-btn" type="button" disabled>
+            캐릭터 전체 세팅 현황
+          </button>
 
           <!-- ▼ 항상 맨 아래 행(3행 auto) -->
           <div class="final-damage">
@@ -26452,7 +26452,7 @@ try {
           }
         }
         if (characterGhost) {
-          characterGhost.style.display = charName ? 'none' : 'block';
+          characterGhost.style.display = charName ? 'none' : 'grid';
         }
 
         // ✅ 프리셋 불러오기 후 시너지 효과 설정 버튼 표시 갱신
@@ -26919,7 +26919,7 @@ try {
             characterImg.style.display = 'block';
           }
           if (characterGhost) {
-            characterGhost.style.display = charName ? 'none' : 'block';
+            characterGhost.style.display = charName ? 'none' : 'grid';
           }
 
           // 상태에도 썸네일/풀 이미지 살짝 저장해두면 나중에 써먹기 좋음
@@ -30849,9 +30849,8 @@ wrap.appendChild(listBox);
           role.isRegistered === true
         );
 
-        // 헤더 버튼에는 과거 5열 내부 버튼용 클래스를 사용하지 않는다.
-        // 해당 클래스에는 height:36px !important가 있어 로그인 후 헤더 높이를 키운다.
-        btn.classList.remove('setting-status-inline-btn');
+        // 장비 설명 아래의 기존 버튼 디자인을 적용한다.
+        btn.classList.add('setting-status-inline-btn');
         btn.style.display = canOpen ? 'inline-flex' : 'none';
         btn.disabled = !canOpen;
 
@@ -31943,6 +31942,7 @@ return `
       s.seals = {};
       s.enchants = {};
       s.emblems = {};
+      s.refines = {};
       s.customOptions = {};
       s.customSkills = {};
       s.customOptLabel = null;
@@ -32088,7 +32088,19 @@ return `
           rects[2].classList.remove('selected', 'active');
         }
 
-        row.querySelectorAll('.seal-captions, .enh-caption, .enchant-caption').forEach((el) => el.remove());
+        // 무기(R1)와 보조장비(R5)의 연마도 선택 전 상태로 복원한다.
+        const slotCode = row.querySelector('.slot[data-slot]')?.getAttribute('data-slot');
+        if ((slotCode === 'R1' || slotCode === 'R5') && rects[3]) {
+          rects[3].textContent = '연마 설정';
+          rects[3].classList.remove('selected', 'active');
+          rects[3].dataset.role = 'refine';
+          rects[3].disabled = false;
+          rects[3].removeAttribute('data-unused');
+          rects[3].removeAttribute('aria-disabled');
+          rects[3].style.pointerEvents = '';
+        }
+
+        row.querySelectorAll('.seal-captions, .enh-caption, .enchant-caption, .refine-caption').forEach((el) => el.remove());
       });
 
       // 5) 엠블렘 도트 상태와 이미지까지 완전히 제거한다.
@@ -32185,6 +32197,19 @@ return `
         else el.selectedIndex = 0;
         el.dispatchEvent(new Event('change', { bubbles: true }));
       });
+
+      // 시간 기준과 던전 난이도는 초기화 후 지정된 기본값으로 복원한다.
+      const timeSelect = document.getElementById('selTime');
+      if (timeSelect) {
+        timeSelect.value = '1m';
+        timeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      const difficultySelect = document.getElementById('selDifficulty');
+      if (difficultySelect) {
+        difficultySelect.value = 'nugol_room';
+        difficultySelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
 
       // 8) 상태 기반 보조 UI를 다시 그린다.
       try { refreshEnhLabelsFromState?.(); } catch (_) {}
