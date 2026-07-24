@@ -210,6 +210,69 @@
       font-size: 12px;
     }
 
+    @media (max-width: 620px) {
+      .login-action-row {
+        flex-wrap: wrap;
+      }
+
+      .guest-entry-row {
+        flex: 1 1 100%;
+      }
+    }
+
+    /* ✅ Google 로그인 + 비로그인 입장 버튼 가로 배치 */
+    .login-action-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      flex-wrap: nowrap;
+    }
+
+    .login-action-row .g_id_signin {
+      flex: 0 0 auto;
+    }
+
+    .guest-entry-row {
+      flex: 1 1 auto;
+      min-width: 0;
+      margin-top: 0;
+    }
+
+    .guest-entry-btn {
+      width: 100%;
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(110, 168, 255, 0.65);
+      background: linear-gradient(180deg, rgba(110, 168, 255, 0.18), rgba(110, 168, 255, 0.08));
+      color: #eaf2ff;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .14s ease, border-color .14s ease, background .14s ease, box-shadow .14s ease;
+    }
+
+    .guest-entry-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(143, 186, 255, 0.95);
+      background: linear-gradient(180deg, rgba(110, 168, 255, 0.28), rgba(110, 168, 255, 0.12));
+      box-shadow: 0 0 0 3px rgba(110, 168, 255, 0.10);
+    }
+
+    .guest-entry-btn:disabled {
+      opacity: .55;
+      cursor: wait;
+      transform: none;
+    }
+
+    .guest-entry-note {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
     /* ===== 오른쪽: 업데이트/공지 ===== */
     .notice {
       background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .03));
@@ -221,6 +284,25 @@
     .notice h3 {
       margin: 6px 0 10px;
       font-size: 18px;
+    }
+
+    .calculator-intro {
+      margin-bottom: 12px;
+    }
+
+    .calculator-intro h3 {
+      margin: 6px 0 8px;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    .calculator-intro p {
+      margin: 0;
+      color: #dbe6f5;
+      font-size: 14px;
+      line-height: 1.72;
+      font-weight: 500;
+      word-break: keep-all;
     }
 
     .notice .box {
@@ -1015,33 +1097,7 @@
       display: block;
     }
 
-    /* =========================================================
-       일반 로그인 사용자 전용 PC 5열 광고
-       - 등록 사용자는 기존 5열(stats-panel)을 그대로 사용
-       - 일반 사용자는 기존 5열 내용을 숨기고 광고 영역으로 교체
-       ========================================================= */
-    .public-right-column-ad {
-      display: none;
-      min-height: 100%;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
-      padding: 10px;
-      overflow: hidden;
-    }
-
-    body.access-public.pc .stats > .stats-panel {
-      display: none !important;
-    }
-
-    body.access-public.pc .stats > .public-right-column-ad {
-      display: flex;
-      flex-direction: column;
-    }
-
-    body.access-member .stats > .public-right-column-ad {
-      display: none !important;
-    }
+    /* 우측 5열은 로그인 여부와 관계없이 기존 계산기 패널을 그대로 사용 */
 
     .public-ad-label {
       flex: 0 0 auto;
@@ -1092,8 +1148,7 @@
       border-radius: 11px;
     }
 
-    .public-left-column-ad .temporary-promo-banner,
-    .public-right-column-ad .temporary-promo-banner {
+    .public-left-column-ad .temporary-promo-banner {
       flex: 0 0 auto;
       width: 100%;
       height: auto;
@@ -1102,16 +1157,28 @@
     }
 
     .public-left-column-ad {
-      gap: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 0;
       padding-top: 0;
     }
 
-    .public-right-column-ad {
-      padding-top: 0;
+    .public-left-column-ad > a {
+      display: block;
+      width: 100%;
+      text-decoration: none;
+      line-height: 0;
     }
 
-    .public-left-column-ad .temporary-promo-banner:first-child,
-    .public-right-column-ad .temporary-promo-banner:first-child {
+    .public-left-column-ad > a .temporary-promo-banner {
+      display: block;
+      margin: 0 auto;
+      cursor: pointer;
+    }
+
+    .public-left-column-ad .temporary-promo-banner:first-child {
       margin-top: 0;
     }
 
@@ -1120,6 +1187,8 @@
       width: 100%;
       display: block;
       margin-top: 16px;
+      text-decoration: none;
+      cursor: pointer;
       overflow: hidden;
       border-radius: 14px;
       border: 1px solid rgba(207, 162, 79, 0.38);
@@ -9539,7 +9608,13 @@
   <!-- 오른쪽: 공지/업데이트 -->
   <div class="sidebar">
             <aside class="notice">
-              <h3>* 계산기는 계속해서 업데이트될 예정입니다!</h3>
+              <div class="calculator-intro">
+                <p>
+                  * 캐릭터, 장비, 강화, 마법봉인, 마법부여, 엠블렘, 스킬트리와 전투 조건을 반영해
+                  세팅별 예상 데미지를 비교할 수 있습니다. <br>
+                  다양한 장비 조합과 전투 조건을 직접 설정하여 데미지 변화와 세팅 효율을 비교해보세요.
+                </p>
+              </div>
               <div class="box">
                 <div class="notice-top-row">
                   <div class="badge-danger">25.11.29 시즌5 신규 계산기 배포</div>
@@ -9551,9 +9626,6 @@
                   <li>계산기 사용법 <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>02.20 <span class="notice-badge">게임실험연구소 계산기 모바일 버전</span> 오픈!</li>
-                  <li>06.20 침식 무기 개별 고유효과 설정 불능 버그 수정</li>
-                  <li>06.23 장비 아이콘 마우스 오버시 설명 추가</li>
-                  <li>06.24 <span class="notice-badge">게임실험연구소 전체 캐릭 현황</span> 오픈!</li>
                   <li>06.29 저장슬롯 메모 기능 추가</li>
                   <li>07.05 내 정보 보기 기능 추가</li>
                   <li>07.08 <span class="flame-badge">데미지 계산 속도 대폭 개선</span></li>
@@ -9568,12 +9640,11 @@
               </div>
             </aside>
             <div class="login-card">
-              <div class="login-title">계산기 접근을 위해 구글 계정으로 로그인</div>
+              <div class="login-title">던파모바일 시즌 5 데미지 계산기 이용하기</div>
               <div class="login-desc">
-                Google 로그인 후 누구나 손쉽게 계산기를 이용할 수 있습니다. <br>
+                로그인 없이 비회원으로도 일반 계산 기능을 바로 이용할 수 있습니다. <br>
                 연구원 계정은 저장 기능을 포함한 다양한 혜택을 이용할 수 있습니다.
               </div>
-
               <div class="login-row">
                 <!-- Google Sign-In 버튼 -->
                 <!-- 1) onload 세팅: client_id 교체 필수 -->
@@ -9582,9 +9653,16 @@
                   data-callback="onGoogleCredential" data-auto_select="true" data-auto_prompt="false"
                   data-itp_support="true">
                 </div>
-                <!-- 2) 버튼 렌더 -->
-                <div class="g_id_signin" data-type="standard" data-size="large" data-shape="pill" data-theme="outline"
-                  data-text="signin_with" data-logo_alignment="left">
+                <div class="login-action-row">
+                  <!-- 2) Google 로그인 버튼 렌더 -->
+                  <div class="g_id_signin" data-type="standard" data-size="large" data-shape="pill" data-theme="outline"
+                    data-text="signin_with" data-logo_alignment="left">
+                  </div>
+
+                  <!-- 비로그인 계산기 입장 -->
+                  <div class="guest-entry-row">
+                    <button id="btnGuestCalcOpen" class="guest-entry-btn" type="button">로그인 없이 계산기 이용하기</button>
+                  </div>
                 </div>
 
                 <div class="login-hint">※ 버튼이 보이지 않으면 팝업/추적차단을 확인해 주세요.</div>
@@ -9594,9 +9672,10 @@
         </div>
 
         <!-- 광고 승인 전: 로그인 메인 하단 유튜브 홍보 배너 -->
-        <div class="login-bottom-promo" aria-label="게임실험연구소 유튜브 채널 홍보">
+        <a class="login-bottom-promo" href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA"
+          target="_blank" rel="noopener noreferrer" aria-label="게임실험연구소 유튜브 채널 열기">
           <img src="img/bottom.png" alt="게임실험연구소 유튜브 채널 홍보 배너" />
-        </div>
+        </a>
 
       </div>
 
@@ -9611,8 +9690,9 @@
     <section class="layout">
       <!-- 일반 로그인 사용자 전용: 새 1열 광고 영역 -->
       <aside id="publicLeftColumnAd" class="public-left-column-ad" aria-label="게임실험연구소 유튜브 채널 홍보">
-        <img class="temporary-promo-banner" src="img/left.png" alt="게임실험연구소 유튜브 채널 홍보 배너" />
-        <img class="temporary-promo-banner" src="img/left.png" alt="게임실험연구소 유튜브 채널 홍보 배너" />
+        <a href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA" target="_blank" rel="noopener noreferrer" aria-label="게임실험연구소 유튜브 채널 새 탭에서 열기">
+          <img class="temporary-promo-banner" src="img/left.png" alt="게임실험연구소 유튜브 채널 홍보 배너" />
+        </a>
       </aside>
 
       <div class="column left">
@@ -10184,31 +10264,12 @@
           </div>
         </div>
 
-        <!-- 일반 로그인 사용자 전용: PC 계산기 5열 광고 영역 -->
-        <div id="publicRightColumnAd" class="public-right-column-ad" aria-label="계산기 연구원 가입 홍보">
-          <img class="temporary-promo-banner" src="img/right.png" alt="계산기 연구원 가입 홍보 배너" />
-        </div>
       </aside>
 
     </section>
   </section>
   </div>
-  <!-- 일반 로그인 사용자 전용: 계산기 최초 진입 팝업 광고 -->
-  <div id="publicEntryAdModal" class="public-entry-ad-modal" aria-hidden="true">
-    <div class="public-entry-ad-backdrop"></div>
-    <div class="public-entry-ad-dialog" role="dialog" aria-modal="true" aria-labelledby="publicEntryAdTitle">
-      <div class="public-entry-ad-head">
-        <span id="publicEntryAdTitle">GAME LAB PROMOTION</span>
-      </div>
-      <div id="publicEntryAdContent" class="public-entry-ad-content promo-image-mode">
-        <img src="img/popup.png" alt="게임실험연구소 홍보 팝업" />
-      </div>
-      <div class="public-entry-ad-actions">
-        <button id="btnPublicAdHideToday" type="button">오늘 다시 보지 않기</button>
-        <button id="btnPublicAdClose" type="button">닫기</button>
-      </div>
-    </div>
-  </div>
+
 
   <!--ㅇ-->
   <div id="charModal" class="modal" aria-hidden="true">
@@ -11787,8 +11848,6 @@ window.__userRole = window.__userRole || {
         }
       }));
 
-      // 계산기 화면이 이미 열린 상태에서 권한 판정이 끝난 경우 팝업 광고 확인
-      setTimeout(openPublicEntryAdIfNeeded, 0);
     }
 
     const PUBLIC_ENTRY_AD_HIDE_KEY = 'gamelab_public_entry_ad_hide_date';
@@ -30922,6 +30981,99 @@ wrap.appendChild(listBox);
 
       // === 로그인 성공 콜백(GSI에서 호출) ===
       // ---------- 로그인 처리 ----------
+      // === 비로그인(게스트) 계산기 입장 ===
+      function createGuestSessionToken() {
+        const uuid = (window.crypto && typeof window.crypto.randomUUID === 'function')
+          ? window.crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+        return `GUEST.${uuid}`;
+      }
+
+      async function enterGuestCalculator() {
+        const btn = document.getElementById('btnGuestCalcOpen');
+        if (btn?.disabled) return;
+
+        const originalText = btn?.textContent || '로그인 없이 계산기 이용하기';
+
+        try {
+          if (btn) {
+            btn.disabled = true;
+            btn.textContent = '계산기 준비 중…';
+          }
+
+          // 게스트 토큰은 현재 탭에서만 사용한다.
+          // Google 로그인 토큰처럼 localStorage에 영구 저장하지 않는다.
+          const guestToken = createGuestSessionToken();
+          window.idToken = guestToken;
+          window.__GUEST_MODE__ = true;
+          window.__ADMIN_PIN_LOGIN_MODE__ = false;
+          sessionStorage.setItem('id_token', guestToken);
+          localStorage.removeItem('id_token');
+
+          // 기존 로그인 결과 캐시는 게스트 기준으로 다시 판정
+          window.__loginPingSent = false;
+          window.__loginPingResult = null;
+          window.__userRole = {
+            accessTier: 'public',
+            isRegistered: false,
+            adsEnabled: true,
+            canUsePreset: false,
+            roleLabel: '비로그인 이용자',
+            roleLevel: 0,
+            presetSlots: 0,
+            totalSlots: 0,
+          };
+
+          const isMobileEnv =
+            /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent) ||
+            window.matchMedia('(max-width: 980px)').matches;
+
+          if (isMobileEnv) {
+            // 모바일 계산기도 같은 게스트 토큰을 이어받아 사용
+            location.href = 'mobileindex.html';
+            return;
+          }
+
+          showOverlay('데이터 준비 중…');
+          window.__CALC_DATA_READY__ = true;
+          setProgressExactMonotonic(5, '초기 설정 불러오는 중…');
+
+          await initCalculatorOnce();
+          window.showCalcView?.('pc');
+
+          if (typeof window.showQuatroNoticeOnce === 'function') {
+            window.showQuatroNoticeOnce();
+          }
+        } catch (err) {
+          console.error('[guest-entry]', err);
+          window.__GUEST_MODE__ = false;
+          window.idToken = null;
+          sessionStorage.removeItem('id_token');
+
+          const msg = err?.message === 'login_timeout'
+            ? '비로그인 계산기 초기화에 실패했습니다.'
+            : '계산기 초기화에 실패했습니다. 새로고침 후 다시 시도해주세요.';
+
+          (typeof toast === 'function' ? toast : alert)(msg);
+        } finally {
+          hideOverlay();
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = originalText;
+          }
+        }
+      }
+
+      window.enterGuestCalculator = enterGuestCalculator;
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('btnGuestCalcOpen');
+        if (btn && btn.dataset.bound !== '1') {
+          btn.dataset.bound = '1';
+          btn.addEventListener('click', enterGuestCalculator);
+        }
+      });
+
       async function onGoogleCredential({ credential }) {
         try {
           if (!credential) throw new Error("ID 토큰 없음");
@@ -31195,9 +31347,9 @@ wrap.appendChild(listBox);
           const card2 = document.querySelector('.login-card');
           if (card2) {
             card2.innerHTML = `
-              <div class="login-title">계산기 접근을 위해 구글 계정으로 로그인</div>
+              <div class="login-title">던파모바일 계산기 이용하기</div>
               <div class="login-desc">
-                Google 로그인 후 누구나 계산기를 이용할 수 있습니다. 등록 계정은 광고 없이 저장 기능을 이용합니다.
+                로그인 없이도 일반 계산 기능을 이용할 수 있습니다. 등록 계정은 로그인 후 저장 기능을 이용할 수 있습니다.
               </div>
               <div class="login-row">
                 <div id="g_id_onload"
@@ -31205,7 +31357,11 @@ wrap.appendChild(listBox);
                   data-callback="onGoogleCredential" data-auto_prompt="true"></div>
                 <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
                   data-text="signin_with" data-shape="pill" data-logo_alignment="left"></div>
-                <span class="login-hint">허용된 Google 계정만 접근 가능</span>
+                <span class="login-hint">Google 로그인: 등록 계정의 저장/불러오기 등 추가 기능 이용</span>
+                <div class="guest-entry-row">
+                  <button id="btnGuestCalcOpen" class="guest-entry-btn" type="button">로그인 없이 계산기 이용하기</button>
+                  <div class="guest-entry-note">비로그인 상태에서는 계정 전용 저장 기능이 제한됩니다.</div>
+                </div>
               </div>`;
 
             try {
@@ -31227,6 +31383,12 @@ wrap.appendChild(listBox);
               }
             } catch (e) {
               console.warn('[admin_pin_login] GSI 버튼 복원 실패:', e);
+            }
+
+            const guestBtn = card2.querySelector('#btnGuestCalcOpen');
+            if (guestBtn && guestBtn.dataset.bound !== '1') {
+              guestBtn.dataset.bound = '1';
+              guestBtn.addEventListener('click', enterGuestCalculator);
             }
           }
         }

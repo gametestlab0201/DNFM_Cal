@@ -7595,6 +7595,7 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
     window.idToken = sessionStorage.getItem('id_token') || null;
+    window.__GUEST_MODE__ = String(window.idToken || '').startsWith('GUEST.');
     window.WEBAPP_URL = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
     const WEBAPP_URL = window.WEBAPP_URL;   // 기존 코드들이 쓰는 식별자 보존
 
@@ -7607,12 +7608,26 @@
       );
     }
 
+    function isGuestMobileToken(token) {
+      return String(token || '').trim().startsWith('GUEST.');
+    }
+
     function rememberMobileToken(token) {
       const t = String(token || '').trim();
       if (!t) return;
+
       window.idToken = t;
+      window.__GUEST_MODE__ = isGuestMobileToken(t);
+
+      // 게스트 토큰은 현재 탭에서만 유지한다.
+      // Google 로그인 토큰처럼 localStorage에 영구 저장하지 않는다.
       sessionStorage.setItem('id_token', t);
-      localStorage.setItem('id_token', t);
+
+      if (window.__GUEST_MODE__) {
+        localStorage.removeItem('id_token');
+      } else {
+        localStorage.setItem('id_token', t);
+      }
     }
 
     function openSettingStatusPageMobile() {
@@ -7634,10 +7649,17 @@
       const btn = document.getElementById('btnOpenSettingStatusMobile');
       if (!btn) return;
 
-      // ✅ 모바일 1페이지의 "캐릭터 전체 세팅 현황" 버튼은 로그인 허용 유저 전체에게 노출
+      // ✅ 모바일 1페이지의 "캐릭터 전체 세팅 현황" 버튼은 실제 로그인 사용자에게만 노출
+      // 게스트(GUEST.*)는 일반 계산 기능만 사용하고 계정/저장 전용 기능은 숨긴다.
       const ping = window.__loginPingResult_mobile || {};
       const role = window.__userRole || {};
-      const canOpen = !!(ping.ok || role.isLoggedIn || getStoredMobileToken());
+      const token = getStoredMobileToken();
+      const isGuest = isGuestMobileToken(token);
+      const canOpen = !isGuest && !!(
+        ping.isRegistered ||
+        role.isLoggedIn ||
+        role.email
+      );
 
       btn.classList.add('setting-status-mobile-btn');
       btn.style.display = canOpen ? 'inline-flex' : 'none';
@@ -12416,7 +12438,15 @@
     function canShowMyUsageInfoButton_mobile() {
       const lp = window.__loginPingResult_mobile || {};
       const ur = window.__userRole || {};
-      return !!(lp.ok || ur.isLoggedIn || ur.email);
+      const token = getStoredMobileToken();
+
+      if (isGuestMobileToken(token)) return false;
+
+      return !!(
+        lp.isRegistered ||
+        ur.isLoggedIn ||
+        ur.email
+      );
     }
 
     function updateMyUsageInfoButtonUI_mobile() {
