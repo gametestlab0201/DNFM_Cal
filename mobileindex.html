@@ -5,6 +5,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>게임실험연구소 계산기 (시즌5) - Mobile</title>
+  <link rel="stylesheet" href="./common-header.css?v=20260809-1">
+  <link rel="stylesheet" href="./common-header-modals.css?v=20260809-1">
 
   <style>
     :root {
@@ -51,313 +53,7 @@
       flex-direction: column;
     }
 
-    .m-header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      padding: calc(10px + var(--safe-top)) 12px 2px 12px;
-      border-bottom: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.15));
-      backdrop-filter: blur(10px);
-    }
-
-    .m-header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    /* ====== 한마디 (헤더 바로 아래) ====== */
-    .m-oneliner {
-      margin-top: 6px !important;
-      /* 간격도 같이 축소 */
-      padding: 6px 10px !important;
-      /* 내부도 축소 */
-
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.04);
-
-      display: flex;
-      align-items: center !important;
-      /* ✅ 핵심: 가운데 정렬로 높이 흔들림 방지 */
-      gap: 6px !important;
-
-      height: 35px !important;
-      /* ✅ 핵심: 고정 높이 */
-      min-height: 35px !important;
-      /* 혹시 min-height가 다른 곳에서 살아있을 때 대비 */
-      max-height: 35px !important;
-
-      overflow: hidden !important;
-      /* ✅ 내용이 커도 박스가 늘지 않게 */
-    }
-
-    .m-oneliner .bullet {
-      opacity: 0.65;
-      line-height: 1.2;
-      flex: 0 0 auto;
-      padding-top: 1px;
-    }
-
-    .m-oneliner .text {
-      font-size: 12px;
-      line-height: 1.25;
-      color: rgba(233, 238, 247, 0.92);
-      overflow: hidden;
-
-      /* 2줄까지만 보여주기 */
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-    }
-
-    .m-oneliner .muted {
-      color: var(--muted);
-    }
-
-    /* ===== 한마디(PC 배지/아이콘 스타일 이식) ===== */
-    .m-oneliner .text.fade-out {
-      opacity: 0;
-      transition: opacity .18s ease;
-    }
-
-    .m-oneliner .text {
-      opacity: 1;
-      transition: opacity .18s ease;
-
-      /* ✅ 긴 한마디 마퀴가 실제 남은 폭을 기준으로 계산되도록 보정 */
-      display: block;
-      flex: 1 1 auto;
-      min-width: 0;
-      max-width: 100%;
-      white-space: nowrap;
-    }
-
-    .m-oneliner .hdrmsg {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-      /* ✅ 중요: inline-flex 자식이 줄어들 수 있게 */
-      min-width: 0;
-      max-width: 100%;
-      width: 100%;
-    }
-
-    .m-oneliner .msg-nick {
-      font-weight: 900;
-    }
-
-    .m-oneliner .msg-bullet {
-      opacity: .7;
-      padding: 0 2px;
-    }
-
-    .m-oneliner .msg-text {
-      display: block;
-      flex: 1 1 auto;
-      min-width: 0;
-      max-width: none;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: clip;
-      position: relative;
-    }
-
-    .m-oneliner .msg-text .msg-track {
-      display: inline-block;
-      white-space: nowrap;
-      transform: translateX(0);
-      will-change: transform;
-    }
-
-    .m-oneliner .msg-text.is-marquee .msg-track {
-      animation: mOneLinerMarquee var(--m-marquee-dur, 10s) linear 1 forwards;
-    }
-
-    @keyframes mOneLinerMarquee {
-      0% { transform: translateX(0); }
-      18% { transform: translateX(0); }
-      82% { transform: translateX(calc(-1px * var(--m-marquee-dist, 0))); }
-      100% { transform: translateX(calc(-1px * var(--m-marquee-dist, 0))); }
-    }
-
-    /* ===== 한마디 배지 (PC 수석 스타일 이식) ===== */
-
-    /* 공통: hdrmsg 라인 정렬 */
-    .m-oneliner .hdrmsg {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-    }
-
-    /* ✅ 수석 배지: PC처럼 골드 pill + 은은한 반짝임 */
-    .m-oneliner .tag-senior {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-
-      padding: 2px 10px;
-      min-width: 32px;
-      height: 20px;
-      border-radius: 999px;
-
-      font-size: 13px;
-      line-height: 1;
-
-      background: linear-gradient(135deg, #ffe08a 0%, #ffd257 45%, #ffc63a 100%);
-      border: 1px solid rgba(172, 124, 22, 0.55);
-      color: #2a1b00;
-
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* shimmer */
-    .m-oneliner .tag-senior::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, .45) 35%, transparent 70%);
-      transform: translateX(-120%);
-      animation: m_one_shimmer 2.4s linear infinite;
-      pointer-events: none;
-    }
-
-    @keyframes m_one_shimmer {
-      0% {
-        transform: translateX(-120%);
-      }
-
-      100% {
-        transform: translateX(120%);
-      }
-    }
-
-    /* 이모지 살짝 정렬 */
-    .m-oneliner .badge-emoji {
-      transform: translateY(-.5px);
-    }
-
-    /* ✅ 책임은 아이콘/배지가 아예 없으니 tag-lead 스타일은 필요 없음 (남겨도 되지만 사용 안 됨) */
-
-    /* ===== 수석 한마디: PC 네온 스타일 이식 ===== */
-    .m-oneliner .hdrmsg.senior {
-      position: relative;
-      filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.35));
-    }
-
-    /* 수석 본문 텍스트 네온 */
-    .m-oneliner .hdrmsg.senior .msg-text {
-      color: #fef9c3;
-      text-shadow:
-        0 0 4px rgba(250, 204, 21, 0.65),
-        0 0 8px rgba(250, 204, 21, 0.82),
-        0 0 14px rgba(250, 204, 21, 0.95);
-    }
-
-    /* 수석 닉네임도 PC처럼 푸른 그림자 */
-    .m-oneliner .hdrmsg.senior .msg-nick {
-      color: #e5e7eb;
-      font-weight: 600;
-      /* PC가 600쪽 느낌 */
-      text-shadow:
-        0 0 3px rgba(59, 130, 246, 0.55),
-        0 0 7px rgba(59, 130, 246, 0.75);
-      text-decoration: underline;
-      text-decoration-color: rgba(255, 198, 58, .7);
-      text-underline-offset: 2px;
-    }
-
-    /* (참고) 수석은 원칙상 점이 없지만, 혹시 남아있을 때만 색 보정 */
-    .m-oneliner .hdrmsg.senior .msg-bullet {
-      color: #facc15;
-      opacity: 0.9;
-    }
-
-    /* ===== 책임 한마디: 닉네임만 진하게(PC 규칙) ===== */
-    .m-oneliner .hdrmsg.lead .msg-nick {
-      font-weight: 700;
-    }
-
-    /* 책임 점(·)은 닉네임 앞에서 너무 튀지 않게 */
-    .m-oneliner .hdrmsg.lead .msg-bullet {
-      opacity: .7;
-      padding: 0 4px 0 0;
-      /* 닉네임과 간격 (앞에 붙으니 오른쪽만) */
-    }
-
-    /* ✅ 책임: 닉네임 앞 ‘두꺼운 점’(PC의 tag-lead 원형 도트 이식) */
-    .m-oneliner .tag-lead {
-      display: inline-block;
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(120, 120, 120, .75);
-      box-shadow: 0 0 0 1px rgba(120, 120, 120, .28);
-      margin-right: 2px;
-      vertical-align: middle;
-    }
-
-    /* ✅ 모바일 한마디 끝부분 확인용: 닉네임/배지 제외한 남은 폭만 본문이 차지 */
-    .m-oneliner .hdrmsg {
-      width: 100%;
-      min-width: 0;
-    }
-
-    .m-oneliner .msg-nick,
-    .m-oneliner .msg-bullet,
-    .m-oneliner .tag-senior,
-    .m-oneliner .tag-lead {
-      flex: 0 0 auto;
-    }
-
-
-    .m-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .m-title:active {
-      transform: translateY(1px);
-      opacity: 0.9;
-    }
-
-    .m-title .txt {
-      font-weight: 800;
-      letter-spacing: -0.2px;
-      font-size: 15px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .m-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 0 0 auto;
-    }
-
-    .m-action-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text);
-      font-size: 12px;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
+    /* 모바일 상단 헤더는 공통 헤더(common-header.css)를 사용 */
 
     /* ✅ hidden 속성이 있으면 무조건 숨김 */
     #mobileBladeWafflePreset[hidden],
@@ -1168,52 +864,7 @@
       transform: translateY(1px);
     }
 
-    /* ✅ 1페이지 캐릭터 선택 아래: 세팅현황 바로가기 버튼(PC 버튼 스타일 참고) */
-    #btnOpenSettingStatusMobile.setting-status-mobile-btn {
-      width: 100% !important;
-      height: 38px !important;
-      padding: 0 12px !important;
-      margin: 10px 0 2px !important;
-      border-radius: 999px !important;
-
-      display: none;
-      align-items: center !important;
-      justify-content: center !important;
-
-      border: 1px solid rgba(250, 204, 107, 0.78) !important;
-      background:
-        radial-gradient(circle at 30% 18%, rgba(255, 248, 202, 0.38), transparent 42%),
-        linear-gradient(135deg, #facc6b 0%, #cfa24f 52%, #8f6b2b 100%) !important;
-      color: #1b1207 !important;
-
-      font-size: 13px !important;
-      font-weight: 900 !important;
-      line-height: 1 !important;
-      white-space: nowrap !important;
-      text-align: center !important;
-
-      cursor: pointer;
-      box-shadow:
-        0 6px 14px rgba(0, 0, 0, 0.30),
-        inset 0 1px 0 rgba(255, 255, 255, 0.38) !important;
-      transition: box-shadow .15s, border-color .15s, opacity .15s, transform .15s, filter .15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    #btnOpenSettingStatusMobile.setting-status-mobile-btn:active:not(:disabled) {
-      transform: translateY(1px);
-      filter: brightness(1.06);
-      box-shadow:
-        0 8px 18px rgba(0, 0, 0, 0.38),
-        0 0 0 3px rgba(250, 204, 107, 0.20),
-        inset 0 1px 0 rgba(255, 255, 255, 0.46) !important;
-    }
-
-    #btnOpenSettingStatusMobile.setting-status-mobile-btn:disabled {
-      opacity: .5;
-      cursor: not-allowed;
-      filter: grayscale(30%);
-    }
+    /* 캐릭터 전체 세팅 현황 버튼 제거: 캐릭터 선택 영역이 남는 높이를 사용 */
 
     /* ✅ 모바일 캐릭터선택 박스 안 우측상단 솔플/파티 토글 */
     .mobile-solo-party-overlay {
@@ -1835,6 +1486,22 @@
       flex-direction: column;
       gap: 8px;
     }
+
+    .meq-season-divider{
+      display:flex;
+      align-items:center;
+      gap:9px;
+      margin:18px 2px 3px;
+      padding-left:8px;
+      color:rgba(250,214,139,.92);
+      font-size:11px;
+      font-weight:900;
+      text-align:left;
+    }
+    .meq-season-divider:first-child{margin-top:8px}
+    .meq-season-divider::before{display:none}
+    .meq-season-divider::after{content:"";height:1px;flex:1 1 auto;background:rgba(250,204,107,.28)}
+    .meq-season-divider span{white-space:nowrap}
 
     .meq-row {
       width: 100%;
@@ -3961,6 +3628,23 @@
       padding: 0 2px;
     }
 
+    .armor-set-season-divider{
+      grid-column:1/-1;
+      display:flex;
+      align-items:center;
+      gap:9px;
+      margin:20px 0 3px;
+      padding-left:8px;
+      color:rgba(250,214,139,.96);
+      font-size:12px;
+      font-weight:950;
+      text-align:left;
+    }
+    .armor-set-season-divider:first-child{margin-top:10px}
+    .armor-set-season-divider::before{display:none}
+    .armor-set-season-divider::after{content:"";height:1px;flex:1 1 auto;background:rgba(250,204,107,.34)}
+    .armor-set-season-divider .txt{white-space:nowrap}
+
 
     /* (PC처럼) 첫 줄 정렬 맞추기용 스페이서 */
     .armor-set-spacer {
@@ -5819,39 +5503,8 @@
 
   <div class="m-shell">
 
-    <!-- ====== Header ====== -->
-    <header class="m-header">
-      <div class="m-header-row">
-        <div class="m-title" id="btnGoMain" role="button" tabindex="0" aria-label="메인으로 이동">
-          <div class="txt">게임실험연구소 계산기 (시즌5)</div>
-        </div>
-
-        <div class="m-actions">
-          <!-- 문의하기 (PC와 동일 id 유지) -->
-          <button id="btnContactAdmin" class="m-action-btn" type="button" title="문의하기">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="3" y="6" width="18" height="13" rx="2"></rect>
-              <path d="M3 8l9 6 9-6"></path>
-            </svg>
-            <span>문의하기</span>
-          </button>
-
-          <!-- Q&A (PC와 동일 id 유지) -->
-          <button id="btnFaq" class="m-action-btn" type="button" title="문의 전 자주하는 Q&A">
-            <span>Q&amp;A</span>
-          </button>
-
-          <!-- 내 이용 정보 (special_user 테스트용) -->
-          <button id="btnMyUsageInfoM" class="m-action-btn" type="button" title="내 이용 정보" style="display:none;">
-            <span>내정보</span>
-          </button>
-        </div>
-      </div>
-      <div id="mOneLiner" class="m-oneliner" aria-live="polite">
-        <div class="text muted">한마디 불러오는 중…</div>
-      </div>
-
-    </header>
+    <!-- ====== Common Header ====== -->
+    <div id="commonSiteHeader" data-root="." data-title="게임실험연구소"></div>
 
     <!-- ====== Main (Swipe) ====== -->
     <main class="m-main">
@@ -5875,11 +5528,6 @@
               <!-- ✅ 선택 후 표시될 캐릭터 이미지 -->
               <img id="pickedCharImg" class="picked-char-img" alt="" />
             </div>
-
-            <button id="btnOpenSettingStatusMobile" class="setting-status-mobile-btn" type="button" disabled>
-              캐릭터 전체 세팅 현황
-            </button>
-
             <div class="hint">
             </div>
           </div>
@@ -6761,12 +6409,6 @@
                 </select>
               </label>
 
-              <label class="field">
-                <span class="label">던전 난이도(미구현)</span>
-                <select id="selDungeonM" class="select" disabled>
-                  <option value="" selected>누골방 고정(미구현)</option>
-                </select>
-              </label>
             </div>
 
             <!-- 3) 스킬룬 / 룬각인 -->
@@ -8069,6 +7711,7 @@
           window.__userRole = {
             level: lvl,
             label,
+            email: String(data.email || '').trim().toLowerCase(),
             presetSlots: slots,
             specialUser: !!data.specialUser,
             researchUser: !!data.researchUser,
@@ -9381,9 +9024,15 @@
       if (!sel) return;
       window.state = window.state || {};
       const s = window.state;
-      if (s.timeKey) sel.value = s.timeKey;
-      sel.addEventListener('change', () => { s.timeKey = sel.value; });
+      if (s.timeKey || s?.options?.timeWindow) sel.value = String(s.timeKey || s.options.timeWindow);
+      sel.addEventListener('change', () => {
+        s.timeKey = sel.value;
+        s.options = s.options && typeof s.options === 'object' ? s.options : {};
+        s.options.timeWindow = s.timeKey;
+      });
       if (!s.timeKey) s.timeKey = sel.value;
+      s.options = s.options && typeof s.options === 'object' ? s.options : {};
+      s.options.timeWindow = s.timeKey;
     }
 
     // 3페이지: 스킬룬(모달)
@@ -12915,6 +12564,27 @@
       });
     })();
 
+    // ===== 시즌 컬럼 공통 처리 =====
+    function getEquipSeasonValue_mobile(item){
+      const raw=item?._raw||item?.raw||item||{};
+      return String(item?.season??item?.['시즌']??raw?.season??raw?.['시즌']??'').trim();
+    }
+    function groupBySeasonStable_mobile(items){
+      const groups=new Map(),order=[];
+      for(const item of (Array.isArray(items)?items:[])){
+        const season=getEquipSeasonValue_mobile(item),key=season||'__NO_SEASON__';
+        if(!groups.has(key)){groups.set(key,[]);order.push(key)} groups.get(key).push(item);
+      }
+      return order.flatMap(k=>groups.get(k));
+    }
+    function seasonDisplayLabel_mobile(v){return String(v??'').trim()||'시즌 무관'}
+    function isSeasonGroupedEquipSlot_mobile(slot){
+      return [
+        'weapon','headshoulder','top','bottom','belt','shoes',
+        'bracelet','necklace','ring','sub','magestone','earring'
+      ].includes(String(slot||''));
+    }
+
     function renderMobileEquipList(slot, items) {
       const titleEl = document.getElementById('equipModalTitle');
       if (titleEl) titleEl.textContent = `${EQUIP_SLOT_LABELS[slot] || slot} 선택`;
@@ -12926,7 +12596,17 @@
       const wrap = document.createElement('div');
       wrap.className = 'meq-wrap';
 
-      for (const it of (items || [])) {
+      const useSeasonGroup=isSeasonGroupedEquipSlot_mobile(slot);
+      const groupedItems=useSeasonGroup?groupBySeasonStable_mobile(items||[]):(Array.isArray(items)?items:[]);
+      let lastSeasonKey=null;
+      for (const it of groupedItems) {
+        if(useSeasonGroup){
+          const seasonValue=getEquipSeasonValue_mobile(it),seasonKey=seasonValue||'__NO_SEASON__';
+          if(seasonKey!==lastSeasonKey){
+            const d=document.createElement('div'); d.className='meq-season-divider'; d.innerHTML=`<span>${seasonDisplayLabel_mobile(seasonValue)}</span>`;
+            wrap.appendChild(d); lastSeasonKey=seasonKey;
+          }
+        }
         const name = String(it?.name || '').trim();
         if (!name) continue;
 
@@ -13055,6 +12735,7 @@
       const desc = String(it?.desc ?? it?.['설명'] ?? it?.description ?? '').trim();
       const rarity = String(it?.rarity ?? it?.['레어리티'] ?? it?.['희귀도'] ?? it?.['등급'] ?? '').trim();
       const type = String(it?.type ?? it?.['타입'] ?? it?.['종류'] ?? '').trim();
+      const season = getEquipSeasonValue_mobile(it);
 
       let level = it?.level ?? it?.['레벨'] ?? it?.['요구레벨'];
       level = (level === '' || level == null) ? null : (Number.isFinite(+level) ? +level : null);
@@ -13073,6 +12754,7 @@
         desc: desc || undefined,
         rarity: rarity || undefined,
         type: type || undefined,
+        season: season || undefined,
         level: level,
         prefixLabel: prefixLabel || undefined,
       };
@@ -14944,7 +14626,9 @@
         const num = toNum(r.num);
         const name = norm(r.name || r['이름'] || type);
 
-        const prev = armorSetByType.get(type) || { type, name, num: 0, rarity, desc3: '', desc5: '' };
+        const season = norm(r.season || r['시즌'] || '');
+        const mapKey = `${season}\u0001${type}`;
+        const prev = armorSetByType.get(mapKey) || { type, name, season, num: 0, rarity, desc3: '', desc5: '' };
 
         // ✅ 3세트/5세트 설명 각각 저장
         const desc = (typeof _pickDesc_mobile === 'function') ? _pickDesc_mobile(r) : '';
@@ -14958,7 +14642,7 @@
           prev.rarity = rarity;
         }
 
-        armorSetByType.set(type, prev);
+        armorSetByType.set(mapKey, prev);
       }
 
 
@@ -14993,12 +14677,14 @@
         const 렙제 = row['레벨제한'] ?? row['렙제'] ?? row.level ?? row.reqLevel ?? 0;
         const 이미지 = row['이미지'] ?? row.image ?? row.img ?? '';
         const 레어리티 = row['레어리티'] ?? row.rarity ?? '';
+        const 시즌 = row['시즌'] ?? row.season ?? '';
         return {
           name: S(이름),
           type: S(종류),
           level: N(렙제),
           img: S(이미지),
           rarity: S(레어리티),
+          season: S(시즌),
           _raw: row,
         };
       }
@@ -15011,7 +14697,9 @@
       // 4) 세트별 카드 데이터 구성
       const cards = [];
 
-      armorSetByType.forEach((info, typeKey) => {
+      armorSetByType.forEach((info) => {
+        const typeKey=info.type;
+        const seasonKey=String(info.season||'').trim();
         const pieces = [];
 
         for (const slotKey of slotKeys) {
@@ -15024,15 +14712,17 @@
             row = rows.find(
               (r) =>
                 keyNoSpace(r.type) === keyNoSpace(typeKey) &&
+                norm(r.season) === seasonKey &&
                 norm(r.rarity || r['레어리티']) === '에픽'
             );
 
             // 혹시 에픽 장비가 없으면(데이터 누락 등) 그냥 종류만 맞는 첫 장비로 fallback
             if (!row) {
               row =
-                rows.find((r) => keyNoSpace(r.type) === keyNoSpace(typeKey)) ||
+                rows.find((r) => keyNoSpace(r.type) === keyNoSpace(typeKey) && norm(r.season) === seasonKey) ||
                 rows.find((r) => {
                   const rt = keyNoSpace(r.type);
+                  if(norm(r.season)!==seasonKey) return false;
                   const tt = keyNoSpace(typeKey);
                   return rt && tt && (rt.includes(tt) || tt.includes(rt));
                 });
@@ -15040,7 +14730,7 @@
           } else {
             // ✅ 익시드 모드: 기존과 동일 (종류만 맞으면 사용)
             row =
-              rows.find((r) => keyNoSpace(r.type) === keyNoSpace(typeKey)) ||
+              rows.find((r) => keyNoSpace(r.type) === keyNoSpace(typeKey) && norm(r.season) === seasonKey) ||
               rows.find((r) => {
                 const rt = keyNoSpace(r.type);
                 const tt = keyNoSpace(typeKey);
@@ -15084,6 +14774,7 @@
           id: typeKey,
           type: typeKey,
           name: info.name,
+          season: seasonKey,
           num: info.num,
           desc3: info.desc3 || '',
           desc5: info.desc5 || '',
@@ -15143,10 +14834,12 @@
         const num = toNum(r.num);
         const name = norm(r.name || r['이름'] || type);
 
-        const prev = accSetByType.get(type);
+        const season = norm(r.season || r['시즌'] || '');
+        const mapKey = `${season}\u0001${type}`;
+        const prev = accSetByType.get(mapKey);
         if (!prev || num > prev.num) {
           const desc = (typeof _pickDesc_mobile === 'function') ? _pickDesc_mobile(r) : String(r?.desc || '').trim();
-          accSetByType.set(type, { type, name, num, rarity, desc });
+          accSetByType.set(mapKey, { type, name, season, num, rarity, desc });
         }
       }
 
@@ -15180,12 +14873,14 @@
         const 렙제 = row['레벨제한'] ?? row['렙제'] ?? row.level ?? row.reqLevel ?? 0;
         const 이미지 = row['이미지'] ?? row.image ?? row.img ?? '';
         const 레어리티 = row['레어리티'] ?? row.rarity ?? '';
+        const 시즌 = row['시즌'] ?? row.season ?? '';
         return {
           name: S(이름),
           type: S(종류),
           level: N(렙제),
           img: S(이미지),
           rarity: S(레어리티),
+          season: S(시즌),
           _raw: row,
         };
       }
@@ -15197,7 +14892,9 @@
 
       const cards = [];
 
-      accSetByType.forEach((info, typeKey) => {
+      accSetByType.forEach((info) => {
+        const typeKey=info.type;
+        const seasonKey=String(info.season||'').trim();
         const pieces = [];
 
         for (const slotKey of slotKeys) {
@@ -15209,14 +14906,15 @@
             row = rows.find(
               (r) =>
                 norm(r.type) === norm(typeKey) &&
+                norm(r.season) === seasonKey &&
                 norm(r.rarity || r['레어리티']) === '에픽'
             );
             if (!row) {
-              row = rows.find((r) => norm(r.type) === norm(typeKey));
+              row = rows.find((r) => norm(r.type) === norm(typeKey) && norm(r.season) === seasonKey);
             }
           } else {
             // 익시드 모드: 종류만 맞으면 OK
-            row = rows.find((r) => norm(r.type) === norm(typeKey));
+            row = rows.find((r) => norm(r.type) === norm(typeKey) && norm(r.season) === seasonKey);
           }
 
           if (row) {
@@ -15244,6 +14942,7 @@
           id: typeKey,
           type: typeKey,
           name: info.name,
+          season: seasonKey,
           num: info.num,
           desc: info.desc || '',
           pieces,
@@ -15304,10 +15003,12 @@
         const num = toNum(r.num);
         const name = norm(r.name || r['이름'] || type);
 
-        const prev = specSetByType.get(type);
+        const season = norm(r.season || r['시즌'] || '');
+        const mapKey = `${season}\u0001${type}`;
+        const prev = specSetByType.get(mapKey);
         if (!prev || num > prev.num) {
           const desc = (typeof _pickDesc_mobile === 'function') ? _pickDesc_mobile(r) : String(r?.desc || '').trim();
-          specSetByType.set(type, { type, name, num, rarity, desc });
+          specSetByType.set(mapKey, { type, name, season, num, rarity, desc });
         }
       }
 
@@ -15342,12 +15043,14 @@
         const 렙제 = row['레벨제한'] ?? row['렙제'] ?? row.level ?? row.reqLevel ?? 0;
         const 이미지 = row['이미지'] ?? row.image ?? row.img ?? '';
         const 레어리티 = row['레어리티'] ?? row.rarity ?? '';
+        const 시즌 = row['시즌'] ?? row.season ?? '';
         return {
           name: S(이름),
           type: S(종류),
           level: N(렙제),
           img: S(이미지),
           rarity: S(레어리티),
+          season: S(시즌),
           _raw: row,
         };
       }
@@ -15359,7 +15062,9 @@
 
       const cards = [];
 
-      specSetByType.forEach((info, typeKey) => {
+      specSetByType.forEach((info) => {
+        const typeKey=info.type;
+        const seasonKey=String(info.season||'').trim();
         const pieces = [];
 
         for (const slotKey of slotKeys) {
@@ -15371,14 +15076,15 @@
             row = rows.find(
               (r) =>
                 norm(r.type) === norm(typeKey) &&
+                norm(r.season) === seasonKey &&
                 norm(r.rarity || r['레어리티']) === '에픽'
             );
             if (!row) {
-              row = rows.find((r) => norm(r.type) === norm(typeKey));
+              row = rows.find((r) => norm(r.type) === norm(typeKey) && norm(r.season) === seasonKey);
             }
           } else {
             // 익시드 모드: 종류만 맞으면 OK
-            row = rows.find((r) => norm(r.type) === norm(typeKey));
+            row = rows.find((r) => norm(r.type) === norm(typeKey) && norm(r.season) === seasonKey);
           }
 
           if (row) {
@@ -15406,6 +15112,7 @@
           id: typeKey,
           type: typeKey,
           name: info.name,
+          season: seasonKey,
           num: info.num,
           desc: info.desc || '',
           pieces,
@@ -15847,6 +15554,8 @@
         sets = (typeof buildSpecSetCardsFromSheets === 'function') ? buildSpecSetCardsFromSheets() : [];
       }
 
+      sets=groupBySeasonStable_mobile(sets);
+
       const box = document.getElementById(listId);
       if (!box) return;
 
@@ -15873,8 +15582,15 @@
       };
 
       let prevGroupKey = null;
+      let prevSeasonKey = null;
 
       sets.forEach((s) => {
+        const seasonValue=getEquipSeasonValue_mobile(s),seasonKey=seasonValue||'__NO_SEASON__';
+        if(seasonKey!==prevSeasonKey){
+          const d=document.createElement('div'); d.className='armor-set-season-divider';
+          const sp=document.createElement('span'); sp.className='txt'; sp.textContent=seasonDisplayLabel_mobile(seasonValue);
+          d.appendChild(sp); box.appendChild(d); prevSeasonKey=seasonKey; prevGroupKey=null;
+        }
         const curKey = _getSetGroupTitle_mobile(s?.name);
 
         if (prevGroupKey !== curKey) {
@@ -17676,7 +17392,8 @@ function buildSynergyPayloadMobile() {
 
         // 1) final_compute: 기존 5회 호출을 백엔드 내부 직접 호출 1회로 통합
         const s = window.state || {};
-        const timeKey = String(s.timeKey || '180');
+        normalizeCanonicalCalculatorState_mobile(s);
+        const timeKey = String(s.timeKey || '1m');
 
         let ownerKey = '';
         if (s.currentCharacter) {
@@ -17769,6 +17486,18 @@ function buildSynergyPayloadMobile() {
           patchBefore,
         };
 
+        // 공통 v3 상태에 실제 계산 조건을 확정한다.
+        s.timeKey = String(timeKey || '1m');
+        s.monster = monster ? { ...(monster || {}) } : null;
+        s.monsterName = String(monster?.name || '');
+        s.computeOptions = {
+          ...(s.computeOptions || {}),
+          forceCrit100: !!forceCrit100,
+          tohampo12: !!tohampo12,
+          patchBefore: !!patchBefore
+        };
+        normalizeCanonicalCalculatorState_mobile(s);
+
         const resCompute = await apiJSON('final_compute', {
           calcPayload: { payload, p: null },
           sumStatsPayload: { wantDbg: false },
@@ -17780,6 +17509,23 @@ function buildSynergyPayloadMobile() {
         if (!resCompute?.ok) {
           console.error('[MOBILE final_compute fail]', resCompute);
           throw new Error(resCompute?.message || resCompute?.error || 'final_compute_failed');
+        }
+
+        // 실제 final_compute에 사용한 payload를 PC와 동일한 canonical 키로 저장한다.
+        try {
+          const cloneForState = (v) => JSON.parse(JSON.stringify(v));
+          s.lastFinalCompute = cloneForState({
+            calcPayload: { payload, p: null },
+            sumStatsPayload: { wantDbg: false },
+            skillStatePayload,
+            skillUsesPayload,
+            computePayload
+          });
+          s.lastComputedTotal = Number(resCompute.total || 0) || 0;
+          s.lastComputedAt = Date.now();
+          normalizeCanonicalCalculatorState_mobile(s);
+        } catch (e) {
+          console.warn('[MOBILE final_compute] 공통 계산 payload 저장 실패:', e);
         }
 
         const sum = resCompute.sumStats || null;
@@ -19244,6 +18990,88 @@ function buildSynergyPayloadMobile() {
       return result;
     }
 
+
+    // ============================================================
+    // 공통 계산기 상태 규격 v3
+    // PC / Mobile / Board가 동일한 필드명을 사용한다.
+    // legacy 필드는 기존 코드 호환을 위해 mirror만 유지한다.
+    // ============================================================
+    function normalizeCanonicalCalculatorState_mobile(rawState) {
+      const s = rawState && typeof rawState === 'object' ? rawState : {};
+      s.calculatorStateVersion = 3;
+
+      const timeKey = String(
+        s.timeKey ||
+        s?.options?.timeWindow ||
+        s?.lastFinalCompute?.computePayload?.window ||
+        '1m'
+      ).trim() || '1m';
+      s.timeKey = timeKey;
+      s.options = s.options && typeof s.options === 'object' ? s.options : {};
+      s.options.timeWindow = timeKey;
+
+      const monsterName = String(
+        s?.monster?.name ||
+        s.monsterName ||
+        s?.lastFinalCompute?.computePayload?.monster?.name ||
+        ''
+      ).trim();
+      if (monsterName) {
+        s.monster = {
+          ...(s.monster && typeof s.monster === 'object' ? s.monster : {}),
+          name: monsterName
+        };
+        s.monsterName = monsterName;
+      } else {
+        s.monster = s.monster && typeof s.monster === 'object' ? s.monster : null;
+        s.monsterName = '';
+      }
+
+      const co = s.computeOptions && typeof s.computeOptions === 'object'
+        ? s.computeOptions
+        : {};
+      const lastCo = s?.lastFinalCompute?.computePayload || {};
+      if (typeof co.forceCrit100 !== 'boolean') {
+        co.forceCrit100 = typeof s.forceCrit100 === 'boolean'
+          ? s.forceCrit100
+          : !!lastCo.forceCrit100;
+      }
+      if (typeof co.tohampo12 !== 'boolean') {
+        co.tohampo12 = typeof s.tohampo12 === 'boolean'
+          ? s.tohampo12
+          : !!lastCo.tohampo12;
+      }
+      if (typeof co.patchBefore !== 'boolean') {
+        co.patchBefore = typeof s.patchBefore === 'boolean'
+          ? s.patchBefore
+          : !!lastCo.patchBefore;
+      }
+      s.computeOptions = co;
+      s.forceCrit100 = !!co.forceCrit100;
+      s.tohampo12 = !!co.tohampo12;
+      s.patchBefore = !!co.patchBefore;
+
+      const mode = String(s.soloPartyMode || '').trim().toLowerCase();
+      const isParty = mode === 'party' ? true : mode === 'solo' ? false : !!s.isPartyMode;
+      s.soloPartyMode = isParty ? 'party' : 'solo';
+      s.isPartyMode = isParty;
+
+      if (s.runeEngrave && typeof s.runeEngrave === 'object') {
+        const level = String(
+          s.runeEngrave.level ??
+          s.runeEngrave.levelVal ??
+          s.runeEngrave.tag ??
+          ''
+        ).trim();
+        if (level) {
+          s.runeEngrave.level = level;
+          s.runeEngrave.levelVal = level;
+        }
+      }
+
+      return s;
+    }
+
     function normalizePresetStateForSave_mobile(rawState) {
       const raw = rawState || {};
       const snap = _clonePlain_mobile(raw);
@@ -19297,6 +19125,7 @@ function buildSynergyPayloadMobile() {
       delete snap._skillTreesConvertedFor;
       delete snap._stOwnerKey;
 
+      normalizeCanonicalCalculatorState_mobile(snap);
       return snap;
     }
 
@@ -19311,18 +19140,47 @@ function buildSynergyPayloadMobile() {
 
     // 현재 프론트 state 전체를 스냅샷으로 만들어서 서버에 보낼 객체로 반환
     function buildFrontPresetState_mobile() {
+      window.state = window.state || {};
+      try {
+        const flags = (typeof getSpecialDamageFlagsMobile === 'function')
+          ? getSpecialDamageFlagsMobile()
+          : {
+              forceCrit100: !!window.state.forceCrit100,
+              tohampo12: !!window.state.tohampo12
+            };
+        window.state.computeOptions = {
+          ...(window.state.computeOptions || {}),
+          forceCrit100: !!flags.forceCrit100,
+          tohampo12: !!flags.tohampo12,
+          patchBefore: (typeof getPatchBeforeMobile === 'function')
+            ? !!getPatchBeforeMobile()
+            : !!window.state.patchBefore
+        };
+        normalizeCanonicalCalculatorState_mobile(window.state);
+      } catch (_) {}
       return normalizePresetStateForSave_mobile(window.state || {});
     }
 
     // 저장된 state를 window.state에 반영하고, 화면을 state 기준으로 갱신
     function applyFrontPresetState_mobile(presetState) {
-      const next = _clonePlain(presetState || {});
+      const next = normalizePresetStateForLoad_mobile(_clonePlain(presetState || {}));
 
       // ✅ window.state 객체를 교체하지 말고, 같은 참조를 유지한 채 내용만 갱신
       window.state = window.state || {};
       const s = window.state;
       for (const k of Object.keys(s)) delete s[k];
       Object.assign(s, next);
+      normalizeCanonicalCalculatorState_mobile(s);
+
+      // 공통 v3 계산 옵션을 실제 모바일 체크박스에도 복원
+      try {
+        const critEl = document.getElementById('chkForceCrit100M');
+        const tohampoEl = document.getElementById('chkTohampo12M');
+        const patchEl = document.getElementById('chkUsePrePatchSkillsM');
+        if (critEl) critEl.checked = !!s.computeOptions?.forceCrit100;
+        if (tohampoEl) tohampoEl.checked = !!s.computeOptions?.tohampo12;
+        if (patchEl) patchEl.checked = !!s.computeOptions?.patchBefore;
+      } catch (_) {}
 
       // ✅ 구형 프리셋 호환:
       //    soloPartyMode / isPartyMode 가 없으면 기본은 'party'
@@ -20496,7 +20354,6 @@ function buildSynergyPayloadMobile() {
       window.__presetPagerBound = true;
       window.addEventListener('DOMContentLoaded', () => {
         initPresetPager();
-        initOneLinerMobile();
 
         // ✅ 모바일 5페이지 시너지 효과 설정 초기화
         initMobileSynergyFeature();
@@ -20725,6 +20582,332 @@ function buildSynergyPayloadMobile() {
       </div>
     </div>
   </div>
+
+  <script>
+    /* =========================================================
+       PC / 모바일 계산기 마지막 상태 공통 동기화
+       - PC와 동일한 localStorage 키 사용
+       - 로그인 이메일별 마지막 상태 공유
+       - 모바일에서 변경한 상태도 게시판 "마지막 상태"와 공유
+       ========================================================= */
+    (() => {
+      const LAST_STATE_PREFIX = 'dnfm:last-calculator-state:v1:';
+      const SAVE_DELAY_MS = 700;
+      const CHECK_INTERVAL_MS = 2500;
+
+      let saveTimer = 0;
+      let restoreStarted = false;
+      let restoreFinished = false;
+      let applyingSavedState = false;
+      let dirty = false;
+      let lastSavedStateJson = '';
+
+      function getLoginEmailForSharedLastState_mobile() {
+        return String(
+          window.__userRole?.email ||
+          window.__loginPingResult_mobile?.email ||
+          window.CORE?.userEmail ||
+          ''
+        ).trim().toLowerCase();
+      }
+
+      function getSharedLastStateStorageKey_mobile() {
+        const email = getLoginEmailForSharedLastState_mobile();
+        return email ? `${LAST_STATE_PREFIX}${email}` : '';
+      }
+
+      function areSharedLastStateFunctionsReady_mobile() {
+        return (
+          window.state &&
+          typeof window.state === 'object' &&
+          typeof buildFrontPresetState_mobile === 'function' &&
+          typeof applyFrontPresetState_mobile === 'function'
+        );
+      }
+
+      function buildSharedLastStateSnapshot_mobile() {
+        const raw = buildFrontPresetState_mobile();
+        return (typeof normalizePresetStateForMobile === 'function')
+          ? normalizePresetStateForMobile(raw)
+          : raw;
+      }
+
+      function saveSharedLastState_mobile(force = false) {
+        if (applyingSavedState || !restoreFinished) return;
+        if (!force && !dirty) return;
+        if (!areSharedLastStateFunctionsReady_mobile()) return;
+
+        const key = getSharedLastStateStorageKey_mobile();
+        if (!key) return;
+
+        try {
+          const snapshot = buildSharedLastStateSnapshot_mobile();
+          const stateJson = JSON.stringify(snapshot);
+
+          if (!force && stateJson === lastSavedStateJson) {
+            dirty = false;
+            return;
+          }
+
+          localStorage.setItem(key, JSON.stringify({
+            version: 1,
+            savedAt: Date.now(),
+            source: 'mobile',
+            state: snapshot
+          }));
+
+          lastSavedStateJson = stateJson;
+          dirty = false;
+        } catch (error) {
+          console.warn('[모바일 마지막 설정 자동 저장] 실패:', error);
+        }
+      }
+
+      function scheduleSharedLastStateSave_mobile() {
+        if (!restoreFinished || applyingSavedState) return;
+        dirty = true;
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => saveSharedLastState_mobile(false), SAVE_DELAY_MS);
+      }
+
+      function refreshSharedEquipSummary_mobile() {
+        const run = () => {
+          try { syncEquipSubOptionsFromState_mobile?.(); } catch (error) {
+            console.warn('[모바일 마지막 설정 자동 복원] 장비 부가옵션 UI 갱신 실패:', error);
+          }
+          try { syncUniqueMiniLabels?.(); } catch (_) {}
+        };
+
+        // applyFrontPresetState_mobile 직후 + 실제 레이아웃이 한 번 그려진 뒤 모두 갱신한다.
+        run();
+        requestAnimationFrame(() => {
+          run();
+          setTimeout(run, 120);
+        });
+      }
+
+      function restoreSharedSkillTreeCompat_mobile() {
+        try {
+          const s = window.state || {};
+          const charKey = (typeof _getCurrentCharKeyForPreset_mobile === 'function')
+            ? _getCurrentCharKeyForPreset_mobile(s)
+            : String(s?.currentCharacter?.ownerKey || '').trim().replace(/\s+/g, '');
+
+          // 저장슬롯 불러오기와 동일하게 PC ownerKey를 모바일 현재 캐릭터 키로 복구한다.
+          if (
+            charKey &&
+            s.skillTrees &&
+            typeof s.skillTrees === 'object' &&
+            (!s.skillTrees[charKey] || Object.keys(s.skillTrees[charKey]).length === 0)
+          ) {
+            for (const [ownerKey, tree] of Object.entries(s.skillTrees)) {
+              if (!tree || typeof tree !== 'object') continue;
+              if (typeof _looseOwnerMatch === 'function' && !_looseOwnerMatch(ownerKey, charKey)) continue;
+
+              const remapped = {};
+              for (const [skillKey, node] of Object.entries(tree)) {
+                const skillName = (typeof _stripPcSkillKeyToName === 'function')
+                  ? _stripPcSkillKeyToName(skillKey)
+                  : String(skillKey || '').trim();
+                if (!skillName) continue;
+
+                const next = {
+                  ...(node && typeof node === 'object' ? _clonePlain_mobile(node) : {}),
+                  spLv: Number(node?.spLv ?? node?.lv ?? node?.level ?? 0) || 0,
+                  tpLv: Number(node?.tpLv ?? node?.tp ?? 0) || 0,
+                };
+
+                if (node?.chargeStage != null) next.chargeStage = Number(node.chargeStage) || 0;
+                if (node?.chargeStageIndex != null) next.chargeStageIndex = Number(node.chargeStageIndex) || 0;
+                if (node?.extremeCharge === true) next.extremeCharge = true;
+                if (node?.extremeOpen === true) next.extremeOpen = true;
+                if (node?.doubleOpen === true) next.doubleOpen = true;
+
+                remapped[skillName] = next;
+              }
+
+              if (Object.keys(remapped).length) {
+                s.skillTrees[charKey] = remapped;
+                break;
+              }
+            }
+          }
+
+          const hasTree = !!(
+            charKey &&
+            s.skillTrees?.[charKey] &&
+            Object.keys(s.skillTrees[charKey]).length
+          );
+          const hasLvMap = !!(
+            (s.skillLv && Object.keys(s.skillLv).length) ||
+            (s.skillTpLv && Object.keys(s.skillTpLv).length)
+          );
+
+          if (!hasTree && hasLvMap && typeof syncSkillTreesFromLvMaps_mobile === 'function') {
+            syncSkillTreesFromLvMaps_mobile(s.currentCharacter);
+          }
+        } catch (error) {
+          console.warn('[모바일 마지막 설정 자동 복원] 스킬트리 호환 복원 실패:', error);
+        }
+      }
+
+      async function finalizeSharedSkillUi_mobile() {
+        // 모바일 초기 진입 시 CORE의 skill:list가 마지막 상태보다 늦게 준비될 수 있다.
+        // 실제 스킬 데이터가 준비될 때까지 기다린 뒤 한 번만 최종 렌더한다.
+        for (let attempt = 0; attempt < 80; attempt++) {
+          let rows = [];
+          try {
+            rows = (typeof _getSkillListRaw === 'function') ? _getSkillListRaw() : [];
+          } catch (_) {}
+
+          if (Array.isArray(rows) && rows.length > 0) {
+            restoreSharedSkillTreeCompat_mobile();
+            try {
+              ensurePage4Init?.();
+              renderSkillPageMobile?.(window.state?.currentCharacter);
+              updateSkillRemainBar?.();
+            } catch (error) {
+              console.warn('[모바일 마지막 설정 자동 복원] 스킬 UI 최종 갱신 실패:', error);
+            }
+            return true;
+          }
+
+          await new Promise(resolve => setTimeout(resolve, 250));
+        }
+
+        console.warn('[모바일 마지막 설정 자동 복원] skill:list 준비 대기 시간 초과');
+        return false;
+      }
+
+      async function restoreSharedLastState_mobile() {
+        if (restoreStarted || restoreFinished) return;
+        if (!areSharedLastStateFunctionsReady_mobile()) return;
+
+        const key = getSharedLastStateStorageKey_mobile();
+        if (!key) return;
+
+        restoreStarted = true;
+
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) {
+            restoreFinished = true;
+            dirty = false;
+            return;
+          }
+
+          const saved = JSON.parse(raw);
+          let snapshot = saved?.state;
+          if (!snapshot || typeof snapshot !== 'object') {
+            localStorage.removeItem(key);
+            restoreFinished = true;
+            return;
+          }
+
+          // PC 저장본/구형 저장본도 모바일 표준 형태로 정규화한 뒤 적용한다.
+          if (typeof normalizePresetStateForLoad_mobile === 'function') {
+            snapshot = normalizePresetStateForLoad_mobile(snapshot);
+          }
+          if (typeof normalizePresetStateForMobile === 'function') {
+            snapshot = normalizePresetStateForMobile(snapshot);
+          }
+
+          applyingSavedState = true;
+          applyFrontPresetState_mobile(snapshot);
+
+          // 마법부여/엠블렘 데이터는 이미 state에 있으므로 2페이지 요약 UI를 명시적으로 다시 그린다.
+          refreshSharedEquipSummary_mobile();
+
+          // PC 스킬트리 호환 변환 후, skill:list 로딩 완료까지 기다렸다가 렌더한다.
+          await finalizeSharedSkillUi_mobile();
+
+          try { updateMobileSoloPartyUI?.(); } catch (_) {}
+          try { updatePresetButtonsUI?.(); } catch (_) {}
+
+          lastSavedStateJson = JSON.stringify(buildSharedLastStateSnapshot_mobile());
+          restoreFinished = true;
+          dirty = false;
+        } catch (error) {
+          console.warn('[모바일 마지막 설정 자동 복원] 실패:', error);
+          restoreFinished = true;
+        } finally {
+          applyingSavedState = false;
+          restoreStarted = false;
+        }
+      }
+
+      function tryRestoreSharedLastState_mobile(attempt = 0) {
+        if (restoreFinished) return;
+
+        if (
+          getSharedLastStateStorageKey_mobile() &&
+          areSharedLastStateFunctionsReady_mobile()
+        ) {
+          restoreSharedLastState_mobile();
+          return;
+        }
+
+        if (attempt < 100) {
+          setTimeout(() => tryRestoreSharedLastState_mobile(attempt + 1), 250);
+        }
+      }
+
+      // 사용자의 직접 조작은 짧은 지연 뒤 저장한다.
+      for (const eventName of ['click', 'change', 'input']) {
+        document.addEventListener(eventName, (event) => {
+          if (event.target?.closest?.('.m-main, .m-footer, .m-presetbar-bottom, .modal')) {
+            scheduleSharedLastStateSave_mobile();
+          }
+        }, true);
+      }
+
+      // 코드에서 직접 state가 바뀌는 경우도 감지한다.
+      setInterval(() => {
+        if (!restoreFinished || applyingSavedState || !areSharedLastStateFunctionsReady_mobile()) return;
+        try {
+          const currentJson = JSON.stringify(buildSharedLastStateSnapshot_mobile());
+          if (currentJson !== lastSavedStateJson) {
+            dirty = true;
+            saveSharedLastState_mobile(false);
+          }
+        } catch (_) {}
+      }, CHECK_INTERVAL_MS);
+
+      // 로그인 정보가 새로 발급되면 해당 계정의 마지막 상태를 다시 찾는다.
+      document.addEventListener('gsi:issued', () => {
+        restoreStarted = false;
+        restoreFinished = false;
+        lastSavedStateJson = '';
+        tryRestoreSharedLastState_mobile();
+      });
+
+      window.addEventListener('common-header-auth-changed', (event) => {
+        if (event?.detail?.loggedIn) {
+          restoreStarted = false;
+          restoreFinished = false;
+          lastSavedStateJson = '';
+          tryRestoreSharedLastState_mobile();
+        }
+      });
+
+      // 탭 종료/백그라운드 전환 직전에 강제 저장한다.
+      window.addEventListener('pagehide', () => saveSharedLastState_mobile(true));
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') saveSharedLastState_mobile(true);
+      });
+
+      window.addEventListener('pageshow', () => tryRestoreSharedLastState_mobile());
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => tryRestoreSharedLastState_mobile());
+      } else {
+        tryRestoreSharedLastState_mobile();
+      }
+    })();
+  </script>
+
+  <script src="./common-header-v2.js?v=20260809-1"></script>
+  <script src="./common-header-modals.js?v=20260809-1"></script>
 
 </body>
 

@@ -354,7 +354,10 @@
 
     .status-loading-overlay {
       position: fixed;
-      inset: 0;
+      top: var(--status-loading-top, 56px);
+      right: 0;
+      bottom: 0;
+      left: 0;
       z-index: 9999;
       display: none;
       align-items: center;
@@ -5042,6 +5045,9 @@
 
 
   </style>
+
+  <link rel="stylesheet" href="../common-header.css?v=20260805-3">
+  <link rel="stylesheet" href="../common-header-modals.css?v=20260805-3">
 </head>
 
 <body>
@@ -5058,43 +5064,7 @@
       <div class="status-loading-sub" id="statusLoadingSub">잠시만 기다려주세요.</div>
     </div>
   </div>
-  <header class="site-header">
-    <div class="title">
-      <div class="logo-box">
-        <img src="../img/gametestlab.png" alt="게임실험연구소 로고">
-      </div>
-      <h1 id="btnGoMain" role="button" tabindex="0" title="메인화면으로 이동">게임실험연구소 세팅현황 (시즌5)</h1>
-
-      <button id="btnContactAdmin" class="contact-btn" type="button" title="게임실험연구소에 문의">
-        <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-mail">
-          <rect x="3" y="5" width="18" height="14" rx="2" ry="2"></rect>
-          <path d="M3 7l9 6 9-6"></path>
-        </svg>
-        <span class="contact-label">문의하기</span>
-      </button>
-
-      <button id="btnFaq" class="contact-btn faq-btn" type="button" title="문의하기 전 자주하는 Q&A">
-        <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-mail">
-          <path d="M12 18h.01"></path>
-          <path d="M9.1 9a3 3 0 1 1 5.8 1c-.6.7-1.4 1.1-1.9 1.5-.4.4-.5.6-.5 1.5"></path>
-          <path d="M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10z"></path>
-        </svg>
-        <span class="contact-label">Q&amp;A</span>
-      </button>
-
-      <button id="btnOneLinerOpen" class="contact-btn faq-btn one-liner-edit-btn" type="button" title="한마디 변경">
-        <span class="contact-label">한마디 변경</span>
-      </button>
-
-      <button id="btnMyUsageInfo" class="contact-btn faq-btn" type="button" title="내 이용 정보">
-        <span class="contact-label">내 이용 정보</span>
-      </button>
-    </div>
-
-    <div class="header-ads" aria-label="한마디">
-      <div class="ad-text" id="headerOneLinerText">불러오는 중…</div>
-    </div>
-  </header>
+  <div id="commonSiteHeader" data-root=".." data-title="게임실험연구소 세팅현황"></div>
 
   <div id="settingMobileOneLiner" class="setting-mobile-oneliner" aria-live="polite">
     <div class="text muted" id="settingMobileOneLinerText">한마디 불러오는 중…</div>
@@ -6218,7 +6188,36 @@
     let statusLoadingValue = 0;
     let statusLoadingHideTimer = null;
 
+    // 로딩 중에도 상단 헤더와 한마디 영역은 그대로 보이게 한다.
+    function updateStatusLoadingTop() {
+      if (!statusLoadingOverlay) return;
+
+      let visibleBottom = 0;
+      const commonHeaderHost = document.getElementById('commonSiteHeader');
+      const mobileOneLiner = document.getElementById('settingMobileOneLiner');
+
+      if (commonHeaderHost) {
+        const headerRect = commonHeaderHost.getBoundingClientRect();
+        visibleBottom = Math.max(visibleBottom, headerRect.bottom);
+      }
+
+      if (mobileOneLiner) {
+        const style = window.getComputedStyle(mobileOneLiner);
+        if (style.display !== 'none' && style.visibility !== 'hidden') {
+          const oneLinerRect = mobileOneLiner.getBoundingClientRect();
+          visibleBottom = Math.max(visibleBottom, oneLinerRect.bottom);
+        }
+      }
+
+      statusLoadingOverlay.style.setProperty(
+        '--status-loading-top',
+        `${Math.max(0, Math.ceil(visibleBottom))}px`
+      );
+    }
+
     function setStatusLoading(percent, step = '', sub = '') {
+      updateStatusLoadingTop();
+
       const next = Math.max(0, Math.min(100, Number(percent) || 0));
       statusLoadingValue = Math.max(statusLoadingValue, next);
 
@@ -6249,6 +6248,22 @@
       }, delay);
     }
 
+
+    window.addEventListener('resize', updateStatusLoadingTop, { passive: true });
+    window.addEventListener('load', updateStatusLoadingTop);
+    requestAnimationFrame(updateStatusLoadingTop);
+
+    const statusHeaderHost = document.getElementById('commonSiteHeader');
+    if (statusHeaderHost && typeof MutationObserver === 'function') {
+      const statusHeaderObserver = new MutationObserver(() => {
+        requestAnimationFrame(updateStatusLoadingTop);
+      });
+      statusHeaderObserver.observe(statusHeaderHost, {
+        childList: true,
+        subtree: true,
+        attributes: true
+      });
+    }
 
     let statusFailRedirectTimer = null;
 
@@ -9991,7 +10006,7 @@
       }
 
       sessionStorage.setItem('return_to_calculator', 'pc');
-      location.href = '../index.html?view=pc';
+      location.href = '../calculator.html?view=pc';
     }
 
     function bindHeaderActions() {
@@ -10626,5 +10641,8 @@
 
   </script>
 
+
+  <script src="../common-header-v2.js?v=20260805-3"></script>
+  <script src="../common-header-modals.js?v=20260805-3"></script>
 </body>
 </html>
