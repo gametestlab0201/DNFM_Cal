@@ -226,28 +226,6 @@
     return `기본 ${getMyUsageRoleBase(res)} 연구원 등급 저장 슬롯 갯수`;
   }
 
-  function getMyUsageSlotExtensionInfo(res) {
-    if (res?.slotEventActive) {
-      return {
-        text: `${Number(res.slotEventMultiplier || 3)}배 확장 적용 중`,
-        sub: res.slotEventUntil
-          ? `종료일: ${formatMyUsageDate(res.slotEventUntil)}`
-          : (res.slotEventDescription || '가입 45일 경과로 저장슬롯 3배 확장이 적용 중입니다.')
-      };
-    }
-    if (Number(res?.roleLevel || 0) <= 0) {
-      return { text: '미적용', sub: '선임 연구원 이상 등급부터 혜택이 적용됩니다' };
-    }
-    const raw = String(res?.joinedAt || res?.joinedAtRaw || res?.joinDate || res?.joinedDate || res?.signupDate || '').trim();
-    const joined = raw ? new Date(raw) : null;
-    if (joined && !Number.isNaN(joined.getTime())) {
-      const expected = new Date(joined.getTime());
-      expected.setDate(expected.getDate() + 45);
-      return { text: '미적용', sub: `3배 확장 예정일 : ${formatMyUsageDateOnly(expected)}` };
-    }
-    return { text: '미적용', sub: '가입일을 확인할 수 없어 45일 확장 여부를 계산하지 못했습니다.' };
-  }
-
   function getMyUsageExtraSlotItems(res) {
     const eventExtra = Math.max(0, Number(res?.eventExtraSlots || 0));
     const sheetExtra = Math.max(0, Number(res?.sheetExtraSlots ?? res?.manualExtraSlots ?? 0));
@@ -310,7 +288,7 @@
           <div class="usage-public-benefit"><div class="usage-public-benefit-icon">◆</div><strong>광고 없이 이용</strong><span>등록 연구원은 계산기를 보다 깔끔한 화면으로 이용할 수 있습니다.</span></div>
           <div class="usage-public-benefit"><div class="usage-public-benefit-icon">▣</div><strong>등급별 저장슬롯</strong><span>자주 사용하는 캐릭터와 장비 세팅을 저장하고 다시 불러올 수 있습니다.</span></div>
           <div class="usage-public-benefit"><div class="usage-public-benefit-icon">◎</div><strong>세팅 현황 기능</strong><span>여러 캐릭터의 장비와 세팅 상태를 한눈에 관리할 수 있습니다.</span></div>
-          <div class="usage-public-benefit"><div class="usage-public-benefit-icon">✦</div><strong>등급별 추가 기능</strong><span>등급에 따라 저장슬롯 확장과 한마디 기능 등의 혜택이 적용됩니다.</span></div>
+          <div class="usage-public-benefit"><div class="usage-public-benefit-icon">✦</div><strong>등급별 추가 기능</strong><span>등급에 따라 저장슬롯과 한마디 기능 등의 혜택이 적용됩니다.</span></div>
         </div>
         <section class="usage-public-join">
           <strong>더 많은 혜택을 누리려면 연구원으로 가입해 보세요!</strong>
@@ -368,14 +346,14 @@
     return `<div class="usage-info-row"><div class="usage-info-label">추가 저장슬롯</div><div class="usage-info-value">${body}</div></div>`;
   }
 
-  function usageInfoSummary(res, eventText, phraseText) {
+  function usageInfoSummary(res, phraseText) {
     const role = escapeMyUsageHtml(getMyUsageRoleDisplay(res));
     const joined = escapeMyUsageHtml(getMyUsageJoinedDateText(res) || '가입일 정보 없음');
     const total = Number(res.totalSlots || res.presetSlots || 0);
     const formula = escapeMyUsageHtml(res.slotFormulaText || `기본 ${Number(res.baseSlots || 0)}개 + 추가 ${Number(res.extraSlots || 0)}개`);
     return `<div class="usage-info-summary">
       <div class="usage-summary-card primary"><div class="usage-summary-label">현재 등급</div><div class="usage-summary-value">${role}</div><div class="usage-summary-sub">가입일: ${joined}</div></div>
-      <div class="usage-summary-card gold"><div class="usage-summary-label">현재 사용 가능 슬롯</div><div class="usage-summary-value">${total}개</div><div class="usage-summary-sub">${formula} · 저장슬롯 확장 ${escapeMyUsageHtml(eventText || '미적용')} · 한마디 ${escapeMyUsageHtml(phraseText || '-')}</div></div>
+      <div class="usage-summary-card gold"><div class="usage-summary-label">현재 사용 가능 슬롯</div><div class="usage-summary-value">${total}개</div><div class="usage-summary-sub">${formula} · 한마디 ${escapeMyUsageHtml(phraseText || '-')}</div></div>
     </div>`;
   }
 
@@ -475,7 +453,6 @@
         currentBoardNickname = '';
       }
 
-      const extension = getMyUsageSlotExtensionInfo(res);
       const phraseText = res.canEditPhrase ? (res.canChangePhrase ? '변경 가능' : '변경 대기 중') : '사용 불가';
       const phraseParts = [];
       const currentPhrase = String(res.phraseMessage || '').trim();
@@ -484,12 +461,11 @@
         ? `다음 변경 가능일: ${formatMyUsageDate(res.phraseNextAt)}`
         : (res.canChangePhrase ? '지금 한마디를 변경할 수 있습니다.' : '책임 등급 이상부터 한마디를 사용할 수 있습니다.'));
 
-      box.innerHTML = usageInfoSummary(res, extension.text, phraseText) + [
+      box.innerHTML = usageInfoSummary(res, phraseText) + [
         usageInfoRow('현재 등급', getMyUsageRoleDisplay(res), res.email || ''),
         usageInfoRow('가입일', getMyUsageJoinedDateText(res) || '가입일 정보 없음'),
         usageInfoBoardNicknameRow(boardNicknameText, boardNicknameText === '미설정' ? '닉네임을 설정하면 세팅 종합토론방에서 사용할 수 있습니다.' : ''),
         usageInfoRow('기본 저장슬롯', `${Number(res.baseSlots || 0)}개`, getMyUsageBaseSlotSub(res)),
-        usageInfoRow('저장슬롯 확장', extension.text, extension.sub, res.slotEventActive ? 'good' : ''),
         usageInfoExtraSlotRow(res),
         usageInfoRow('현재 사용 가능 슬롯', `${Number(res.totalSlots || res.presetSlots || 0)}개`, res.slotFormulaText || `기본 ${Number(res.baseSlots || 0)}개 + 추가 ${Number(res.extraSlots || 0)}개`, 'warn'),
         usageInfoOneLinerRow(phraseText, phraseParts.filter(Boolean).join('\n'), res.canEditPhrase === true, res.canChangePhrase ? 'good' : '')

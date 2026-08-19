@@ -655,12 +655,146 @@
     }
     .calc-share-detail-values span{min-width:0;overflow-wrap:anywhere;}
     .calc-share-detail-values strong{color:#cfa24f;font-weight:900;}
+    .calc-share-detail-trait-row{
+      display:grid;
+      grid-template-columns:54px minmax(0,1fr);
+      gap:8px;
+      align-items:center;
+      margin-top:-2px;
+      padding:4px 7px 4px 7px;
+      border-radius:7px;
+      background:rgba(110,168,255,.025);
+    }
+    .calc-share-detail-trait-slot{
+      color:#64748b;
+      font-size:9px;
+      font-weight:800;
+      text-align:right;
+      padding-right:2px;
+    }
+    .calc-share-detail-trait-value{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      gap:7px;
+      color:#cbd5e1;
+      font-size:10px;
+      line-height:1.5;
+      overflow-wrap:anywhere;
+    }
+    .calc-share-detail-trait-row .calc-share-trait-badge{
+      flex:0 0 auto;
+      width:22px;
+      min-width:22px;
+      height:20px;
+      padding:0 4px;
+      font-size:10px;
+      border-radius:4px;
+    }
+    .calc-share-detail-trait-text{
+      min-width:0;
+      color:#dbe4f0;
+      font-weight:700;
+    }
     .calc-share-detail-empty{
       padding:8px 4px;
       color:#94a3b8;
       font-size:11px;
       text-align:center;
     }
+
+    /* ✅ 캐릭터카드 상세보기 > 수련일지 요약 */
+    .calc-share-training-summary{
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px solid rgba(255,255,255,.10);
+    }
+    .calc-share-training-title{
+      margin-bottom:6px;
+      color:#e2e8f0;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:-.15px;
+    }
+    .calc-share-training-castle{
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+      margin-bottom:7px;
+    }
+    .calc-share-training-columns{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+      gap:7px;
+      align-items:start;
+    }
+    .calc-share-training-column{
+      min-width:0;
+      padding:7px;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;
+      background:rgba(255,255,255,.025);
+    }
+    .calc-share-training-column-title{
+      margin-bottom:5px;
+      color:#cbd5e1;
+      font-size:10px;
+      font-weight:900;
+    }
+    .calc-share-training-list{
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+    }
+    .calc-share-training-row{
+      display:grid;
+      grid-template-columns:88px minmax(0,1fr);
+      gap:8px;
+      align-items:start;
+      padding:5px 7px;
+      border-radius:7px;
+      background:rgba(255,255,255,.03);
+      color:#cbd5e1;
+      font-size:10px;
+      line-height:1.45;
+    }
+    .calc-share-training-label{
+      color:#94a3b8;
+      font-weight:800;
+    }
+    .calc-share-training-value{
+      min-width:0;
+      color:#e2e8f0;
+      font-weight:700;
+      overflow-wrap:anywhere;
+    }
+    .calc-share-training-row.rune .calc-share-training-value{
+      color:#dbeafe;
+    }
+    .calc-share-training-row.magic .calc-share-training-value{
+      color:#f1d18a;
+    }
+    @media (max-width:700px){
+      .calc-share-training-columns{
+        grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+        gap:5px;
+      }
+      .calc-share-training-column{
+        padding:6px;
+      }
+      .calc-share-training-row{
+        grid-template-columns:1fr;
+        gap:2px;
+        padding:5px 6px;
+      }
+      .calc-share-training-label{
+        font-size:9px;
+      }
+      .calc-share-training-value{
+        font-size:10px;
+      }
+    }
+
     .calc-share-detail-footer{
       display:flex;
       justify-content:flex-end;
@@ -945,6 +1079,15 @@
       white-space:nowrap;
       text-shadow:0 0 8px rgba(250,204,107,.12);
     }
+    /* 세트 구성 장비 등급에 맞춘 세트명 색상 */
+    .calc-share-equip-name.set-rarity-unique{
+      color:#ef53ce;
+      text-shadow:0 0 8px rgba(239,83,206,.20);
+    }
+    .calc-share-equip-name.set-rarity-exceed{
+      color:#62e8ff;
+      text-shadow:0 0 8px rgba(98,232,255,.24);
+    }
     .calc-share-unique{
       margin-right:5px;
       font-weight:950;
@@ -984,6 +1127,94 @@
       height:100%;
       max-width:none;
       margin:0;
+    }
+
+
+    /* PC 계산기와 동일: 실제 세트효과가 성립한 장비의 은은한 광택 */
+    .calc-share-equip-img-wrap.set-effect-active{
+      isolation:isolate;
+      overflow:hidden;
+      animation:activeSetItemGlow 2.6s ease-in-out infinite;
+    }
+    .calc-share-equip-img-wrap.set-effect-active::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:2;
+      pointer-events:none;
+      border-radius:inherit;
+      background:linear-gradient(
+        115deg,
+        transparent 30%,
+        rgba(255,255,255,0) 39%,
+        rgba(255,244,190,.15) 44%,
+        rgba(255,248,204,.92) 49%,
+        rgba(255,255,255,.78) 52%,
+        rgba(255,244,190,.12) 58%,
+        rgba(255,255,255,0) 64%,
+        transparent 72%
+      );
+      background-size:260% 100%;
+      background-position:160% 0;
+      opacity:0;
+      animation:activeSetItemShine 2.9s ease-in-out infinite;
+    }
+    .calc-share-equip-img-wrap.set-effect-active .calc-share-equip-set-badge{
+      z-index:3;
+    }
+    @keyframes activeSetItemShine{
+      0%,22%{background-position:160% 0;opacity:0}
+      30%{opacity:1}
+      50%{background-position:-160% 0;opacity:1}
+      58%,100%{background-position:-160% 0;opacity:0}
+    }
+    @keyframes activeSetItemGlow{
+      0%,100%{filter:drop-shadow(0 0 3px rgba(255,215,112,.30))}
+      50%{filter:drop-shadow(0 0 8px rgba(255,220,125,.70))}
+    }
+
+    /* PC 계산기와 동일한 장비 등급별 그라데이션 테두리 */
+    .calc-share-equip-img-wrap.equip-rarity-exceed,
+    .calc-share-equip-img-wrap.equip-rarity-epic,
+    .calc-share-equip-img-wrap.equip-rarity-unique,
+    .calc-share-equip-img-wrap.equip-rarity-rare{
+      border:1px solid transparent !important;
+      box-sizing:border-box;
+      background-clip:padding-box,border-box;
+      background-origin:border-box;
+      border-radius:2px;
+      overflow:hidden;
+    }
+    .calc-share-equip-img-wrap.equip-rarity-exceed{
+      background-image:
+        linear-gradient(#0f0d0b,#0f0d0b),
+        linear-gradient(135deg,#82ff86 0%,#5cf3bf 20%,#62e8ff 43%,#33b7ee 67%,#177fbc 87%,#2cc7b2 100%);
+      box-shadow:inset 0 0 0 1px rgba(10,12,14,.82),0 0 0 .5px rgba(88,224,246,.48),0 0 1px rgba(103,234,255,.36),0 0 3px rgba(53,188,239,.10);
+    }
+    .calc-share-equip-img-wrap.equip-rarity-epic{
+      background-image:
+        linear-gradient(#0f0d0b,#0f0d0b),
+        linear-gradient(135deg,#fff06a 0%,#ffd133 22%,#ffab09 45%,#d87806 73%,#8f5007 100%);
+      box-shadow:inset 0 0 0 1px rgba(16,11,6,.82),0 0 0 .5px rgba(244,183,31,.50),0 0 1px rgba(255,216,88,.36),0 0 3px rgba(235,140,16,.10);
+    }
+    .calc-share-equip-img-wrap.equip-rarity-unique{
+      background-image:
+        linear-gradient(#100c10,#100c10),
+        linear-gradient(135deg,#ff7de3 0%,#ef53ce 28%,#c8349f 56%,#882b78 79%,#572254 100%);
+      box-shadow:inset 0 0 0 1px rgba(16,10,16,.82),0 0 0 .5px rgba(221,72,181,.48),0 0 1px rgba(255,129,231,.34),0 0 3px rgba(198,51,159,.09);
+    }
+    .calc-share-equip-img-wrap.equip-rarity-rare{
+      background-image:
+        linear-gradient(#0e0b12,#0e0b12),
+        linear-gradient(135deg,#ce9cff 0%,#ad6df5 28%,#8751d7 55%,#6235a5 79%,#412771 100%);
+      box-shadow:inset 0 0 0 1px rgba(14,10,18,.82),0 0 0 .5px rgba(155,99,230,.48),0 0 1px rgba(196,148,255,.34),0 0 3px rgba(123,76,201,.09);
+    }
+    .calc-share-equip-img-wrap.equip-rarity-exceed .calc-share-equip-img,
+    .calc-share-equip-img-wrap.equip-rarity-epic .calc-share-equip-img,
+    .calc-share-equip-img-wrap.equip-rarity-unique .calc-share-equip-img,
+    .calc-share-equip-img-wrap.equip-rarity-rare .calc-share-equip-img{
+      border-radius:0;
+      border:0;
     }
     .calc-share-equip-set-badge{
       position:absolute;
@@ -1026,6 +1257,48 @@
       font-size:10px;
       font-weight:900;
     }
+
+    /* 게시판 캐릭터카드: 방어구 특성옵션 3개 배지 */
+    .calc-share-trait-badges{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:2px;
+      width:42px;
+      min-height:14px;
+      margin:3px auto 0;
+    }
+    .calc-share-trait-badge{
+      width:12px;
+      min-width:12px;
+      height:13px;
+      padding:0 1px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid transparent;
+      border-radius:3px;
+      color:#fff;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:7px;
+      line-height:1;
+      font-weight:900;
+      box-sizing:border-box;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.13);
+      overflow:hidden;
+      white-space:nowrap;
+    }
+    .calc-share-trait-badge.stage-1{border-color:rgba(160,160,160,.70);background:linear-gradient(180deg,#66645f,#3f3d39)}
+    .calc-share-trait-badge.stage-2{border-color:rgba(55,142,220,.78);background:linear-gradient(180deg,#2f78bd,#18518c)}
+    .calc-share-trait-badge.stage-3{border-color:rgba(181,93,225,.78);background:linear-gradient(180deg,#a34bcf,#6e2b91)}
+    .calc-share-trait-badge.stage-4{border-color:rgba(234,70,162,.82);background:linear-gradient(180deg,#df3b92,#a51d65)}
+    .calc-share-trait-badge.stage-5{border-color:rgba(231,184,35,.88);background:linear-gradient(180deg,#e3ad12,#a97600)}
+    .calc-share-trait-badge.empty{
+      border-color:rgba(148,163,184,.25);
+      background:rgba(148,163,184,.08);
+      color:#64748b;
+      box-shadow:none;
+    }
     .calc-share-extra{
       display:flex;
       flex-wrap:wrap;
@@ -1042,14 +1315,25 @@
       .calc-share-equip-row{grid-template-columns:1fr;gap:5px}
       .calc-share-equip-group-label{min-height:0;font-size:10px;gap:1px}
       .calc-share-card-columns{grid-template-columns:1fr;gap:14px}
+      /* 모바일 캐릭터카드: 기본 상태에서는 스킬트리를 적당한 높이까지만 노출하고 내부 스크롤 */
       .calc-share-card-col.skill-col{
-        max-height:none;
+        max-height:300px;
         padding-left:0;
-        padding-right:0;
+        padding-right:4px;
         padding-top:14px;
         border-left:0;
         border-top:1px solid rgba(255,255,255,.10);
-        overflow:visible;
+        overflow-y:auto;
+        overflow-x:hidden;
+        scrollbar-width:thin;
+        scrollbar-color:rgba(207,162,79,.55) rgba(255,255,255,.04);
+      }
+
+      /* [상세보기]를 눌렀을 때만 스킬트리 전체를 펼친다. */
+      .calc-share-card.detail-expanded .calc-share-card-col.skill-col{
+        max-height:none;
+        overflow-y:visible;
+        overflow-x:visible;
       }
 
       .calc-share-editor-head{align-items:flex-start;flex-direction:column}
@@ -1284,14 +1568,14 @@
          - 직업군/시간/모드 메타는 모바일 글쓰기 미리보기에서 숨김
          - 게임실험연구소 카드로고는 헤더 우측 상단에 크게 표시
          - 최종데미지는 카드로고 바로 아래에 표시 */
-      .editor .calc-share-card{
+      :is(.editor,.view) .calc-share-card{
         position:relative;
         padding-bottom:12px;
       }
-      .editor .calc-share-card.compact{
+      :is(.editor,.view) .calc-share-card.compact{
         padding-bottom:12px;
       }
-      .editor .calc-share-card-head{
+      :is(.editor,.view) .calc-share-card-head{
         position:relative;
         display:grid;
         grid-template-columns:72px minmax(0,1fr);
@@ -1302,20 +1586,20 @@
         row-gap:4px;
         padding-right:148px;
       }
-      .editor .calc-share-char-img,
-      .editor .calc-share-char-placeholder{
+      :is(.editor,.view) .calc-share-char-img,
+      :is(.editor,.view) .calc-share-char-placeholder{
         grid-column:1;
         grid-row:1;
         justify-self:center;
       }
-      .editor .calc-share-char-info{
+      :is(.editor,.view) .calc-share-char-info{
         grid-column:1;
         grid-row:2;
         width:72px;
         min-width:0;
         text-align:center;
       }
-      .editor .calc-share-char-name{
+      :is(.editor,.view) .calc-share-char-name{
         font-size:11px;
         line-height:1.25;
         white-space:normal;
@@ -1323,10 +1607,10 @@
         text-overflow:clip;
         word-break:keep-all;
       }
-      .editor .calc-share-char-sub{
+      :is(.editor,.view) .calc-share-char-sub{
         display:none !important;
       }
-      .editor .calc-share-final-damage{
+      :is(.editor,.view) .calc-share-final-damage{
         position:absolute;
          /* 초상화 영역을 제외한 나머지 영역 */
   left:110px;
@@ -1343,16 +1627,16 @@
         white-space:nowrap;
       }
       /* 기존 스킬트리 헤더 안의 카드로고를 모바일 카드 헤더 우측으로 이동 */
-      .editor .calc-share-section-head{
+      :is(.editor,.view) .calc-share-section-head{
         position:static;
       }
       /* 상세보기(detail-expanded) 시 PC용 position:relative 규칙이 다시 적용되어
          모바일 로고 기준점이 스킬트리 헤더로 내려가는 것을 방지 */
-      .editor .calc-share-card.detail-expanded .calc-share-section-head{
+      :is(.editor,.view) .calc-share-card.detail-expanded .calc-share-section-head{
         position:static;
         top:auto;
       }
-      .editor .calc-share-card-logo{
+      :is(.editor,.view) .calc-share-card-logo{
         position:absolute;
         top:-37px;
         left:110px;
@@ -3698,6 +3982,7 @@ async function list(page=1,push=true,silentRefresh=false){
         refines:clone(src?.refines)||{},
         seals:clone(src?.seals)||{},
         emblems:clone(src?.emblems)||{},
+        traitOptions:clone(src?.traitOptions)||{},
         avatar:clone(src?.avatar||src?.avatarSel)||{},
         customSkills:clone(src?.customSkills)||{},
         customArmorLabel:src?.customArmorLabel??null,
@@ -3707,6 +3992,8 @@ async function list(page=1,push=true,silentRefresh=false){
         castleSeal:clone(src?.castleSeal||src?.CastleSeal)||{},
         runes:clone(src?.runes||src?.skillrune)||null,
         runeEngrave:clone(src?.runeEngrave)||{},
+        trainingRuneEngrave:clone(src?.trainingRuneEngrave)||null,
+        trainingMagicSeal:clone(src?.trainingMagicSeal)||null,
         specialRunes:clone(src?.specialRunes)||{},
         skillTrees:clone(src?.skillTrees)||{},
         skillLv:clone(src?.skillLv)||{},
@@ -3747,27 +4034,30 @@ async function list(page=1,push=true,silentRefresh=false){
 
   function readLastCalculatorStateForBoard(){
     const email=currentBoardLoginEmail();
-    const exactKey=email?`${CALC_LAST_STATE_PREFIX}${email}`:'';
-    let raw=exactKey?localStorage.getItem(exactKey):null;
-
-    if(!raw){
-      let newest=null;
-      for(let i=0;i<localStorage.length;i++){
-        const key=localStorage.key(i)||'';
-        if(!key.startsWith(CALC_LAST_STATE_PREFIX))continue;
-        try{
-          const parsed=JSON.parse(localStorage.getItem(key)||'null');
-          const savedAt=Number(parsed?.savedAt||0);
-          if(parsed?.state&&(!newest||savedAt>newest.savedAt))newest={savedAt,parsed};
-        }catch(_){}
-      }
-      if(newest)raw=JSON.stringify(newest.parsed);
+    if(!email){
+      throw new Error('현재 Google 로그인 계정을 확인할 수 없습니다. 로그인 상태를 확인한 뒤 다시 시도해 주세요.');
     }
 
-    if(!raw)throw new Error('이 브라우저에 저장된 계산기 마지막 상태가 없습니다.');
+    // 계산기 마지막 상태는 반드시 현재 로그인 계정의 정확한 키만 사용한다.
+    // 다른 계정/과거 세션의 dnfm:last-calculator-state:* 를 대신 읽는 fallback은 금지한다.
+    const exactKey=`${CALC_LAST_STATE_PREFIX}${email}`;
+    const raw=localStorage.getItem(exactKey);
+
+    if(!raw){
+      throw new Error('현재 로그인 계정에 저장된 계산기 마지막 상태가 없습니다. 계산기에서 세팅한 뒤 다시 시도해 주세요.');
+    }
+
     let saved;
-    try{saved=JSON.parse(raw)}catch(_){throw new Error('저장된 계산기 상태를 읽을 수 없습니다.')}
-    if(!saved?.state||typeof saved.state!=='object')throw new Error('저장된 계산기 상태가 올바르지 않습니다.');
+    try{
+      saved=JSON.parse(raw);
+    }catch(_){
+      throw new Error('현재 로그인 계정의 계산기 상태를 읽을 수 없습니다.');
+    }
+
+    if(!saved?.state||typeof saved.state!=='object'){
+      throw new Error('현재 로그인 계정의 계산기 상태가 올바르지 않습니다.');
+    }
+
     return makeBoardCalcSnapshotFromState(saved.state,saved.savedAt);
   }
 
@@ -3798,6 +4088,127 @@ async function list(page=1,push=true,silentRefresh=false){
 
   function calcTimeLabel(value){
     return ({'30s':'30초딜','1m':'1분딜','3m':'3분딜','5m':'5분딜','10m':'10분딜'})[String(value||'')]||String(value||'1분딜');
+  }
+
+  // PC 계산기와 동일한 장비 등급 테두리 클래스 판정
+  function normalizeCalcShareEquipRarity(value){
+    const raw=String(value??'').trim();
+    const lower=raw.toLowerCase();
+    if(raw==='익시드'||lower==='exceed')return '익시드';
+    if(raw==='에픽'||lower==='epic')return '에픽';
+    if(raw==='유니크'||lower==='unique')return '유니크';
+    if(raw==='레어'||lower==='rare')return '레어';
+    return raw;
+  }
+  function getCalcShareEquipRarityBorderClass(value){
+    const rarity=normalizeCalcShareEquipRarity(value);
+    if(rarity==='익시드')return 'equip-rarity-exceed';
+    if(rarity==='에픽')return 'equip-rarity-epic';
+    if(rarity==='유니크')return 'equip-rarity-unique';
+    if(rarity==='레어')return 'equip-rarity-rare';
+    return '';
+  }
+
+
+  // PC 계산기 세트 광택을 게시판 카드에서도 재현한다.
+  // 카드 스냅샷에는 set:list 전체가 없으므로, 저장된 장비의 type/시즌/부위군을 기준으로
+  // PC와 동일하게 접두사 제거 베이스 세트를 묶고 3부위 이상 성립 여부를 판정한다.
+  const CALC_SHARE_SET_VISUAL_SLOT_GROUP={
+    headshoulder:'armor',top:'armor',bottom:'armor',belt:'armor',shoes:'armor',
+    bracelet:'acc',necklace:'acc',ring:'acc',
+    sub:'spec',magestone:'spec',earring:'spec'
+  };
+
+  function calcShareStripSetPrefix(value){
+    const s=calcShareCleanSetName(value);
+    if(!s)return '';
+    const idx=s.indexOf(': ');
+    return idx<0?s:s.slice(idx+2).trim();
+  }
+
+  function calcShareValidSetType(item){
+    const type=calcShareCleanSetName(item?.type);
+    const itemName=calcShareCleanSetName(item?.name);
+    if(!type)return '';
+    const noSet=/^(세트효과없음|세트효과 없음|세트없음|세트 없음|없음)$/i.test(type.replace(/\s+/g,''));
+    if(noSet||(itemName&&type===itemName))return '';
+    return type;
+  }
+
+  function calcShareBuildActiveSetVisualMap(sels){
+    const records=[];
+    const baseGroups=new Map();
+    const exactGroups=new Map();
+
+    for(const [slotKey,group] of Object.entries(CALC_SHARE_SET_VISUAL_SLOT_GROUP)){
+      const item=sels?.[slotKey]||null;
+      const type=calcShareValidSetType(item);
+      if(!type)continue;
+      const base=calcShareStripSetPrefix(type)||type;
+      const season=String(item?.season??item?.['시즌']??item?._raw?.['시즌']??item?.raw?.['시즌']??'').trim();
+      const rec={slotKey,group,type,base,season};
+      records.push(rec);
+
+      const baseKey=`${season}\u0001${group}\u0001${base}`;
+      if(!baseGroups.has(baseKey))baseGroups.set(baseKey,[]);
+      baseGroups.get(baseKey).push(rec);
+
+      const exactKey=`${season}\u0001${type}`;
+      if(!exactGroups.has(exactKey))exactGroups.set(exactKey,[]);
+      exactGroups.get(exactKey).push(rec);
+    }
+
+    const active=new Map();
+
+    // 방어구/악세/특수 각각: 접두사를 제거한 같은 베이스 세트가 3부위 이상이면 발동.
+    baseGroups.forEach((list,key)=>{
+      if(list.length<3)return;
+      const [season,group,base]=key.split('\u0001');
+      const syncKey=`${group}:${season}:${base}`;
+      list.forEach(rec=>active.set(rec.slotKey,syncKey));
+    });
+
+    // 통합형: 동일 원본 type이 서로 다른 부위군에 걸쳐 3부위 이상 모이면 함께 발동.
+    exactGroups.forEach((list,key)=>{
+      if(list.length<3)return;
+      const groups=new Set(list.map(rec=>rec.group));
+      if(groups.size<2)return;
+      const [season,type]=key.split('\u0001');
+      const syncKey=`exact:${season}:${type}`;
+      list.forEach(rec=>active.set(rec.slotKey,syncKey));
+    });
+
+    return active;
+  }
+
+  let calcShareSetSyncScheduled=false;
+  function scheduleCalcShareSetAnimationSync(){
+    if(calcShareSetSyncScheduled)return;
+    calcShareSetSyncScheduled=true;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      calcShareSetSyncScheduled=false;
+      const groups=new Map();
+      document.querySelectorAll('.calc-share-equip-img-wrap.set-effect-active[data-set-effect-sync-key]').forEach(wrap=>{
+        const key=String(wrap.dataset.setEffectSyncKey||'');
+        if(!key)return;
+        if(!groups.has(key))groups.set(key,[]);
+        groups.get(key).push(wrap);
+      });
+
+      groups.forEach(wraps=>{
+        const animationsByIndex=wraps.map(wrap=>{
+          try{return wrap.getAnimations({subtree:true})||[]}catch(_){return []}
+        });
+        const maxCount=Math.max(0,...animationsByIndex.map(list=>list.length));
+        for(let i=0;i<maxCount;i++){
+          for(const list of animationsByIndex){
+            const anim=list[i];
+            if(!anim)continue;
+            try{anim.currentTime=0}catch(_){}
+          }
+        }
+      });
+    }));
   }
 
 
@@ -4041,14 +4452,44 @@ async function list(page=1,push=true,silentRefresh=false){
     };
   }
 
+  function calcShareSetNameRarityClass(groupLabel,sels,baseText){
+    const slotMap={
+      '방어구':['headshoulder','top','bottom','belt','shoes'],
+      '악세사리':['bracelet','necklace','ring'],
+      '특수장비':['sub','magestone','earring']
+    };
+    const slots=slotMap[groupLabel];
+    if(!slots)return '';
+
+    const base=String(baseText||'').trim();
+    if(!base || base==='미선택' || base.includes('세트효과 없음'))return '';
+
+    const items=slots.map(key=>sels?.[key]).filter(Boolean);
+    if(!items.length)return '';
+
+    const rarities=items.map(item=>normalizeCalcShareEquipRarity(
+      item?.rarity ?? item?._raw?.['레어리티'] ?? item?.raw?.['레어리티'] ?? ''
+    ));
+
+    // 익시드가 한 부위라도 포함되면 익시드 색상을 최우선 적용
+    if(rarities.some(r=>r==='익시드'))return 'set-rarity-exceed';
+
+    // 익시드가 없고 현재 구성 장비가 전부 유니크면 유니크 세트 색상 적용
+    if(rarities.length && rarities.every(r=>r==='유니크'))return 'set-rarity-unique';
+
+    // 에픽 및 그 외 구성은 기존 노란색 유지
+    return '';
+  }
+
   function renderCalcShareGroupLabel(groupLabel,sels,snapshotState){
     const parts=calcShareGroupSummaryParts(groupLabel,sels,snapshotState);
     const uniqueClass=calcShareUniqueClass(parts.unique);
+    const setRarityClass=calcShareSetNameRarityClass(groupLabel,sels,parts.base);
     const uniqueHtml=parts.unique
       ? `<span class="calc-share-unique ${uniqueClass}">[${esc(parts.unique)}]</span>`
       : '';
 
-    return `<span class="calc-share-group-kind">${esc(groupLabel)}</span><span class="calc-share-group-setting">${uniqueHtml}<span class="calc-share-equip-name">${esc(parts.base)}</span></span>`;
+    return `<span class="calc-share-group-kind">${esc(groupLabel)}</span><span class="calc-share-group-setting">${uniqueHtml}<span class="calc-share-equip-name ${setRarityClass}">${esc(parts.base)}</span></span>`;
   }
 
 
@@ -4372,63 +4813,8 @@ async function list(page=1,push=true,silentRefresh=false){
       throw new Error('최종 데미지 자동 계산은 Google 로그인 후 이용할 수 있습니다.');
     }
 
-    // 공통 v3 계산기에서 마지막으로 실제 사용한 final_compute payload가 있으면
-    // 게시판이 장비/시너지/시간/몬스터/스킬 조건을 다시 추측하지 않고 그대로 재사용한다.
-    const savedFinal=s?.lastFinalCompute&&typeof s.lastFinalCompute==='object'
-      ? JSON.parse(JSON.stringify(s.lastFinalCompute))
-      : null;
-
-    if(savedFinal?.calcPayload&&savedFinal?.skillStatePayload&&savedFinal?.skillUsesPayload&&savedFinal?.computePayload){
-      const co=s?.computeOptions||{};
-      savedFinal.computePayload={
-        ...(savedFinal.computePayload||{}),
-        forceCrit100:!!co.forceCrit100,
-        tohampo12:!!co.tohampo12,
-        patchBefore:!!co.patchBefore
-      };
-
-      // canonical state의 현재 표준값도 payload와 일치시킨다.
-      if(s.timeKey) savedFinal.computePayload.window=String(savedFinal.computePayload.window||s.timeKey);
-      if(s.monster && !savedFinal.computePayload.monster) savedFinal.computePayload.monster=s.monster;
-
-      const res=await fetch(`${WEBAPP_URL}?type=final_compute`,{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'Authorization':`Bearer ${idToken}`
-        },
-        body:JSON.stringify({
-          id_token:idToken,
-          calcPayload:savedFinal.calcPayload,
-          sumStatsPayload:savedFinal.sumStatsPayload||{},
-          skillStatePayload:savedFinal.skillStatePayload,
-          skillUsesPayload:savedFinal.skillUsesPayload,
-          computePayload:savedFinal.computePayload
-        })
-      });
-
-      let data=null;
-      try{data=await res.json()}catch(_){
-        throw new Error(`최종 데미지 서버 응답을 확인할 수 없습니다. (${res.status})`);
-      }
-      if(!res.ok||!data?.ok){
-        throw new Error(data?.message||data?.error||`최종 데미지 계산 실패 (${res.status})`);
-      }
-
-      const rawTotal=Number(data?.total||0)||0;
-      const coeffs=data?.coeffs&&typeof data.coeffs==='object'?data.coeffs:{};
-      const backendCritApplied=!!coeffs.forceCrit100Applied;
-      const critRatio=backendCritApplied
-        ? 1
-        : boardCalcCritRatio(coeffs,c?.power||'',!!co.forceCrit100);
-      snapshot.finalDamage=Math.floor(rawTotal*critRatio);
-      snapshot.state=s;
-      snapshot.state.lastFinalCompute=savedFinal;
-      snapshot.state.lastComputedTotal=snapshot.finalDamage;
-      snapshot.state.lastComputedAt=Date.now();
-      return snapshot;
-    }
-
+    // 과거 lastFinalCompute는 계산 입력으로 사용하지 않는다.
+    // 캐릭터카드의 유일한 계산 원본은 지금 읽은 canonical state다.
     const charPayload={
       name:String(c?.name||''),
       jobGroup:String(c?.jobGroupLabel||c?.jobGroup||''),
@@ -4439,19 +4825,24 @@ async function list(page=1,push=true,silentRefresh=false){
 
     const payload={char:charPayload};
 
+    const setPayloadSection=(key,value,hasValue)=>{
+      if(hasValue)payload[key]=value;
+      else delete payload[key];
+    };
+
     const equip={};
     for(const [slotKey,info] of Object.entries(s?.selections||{})){
       if(!info?.name)continue;
       equip[slotKey]={name:info.name,code:info.code||''};
     }
-    if(Object.keys(equip).length)payload.equip=equip;
+    setPayloadSection('equip',equip,Object.keys(equip).length>0);
 
     const enh={};
     for(const [slotKey,up] of Object.entries(s?.enh||{})){
       if(!up?.name)continue;
       enh[slotKey]={name:up.name,type:up.type||'',level:up.level??null};
     }
-    if(Object.keys(enh).length)payload.enh=enh;
+    setPayloadSection('enh',enh,Object.keys(enh).length>0);
 
     const seals={};
     for(const [slotKey,sv] of Object.entries(s?.seals||{})){
@@ -4460,14 +4851,14 @@ async function list(page=1,push=true,silentRefresh=false){
       const general1=sv?.general1?.name||'';
       if(unique||general1)seals[slotKey]={unique:unique||null,general1:general1||null};
     }
-    if(Object.keys(seals).length)payload.seals=seals;
+    setPayloadSection('seals',seals,Object.keys(seals).length>0);
 
     const enchants={};
     for(const [slotKey,e] of Object.entries(s?.enchants||{})){
       if(!e?.name)continue;
       enchants[slotKey]={name:e.name,enchType:e.typeKey||e.enchType||''};
     }
-    if(Object.keys(enchants).length)payload.enchants=enchants;
+    setPayloadSection('enchants',enchants,Object.keys(enchants).length>0);
 
     const emblems={};
     for(const [slotKey,arr] of Object.entries(s?.emblems||{})){
@@ -4482,21 +4873,21 @@ async function list(page=1,push=true,silentRefresh=false){
       });
       if(mapped.some(Boolean))emblems[slotKey]=mapped;
     }
-    if(Object.keys(emblems).length)payload.emblems=emblems;
+    setPayloadSection('emblems',emblems,Object.keys(emblems).length>0);
 
     const refines={};
     for(const [slotKey,r] of Object.entries(s?.refines||{})){
       if(!r?.name)continue;
       refines[slotKey]={name:r.name,refineType:r.refineType||''};
     }
-    if(Object.keys(refines).length)payload.refines=refines;
+    setPayloadSection('refines',refines,Object.keys(refines).length>0);
 
     const avatar={};
     if(s?.avatar?.avatarName)avatar.avatarName=String(s.avatar.avatarName).trim();
     if(s?.avatar?.imprintName)avatar.imprintName=String(s.avatar.imprintName).trim();
-    if(Object.keys(avatar).length)payload.avatar=avatar;
+    setPayloadSection('avatar',avatar,Object.keys(avatar).length>0);
 
-    if(s?.customSkills)payload.customSkills=s.customSkills;
+    setPayloadSection('customSkills',s?.customSkills||null,!!s?.customSkills);
 
     const co=s?.computeOptions||{};
     payload.patchBefore=!!co.patchBefore;
@@ -4511,19 +4902,71 @@ async function list(page=1,push=true,silentRefresh=false){
       jihe:Number(sr.jihe||0)||0,
       waegok:Number(sr.waegok||0)||0
     };
-    if(Object.values(specialRunes).some(v=>v))payload.specialRunes=specialRunes;
+    setPayloadSection('specialRunes',specialRunes,Object.values(specialRunes).some(v=>v));
 
     const cs=s?.castleSeal||{};
     const mainName=cs?.main?.name||cs?.main||'';
     const subName=cs?.sub?.name||cs?.sub||'';
-    if(mainName||subName)payload.castleSeal={mainName,subName};
+    setPayloadSection('castleSeal',{mainName,subName},!!(mainName||subName));
 
-    if(s?.runes)payload.runes=s.runes;
+    setPayloadSection('runes',s?.runes||null,!!s?.runes);
 
     const re=s?.runeEngrave||{};
     if(re?.name&&re?.level){
       payload.runeEngrave={type:'룬각인',name:String(re.name).trim(),level:String(re.level).trim()};
+    }else{
+      delete payload.runeEngrave;
     }
+
+    // PC final_compute와 동일한 방어구 특성 옵션 payload.
+    const traitOptionsPayload={};
+    for(const slotKey of ['headshoulder','top','bottom','belt','shoes']){
+      const entries=Array.isArray(s?.traitOptions?.[slotKey]?.entries)
+        ? s.traitOptions[slotKey].entries
+        : [];
+      const normalized=[0,1,2].map(index=>{
+        const entry=entries[index]&&typeof entries[index]==='object'?entries[index]:{};
+        return {
+          stage:Math.max(1,Math.min(5,Number(entry?.stage||1)||1)),
+          name:String(entry?.name||'').trim()
+        };
+      });
+      if(normalized.some(entry=>entry.name)){
+        traitOptionsPayload[slotKey]={entries:normalized};
+      }
+    }
+    setPayloadSection('traitOptions',traitOptionsPayload,Object.keys(traitOptionsPayload).length>0);
+
+    // 수련일지 룬각인: PC 계산기와 동일하게 저장 이력이 없어도 1~5단계 기본값은 attack.
+    {
+      const runeTrainingChoices=s?.trainingRuneEngrave?.choices||{};
+      const choices={};
+      for(let stage=1;stage<=5;stage++){
+        const raw=String(runeTrainingChoices?.[stage]??runeTrainingChoices?.[String(stage)]??'attack').trim();
+        choices[stage]=raw==='cooldown'?'cooldown':'attack';
+      }
+      payload.trainingRuneEngrave={choices};
+    }
+
+    // 수련일지 마법봉인: 현재 canonical state에 확정된 값만 사용한다.
+    const magicTrainingChoices=s?.trainingMagicSeal?.choices;
+    if(magicTrainingChoices&&typeof magicTrainingChoices==='object'){
+      const choices={};
+      for(let stage=1;stage<=12;stage++){
+        const picked=magicTrainingChoices?.[stage]??magicTrainingChoices?.[String(stage)]??null;
+        if(!picked)continue;
+        const unique=String(picked?.unique||'').trim();
+        const normal=String(picked?.normal||'').trim();
+        if(unique||normal)choices[stage]={unique,normal};
+      }
+      setPayloadSection('trainingMagicSeal',{choices},Object.keys(choices).length>0);
+    }else{
+      delete payload.trainingMagicSeal;
+    }
+
+    // 캐릭터카드의 최종데미지는 계산기 본체의 일반 계산값 기준이다.
+    // 과거 시너지 계산 payload가 남아 있어도 절대 섞이지 않게 명시적으로 제거한다.
+    delete payload.synergy;
 
     const ownerKey=boardCalcOwnerKey(s);
     const tree=calcShareCurrentSkillTree(s);
@@ -4588,6 +5031,14 @@ async function list(page=1,push=true,silentRefresh=false){
       patchBefore:!!co.patchBefore
     };
 
+    const currentFinalRequest={
+      calcPayload:{payload,p:null},
+      sumStatsPayload:{},
+      skillStatePayload,
+      skillUsesPayload,
+      computePayload
+    };
+
     const res=await fetch(`${WEBAPP_URL}?type=final_compute`,{
       method:'POST',
       headers:{
@@ -4595,13 +5046,9 @@ async function list(page=1,push=true,silentRefresh=false){
         'Authorization':`Bearer ${idToken}`
       },
       body:JSON.stringify({
-        id_token:idToken,
-        calcPayload:{payload,p:null},
-        sumStatsPayload:{},
-        skillStatePayload,
-        skillUsesPayload,
-        computePayload
-      })
+          id_token:idToken,
+          ...currentFinalRequest
+        })
     });
 
     let data=null;
@@ -4624,6 +5071,10 @@ async function list(page=1,push=true,silentRefresh=false){
 
     snapshot.finalDamage=Number.isFinite(total)?total:0;
     snapshot.finalDamageCalculatedAt=Date.now();
+    snapshot.state=s;
+    snapshot.state.lastFinalCompute=JSON.parse(JSON.stringify(currentFinalRequest));
+    snapshot.state.lastComputedTotal=snapshot.finalDamage;
+    snapshot.state.lastComputedAt=Date.now();
     return snapshot;
   }
 
@@ -4701,6 +5152,184 @@ async function list(page=1,push=true,silentRefresh=false){
     return [...new Set(formatted)];
   }
 
+  const CALC_SHARE_TRAIT_ARMOR_SLOTS=new Set(['headshoulder','top','bottom','belt','shoes']);
+
+  function calcShareNormalizeTraitStage(value){
+    const n=Number(String(value??'').trim());
+    return Number.isFinite(n)?Math.max(1,Math.min(5,Math.trunc(n))):1;
+  }
+
+  function calcShareTraitStageRoman(stage){
+    return ['', 'I', 'II', 'III', 'IV', 'V'][calcShareNormalizeTraitStage(stage)]||'I';
+  }
+
+  function renderCalcShareTraitBadges(snapshotState,slotKey){
+    if(!CALC_SHARE_TRAIT_ARMOR_SLOTS.has(slotKey))return '';
+    const entries=Array.isArray(snapshotState?.traitOptions?.[slotKey]?.entries)
+      ? snapshotState.traitOptions[slotKey].entries
+      : [];
+
+    const badges=[0,1,2].map(index=>{
+      const entry=entries[index]&&typeof entries[index]==='object'?entries[index]:{};
+      const name=String(entry?.name||'').trim();
+      if(!name){
+        return `<span class="calc-share-trait-badge empty" title="특성옵션 ${index+1} 미선택" aria-label="특성옵션 ${index+1} 미선택">-</span>`;
+      }
+      const stage=calcShareNormalizeTraitStage(entry?.stage||1);
+      const roman=calcShareTraitStageRoman(stage);
+      const title=`${roman}단계 · ${name}`;
+      return `<span class="calc-share-trait-badge stage-${stage}" title="${esc(title)}" aria-label="${esc(title)}">${roman}</span>`;
+    }).join('');
+
+    return `<div class="calc-share-trait-badges" aria-label="${esc(slotKey)} 특성옵션">${badges}</div>`;
+  }
+
+  // ✅ 모바일 계산기 수련일지 요약과 동일한 계산 규칙
+  function calcShareFormatTrainingPercent(value){
+    const n=Number(value||0);
+    if(!Number.isFinite(n))return '0%';
+    const rounded=Math.round(n*100)/100;
+    const body=Number.isInteger(rounded)
+      ? String(rounded)
+      : String(rounded).replace(/0+$/,'').replace(/\.$/,'');
+    return `${body}%`;
+  }
+
+  function calcShareTrainingRuneSummary(rawChoices){
+    const choices={1:'attack',2:'attack',3:'attack',4:'attack',5:'attack'};
+    const raw=rawChoices&&typeof rawChoices==='object'?rawChoices:{};
+    for(let stage=1;stage<=5;stage+=1){
+      const v=raw?.[stage]??raw?.[String(stage)];
+      if(v==='attack'||v==='cooldown')choices[stage]=v;
+    }
+
+    let skillRemainMul=1;
+    let cooldownRemainMul=1;
+    for(let stage=1;stage<=5;stage+=1){
+      if(choices[stage]==='cooldown')cooldownRemainMul*=0.95;
+      else skillRemainMul*=1+((stage===5?10:5)/100);
+    }
+
+    return {
+      skillDmgPct:(skillRemainMul-1)*100,
+      cooldownPct:(1-cooldownRemainMul)*100
+    };
+  }
+
+  function calcShareTrainingMagicSummary(rawChoices){
+    const total={
+      strInt:0,physCrit:0,magCrit:0,vit:0,spirit:0,allElement:0,
+      physMagAtk:0,atkSpeed:0,castSpeed:0,accuracy:0,evasion:0,
+      damageInc:0,addDamage:0,skillLv50:0
+    };
+    const exact={
+      '힘/지능 +46':['strInt',46],
+      '물리 크리티컬 +29':['physCrit',29],
+      '물리 크리티컬 +30':['physCrit',30],
+      '물리 크리티컬 +60':['physCrit',60],
+      '마법 크리티컬 +29':['magCrit',29],
+      '마법 크리티컬 +30':['magCrit',30],
+      '마법 크리티컬 +60':['magCrit',60],
+      '체력 +46':['vit',46],
+      '정신력 +46':['spirit',46],
+      '모든 속성 강화 +8':['allElement',8],
+      '모든 속성 강화 +10':['allElement',10],
+      '물리/마법 공격력 +18':['physMagAtk',18],
+      '물리/마법 공격력 +19':['physMagAtk',19],
+      '공격 속도 +1.6%':['atkSpeed',1.6],
+      '캐스팅 속도 +2%':['castSpeed',2],
+      '적중 +124':['accuracy',124],
+      '적중 +75':['accuracy',75],
+      '회피 +70':['evasion',70],
+      '회피 +75':['evasion',75],
+      '데미지 8% 증가':['damageInc',8],
+      '추가 데미지 8%':['addDamage',8],
+      '50레벨 스킬 Lv+1':['skillLv50',1]
+    };
+
+    const choices=rawChoices&&typeof rawChoices==='object'?rawChoices:{};
+    const addLabel=raw=>{
+      const label=String(raw||'').normalize('NFC').trim();
+      const hit=exact[label];
+      if(hit)total[hit[0]]+=hit[1];
+    };
+
+    for(let stage=1;stage<=12;stage+=1){
+      const picked=choices?.[stage]??choices?.[String(stage)]??{};
+      if(picked&&typeof picked==='object'){
+        addLabel(picked.unique);
+        addLabel(picked.normal);
+      }
+    }
+    return total;
+  }
+
+  function calcShareFormatTrainingNumber(value,suffix=''){
+    const n=Number(value||0);
+    const rounded=Math.round(n*100)/100;
+    const body=Number.isInteger(rounded)
+      ? String(rounded)
+      : String(rounded).replace(/0+$/,'').replace(/\.$/,'');
+    return `+${body}${suffix}`;
+  }
+
+  function renderCalcShareTrainingSummary(s){
+    const castleRows=[];
+    const runeRows=[];
+    const magicRows=[];
+
+    const castle=s?.castleSeal||s?.CastleSeal||{};
+    const mainName=String(castle?.mainName||'').trim();
+    const subName=String(castle?.subName||'').trim();
+    if(mainName||subName){
+      castleRows.push(`<div class="calc-share-training-row"><div class="calc-share-training-label">성안 주요 옵션</div><div class="calc-share-training-value">${esc(mainName||'-')}</div></div>`);
+      castleRows.push(`<div class="calc-share-training-row"><div class="calc-share-training-label">성안 추가 옵션</div><div class="calc-share-training-value">${esc(subName||'-')}</div></div>`);
+    }
+
+    const runeChoices=s?.trainingRuneEngrave?.choices;
+    if(runeChoices&&typeof runeChoices==='object'){
+      const rune=calcShareTrainingRuneSummary(runeChoices);
+      runeRows.push(`<div class="calc-share-training-row rune"><div class="calc-share-training-label">스킬 공격력</div><div class="calc-share-training-value">${esc(calcShareFormatTrainingPercent(rune.skillDmgPct))} 증가</div></div>`);
+      runeRows.push(`<div class="calc-share-training-row rune"><div class="calc-share-training-label">스킬 쿨타임</div><div class="calc-share-training-value">${esc(calcShareFormatTrainingPercent(rune.cooldownPct))} 감소</div></div>`);
+    }
+
+    const magicChoices=s?.trainingMagicSeal?.choices;
+    if(magicChoices&&typeof magicChoices==='object'){
+      const total=calcShareTrainingMagicSummary(magicChoices);
+      const defs=[
+        ['힘/지능',total.strInt,''],
+        ['물리 크리티컬',total.physCrit,''],
+        ['마법 크리티컬',total.magCrit,''],
+        ['체력',total.vit,''],
+        ['정신력',total.spirit,''],
+        ['모든 속성 강화',total.allElement,''],
+        ['물리/마법 공격력',total.physMagAtk,''],
+        ['공격 속도',total.atkSpeed,'%'],
+        ['캐스팅 속도',total.castSpeed,'%'],
+        ['적중',total.accuracy,''],
+        ['회피',total.evasion,''],
+        ['데미지 증가',total.damageInc,'%'],
+        ['추가 데미지',total.addDamage,'%'],
+        ['50레벨 스킬 Lv',total.skillLv50,'']
+      ].filter(([,value])=>Number(value||0)!==0);
+
+      defs.forEach(([label,value,suffix])=>{
+        magicRows.push(`<div class="calc-share-training-row magic"><div class="calc-share-training-label">${esc(label)}</div><div class="calc-share-training-value">${esc(calcShareFormatTrainingNumber(value,suffix))}</div></div>`);
+      });
+    }
+
+    if(!castleRows.length&&!runeRows.length&&!magicRows.length)return '';
+
+    const castleHtml=castleRows.length
+      ? `<div class="calc-share-training-castle">${castleRows.join('')}</div>`
+      : '';
+
+    const runeHtml=`<div class="calc-share-training-column"><div class="calc-share-training-column-title">룬각인</div><div class="calc-share-training-list">${runeRows.length?runeRows.join(''):'<div class="calc-share-detail-empty">-</div>'}</div></div>`;
+    const magicHtml=`<div class="calc-share-training-column"><div class="calc-share-training-column-title">마법봉인</div><div class="calc-share-training-list">${magicRows.length?magicRows.join(''):'<div class="calc-share-detail-empty">-</div>'}</div></div>`;
+
+    return `<section class="calc-share-training-summary"><div class="calc-share-training-title">수련일지</div>${castleHtml}<div class="calc-share-training-columns">${runeHtml}${magicHtml}</div></section>`;
+  }
+
   function renderCalcShareEquipmentDetails(s){
     const sels=s?.selections||{};
     const enh=s?.enh||{};
@@ -4708,6 +5337,7 @@ async function list(page=1,push=true,silentRefresh=false){
     const seals=s?.seals||{};
     const emblems=s?.emblems||{};
     const refines=s?.refines||{};
+    const traitOptions=s?.traitOptions||{};
     const slotDefs=CALC_SHARE_EQUIP_GROUPS.flatMap(group=>group.slots);
 
     const rows=[];
@@ -4745,22 +5375,41 @@ async function list(page=1,push=true,silentRefresh=false){
         : calcShareDetailValues(emblems?.[slotKey]);
       if(emblemVals.length)parts.push(`<span><strong>엠블렘</strong> ${esc([...new Set(emblemVals)].join(', '))}</span>`);
 
-      if(parts.length){
+      const traitEntries=CALC_SHARE_TRAIT_ARMOR_SLOTS.has(slotKey) && Array.isArray(traitOptions?.[slotKey]?.entries)
+        ? traitOptions[slotKey].entries.slice(0,3).filter(entry=>String(entry?.name||'').trim())
+        : [];
+
+      if(parts.length || traitEntries.length){
         const equipName=String(sels?.[slotKey]?.name||'').trim();
         const title=equipName?`${slotLabel} · ${equipName}`:slotLabel;
         rows.push(`<div class="calc-share-detail-row"><div class="calc-share-detail-slot" title="${esc(title)}">${esc(slotLabel)}</div><div class="calc-share-detail-values">${parts.join('')}</div></div>`);
       }
+
+      traitEntries.forEach((entry,index)=>{
+        const stage=calcShareNormalizeTraitStage(entry?.stage||1);
+        const roman=calcShareTraitStageRoman(stage);
+        const name=String(entry?.name||'').trim();
+        rows.push(`<div class="calc-share-detail-trait-row"><div class="calc-share-detail-trait-slot">특성${index+1}</div><div class="calc-share-detail-trait-value"><span class="calc-share-trait-badge stage-${stage}" title="${esc(`${roman}단계 · ${name}`)}">${roman}</span><span class="calc-share-detail-trait-text">${esc(name)}</span></div></div>`);
+      });
     }
 
-    return rows.length
+    const equipmentDetailHtml=rows.length
       ? `<div class="calc-share-detail-list">${rows.join('')}</div>`
-      : `<div class="calc-share-detail-empty">저장된 상세 설정 정보가 없습니다.</div>`;
+      : `<div class="calc-share-detail-empty">저장된 장비 상세 설정 정보가 없습니다.</div>`;
+
+    const trainingSummaryHtml=renderCalcShareTrainingSummary(s);
+    return equipmentDetailHtml+trainingSummaryHtml;
   }
+
+  // ✅ 캐릭터카드 상세보기 열림 상태 보존
+  // 카드 DOM이 후속 갱신으로 다시 그려져도 상세보기 상태가 초기화되지 않도록 한다.
+  let calcShareDetailExpandedState = false;
 
   function renderCalcShareCard(snapshot,{compact=false}={}){
     const s=snapshot?.state||{};
     const c=s.currentCharacter||{};
     const sels=s.selections||{};
+    const activeSetVisualMap=calcShareBuildActiveSetVisualMap(sels);
     const charName=String(c.name||'캐릭터 미선택');
     const job=String(c.jobGroupLabel||c.jobGroup||'');
     const charImg=safeBoardImgSrc(c.saveFace||c.thumb||c.full||c.imgSrc);
@@ -4787,10 +5436,15 @@ async function list(page=1,push=true,silentRefresh=false){
         const name=String(it?.name||'');
         const badgeSrc=safeBoardImgSrc(getCalcShareSetBadgeSrc(it,key));
         const badgeClass=getCalcShareSetBadgeExtraClass(badgeSrc);
+        const rarityClass=getCalcShareEquipRarityBorderClass(it?.rarity||it?._raw?.['레어리티']||it?.raw?.['레어리티']||'');
+        const setSyncKey=activeSetVisualMap.get(key)||'';
+        const setActiveClass=setSyncKey?' set-effect-active':'';
+        const setSyncAttr=setSyncKey?` data-set-effect-sync-key="${esc(setSyncKey)}"`:'';
         const imageHtml=img
-          ? `<div class="calc-share-equip-img-wrap"><img class="calc-share-equip-img" src="${img}" alt="${esc(name)}" loading="lazy">${badgeSrc?`<img class="calc-share-equip-set-badge ${badgeClass}" src="${badgeSrc}" alt="" loading="lazy">`:''}</div>`
+          ? `<div class="calc-share-equip-img-wrap ${rarityClass}${setActiveClass}"${setSyncAttr}><img class="calc-share-equip-img" src="${img}" alt="${esc(name)}" loading="lazy">${badgeSrc?`<img class="calc-share-equip-set-badge ${badgeClass}" src="${badgeSrc}" alt="" loading="lazy">`:''}</div>`
           : `<div class="calc-share-equip-empty">+</div>`;
-        return `<div class="calc-share-equip" title="${esc(name||`${label} 미선택`)}">${imageHtml}</div>`;
+        const traitBadgesHtml=renderCalcShareTraitBadges(s,key);
+        return `<div class="calc-share-equip" title="${esc(name||`${label} 미선택`)}">${imageHtml}${traitBadgesHtml}</div>`;
       }).join('');
       const summaryHtml=renderCalcShareGroupLabel(group.label,sels,s);
       return `<div class="calc-share-equip-row"><div class="calc-share-equip-group-label">${summaryHtml}</div><div class="calc-share-equip-items">${items}</div></div>`;
@@ -4809,7 +5463,9 @@ async function list(page=1,push=true,silentRefresh=false){
 
     const cardLogoImg=safeBoardImgSrc('img/카드로고.png');
     const detailHtml=renderCalcShareEquipmentDetails(s);
-    return `<section class="calc-share-card ${compact?'compact':''}" aria-label="첨부된 계산기 세팅"><div class="calc-share-card-columns"><div class="calc-share-card-col equip-col"><div class="calc-share-card-head">${charImg?`<img class="calc-share-char-img" src="${charImg}" alt="${esc(charName)}" loading="lazy">`:`<div class="calc-share-char-placeholder">?</div>`}<div class="calc-share-char-info"><div class="calc-share-char-name">${esc(charName)}</div><div class="calc-share-char-sub">${esc(job||'던파모바일 계산기 세팅')} · ${esc(timeLabel)} · ${esc(mode)}</div></div>${finalDamageHtml}</div><div class="calc-share-equip-groups">${equips}</div><div class="calc-share-extra">${extras}</div><div class="calc-share-detail-panel" hidden>${detailHtml}</div><div class="calc-share-detail-footer"><button type="button" class="calc-share-detail-toggle" aria-expanded="false">[상세보기]</button></div></div><div class="calc-share-card-col skill-col"><div class="calc-share-section-head"><div class="calc-share-section-title">스킬트리</div>${cardLogoImg?`<img class="calc-share-card-logo" src="${cardLogoImg}" alt="카드 로고" loading="lazy">`:''}</div>${skillTreeHtml}</div></div></section>`;
+    const detailOpen=!!calcShareDetailExpandedState;
+    scheduleCalcShareSetAnimationSync();
+    return `<section class="calc-share-card ${compact?'compact':''} ${detailOpen?'detail-expanded':''}" aria-label="첨부된 계산기 세팅"><div class="calc-share-card-columns"><div class="calc-share-card-col equip-col"><div class="calc-share-card-head">${charImg?`<img class="calc-share-char-img" src="${charImg}" alt="${esc(charName)}" loading="lazy">`:`<div class="calc-share-char-placeholder">?</div>`}<div class="calc-share-char-info"><div class="calc-share-char-name">${esc(charName)}</div><div class="calc-share-char-sub">${esc(job||'던파모바일 계산기 세팅')} · ${esc(timeLabel)} · ${esc(mode)}</div></div>${finalDamageHtml}</div><div class="calc-share-equip-groups">${equips}</div><div class="calc-share-extra">${extras}</div><div class="calc-share-detail-panel" ${detailOpen?'':'hidden'}>${detailHtml}</div><div class="calc-share-detail-footer"><button type="button" class="calc-share-detail-toggle" aria-expanded="${detailOpen?'true':'false'}">${detailOpen?'[상세닫기]':'[상세보기]'}</button></div></div><div class="calc-share-card-col skill-col"><div class="calc-share-section-head"><div class="calc-share-section-title">스킬트리</div>${cardLogoImg?`<img class="calc-share-card-logo" src="${cardLogoImg}" alt="카드 로고" loading="lazy">`:''}</div>${skillTreeHtml}</div></div></section>`;
   }
 
   document.addEventListener('click',(e)=>{
@@ -4819,6 +5475,10 @@ async function list(page=1,push=true,silentRefresh=false){
     const detail=card?.querySelector('.calc-share-detail-panel');
     if(!detail)return;
     const willOpen=detail.hidden;
+
+    // ✅ DOM 상태와 별개로 열림 상태를 기억해 재렌더 후에도 복원
+    calcShareDetailExpandedState=willOpen;
+
     detail.hidden=!willOpen;
     card.classList.toggle('detail-expanded',willOpen);
     btn.setAttribute('aria-expanded',willOpen?'true':'false');
@@ -4828,6 +5488,13 @@ async function list(page=1,push=true,silentRefresh=false){
   async function view(id,push=true){
     panel.classList.add('detail-view');
     const postId=Number(id);
+
+    // 다른 게시글로 이동할 때는 상세보기를 기본 닫힘 상태로 시작한다.
+    // 같은 게시글의 후속 재렌더에서는 현재 열림 상태를 유지한다.
+    const currentPostId=Number(state.currentPost?.id||0);
+    if(currentPostId!==postId){
+      calcShareDetailExpandedState=false;
+    }
     const cached=getCachedBoardDetail(postId);
     // 새로고침/직접접속에서도 '게시글을 불러오는 중...' 문구로 화면을 덮지 않는다.
     // 캐시가 있으면 즉시 본문을 그리고, 없으면 현재 패널을 유지한 채 서버 응답을 기다린다.
@@ -5112,6 +5779,25 @@ async function list(page=1,push=true,silentRefresh=false){
       saveBtn.textContent=calcShareBusy?'계산중':saveBtn.dataset.normalText;
     };
 
+    // 글쓰기 화면에 진입한 직후에는 계산기 마지막 상태 버튼을 잠시 잠가
+    // 게시판/로그인/저장슬롯 초기화가 끝난 뒤에만 사용하도록 한다.
+    // 즉시 클릭으로 이전값/이상값이 섞이는 문제를 UX 차원에서 차단한다.
+    let calcLastStateReady=false;
+    const setCalcLastStateReady=(ready)=>{
+      calcLastStateReady=!!ready;
+      const loadBtn=panel.querySelector('#loadCalcState');
+      if(!loadBtn)return;
+      if(calcLastStateReady){
+        loadBtn.disabled=calcShareBusy;
+        loadBtn.textContent=attachedCalcSnapshot?'마지막 상태로 교체':'계산기 마지막 상태 불러오기';
+        loadBtn.removeAttribute('title');
+      }else{
+        loadBtn.disabled=true;
+        loadBtn.textContent='계산기 상태 준비중...';
+        loadBtn.title='글쓰기 화면 초기화가 끝난 뒤 사용할 수 있습니다.';
+      }
+    };
+
     const boardPresetState={page:0,maxSlots:0,canUse:false,data:{}};
     // PC는 기존처럼 10개, 모바일 글쓰기에서는 5개씩 표시
     const getBoardPresetPerPage=()=>window.matchMedia('(max-width:700px)').matches?5:10;
@@ -5240,7 +5926,17 @@ async function list(page=1,push=true,silentRefresh=false){
       const tohampoInput=panel.querySelector('#calcShareTohampo');
       if(preview)preview.innerHTML=attachedCalcSnapshot?renderCalcShareCard(attachedCalcSnapshot,{compact:true}):'';
       if(removeBtn)removeBtn.hidden=!attachedCalcSnapshot;
-      if(loadBtn)loadBtn.textContent=attachedCalcSnapshot?'마지막 상태로 교체':'계산기 마지막 상태 불러오기';
+      if(loadBtn){
+        if(calcLastStateReady){
+          loadBtn.disabled=calcShareBusy;
+          loadBtn.textContent=attachedCalcSnapshot?'마지막 상태로 교체':'계산기 마지막 상태 불러오기';
+          loadBtn.removeAttribute('title');
+        }else{
+          loadBtn.disabled=true;
+          loadBtn.textContent='계산기 상태 준비중...';
+          loadBtn.title='글쓰기 화면 초기화가 끝난 뒤 사용할 수 있습니다.';
+        }
+      }
       if(note)note.hidden=!!attachedCalcSnapshot;
       if(options)options.hidden=!attachedCalcSnapshot;
       if(attachedCalcSnapshot){
@@ -5371,7 +6067,19 @@ async function list(page=1,push=true,silentRefresh=false){
     }));
 
     // 계산기와 동일한 서버 저장슬롯 목록을 글쓰기 화면에 동기화한다.
-    refreshBoardPresetSlots();
+    setCalcLastStateReady(false);
+    refreshCalcShareEditor();
+    (async()=>{
+      try{
+        await refreshBoardPresetSlots();
+      }finally{
+        // 초기 렌더 및 로그인/스토리지 반영이 한 번 안정화된 뒤에만 버튼을 연다.
+        setTimeout(()=>{
+          setCalcLastStateReady(true);
+          refreshCalcShareEditor();
+        },400);
+      }
+    })();
 
     panel.querySelector('#loadCalcState')?.addEventListener('click',async e=>{
       const status=panel.querySelector('#status');
@@ -5379,6 +6087,11 @@ async function list(page=1,push=true,silentRefresh=false){
       const previousSnapshot=attachedCalcSnapshot;
 
       try{
+        if(!calcLastStateReady){
+          const status=panel.querySelector('#status');
+          if(status)status.textContent='잠시만 기다려주세요. 글쓰기 화면 초기화가 끝난 뒤 불러올 수 있습니다.';
+          return;
+        }
         btn.disabled=true;
 
         const currentCrit=!!panel.querySelector('#calcShareCrit')?.checked;
