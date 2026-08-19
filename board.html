@@ -4624,7 +4624,23 @@ async function list(page=1,push=true,silentRefresh=false){
       if(r.id)byId[String(r.id)]=r;
     }
 
-    const sourceTree=calcSharePickSkillTree(state);
+    let sourceTree=calcSharePickSkillTree(state);
+
+    // ✅ 모바일 구형/중간 포맷 호환:
+    // skillTrees가 ownerKey 하위가 아니라 곧바로 {스킬명:{spLv,tpLv...}} 형태인 경우
+    // 현재 캐릭터 skill:list의 스킬명과 실제로 겹치는 항목이 있을 때만 직접 트리로 인정한다.
+    if(!sourceTree && state?.skillTrees && typeof state.skillTrees==='object' && !Array.isArray(state.skillTrees)){
+      const directEntries=Object.entries(state.skillTrees);
+      const directSkillHits=directEntries.filter(([key,node])=>{
+        if(!node||typeof node!=='object'||Array.isArray(node))return false;
+        const nk=calcShareNormSkillKey(calcShareStripSkillKey(key));
+        return !!(nk && byName[nk]);
+      });
+      if(directSkillHits.length){
+        sourceTree=state.skillTrees;
+      }
+    }
+
     const outTree={};
     let sourceUseful=0;
     let matchedUseful=0;
@@ -4847,14 +4863,9 @@ async function list(page=1,push=true,silentRefresh=false){
     }
     setPayloadSection('enh',enh,Object.keys(enh).length>0);
 
-    const seals={};
-    for(const [slotKey,sv] of Object.entries(s?.seals||{})){
-      if(!sv)continue;
-      const unique=sv?.unique?.name||'';
-      const general1=sv?.general1?.name||'';
-      if(unique||general1)seals[slotKey]={unique:unique||null,general1:general1||null};
-    }
-    setPayloadSection('seals',seals,Object.keys(seals).length>0);
+    // ✅ 현재 계산기에서는 과거 장비별 마법봉인(state.seals)을 폐기했다.
+    // 게시판 캐릭터카드 재계산에서도 구형 데이터가 남아 있더라도 final_compute에 보내지 않는다.
+    delete payload.seals;
 
     const enchants={};
     for(const [slotKey,e] of Object.entries(s?.enchants||{})){
@@ -4914,12 +4925,10 @@ async function list(page=1,push=true,silentRefresh=false){
 
     setPayloadSection('runes',s?.runes||null,!!s?.runes);
 
-    const re=s?.runeEngrave||{};
-    if(re?.name&&re?.level){
-      payload.runeEngrave={type:'룬각인',name:String(re.name).trim(),level:String(re.level).trim()};
-    }else{
-      delete payload.runeEngrave;
-    }
+    // ✅ 현재 계산기에서는 과거 runeEngrave를 폐기하고
+    // 수련일지 룬각인(trainingRuneEngrave)만 사용한다.
+    // 게시판에서도 구형 runeEngrave가 state에 남아 있어도 계산에 포함하지 않는다.
+    delete payload.runeEngrave;
 
     // PC final_compute와 동일한 방어구 특성 옵션 payload.
     const traitOptionsPayload={};
@@ -5415,7 +5424,22 @@ async function list(page=1,push=true,silentRefresh=false){
     const activeSetVisualMap=calcShareBuildActiveSetVisualMap(sels);
     const charName=String(c.name||'캐릭터 미선택');
     const job=String(c.jobGroupLabel||c.jobGroup||'');
-    const charImg=safeBoardImgSrc(c.saveFace||c.thumb||c.full||c.imgSrc);
+    // ✅ 캐릭터카드에는 저장슬롯용 썸네일(saveFace/thumb)이 아니라
+    // 실제 캐릭터 메인 초상화를 우선 사용한다.
+    // 모바일은 saveFace/thumb에 선택창용 썸네일을 저장하므로 이를 먼저 쓰면
+    // 게시판 카드에서 엉뚱한/축약된 이미지가 표시될 수 있다.
+    const charImg=safeBoardImgSrc(
+      c.full ||
+      c.imgSrc ||
+      c.image ||
+      c['이미지'] ||
+      c.mainImage ||
+      c.fullSrc ||
+      c.saveFace ||
+      c.thumb ||
+      c.thumbnail ||
+      c['썸네일']
+    );
     const timeLabel=calcTimeLabel(s?.options?.timeWindow);
     const monsterName=String(s?.monster?.name||'');
     const mode=s?.isPartyMode||s?.soloPartyMode==='party'?'파티':'솔로';
@@ -5550,6 +5574,87 @@ async function list(page=1,push=true,silentRefresh=false){
     return base.replace(/[\\/:*?"<>|]/g,'_') + '.png';
   }
 
+  function loadCalcShareWatermarkImage(src){
+    if(!src) return Promise.resolve(null);
+    return new Promise(resolve=>{
+      const img=new Image();
+      img.crossOrigin='anonymous';
+      img.decoding='async';
+      img.onload=()=>resolve(img);
+      img.onerror=()=>resolve(null);
+      img.src=src;
+    });
+  }
+
+  async function drawCalcShareWatermarkOnCanvas(canvas, opts={}){
+    if(!canvas) return;
+
+    const ctx=canvas.getContext('2d');
+    if(!ctx) return;
+
+    const logoSrc=String(opts.logoSrc||'').trim();
+    const text=String(opts.text||'게임실험연구소').trim() || '게임실험연구소';
+    const logoImg=await loadCalcShareWatermarkImage(logoSrc);
+
+    const cw=canvas.width||0;
+    const ch=canvas.height||0;
+    if(!(cw>0 && ch>0)) return;
+
+    const minSide=Math.min(cw,ch);
+
+    // 중앙 대각선 메인 워터마크
+    ctx.save();
+    ctx.translate(cw*0.52, ch*0.58);
+    ctx.rotate(-Math.PI/10);
+
+    const logoSize=Math.max(96, Math.min(220, minSide*0.16));
+    const fontSize=Math.max(34, Math.min(86, minSide*0.068));
+    ctx.font=`800 ${fontSize}px Pretendard, "Noto Sans KR", system-ui, sans-serif`;
+    const textWidth=ctx.measureText(text).width;
+    const gap=Math.max(18, logoSize*0.18);
+    const totalWidth=(logoImg?logoSize+gap:0)+textWidth;
+    const startX=-totalWidth/2;
+
+    ctx.globalAlpha=0.08;
+    if(logoImg){
+      ctx.drawImage(logoImg,startX,-logoSize/2,logoSize,logoSize);
+    }
+    ctx.fillStyle='#ffffff';
+    ctx.strokeStyle='rgba(0,0,0,0.22)';
+    ctx.lineWidth=Math.max(1.5, fontSize*0.08);
+    ctx.textAlign='left';
+    ctx.textBaseline='middle';
+    const textX=startX+(logoImg?logoSize+gap:0);
+    ctx.strokeText(text,textX,0);
+    ctx.fillText(text,textX,0);
+    ctx.restore();
+
+    // 우하단 보조 워터마크
+    ctx.save();
+    const smallLogoSize=Math.max(34, Math.min(72, minSide*0.055));
+    const smallFontSize=Math.max(16, Math.min(28, minSide*0.026));
+    const padding=Math.max(16, minSide*0.022);
+    ctx.font=`700 ${smallFontSize}px Pretendard, "Noto Sans KR", system-ui, sans-serif`;
+    const smallTextWidth=ctx.measureText(text).width;
+    const smallGap=Math.max(8, smallLogoSize*0.16);
+    const smallTotal=(logoImg?smallLogoSize+smallGap:0)+smallTextWidth;
+    const smallX=cw-padding-smallTotal;
+    const smallY=ch-padding-smallLogoSize/2;
+
+    ctx.globalAlpha=0.16;
+    if(logoImg){
+      ctx.drawImage(logoImg,smallX,smallY-smallLogoSize/2,smallLogoSize,smallLogoSize);
+    }
+    ctx.fillStyle='rgba(255,255,255,0.9)';
+    ctx.strokeStyle='rgba(0,0,0,0.28)';
+    ctx.lineWidth=Math.max(1, smallFontSize*0.08);
+    ctx.textAlign='left';
+    ctx.textBaseline='middle';
+    ctx.strokeText(text,smallX+(logoImg?smallLogoSize+smallGap:0),smallY);
+    ctx.fillText(text,smallX+(logoImg?smallLogoSize+smallGap:0),smallY);
+    ctx.restore();
+  }
+
   async function saveCalcShareCardAsImage(btn){
     if(!btn || btn.classList.contains('is-saving')) return;
 
@@ -5641,6 +5746,16 @@ async function list(page=1,push=true,silentRefresh=false){
             clonedChar.replaceWith(box);
           }
         }
+      });
+
+      const watermarkLogoSrc=
+        card.querySelector('.calc-share-card-logo')?.currentSrc ||
+        (typeof safeBoardImgSrc==='function' ? safeBoardImgSrc('img/카드로고.png') : '') ||
+        '';
+
+      await drawCalcShareWatermarkOnCanvas(canvas,{
+        logoSrc: watermarkLogoSrc,
+        text: '게임실험연구소'
       });
 
       const fileName=makeCalcShareImageFileName(card);
@@ -6298,6 +6413,25 @@ async function list(page=1,push=true,silentRefresh=false){
         const hadAttachment=!!attachedCalcSnapshot;
         const snapshot=readLastCalculatorStateForBoard();
         snapshot.state=snapshot.state||{};
+
+        // ✅ 모바일 마지막 상태 호환
+        // 모바일 skillTrees에는 SP/TP만 있고 게시판 카드에 필요한
+        // 이미지 / x / y / requiredLevel 메타가 빠져 있을 수 있다.
+        // 저장슬롯 불러오기와 동일하게 현재 CORE skill:list로 보강한다.
+        try{
+          if(calcShareSkillTreeNeedsCompat(snapshot.state)){
+            if(status)status.textContent='모바일 스킬트리 정보를 게시판 카드용으로 복원하고 있습니다.';
+            const skillSheet=await getBoardPresetSkillSheet();
+            snapshot.state=normalizeBoardPresetSkillTreeForShare(snapshot.state,skillSheet);
+          }else{
+            snapshot.state._boardSkillTreeWarning='';
+          }
+        }catch(skillErr){
+          console.warn('[board last-state] 모바일 스킬트리 자동 복원 실패:',skillErr);
+          snapshot.state.skillTrees={};
+          snapshot.state._boardSkillTreeWarning='스킬트리 정보를 자동 복원하지 못했습니다. 계산기에서 스킬을 다시 확인한 뒤 게시판으로 돌아와 주세요.';
+        }
+
         snapshot.state.computeOptions=snapshot.state.computeOptions||{};
         // 최초 첨부 시에는 크리티컬/투함포를 모두 ON으로 시작한다.
         // 이미 첨부한 상태에서 "마지막 상태로 교체"할 때는 사용자가 고른 체크 상태를 유지한다.
