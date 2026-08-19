@@ -9,6 +9,7 @@
   <link rel="icon" type="image/png" href="img/gametestlab.png">
   <link rel="stylesheet" href="./common-header.css?v=20260805-3">
   <link rel="stylesheet" href="./common-header-modals.css?v=20260805-3">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <title>세팅 종합토론방 | 게임실험연구소 던파모바일 계산기</title>
   <style>
     :root { --bg:#0f1115; --panel:#151922; --panel2:#171c27; --line:rgba(255,255,255,.11); --text:#e6e9ef; --muted:#9aa3b2; --accent:#6ea8ff; --danger:#ff7777; }
@@ -798,6 +799,8 @@
     .calc-share-detail-footer{
       display:flex;
       justify-content:flex-end;
+      align-items:center;
+      gap:10px;
       margin-top:8px;
     }
     .calc-share-detail-toggle{
@@ -5468,6 +5471,195 @@ async function list(page=1,push=true,silentRefresh=false){
     return `<section class="calc-share-card ${compact?'compact':''} ${detailOpen?'detail-expanded':''}" aria-label="첨부된 계산기 세팅"><div class="calc-share-card-columns"><div class="calc-share-card-col equip-col"><div class="calc-share-card-head">${charImg?`<img class="calc-share-char-img" src="${charImg}" alt="${esc(charName)}" loading="lazy">`:`<div class="calc-share-char-placeholder">?</div>`}<div class="calc-share-char-info"><div class="calc-share-char-name">${esc(charName)}</div><div class="calc-share-char-sub">${esc(job||'던파모바일 계산기 세팅')} · ${esc(timeLabel)} · ${esc(mode)}</div></div>${finalDamageHtml}</div><div class="calc-share-equip-groups">${equips}</div><div class="calc-share-extra">${extras}</div><div class="calc-share-detail-panel" ${detailOpen?'':'hidden'}>${detailHtml}</div><div class="calc-share-detail-footer"><button type="button" class="calc-share-detail-toggle" aria-expanded="${detailOpen?'true':'false'}">${detailOpen?'[상세닫기]':'[상세보기]'}</button></div></div><div class="calc-share-card-col skill-col"><div class="calc-share-section-head"><div class="calc-share-section-title">스킬트리</div>${cardLogoImg?`<img class="calc-share-card-logo" src="${cardLogoImg}" alt="카드 로고" loading="lazy">`:''}</div>${skillTreeHtml}</div></div></section>`;
   }
 
+  async function waitForImagesInNode(node){
+    const imgs=[...node.querySelectorAll('img')];
+    await Promise.all(imgs.map(img=>{
+      if(img.complete && img.naturalWidth>0)return Promise.resolve();
+      return new Promise(resolve=>{
+        const done=()=>resolve();
+        img.addEventListener('load',done,{once:true});
+        img.addEventListener('error',done,{once:true});
+        setTimeout(resolve,3000);
+      });
+    }));
+  }
+
+  function buildCalcShareCaptureNode(card){
+    const wrap=document.createElement('div');
+
+    // ✅ 실제 카드가 놓인 화면의 CSS 문맥(.view / .editor)을 캡처 복제본에도 유지
+    // :is(.editor,.view) 하위 전용 레이아웃이 빠지면 초상화/헤더 비율이 달라질 수 있다.
+    const contextRoot=card.closest('.editor,.view');
+    if(contextRoot?.classList.contains('editor')) wrap.classList.add('editor');
+    else wrap.classList.add('view');
+
+    wrap.style.position='fixed';
+    wrap.style.left='-100000px';
+    wrap.style.top='0';
+    wrap.style.zIndex='-1';
+    wrap.style.pointerEvents='none';
+    wrap.style.padding='0';
+    wrap.style.margin='0';
+
+    const clone=card.cloneNode(true);
+    const width=Math.ceil(card.getBoundingClientRect().width||0);
+    if(width>0) clone.style.width=width+'px';
+
+    // 저장용 이미지에서는 조작 버튼 영역만 숨기고,
+    // 상세보기/간략보기 상태와 스크롤 위치는 현재 화면 상태 그대로 유지한다.
+    clone.querySelectorAll('.calc-share-detail-footer').forEach(el=>el.remove());
+
+    // ✅ 초상화는 현재 화면에서 실제 렌더된 정사각형 크기를 그대로 고정
+    const originalChar=card.querySelector('.calc-share-char-img, .calc-share-char-placeholder');
+    const clonedChar=clone.querySelector('.calc-share-char-img, .calc-share-char-placeholder');
+    if(originalChar && clonedChar){
+      const rect=originalChar.getBoundingClientRect();
+      if(rect.width>0 && rect.height>0){
+        clonedChar.style.width=Math.ceil(rect.width)+'px';
+        clonedChar.style.height=Math.ceil(rect.height)+'px';
+        clonedChar.style.minWidth=Math.ceil(rect.width)+'px';
+        clonedChar.style.maxWidth=Math.ceil(rect.width)+'px';
+        clonedChar.style.minHeight=Math.ceil(rect.height)+'px';
+        clonedChar.style.maxHeight=Math.ceil(rect.height)+'px';
+        clonedChar.style.flex='0 0 '+Math.ceil(rect.width)+'px';
+        if(clonedChar.tagName==='IMG'){
+          clonedChar.style.objectFit='cover';
+          clonedChar.style.objectPosition='13% center';
+        }
+      }
+    }
+
+    const originalScrollable=[...card.querySelectorAll('.calc-share-card-col.skill-col, .calc-share-detail-panel')];
+    const clonedScrollable=[...clone.querySelectorAll('.calc-share-card-col.skill-col, .calc-share-detail-panel')];
+    originalScrollable.forEach((srcEl,idx)=>{
+      const dstEl=clonedScrollable[idx];
+      if(!dstEl) return;
+      dstEl.scrollTop=srcEl.scrollTop;
+      dstEl.scrollLeft=srcEl.scrollLeft;
+    });
+
+    wrap.appendChild(clone);
+    document.body.appendChild(wrap);
+    return { wrap, clone };
+  }
+
+  function makeCalcShareImageFileName(card){
+    const charName=String(card?.querySelector('.calc-share-char-name')?.textContent||'캐릭터카드').trim() || '캐릭터카드';
+    const postId=Number(state?.currentPost?.id||0);
+    const base=postId ? `${charName}_세팅카드_${postId}` : `${charName}_세팅카드`;
+    return base.replace(/[\\/:*?"<>|]/g,'_') + '.png';
+  }
+
+  async function saveCalcShareCardAsImage(btn){
+    if(!btn || btn.classList.contains('is-saving')) return;
+
+    // ✅ 저장 버튼은 게시글 하단 액션 영역에 있으므로 현재 열린 게시글의 카드 사용
+    const card=panel.querySelector('.view .calc-share-card');
+    if(!card){
+      alert('저장할 캐릭터카드를 찾을 수 없습니다.');
+      return;
+    }
+
+    if(typeof window.html2canvas!=='function'){
+      alert('이미지 저장 기능을 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.');
+      return;
+    }
+
+    const originalText=btn.textContent;
+    btn.classList.add('is-saving');
+    btn.textContent='[저장중...]';
+
+    const captureId='calc-share-capture-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+    card.dataset.captureId=captureId;
+
+    try{
+      await waitForImagesInNode(card);
+
+      // 현재 화면에서 실제 렌더된 초상화 크기/위치를 미리 보관한다.
+      const originalChar=card.querySelector('.calc-share-char-img');
+      const charRect=originalChar?.getBoundingClientRect?.() || null;
+      const charSrc=originalChar?.currentSrc || originalChar?.src || '';
+      const charStyle=originalChar ? getComputedStyle(originalChar) : null;
+
+      // 현재 보이는 스크롤 위치도 보관한다.
+      const scrollState=[...card.querySelectorAll('.calc-share-card-col.skill-col, .calc-share-detail-panel')].map(el=>({
+        scrollTop:el.scrollTop,
+        scrollLeft:el.scrollLeft
+      }));
+
+      const canvas=await window.html2canvas(card,{
+        useCORS:true,
+        backgroundColor:'#151922',
+        scale:Math.max(2, Math.min(3, window.devicePixelRatio||1)),
+        logging:false,
+
+        // ✅ 카드만 따로 떼어 복제하지 않고 문서 전체 CSS 문맥을 유지한 채 캡처한다.
+        onclone:(clonedDoc)=>{
+          const clonedCard=clonedDoc.querySelector(`.calc-share-card[data-capture-id="${captureId}"]`);
+          if(!clonedCard) return;
+
+          // 저장 이미지에는 조작 버튼 영역을 포함하지 않는다.
+          clonedCard.querySelectorAll('.calc-share-detail-footer').forEach(el=>el.remove());
+
+          // 현재 스크롤 상태 유지
+          const clonedScrollable=[...clonedCard.querySelectorAll('.calc-share-card-col.skill-col, .calc-share-detail-panel')];
+          clonedScrollable.forEach((el,idx)=>{
+            const st=scrollState[idx];
+            if(!st) return;
+            el.scrollTop=st.scrollTop;
+            el.scrollLeft=st.scrollLeft;
+          });
+
+          // ✅ html2canvas의 <img> object-fit 렌더링 차이를 피하기 위해
+          // 캐릭터 초상화만 동일 크기의 background-image 박스로 변환한다.
+          const clonedChar=clonedCard.querySelector('.calc-share-char-img');
+          if(clonedChar && charSrc && charRect && charRect.width>0 && charRect.height>0){
+            const box=clonedDoc.createElement('div');
+            box.className=clonedChar.className;
+
+            const w=Math.ceil(charRect.width);
+            const h=Math.ceil(charRect.height);
+
+            box.style.width=w+'px';
+            box.style.height=h+'px';
+            box.style.minWidth=w+'px';
+            box.style.maxWidth=w+'px';
+            box.style.minHeight=h+'px';
+            box.style.maxHeight=h+'px';
+            box.style.flex='0 0 '+w+'px';
+
+            box.style.backgroundImage=`url("${String(charSrc).replace(/"/g,'\\"')}")`;
+            box.style.backgroundSize='cover';
+            box.style.backgroundPosition=charStyle?.objectPosition || '13% center';
+            box.style.backgroundRepeat='no-repeat';
+
+            box.style.borderRadius=charStyle?.borderRadius || '10px';
+            box.style.border=charStyle?.border || '1px solid rgba(250,204,107,.42)';
+            box.style.backgroundColor=charStyle?.backgroundColor || '#111827';
+
+            // 모바일/상세 카드의 grid 위치도 원본 클래스 규칙이 그대로 적용된다.
+            clonedChar.replaceWith(box);
+          }
+        }
+      });
+
+      const fileName=makeCalcShareImageFileName(card);
+      const link=document.createElement('a');
+      link.href=canvas.toDataURL('image/png');
+      link.download=fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }catch(err){
+      console.warn('[calc-share-image-save] 실패:', err);
+      alert('이미지 저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    }finally{
+      delete card.dataset.captureId;
+      btn.classList.remove('is-saving');
+      btn.textContent=originalText;
+    }
+  }
+
   document.addEventListener('click',(e)=>{
     const btn=e.target?.closest?.('.calc-share-detail-toggle');
     if(!btn)return;
@@ -5513,7 +5705,7 @@ async function list(page=1,push=true,silentRefresh=false){
       document.title=`${r.post.title} | 세팅 종합토론방`;
       const comments=(r.post.comments||[]).map(c=>`<div class="comment"><div class="comment-head"><span>${authorCrown(c.author)}${esc(c.author?.nickname||'이용자')} · ${fmtDate(c.createdAt)}</span><span class="comment-admin-actions">${c.canEdit?`<button class="btn secondary" style="min-height:28px;padding:0 9px" data-cedit="${Number(c.id)}">수정</button>`:''}${c.canDelete?`<button class="btn danger" style="min-height:28px;padding:0 9px" data-cdel="${Number(c.id)}">삭제</button>`:''}</span></div><div class="comment-content">${esc(c.content)}</div></div>`).join('');
       const commentLoginRequired=!token()||isGuestToken();
-      panel.innerHTML=`<article class="view"><h2 class="view-title"><span class="category-badge ${r.post.isNotice?'notice':''}" data-category="${esc(r.post.isNotice?'공지':(CATEGORIES.includes(r.post.category)?r.post.category:'기타잡담'))}">${esc(r.post.isNotice?'공지':(CATEGORIES.includes(r.post.category)?r.post.category:'기타잡담'))}</span> ${r.post.prefix?`<span class="prefix-label">[${esc(r.post.prefix)}]</span> `:''}${esc(r.post.title)}</h2><div class="view-meta">${authorCrown(r.post.author)}${esc(r.post.author?.nickname||'이용자')} · ${fmtDate(r.post.createdAt)} · 조회 ${Number(r.post.viewCount||0)}</div>${r.post.calcSnapshot?renderCalcShareCard(r.post.calcSnapshot):''}<div class="view-content">${esc(r.post.content)}</div><div class="view-actions"><button class="btn secondary" id="back">목록</button><span class="view-action-spacer" aria-hidden="true"></span>${r.post.canEditMeta?'<button class="btn secondary" id="editMeta">탭·말머리 수정</button>':''}${r.post.canEdit?'<button class="btn secondary" id="edit">수정</button>':''}${r.post.canDelete?'<button class="btn danger" id="delete">삭제</button>':''}</div><section class="comments"><div class="comment-title">댓글 ${(r.post.comments||[]).length}개</div>${comments||'<div class="empty" style="padding:25px">첫 댓글을 남겨보세요.</div>'}<div class="comment-write"><textarea id="comment" maxlength="1000" placeholder="${commentLoginRequired?'댓글 작성은 로그인 후 이용이 가능합니다.':'댓글을 입력하세요'}" ${commentLoginRequired?'readonly class="login-required" aria-label="로그인 후 댓글 작성 가능"':''}></textarea><button class="btn" id="commentSubmit" ${commentLoginRequired?'disabled title="Google 로그인이 필요합니다."':''}>등록</button></div><div class="status" id="commentStatus"></div></section></article>`;
+      panel.innerHTML=`<article class="view"><h2 class="view-title"><span class="category-badge ${r.post.isNotice?'notice':''}" data-category="${esc(r.post.isNotice?'공지':(CATEGORIES.includes(r.post.category)?r.post.category:'기타잡담'))}">${esc(r.post.isNotice?'공지':(CATEGORIES.includes(r.post.category)?r.post.category:'기타잡담'))}</span> ${r.post.prefix?`<span class="prefix-label">[${esc(r.post.prefix)}]</span> `:''}${esc(r.post.title)}</h2><div class="view-meta">${authorCrown(r.post.author)}${esc(r.post.author?.nickname||'이용자')} · ${fmtDate(r.post.createdAt)} · 조회 ${Number(r.post.viewCount||0)}</div>${r.post.calcSnapshot?renderCalcShareCard(r.post.calcSnapshot):''}<div class="view-content">${esc(r.post.content)}</div><div class="view-actions"><button class="btn secondary" id="back">목록</button><span class="view-action-spacer" aria-hidden="true"></span>${r.post.canEditMeta?'<button class="btn secondary" id="editMeta">탭·말머리 수정</button>':''}${r.post.calcSnapshot?'<button class="btn secondary" id="saveCalcCardImage">이미지 저장</button>':''}${r.post.canEdit?'<button class="btn secondary" id="edit">수정</button>':''}${r.post.canDelete?'<button class="btn danger" id="delete">삭제</button>':''}</div><section class="comments"><div class="comment-title">댓글 ${(r.post.comments||[]).length}개</div>${comments||'<div class="empty" style="padding:25px">첫 댓글을 남겨보세요.</div>'}<div class="comment-write"><textarea id="comment" maxlength="1000" placeholder="${commentLoginRequired?'댓글 작성은 로그인 후 이용이 가능합니다.':'댓글을 입력하세요'}" ${commentLoginRequired?'readonly class="login-required" aria-label="로그인 후 댓글 작성 가능"':''}></textarea><button class="btn" id="commentSubmit" ${commentLoginRequired?'disabled title="Google 로그인이 필요합니다."':''}>등록</button></div><div class="status" id="commentStatus"></div></section></article>`;
       if(commentLoginRequired){
         const lockedComment=panel.querySelector('#comment');
         lockedComment?.addEventListener('click',requestBoardCommentLogin);
@@ -5525,6 +5717,13 @@ async function list(page=1,push=true,silentRefresh=false){
         });
       }
       panel.querySelector('#back').onclick=returnToBoardList;
+
+      // ✅ 글쓰기/수정 화면이 아닌, 등록된 게시글 상세보기에서만 이미지 저장
+      const saveCalcCardImageBtn=panel.querySelector('#saveCalcCardImage');
+      if(saveCalcCardImageBtn){
+        saveCalcCardImageBtn.addEventListener('click',()=>saveCalcShareCardAsImage(saveCalcCardImageBtn));
+      }
+
       panel.querySelector('#editMeta')?.addEventListener('click',()=>editPostMeta(r.post));
       panel.querySelector('#edit')?.addEventListener('click',()=>edit(r.post));
       panel.querySelector('#delete')?.addEventListener('click',async e=>{if(!confirm('이 게시글을 삭제하시겠습니까? 삭제 후 목록에서 보이지 않습니다.'))return;const btn=e.currentTarget;setButtonBusy(btn,true,'삭제 중');try{await api('board_delete',{id:r.post.id});await list(state.page)}catch(err){alert(err.message);setButtonBusy(btn,false)}});
