@@ -9540,7 +9540,10 @@
 
         ensurePage3Init();
         ensurePage4Init();
-        showNoticeOnce_mobile(); // ✅ 로딩 끝나면 공지 자동 오픈
+
+        // ✅ 구버전 안내사항 자동 표시 중단
+        // 필요 시 추후 새 공지로 교체한 뒤 showNoticeOnce_mobile() 호출을 복원한다.
+        // showNoticeOnce_mobile();
 
       } catch (e) {
         console.error(e);
@@ -16044,10 +16047,20 @@
 
         const season = norm(r.season || r['시즌'] || '');
         const mapKey = `${season}\u0001${type}`;
-        const prev = armorSetByType.get(mapKey) || { type, name, season, num: 0, rarity, desc3: '', desc5: '' };
+        const prev = armorSetByType.get(mapKey) || {
+          type, name, season, num: 0, rarity,
+          desc3: '', desc5: '',
+          descByNum: {}
+        };
 
-        // ✅ 3세트/5세트 설명 각각 저장
+        // ✅ 같은 세트의 3~11세트 설명을 단계별로 모두 저장
         const desc = (typeof _pickDesc_mobile === 'function') ? _pickDesc_mobile(r) : '';
+        if (num >= 3 && num <= 11 && desc) {
+          prev.descByNum = prev.descByNum || {};
+          prev.descByNum[num] = desc;
+        }
+
+        // 기존 3/5세트 호환 필드도 유지
         if (num === 3) prev.desc3 = desc;
         if (num === 5) prev.desc5 = desc;
 
@@ -16194,6 +16207,7 @@
           num: info.num,
           desc3: info.desc3 || '',
           desc5: info.desc5 || '',
+          descByNum: { ...(info.descByNum || {}) },
           pieces,
         });
       });
@@ -16252,11 +16266,26 @@
 
         const season = norm(r.season || r['시즌'] || '');
         const mapKey = `${season}\u0001${type}`;
-        const prev = accSetByType.get(mapKey);
-        if (!prev || num > prev.num) {
-          const desc = (typeof _pickDesc_mobile === 'function') ? _pickDesc_mobile(r) : String(r?.desc || '').trim();
-          accSetByType.set(mapKey, { type, name, season, num, rarity, desc });
+        const prev = accSetByType.get(mapKey) || {
+          type, name, season, num: 0, rarity, desc: '', descByNum: {}
+        };
+        const desc = (typeof _pickDesc_mobile === 'function')
+          ? _pickDesc_mobile(r)
+          : String(r?.desc || '').trim();
+
+        if (num >= 3 && num <= 11 && desc) {
+          prev.descByNum = prev.descByNum || {};
+          prev.descByNum[num] = desc;
         }
+
+        if (!prev.num || num > prev.num) {
+          prev.num = num;
+          prev.name = name;
+          prev.rarity = rarity;
+          prev.desc = desc;
+        }
+
+        accSetByType.set(mapKey, prev);
       }
 
       if (!accSetByType.size) return [];
@@ -16361,6 +16390,7 @@
           season: seasonKey,
           num: info.num,
           desc: info.desc || '',
+          descByNum: { ...(info.descByNum || {}) },
           pieces,
         });
       });
@@ -16422,11 +16452,26 @@
 
         const season = norm(r.season || r['시즌'] || '');
         const mapKey = `${season}\u0001${type}`;
-        const prev = specSetByType.get(mapKey);
-        if (!prev || num > prev.num) {
-          const desc = (typeof _pickDesc_mobile === 'function') ? _pickDesc_mobile(r) : String(r?.desc || '').trim();
-          specSetByType.set(mapKey, { type, name, season, num, rarity, desc });
+        const prev = specSetByType.get(mapKey) || {
+          type, name, season, num: 0, rarity, desc: '', descByNum: {}
+        };
+        const desc = (typeof _pickDesc_mobile === 'function')
+          ? _pickDesc_mobile(r)
+          : String(r?.desc || '').trim();
+
+        if (num >= 3 && num <= 11 && desc) {
+          prev.descByNum = prev.descByNum || {};
+          prev.descByNum[num] = desc;
         }
+
+        if (!prev.num || num > prev.num) {
+          prev.num = num;
+          prev.name = name;
+          prev.rarity = rarity;
+          prev.desc = desc;
+        }
+
+        specSetByType.set(mapKey, prev);
       }
 
       if (!specSetByType.size) return [];
@@ -16532,6 +16577,7 @@
           season: seasonKey,
           num: info.num,
           desc: info.desc || '',
+          descByNum: { ...(info.descByNum || {}) },
           pieces,
         });
       });
@@ -17342,15 +17388,24 @@
           e.preventDefault();
           e.stopPropagation();
 
-          // 1) 방어구(3/5세트): desc3/desc5 우선
-          const d3 = String(s?.desc3 || '').trim();
-          const d5 = String(s?.desc5 || '').trim();
-          const merged =
-            (d3 ? `【3세트】\n${d3}` : '') +
-            (d3 && d5 ? '\n\n' : '') +
-            (d5 ? `【5세트】\n${d5}` : '');
+          // ✅ 같은 세트에 존재하는 3~11세트 효과 설명을 모두 표시
+          // 예: 3 / 5 / 8 / 11세트 행이 있으면 네 단계가 모두 순서대로 표시된다.
+          const descByNum = (s?.descByNum && typeof s.descByNum === 'object')
+            ? s.descByNum
+            : {};
 
-          // 2) 악세/특수: 카드의 desc 사용(없으면 _pickDesc_mobile로 fallback)
+          // 구형 3/5세트 카드 호환
+          if (!descByNum[3] && s?.desc3) descByNum[3] = String(s.desc3).trim();
+          if (!descByNum[5] && s?.desc5) descByNum[5] = String(s.desc5).trim();
+
+          const merged = Object.keys(descByNum)
+            .map(Number)
+            .filter(n => Number.isFinite(n) && n >= 3 && n <= 11 && String(descByNum[n] || '').trim())
+            .sort((a, b) => a - b)
+            .map(n => `【${n}세트】\n${String(descByNum[n] || '').trim()}`)
+            .join('\n\n');
+
+          // 단계별 데이터가 없는 구형 카드만 기존 desc fallback 사용
           const fallbackDesc = (typeof _pickDesc_mobile === 'function')
             ? _pickDesc_mobile(s)
             : String(s?.desc || '').trim();
