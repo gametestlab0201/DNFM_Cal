@@ -30542,12 +30542,7 @@ try {
           };
         }
 
-        // 2-6) 스킬룬(runes) 스냅샷 payload 구성
-        const runesPayload = (() => {
-          const runesState = state.runes || state.skillrune || null;
-          if (!runesState) return null;
-          return runesState;   // 그대로 서버로 넘겨서 calc_all에서 처리
-        })();
+        // 일반 스킬룬 / 특수 스킬룬은 폐기된 기능이므로 final_compute payload에서 제외한다.
 
         // 2-6) 아바타 / 무기압 스냅샷 payload 구성
         const avatarPayload = (() => {
@@ -30571,9 +30566,6 @@ try {
         // 2-7) 커스텀옵(customSkills) 스냅샷 payload 구성
         // 시즌 2.0 상의/팔찌/귀걸이는 고유효과가 없으므로 계산 요청에서도 제외한다.
         const customSkillsPayload = window.buildSeasonAwareCustomSkillsPayload?.() || null;
-
-        // 2-8) 특수 스킬룬(가호/지혜/왜곡) 스냅샷 payload 구성
-        const specialRunesPayload = state.specialRunes || null;
 
         // 2-8) 수련일지(castleSeal) 스냅샷 payload 구성
         const castleSealState = state.castleSeal || state.CastleSeal || null;
@@ -30707,25 +30699,10 @@ try {
         payload.soloPartyMode = String(state?.soloPartyMode || 'solo');
         payload.isPartyMode = (payload.soloPartyMode === 'party');
 
-        // ★ 특수 스킬룬 카운트 전송
-        if (specialRunesPayload) {
-          const c = Number(specialRunesPayload.cooldown || 0) || 0;
-          const s = Number(specialRunesPayload.skillDmg || 0) || 0;
-          const g = Number(specialRunesPayload.gaho || 0) || 0;
-          const j = Number(specialRunesPayload.jihe || 0) || 0;
-          const w = Number(specialRunesPayload.waegok || 0) || 0;
+        // 일반/특수 스킬룬은 더 이상 전송하지 않는다.
+        delete payload.runes;
+        delete payload.specialRunes;
 
-          // 전부 0이면 굳이 안 보냄
-          if (c || s || g || j || w) {
-            payload.specialRunes = {
-              cooldown: c,
-              skillDmg: s,
-              gaho: g,
-              jihe: j,
-              waegok: w
-            };
-          }
-        }
         // ★ 수련일지 > 성안의 봉인
         if (castleSealPayload) {
           payload.castleSeal = castleSealPayload;
@@ -30746,10 +30723,6 @@ try {
           payload.trainingMagicSeal = trainingMagicSealPayload;
         }
 
-        // ★ 일반 스킬룬 payload
-        if (runesPayload) {
-          payload.runes = runesPayload;
-        }
         const useSynergy = !!opts.useSynergy;
 
         if (useSynergy) {

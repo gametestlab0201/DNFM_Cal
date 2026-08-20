@@ -19358,11 +19358,7 @@ function buildSynergyPayloadMobile() {
         };
       }
 
-      // 6) 일반 스킬룬
-      const runesPayload = (() => {
-        const runesState = s.runes || s.skillrune || null;
-        return runesState || null;
-      })();
+      // 일반 스킬룬 / 특수 스킬룬은 폐기된 기능이므로 final_compute payload에서 제외한다.
 
       // 7) 아바타/무기압 — PC canonical = state.avatar
       const avatarSource =
@@ -19379,9 +19375,6 @@ function buildSynergyPayloadMobile() {
 
       // 8) PC 규칙과 동일한 고유효과
       const customSkillsPayload = buildPcCompatibleCustomSkillsPayloadMobile(s);
-
-      // 9) 특수 스킬룬
-      const specialRunesPayload = s.specialRunes || null;
 
       // 10) 성안의 봉인 — PC canonical main/sub, 모바일 mainName/subName도 입력 호환
       const castleSealState = s.castleSeal || s.CastleSeal || null;
@@ -19506,23 +19499,14 @@ function buildSynergyPayloadMobile() {
       payload.soloPartyMode = String(s.soloPartyMode || 'solo');
       payload.isPartyMode = (payload.soloPartyMode === 'party');
 
-      if (specialRunesPayload) {
-        const cooldown = Number(specialRunesPayload.cooldown || 0) || 0;
-        const skillDmg = Number(specialRunesPayload.skillDmg || 0) || 0;
-        const gaho = Number(specialRunesPayload.gaho || 0) || 0;
-        const jihe = Number(specialRunesPayload.jihe || 0) || 0;
-        const waegok = Number(specialRunesPayload.waegok || 0) || 0;
-
-        if (cooldown || skillDmg || gaho || jihe || waegok) {
-          payload.specialRunes = { cooldown, skillDmg, gaho, jihe, waegok };
-        }
-      }
+      // 일반/특수 스킬룬은 더 이상 전송하지 않는다.
+      delete payload.runes;
+      delete payload.specialRunes;
 
       if (castleSealPayload) payload.castleSeal = castleSealPayload;
       if (traitOptionsPayload) payload.traitOptions = traitOptionsPayload;
       if (trainingRuneEngravePayload) payload.trainingRuneEngrave = trainingRuneEngravePayload;
       if (trainingMagicSealPayload) payload.trainingMagicSeal = trainingMagicSealPayload;
-      if (runesPayload) payload.runes = runesPayload;
 
       // PC 일반 계산에서는 synergy를 보내지 않는다.
       delete payload.synergy;
@@ -21324,6 +21308,37 @@ function buildSynergyPayloadMobile() {
       return normalizePresetStateForSave_mobile(rawState);
     }
 
+    // 게시판/공유 마지막 상태용 캐릭터 초상화 필드 보존
+    // 메인(full) 일러스트와 분리해서, 캐릭터카드가 사용할 얼굴/썸네일 계열만 채운다.
+    function syncMobileCharacterPortraitFieldsForShare(st) {
+      try {
+        const c = st?.currentCharacter;
+        if (!c || typeof c !== 'object') return st;
+
+        let portrait = '';
+        if (typeof _getPickedCharThumbSrcForPreset === 'function') {
+          portrait = String(_getPickedCharThumbSrcForPreset(st) || '').trim();
+        }
+
+        if (!portrait && typeof _getCharThumb === 'function') {
+          portrait = String(_getCharThumb(c) || '').trim();
+        }
+
+        if (portrait) {
+          c.faceSrc = portrait;
+          c.saveFace = portrait;
+          c.thumbSrc = portrait;
+          c.thumb = portrait;
+          c.thumbnail = portrait;
+          c['썸네일'] = portrait;
+          c['얼굴'] = portrait;
+        }
+      } catch (e) {
+        console.warn('[preset] share portrait sync fail', e);
+      }
+      return st;
+    }
+
     // 현재 프론트 state 전체를 스냅샷으로 만들어서 서버에 보낼 객체로 반환
     function buildFrontPresetState_mobile() {
       window.state = window.state || {};
@@ -21344,7 +21359,9 @@ function buildSynergyPayloadMobile() {
         };
         normalizeCanonicalCalculatorState_mobile(window.state);
       } catch (_) {}
-      return normalizePresetStateForSave_mobile(window.state || {});
+      const snapshot = normalizePresetStateForSave_mobile(window.state || {});
+      syncMobileCharacterPortraitFieldsForShare(snapshot);
+      return snapshot;
     }
 
     // 저장된 state를 window.state에 반영하고, 화면을 state 기준으로 갱신
@@ -21786,21 +21803,28 @@ function buildSynergyPayloadMobile() {
           : '';
 
         if (st.currentCharacter && typeof st.currentCharacter === 'object') {
-          // 1) 초상화(메인)는 full로 유지
+          // 1) 메인 초상화는 현재 모바일 화면에 실제 표시 중인 이미지로 강제 통일한다.
+          //    원본 캐릭터 row의 full 등에 다른 이미지가 남아 있더라도 게시판에서 오인하지 않게 한다.
           if (face) {
-            if (!st.currentCharacter.full) st.currentCharacter.full = face;
-            if (!st.currentCharacter.imgSrc) st.currentCharacter.imgSrc = face;
-            if (!st.currentCharacter.image) st.currentCharacter.image = face;
-            if (!st.currentCharacter['이미지']) st.currentCharacter['이미지'] = face;
+            st.currentCharacter.full = face;
+            st.currentCharacter.fullSrc = face;
+            st.currentCharacter.imgSrc = face;
+            st.currentCharacter.image = face;
+            st.currentCharacter.img = face;
+            st.currentCharacter['이미지'] = face;
+            st.currentCharacter.mainImage = face;
           }
 
           // 2) 썸네일은 saveFace(+thumb 계열)로 강제 저장
           const finalThumb = String(thumb || '').trim() || String(face || '').trim();
           if (finalThumb) {
+            st.currentCharacter.faceSrc = finalThumb;
             st.currentCharacter.saveFace = finalThumb;
+            st.currentCharacter.thumbSrc = finalThumb;
             st.currentCharacter.thumb = finalThumb;
             st.currentCharacter.thumbnail = finalThumb;
             st.currentCharacter['썸네일'] = finalThumb;
+            st.currentCharacter['얼굴'] = finalThumb;
           }
         }
       } catch (e) {

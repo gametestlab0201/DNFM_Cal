@@ -3952,13 +3952,36 @@ async function list(page=1,push=true,silentRefresh=false){
     s.soloPartyMode=isParty?'party':'solo';
     s.isPartyMode=isParty;
 
-    if(s.runeEngrave&&typeof s.runeEngrave==='object'){
-      const level=String(s.runeEngrave.level??s.runeEngrave.levelVal??s.runeEngrave.tag??'').trim();
-      if(level){
-        s.runeEngrave.level=level;
-        s.runeEngrave.levelVal=level;
-      }
+    // PC canonical 아바타 = avatar
+    if((!s.avatar||typeof s.avatar!=='object')&&s.avatarSel&&typeof s.avatarSel==='object'){
+      s.avatar={...s.avatarSel};
     }
+    if(s.avatar&&typeof s.avatar==='object')s.avatarSel={...s.avatar};
+
+    // PC canonical 성안의 봉인 = castleSeal.main/sub
+    if((!s.castleSeal||typeof s.castleSeal!=='object')&&s.CastleSeal&&typeof s.CastleSeal==='object'){
+      s.castleSeal={...s.CastleSeal};
+    }
+    if(s.castleSeal&&typeof s.castleSeal==='object'){
+      const mainName=String(s.castleSeal?.main?.name??s.castleSeal?.main??s.castleSeal?.mainName??'').trim();
+      const subName=String(s.castleSeal?.sub?.name??s.castleSeal?.sub??s.castleSeal?.subName??'').trim();
+      s.castleSeal={
+        ...s.castleSeal,
+        main:mainName?{name:mainName}:'',
+        sub:subName?{name:subName}:'',
+        mainName,
+        subName
+      };
+      s.CastleSeal={...s.castleSeal};
+    }
+
+    // 폐기 기능: 구 룬각인/장비 마봉/일반 스킬룬/특수 스킬룬은 계산 상태에서 제외
+    delete s.runeEngrave;
+    delete s.runeengrave;
+    delete s.seals;
+    delete s.runes;
+    delete s.skillrune;
+    delete s.specialRunes;
     return s;
   }
 
@@ -3983,7 +4006,6 @@ async function list(page=1,push=true,silentRefresh=false){
         enh:clone(src?.enh)||{},
         enchants:clone(src?.enchants)||{},
         refines:clone(src?.refines)||{},
-        seals:clone(src?.seals)||{},
         emblems:clone(src?.emblems)||{},
         traitOptions:clone(src?.traitOptions)||{},
         avatar:clone(src?.avatar||src?.avatarSel)||{},
@@ -3993,11 +4015,8 @@ async function list(page=1,push=true,silentRefresh=false){
         customEarringLabel:src?.customEarringLabel??null,
         uniqueOnOff:!!src?.uniqueOnOff,
         castleSeal:clone(src?.castleSeal||src?.CastleSeal)||{},
-        runes:clone(src?.runes||src?.skillrune)||null,
-        runeEngrave:clone(src?.runeEngrave)||{},
         trainingRuneEngrave:clone(src?.trainingRuneEngrave)||null,
         trainingMagicSeal:clone(src?.trainingMagicSeal)||null,
-        specialRunes:clone(src?.specialRunes)||{},
         skillTrees:clone(src?.skillTrees)||{},
         skillLv:clone(src?.skillLv)||{},
         skillTpLv:clone(src?.skillTpLv)||{},
@@ -4822,6 +4841,82 @@ async function list(page=1,push=true,silentRefresh=false){
     return Number.isFinite(ratio)&&ratio>0?ratio:1;
   }
 
+  // PC final_compute와 동일한 시즌/등급 기준으로 customSkills를 정리한다.
+  function buildBoardPcCompatibleCustomSkillsPayload(s){
+    const src=s?.customSkills;
+    if(!src||typeof src!=='object')return null;
+    const out=JSON.parse(JSON.stringify(src));
+
+    // 모바일 구형 상태가 weaponType만 가진 경우 현재 canonical type으로 보정
+    const hasWeaponKey=String(out?.customType||out?.type||out?.kind||'').trim();
+    if(!hasWeaponKey&&String(out?.weaponType||'').trim())out.type=String(out.weaponType).trim();
+
+    const selections=s?.selections||{};
+    const getSeason=item=>String(
+      item?.season??item?.['시즌']??item?._raw?.season??item?._raw?.['시즌']??''
+    ).trim();
+    const isSeason5=item=>/^(?:시즌\s*)?5(?:\.0)?$/i.test(getSeason(item));
+
+    if(selections?.top&&!isSeason5(selections.top))out.armorType='';
+    if(selections?.bracelet&&!isSeason5(selections.bracelet))out.braceletType='';
+    if(selections?.earring&&!isSeason5(selections.earring))out.earringType='';
+
+    const weapon=selections?.weapon||null;
+    const rarity=String(
+      weapon?.rarity??weapon?.['레어리티']??weapon?.['희귀도']??weapon?.['등급']??''
+    ).trim();
+    const low=rarity.toLowerCase();
+    const rareOrUnique=rarity==='레어'||rarity==='유니크'||low==='rare'||low==='unique';
+    if(rareOrUnique){
+      out.type='';
+      out.customType='';
+      out.weaponType='';
+      out.weaponName='';
+    }
+
+    const weaponSeason=getSeason(weapon);
+    const pickedType=String(out?.type||'').trim();
+    if((pickedType==='참격'||pickedType==='증강')&&!/^(?:시즌\s*)?2(?:\.0)?$/i.test(weaponSeason)){
+      out.type='';
+      out.weaponName='';
+    }
+    return out;
+  }
+
+  // PC 수련일지 마법봉인의 기본 선택 규칙을 게시판 재계산에도 그대로 사용한다.
+  function normalizeBoardTrainingMagicChoicesPc(raw){
+    const pools={
+      low:{
+        unique:['힘/지능 +46','물리 크리티컬 +29','마법 크리티컬 +29','체력 +46','정신력 +46'],
+        normal:['힘/지능 +46','물리 크리티컬 +30','마법 크리티컬 +30','체력 +46','정신력 +46','공격 속도 +1.6%','캐스팅 속도 +2%','적중 +124','회피 +70']
+      },
+      mid:{
+        unique:['힘/지능 +46','모든 속성 강화 +10','체력 +46','정신력 +46'],
+        normal:['힘/지능 +46','모든 속성 강화 +8','체력 +46','정신력 +46','공격 속도 +1.6%','캐스팅 속도 +2%','적중 +124','회피 +70']
+      },
+      high:{
+        unique:['힘/지능 +46','물리/마법 공격력 +19','물리 크리티컬 +60','마법 크리티컬 +60','적중 +75','회피 +75'],
+        normal:['힘/지능 +46','물리/마법 공격력 +18','물리 크리티컬 +30','마법 크리티컬 +30','체력 +46','정신력 +46','공격 속도 +1.6%','캐스팅 속도 +2%','적중 +124','회피 +70']
+      },
+      final:{
+        unique:['데미지 8% 증가','추가 데미지 8%','모든 속성 강화 +10','물리/마법 공격력 +19','50레벨 스킬 Lv+1'],
+        normal:['힘/지능 +46','물리/마법 공격력 +18','체력 +46','정신력 +46','공격 속도 +1.6%','캐스팅 속도 +2%','적중 +124','회피 +70']
+      }
+    };
+    const poolFor=stage=>stage<=5?pools.low:stage<=8?pools.mid:stage<=11?pools.high:pools.final;
+    const out={};
+    for(let stage=1;stage<=12;stage++){
+      const pool=poolFor(stage);
+      out[stage]=(stage>=6&&stage<=8)
+        ? {unique:'모든 속성 강화 +10',normal:'모든 속성 강화 +8'}
+        : {unique:pool.unique[0]||'',normal:pool.normal[0]||''};
+      const saved=raw?.[stage]??raw?.[String(stage)]??{};
+      if(pool.unique.includes(saved?.unique))out[stage].unique=saved.unique;
+      if(pool.normal.includes(saved?.normal))out[stage].normal=saved.normal;
+    }
+    return out;
+  }
+
   async function calculateBoardFinalDamage(snapshot){
     const s=normalizeCanonicalCalculatorState_board(snapshot?.state||{});
     const c=s?.currentCharacter||{};
@@ -4901,29 +4996,22 @@ async function list(page=1,push=true,silentRefresh=false){
     if(s?.avatar?.imprintName)avatar.imprintName=String(s.avatar.imprintName).trim();
     setPayloadSection('avatar',avatar,Object.keys(avatar).length>0);
 
-    setPayloadSection('customSkills',s?.customSkills||null,!!s?.customSkills);
+    const customSkillsPayload=buildBoardPcCompatibleCustomSkillsPayload(s);
+    setPayloadSection('customSkills',customSkillsPayload,!!customSkillsPayload);
 
     const co=s?.computeOptions||{};
     payload.patchBefore=!!co.patchBefore;
     payload.soloPartyMode=String(s?.soloPartyMode||(s?.isPartyMode?'party':'solo'));
     payload.isPartyMode=payload.soloPartyMode==='party';
 
-    const sr=s?.specialRunes||{};
-    const specialRunes={
-      cooldown:Number(sr.cooldown||0)||0,
-      skillDmg:Number(sr.skillDmg||0)||0,
-      gaho:Number(sr.gaho||0)||0,
-      jihe:Number(sr.jihe||0)||0,
-      waegok:Number(sr.waegok||0)||0
-    };
-    setPayloadSection('specialRunes',specialRunes,Object.values(specialRunes).some(v=>v));
+    // 일반/특수 스킬룬은 폐기된 기능이므로 final_compute에 보내지 않는다.
+    delete payload.runes;
+    delete payload.specialRunes;
 
     const cs=s?.castleSeal||{};
-    const mainName=cs?.main?.name||cs?.main||'';
-    const subName=cs?.sub?.name||cs?.sub||'';
+    const mainName=String(cs?.main?.name??cs?.main??cs?.mainName??'').trim();
+    const subName=String(cs?.sub?.name??cs?.sub??cs?.subName??'').trim();
     setPayloadSection('castleSeal',{mainName,subName},!!(mainName||subName));
-
-    setPayloadSection('runes',s?.runes||null,!!s?.runes);
 
     // ✅ 현재 계산기에서는 과거 runeEngrave를 폐기하고
     // 수련일지 룬각인(trainingRuneEngrave)만 사용한다.
@@ -4960,20 +5048,18 @@ async function list(page=1,push=true,silentRefresh=false){
       payload.trainingRuneEngrave={choices};
     }
 
-    // 수련일지 마법봉인: 현재 canonical state에 확정된 값만 사용한다.
-    const magicTrainingChoices=s?.trainingMagicSeal?.choices;
-    if(magicTrainingChoices&&typeof magicTrainingChoices==='object'){
+    // 수련일지 마법봉인: PC와 동일하게 저장 이력이 없어도 1~12단계 기본값을 적용한다.
+    {
+      const normalized=normalizeBoardTrainingMagicChoicesPc(s?.trainingMagicSeal?.choices||null);
       const choices={};
       for(let stage=1;stage<=12;stage++){
-        const picked=magicTrainingChoices?.[stage]??magicTrainingChoices?.[String(stage)]??null;
+        const picked=normalized?.[stage]??normalized?.[String(stage)]??null;
         if(!picked)continue;
         const unique=String(picked?.unique||'').trim();
         const normal=String(picked?.normal||'').trim();
         if(unique||normal)choices[stage]={unique,normal};
       }
       setPayloadSection('trainingMagicSeal',{choices},Object.keys(choices).length>0);
-    }else{
-      delete payload.trainingMagicSeal;
     }
 
     // 캐릭터카드의 최종데미지는 계산기 본체의 일반 계산값 기준이다.
@@ -5001,7 +5087,7 @@ async function list(page=1,push=true,silentRefresh=false){
         tp,
         chargeStage,
         chargeStageIndex:Number(node?.chargeStageIndex||Math.round(chargeStage*10))||0,
-        extremeCharge:node?.extremeCharge===true
+        extremeCharge:node?.extremeCharge===true||node?.extremeOpen===true||node?.doubleOpen===true
       });
     }
 
@@ -5424,21 +5510,25 @@ async function list(page=1,push=true,silentRefresh=false){
     const activeSetVisualMap=calcShareBuildActiveSetVisualMap(sels);
     const charName=String(c.name||'캐릭터 미선택');
     const job=String(c.jobGroupLabel||c.jobGroup||'');
-    // ✅ 캐릭터카드에는 저장슬롯용 썸네일(saveFace/thumb)이 아니라
-    // 실제 캐릭터 메인 초상화를 우선 사용한다.
-    // 모바일은 saveFace/thumb에 선택창용 썸네일을 저장하므로 이를 먼저 쓰면
-    // 게시판 카드에서 엉뚱한/축약된 이미지가 표시될 수 있다.
+    // ✅ 캐릭터카드에는 full 일러스트가 아니라 얼굴/썸네일 초상화를 우선 사용한다.
+    // PC/모바일 저장본 모두 face/saveFace/thumb 계열을 먼저 보고,
+    // 초상화 데이터가 정말 없을 때만 full/main 이미지로 fallback 한다.
     const charImg=safeBoardImgSrc(
-      c.full ||
-      c.imgSrc ||
-      c.image ||
-      c['이미지'] ||
-      c.mainImage ||
-      c.fullSrc ||
+      c.faceSrc ||
       c.saveFace ||
-      c.thumb ||
+      c['얼굴'] ||
+      c.thumbSrc ||
       c.thumbnail ||
-      c['썸네일']
+      c['썸네일'] ||
+      c.thumb ||
+      c.thumbUrl ||
+      c.fullSrc ||
+      c['이미지'] ||
+      c.image ||
+      c.img ||
+      c.imgSrc ||
+      c.mainImage ||
+      c.full
     );
     const timeLabel=calcTimeLabel(s?.options?.timeWindow);
     const monsterName=String(s?.monster?.name||'');
