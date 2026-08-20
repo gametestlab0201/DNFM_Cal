@@ -5837,6 +5837,18 @@
       border-right:1px solid rgba(255,255,255,.07);
       background:rgba(0,0,0,.08);
     }
+
+    /* 단계 변경은 이 작은 좌측 레일 안에서만 위/아래 스와이프로 처리 */
+    .trait-stage-swipe-m{
+      touch-action:none;
+      user-select:none;
+      -webkit-user-select:none;
+      cursor:ns-resize;
+    }
+
+    .trait-stage-swipe-m .trait-stage-display-m{
+      grid-row:2;
+    }
     .trait-stage-arrow-m{
       width:100%;
       min-width:0;
@@ -7842,10 +7854,8 @@
               </div>
             </div>
             <div class="trait-choice-body-m">
-              <div class="trait-levels-m" data-trait-index="0">
-                <button type="button" class="trait-stage-arrow-m" data-trait-stage-step="1" aria-label="특성 단계 올리기">▲</button>
+              <div class="trait-levels-m trait-stage-swipe-m" data-trait-index="0" aria-label="위아래로 밀어 특성 단계 변경">
                 <div class="trait-current-stage-m stage-1 trait-stage-display-m" data-trait-stage-display>I</div>
-                <button type="button" class="trait-stage-arrow-m" data-trait-stage-step="-1" aria-label="특성 단계 내리기">▼</button>
               </div>
               <div class="trait-list-wrap-m">
                 <div class="trait-list-m" id="traitOptionMList1"></div>
@@ -7862,10 +7872,8 @@
               </div>
             </div>
             <div class="trait-choice-body-m">
-              <div class="trait-levels-m" data-trait-index="1">
-                <button type="button" class="trait-stage-arrow-m" data-trait-stage-step="1" aria-label="특성 단계 올리기">▲</button>
+              <div class="trait-levels-m trait-stage-swipe-m" data-trait-index="1" aria-label="위아래로 밀어 특성 단계 변경">
                 <div class="trait-current-stage-m stage-1 trait-stage-display-m" data-trait-stage-display>I</div>
-                <button type="button" class="trait-stage-arrow-m" data-trait-stage-step="-1" aria-label="특성 단계 내리기">▼</button>
               </div>
               <div class="trait-list-wrap-m">
                 <div class="trait-list-m" id="traitOptionMList2"></div>
@@ -7882,10 +7890,8 @@
               </div>
             </div>
             <div class="trait-choice-body-m">
-              <div class="trait-levels-m" data-trait-index="2">
-                <button type="button" class="trait-stage-arrow-m" data-trait-stage-step="1" aria-label="특성 단계 올리기">▲</button>
+              <div class="trait-levels-m trait-stage-swipe-m" data-trait-index="2" aria-label="위아래로 밀어 특성 단계 변경">
                 <div class="trait-current-stage-m stage-1 trait-stage-display-m" data-trait-stage-display>I</div>
-                <button type="button" class="trait-stage-arrow-m" data-trait-stage-step="-1" aria-label="특성 단계 내리기">▼</button>
               </div>
               <div class="trait-list-wrap-m">
                 <div class="trait-list-m" id="traitOptionMList3"></div>
@@ -7920,10 +7926,8 @@
               </div>
             </div>
             <div class="trait-choice-body-m">
-              <div class="trait-levels-m" data-auto-trait-index="0">
-                <button type="button" class="trait-stage-arrow-m" data-auto-trait-stage-step="1" aria-label="특성 단계 올리기">▲</button>
+              <div class="trait-levels-m trait-stage-swipe-m" data-auto-trait-index="0" aria-label="위아래로 밀어 특성 단계 변경">
                 <div class="trait-current-stage-m stage-1 trait-stage-display-m" data-auto-trait-stage-display>I</div>
-                <button type="button" class="trait-stage-arrow-m" data-auto-trait-stage-step="-1" aria-label="특성 단계 내리기">▼</button>
               </div>
               <div class="trait-list-wrap-m">
                 <div class="trait-list-m" id="traitAutoMList1"></div>
@@ -7940,10 +7944,8 @@
               </div>
             </div>
             <div class="trait-choice-body-m">
-              <div class="trait-levels-m" data-auto-trait-index="1">
-                <button type="button" class="trait-stage-arrow-m" data-auto-trait-stage-step="1" aria-label="특성 단계 올리기">▲</button>
+              <div class="trait-levels-m trait-stage-swipe-m" data-auto-trait-index="1" aria-label="위아래로 밀어 특성 단계 변경">
                 <div class="trait-current-stage-m stage-1 trait-stage-display-m" data-auto-trait-stage-display>I</div>
-                <button type="button" class="trait-stage-arrow-m" data-auto-trait-stage-step="-1" aria-label="특성 단계 내리기">▼</button>
               </div>
               <div class="trait-list-wrap-m">
                 <div class="trait-list-m" id="traitAutoMList2"></div>
@@ -7960,10 +7962,8 @@
               </div>
             </div>
             <div class="trait-choice-body-m">
-              <div class="trait-levels-m" data-auto-trait-index="2">
-                <button type="button" class="trait-stage-arrow-m" data-auto-trait-stage-step="1" aria-label="특성 단계 올리기">▲</button>
+              <div class="trait-levels-m trait-stage-swipe-m" data-auto-trait-index="2" aria-label="위아래로 밀어 특성 단계 변경">
                 <div class="trait-current-stage-m stage-1 trait-stage-display-m" data-auto-trait-stage-display>I</div>
-                <button type="button" class="trait-stage-arrow-m" data-auto-trait-stage-step="-1" aria-label="특성 단계 내리기">▼</button>
               </div>
               <div class="trait-list-wrap-m">
                 <div class="trait-list-m" id="traitAutoMList3"></div>
@@ -14349,10 +14349,6 @@
           stageDisplay.classList.add(`stage-${stage}`);
           stageDisplay.textContent = traitStageRomanMobile(stage);
         }
-        levelWrap?.querySelectorAll('[data-trait-stage-step]').forEach((btn) => {
-          const step = Number(btn.dataset.traitStageStep || 0);
-          btn.disabled = (step > 0 && stage >= 5) || (step < 0 && stage <= 1);
-        });
 
         const selectedName = String(traitOptionDraftM?.[index]?.name || '').trim();
         const selectedStage = normalizeTraitStageMobile(traitOptionDraftM?.[index]?.stage || 0);
@@ -14423,6 +14419,60 @@
       document.body.classList.remove('trait-option-modal-open-m');
     }
 
+    function bindTraitStageSwipeMobile(root, selector, indexKey, stages, renderFn) {
+      if (!root) return;
+
+      root.querySelectorAll(selector).forEach((wrap) => {
+        if (wrap.dataset.traitSwipeBound === '1') return;
+        wrap.dataset.traitSwipeBound = '1';
+
+        let startY = null;
+        let activePointerId = null;
+        const threshold = 24;
+
+        wrap.addEventListener('pointerdown', (e) => {
+          if (e.pointerType === 'mouse' && e.button !== 0) return;
+          activePointerId = e.pointerId;
+          startY = e.clientY;
+          try { wrap.setPointerCapture(e.pointerId); } catch (_) {}
+        });
+
+        wrap.addEventListener('pointerup', (e) => {
+          if (activePointerId == null || e.pointerId !== activePointerId || startY == null) return;
+
+          const dy = e.clientY - startY;
+          startY = null;
+          activePointerId = null;
+          try { wrap.releasePointerCapture(e.pointerId); } catch (_) {}
+
+          if (Math.abs(dy) < threshold) return;
+
+          const index = Math.max(0, Math.min(2, Number(wrap.dataset[indexKey] || 0)));
+          const currentStage = normalizeTraitStageMobile(stages[index] || 1) || 1;
+
+          // 위로 밀면 다음 단계, 아래로 밀면 이전 단계
+          const nextStage = Math.max(1, Math.min(5, currentStage + (dy < 0 ? 1 : -1)));
+          if (nextStage === currentStage) return;
+
+          stages[index] = nextStage;
+          renderFn();
+        });
+
+        wrap.addEventListener('pointercancel', () => {
+          startY = null;
+          activePointerId = null;
+        });
+      });
+    }
+
+    bindTraitStageSwipeMobile(
+      traitOptionModalM,
+      '[data-trait-index]',
+      'traitIndex',
+      traitOptionStagesM,
+      renderTraitOptionModalMobile
+    );
+
     traitOptionModalM?.addEventListener('click', (e) => {
       if (e.target.closest('[data-trait-close]')) {
         closeTraitOptionModalMobile();
@@ -14436,17 +14486,6 @@
           stage: normalizeTraitStageMobile(traitOptionStagesM[index]) || 1,
           name: '',
         };
-        renderTraitOptionModalMobile();
-        return;
-      }
-
-      const stageStepBtn = e.target.closest('[data-trait-stage-step]');
-      if (stageStepBtn) {
-        const wrap = stageStepBtn.closest('[data-trait-index]');
-        const index = Math.max(0, Math.min(2, Number(wrap?.dataset.traitIndex || 0)));
-        const currentStage = normalizeTraitStageMobile(traitOptionStagesM[index] || 1) || 1;
-        const step = Number(stageStepBtn.dataset.traitStageStep || 0);
-        traitOptionStagesM[index] = Math.max(1, Math.min(5, currentStage + step));
         renderTraitOptionModalMobile();
         return;
       }
@@ -14506,10 +14545,6 @@
           stageDisplay.classList.add(`stage-${stage}`);
           stageDisplay.textContent = traitStageRomanMobile(stage);
         }
-        levelWrap?.querySelectorAll('[data-auto-trait-stage-step]').forEach((btn) => {
-          const step = Number(btn.dataset.autoTraitStageStep || 0);
-          btn.disabled = (step > 0 && stage >= 5) || (step < 0 && stage <= 1);
-        });
 
         const selectedName = String(traitAutoDraftM?.[index]?.name || '').trim();
         const selectedStage = normalizeTraitStageMobile(traitAutoDraftM?.[index]?.stage || 0);
@@ -14589,6 +14624,14 @@
       openTraitAutoModalMobile();
     });
 
+    bindTraitStageSwipeMobile(
+      traitAutoModalM,
+      '[data-auto-trait-index]',
+      'autoTraitIndex',
+      traitAutoStagesM,
+      renderTraitAutoModalMobile
+    );
+
     traitAutoModalM?.addEventListener('click', (e) => {
       if (e.target.closest('[data-trait-auto-close]')) {
         closeTraitAutoModalMobile();
@@ -14602,17 +14645,6 @@
           stage: normalizeTraitStageMobile(traitAutoStagesM[index]) || 1,
           name: '',
         };
-        renderTraitAutoModalMobile();
-        return;
-      }
-
-      const stageStepBtn = e.target.closest('[data-auto-trait-stage-step]');
-      if (stageStepBtn) {
-        const wrap = stageStepBtn.closest('[data-auto-trait-index]');
-        const index = Math.max(0, Math.min(2, Number(wrap?.dataset.autoTraitIndex || 0)));
-        const currentStage = normalizeTraitStageMobile(traitAutoStagesM[index] || 1) || 1;
-        const step = Number(stageStepBtn.dataset.autoTraitStageStep || 0);
-        traitAutoStagesM[index] = Math.max(1, Math.min(5, currentStage + step));
         renderTraitAutoModalMobile();
         return;
       }
