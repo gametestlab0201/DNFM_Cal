@@ -4443,6 +4443,35 @@
       text-align: right;
     }
 
+    /* 상변 데미지: 상태이상 이름만 작게, 수치는 기존 크기 유지 */
+    .status-damage-value {
+      display: inline-flex;
+      align-items: baseline;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 3px;
+    }
+
+    .status-damage-item {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 3px;
+      white-space: nowrap;
+    }
+
+    .status-damage-name {
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(232, 237, 214, 0.72);
+    }
+
+    .status-damage-sep {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(232, 237, 214, 0.48);
+      margin: 0 1px;
+    }
+
     .final-damage {
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       min-height: 88px;
@@ -25150,6 +25179,47 @@ try {
       return row;
     }
 
+    function showStatusDamage(label, parts) {
+      const row = document.createElement('div');
+      row.className = 'stat-row';
+
+      const l = document.createElement('span');
+      l.className = 'stat-label';
+      l.textContent = label;
+
+      const v = document.createElement('span');
+      v.className = 'stat-value status-damage-value';
+
+      if (!Array.isArray(parts) || !parts.length) {
+        v.textContent = '0';
+      } else {
+        parts.forEach((part, index) => {
+          if (index > 0) {
+            const sep = document.createElement('span');
+            sep.className = 'status-damage-sep';
+            sep.textContent = '/';
+            v.appendChild(sep);
+          }
+
+          const item = document.createElement('span');
+          item.className = 'status-damage-item';
+
+          const name = document.createElement('span');
+          name.className = 'status-damage-name';
+          name.textContent = part.name;
+
+          const value = document.createElement('span');
+          value.textContent = part.value;
+
+          item.append(name, value);
+          v.appendChild(item);
+        });
+      }
+
+      row.append(l, v);
+      return row;
+    }
+
     function powerFrom(S) {
       const raw = String(
         S.PowerType ?? S.powerType ?? S.power ?? S['물마공'] ?? ''
@@ -25217,25 +25287,57 @@ try {
         ?? 0
       );
 
-      const atkLabel = label('물리 데미지', '마법 데미지', '물리/마법 데미지');
-      const atkVal = pick(
-        Number(S.display_phys_damage ?? ((((S.str * (1 + strPct)) / 250) + 1) * (S.phys_atk * (1 + physAtkPct)))),
-        Number(S.display_mag_damage ?? ((((S.int * (1 + intPct)) / 250) + 1) * (S.mag_atk * (1 + magAtkPct))))
+      // 합산스탯 이동속도: 물리/마법 캐릭터 공통 표시
+      const moveSpeedVal = Number(
+        S.mov_spd
+        ?? S.move_spd
+        ?? S['이속']
+        ?? S.speed?.move
+        ?? 0
       );
 
-      const atkPctLabel = label('물리 공격력(%)', '마법 공격력(%)', '물리/마법 공격력(%)');
+      const atkPctLabel = label('물리 공격력', '마법 공격력', '물리/마법 공격력');
       const atkPctVal = pick(
         (S['display_phys_atk_rate'] ?? S.phys_atk_rate),
         (S['display_mag_atk_rate'] ?? S.mag_atk_rate)
       );
 
-      const mainStatLabel = label('힘', '지능', '힘/지능');
-      const mainStatVal = pick(
-        S.str * (1 + strPct / 100),
-        S.int * (1 + intPct / 100)
-      );
+      // 상변 데미지 = 각 상변 추뎀 × (1 + 해당 상변 뎀증/100)
+      // 예) 중독추뎀 10% + 중독뎀증 10% => 중독 11%
+      const statusDamageParts = (() => {
+        // 백엔드 sum_stats는 장비 시트의 한글 컬럼명을 아래 영문 키로 정규화해서 반환한다.
+        const statusRows = [
+          ['출혈', 'bleed_add', 'bleed_inc'],
+          ['화상', 'burn_add', 'burn_inc'],
+          ['중독', 'poison_add', 'poison_inc'],
+          ['감전', 'shock_add', 'shock_inc'],
+        ];
 
-      const mainPctLabel = label('힘(%)', '지능(%)', '힘/지능(%)');
+        const fmtStatusPct = (v) => {
+          const n = Number(v || 0);
+          if (!Number.isFinite(n)) return '0%';
+          return `${Number(n.toFixed(2)).toLocaleString('ko-KR')}%`;
+        };
+
+        const parts = [];
+        for (const [name, addKey, incKey] of statusRows) {
+          const add = Number(S?.[addKey] ?? 0) || 0;
+          const inc = Number(S?.[incKey] ?? 0) || 0;
+          const finalAdd = add * (1 + inc / 100);
+
+          // 실제 상변 추뎀이 존재하는 항목만 표시한다.
+          if (Math.abs(finalAdd) > 1e-9) {
+            parts.push({ name, value: fmtStatusPct(finalAdd) });
+          }
+        }
+
+        return parts;
+      })();
+
+      // 물리/마법 구분 없이 기존 힘/지능 자리는 모두 상변 데미지로 표시
+      const mainStatLabel = '상변 데미지';
+
+      const mainPctLabel = label('힘', '지능', '힘/지능');
       const mainPctVal = pick(strPct, intPct);
 
       const critLabel = label('물리 크리티컬', '마법 크리티컬', '물리/마법 크리티컬');
@@ -25252,22 +25354,37 @@ try {
       const damageIncreaseRate = S.damage_increase_rate ?? 0;
       const allTypeDamage = S.all_type_dmg ?? 0;
 
-      // 렌더
-      statListEl.appendChild(show(atkLabel, showNumInt(atkVal)));
+      // 렌더 순서
+      // 1. 피해증가율
+      // 2. 스킬 공격력 증가
+      // 3. 모든 타입 피해
+      // 4. 최종데미지증가
+      // 5. 데미지증가
+      // 6. 최종 추가데미지
+      // 7. 크리티컬 데미지 증가
+      // 8. 물리/마법 공격력
+      // 9. 힘/지능
+      // 10. 물리/마법 크리티컬
+      // 11. 최종 크리티컬
+      // 12. 속성강화
+      // 13. 상변 데미지
+      // 14. 이동속도
+      // 15. 방어력감소
+      statListEl.appendChild(show('피해증가율', fmtPct(damageIncreaseRate, 0)));
+      statListEl.appendChild(show('스킬 공격력 증가', fmtPct(skillAtk)));
+      statListEl.appendChild(show('모든 타입 피해', fmtPct(allTypeDamage)));
+      statListEl.appendChild(show('최종데미지증가', fmtPct(finalDamageIncrease)));
+      statListEl.appendChild(show('데미지증가', fmtPct(S.dmg_inc ?? 0)));
+      statListEl.appendChild(show('최종 추가데미지', fmtPct(addDmgPct)));
+      statListEl.appendChild(show('크리티컬 데미지 증가', fmtPct(S.crit_dmg_inc ?? 0)));
       statListEl.appendChild(show(atkPctLabel, showPct(atkPctVal)));
-      statListEl.appendChild(show(mainStatLabel, showNumInt(mainStatVal)));
       statListEl.appendChild(show(mainPctLabel, showPct(mainPctVal)));
       statListEl.appendChild(show(critLabel, showNumInt(critVal)));
-      statListEl.appendChild(show('최종 크리티컬(%)', fmtPct(finalCritPct)));
-      statListEl.appendChild(show('데미지증가(%)', fmtPct(S.dmg_inc ?? 0)));
-      statListEl.appendChild(show('크리티컬 데미지 증가(%)', fmtPct(S.crit_dmg_inc ?? 0)));
-      statListEl.appendChild(show('최종 추가데미지(%)', fmtPct(addDmgPct)));
-      statListEl.appendChild(show('스킬 공격력 증가(%)', fmtPct(skillAtk)));
+      statListEl.appendChild(show('최종 크리티컬', fmtPct(finalCritPct)));
       statListEl.appendChild(show('속성강화', elemText));
-      statListEl.appendChild(show('방어력감소(%)', fmtPct(defBreak)));
-      statListEl.appendChild(show('최종데미지증가(%)', fmtPct(finalDamageIncrease)));
-      statListEl.appendChild(show('모든 타입 피해(%)', fmtPct(allTypeDamage)));
-      statListEl.appendChild(show('피해증가율(%)', fmtPct(damageIncreaseRate, 0)));
+      statListEl.appendChild(showStatusDamage(mainStatLabel, statusDamageParts));
+      statListEl.appendChild(show('이동속도', fmtPct(moveSpeedVal)));
+      statListEl.appendChild(show('방어력감소', fmtPct(defBreak)));
     }
 
     // === 합산스탯 / 장비설명 토글 ===
