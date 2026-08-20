@@ -241,6 +241,40 @@
     .category-badge { display:inline; min-width:0; padding:0; border:0; border-radius:0; background:transparent; color:var(--cat,#b9d2ff); font-size:13px; font-weight:850; white-space:nowrap; }
     .category-badge.notice { display:inline-flex; align-items:center; justify-content:center; min-width:48px; padding:4px 7px; border:1px solid rgba(255,202,87,.44); border-radius:999px; background:rgba(255,202,87,.14); color:#ffd978; }
     .comment-count { color:#78adff; font-size:12px; font-weight:900; margin-left:5px; }
+
+    /* 캐릭터카드가 첨부된 게시글 표시 */
+    .calc-card-list-icon{
+      display:inline-block;
+      position:relative;
+      width:15px;
+      height:11px;
+      margin-left:6px;
+      vertical-align:-1px;
+      border:1px solid rgba(134,182,255,.92);
+      border-radius:3px;
+      background:rgba(110,168,255,.10);
+      box-shadow:0 0 0 1px rgba(110,168,255,.08) inset;
+    }
+    .calc-card-list-icon::before{
+      content:'';
+      position:absolute;
+      left:2px;
+      top:2px;
+      width:3px;
+      height:3px;
+      border-radius:50%;
+      background:#86b6ff;
+    }
+    .calc-card-list-icon::after{
+      content:'';
+      position:absolute;
+      left:2px;
+      right:2px;
+      bottom:2px;
+      height:2px;
+      border-radius:2px;
+      background:rgba(134,182,255,.72);
+    }
     .mobile-notice-prefix { display:none; }
     .mobile-meta { display:none; }
     .list-head { color:#aeb8c8; font-size:12px; font-weight:850; background:#1a202c; }
@@ -3843,7 +3877,7 @@ async function list(page=1,push=true,silentRefresh=false){
       state.page=Number(r.page||state.page||1); state.totalPages=r.totalPages||1; state.me=r.me||null;
       if(push) setUrl({page:state.page>1?state.page:'',q:state.keyword,search:state.searchType!=='title_content'?state.searchType:'',cat:state.category});
       const isFullAdmin=!!r.me?.isAdmin;
-      const rows=(r.items||[]).map(x=>{const category=x.isNotice?'공지':(CATEGORIES.includes(x.category)?x.category:'기타잡담');return `<div class="list-row ${x.isNotice?'notice-row':''}" data-id="${Number(x.id)}"><div class="list-no">${isFullAdmin?`<input class="admin-post-check" type="checkbox" value="${Number(x.id)}" aria-label="${Number(x.id)}번 게시글 선택">`:(x.isNotice?'—':Number(x.id))}</div><div class="category-cell"><span class="category-badge ${x.isNotice?'notice':''}" data-category="${esc(category)}">${esc(category)}</span></div><div class="list-title">${x.isNotice?'<span class="mobile-notice-prefix">공지</span>':''}${x.prefix?`<span class="prefix-label">[${esc(x.prefix)}]</span>`:''}${esc(x.title)}${Number(x.commentCount||0)?`<span class="comment-count">[${Number(x.commentCount)}]</span>`:''}<div class="mobile-meta"><span class="mobile-category">${esc(category)}</span><span>${authorCrown(x.author)}${esc(x.author?.nickname||'이용자')}</span><span>${fmtListDate(x.createdAt, x.isNotice)}</span><span>조회 ${Number(x.viewCount||0)}</span></div></div><div class="meta desktop-only">${authorCrown(x.author)}${esc(x.author?.nickname||'이용자')}</div><div class="meta desktop-only">${fmtListDate(x.createdAt, x.isNotice)}</div><div class="meta desktop-only">${Number(x.viewCount||0)}</div><div class="meta desktop-only">${Number(x.commentCount||0)}</div></div>`}).join('');
+      const rows=(r.items||[]).map(x=>{const category=x.isNotice?'공지':(CATEGORIES.includes(x.category)?x.category:'기타잡담');const calcCardIcon=x.hasCalcSnapshot?'<span class="calc-card-list-icon" title="캐릭터카드 첨부" aria-label="캐릭터카드 첨부"></span>':'';return `<div class="list-row ${x.isNotice?'notice-row':''}" data-id="${Number(x.id)}"><div class="list-no">${isFullAdmin?`<input class="admin-post-check" type="checkbox" value="${Number(x.id)}" aria-label="${Number(x.id)}번 게시글 선택">`:(x.isNotice?'—':Number(x.id))}</div><div class="category-cell"><span class="category-badge ${x.isNotice?'notice':''}" data-category="${esc(category)}">${esc(category)}</span></div><div class="list-title">${x.isNotice?'<span class="mobile-notice-prefix">공지</span>':''}${x.prefix?`<span class="prefix-label">[${esc(x.prefix)}]</span>`:''}${esc(x.title)}${calcCardIcon}${Number(x.commentCount||0)?`<span class="comment-count">[${Number(x.commentCount)}]</span>`:''}<div class="mobile-meta"><span class="mobile-category">${esc(category)}</span><span>${authorCrown(x.author)}${esc(x.author?.nickname||'이용자')}</span><span>${fmtListDate(x.createdAt, x.isNotice)}</span><span>조회 ${Number(x.viewCount||0)}</span></div></div><div class="meta desktop-only">${authorCrown(x.author)}${esc(x.author?.nickname||'이용자')}</div><div class="meta desktop-only">${fmtListDate(x.createdAt, x.isNotice)}</div><div class="meta desktop-only">${Number(x.viewCount||0)}</div><div class="meta desktop-only">${Number(x.commentCount||0)}</div></div>`}).join('');
       const emptyMessage=state.keyword?'검색 결과가 없습니다.':state.category?'해당 탭에 등록된 게시글이 없습니다.':'등록된 게시글이 없습니다.';
       panel.innerHTML=`<div class="category-bar"><div class="category-filter" aria-label="게시판 직업군 필터"><button class="filter-btn home ${!state.category?'active':''}" data-filter="">홈</button>${CATEGORIES.map(v=>`<button class="filter-btn ${state.category===v?'active':''}" data-filter="${esc(v)}">${esc(v)}</button>`).join('')}</div><div class="category-admin-actions">${isFullAdmin?'<button class="btn secondary category-admin-mode" id="adminMode">관리자모드</button><button class="btn danger category-bulk-delete" id="bulkDelete" disabled>선택 삭제</button>':''}<button class="btn category-write" id="write" ${(!token()||isGuestToken())?'disabled title="Google 로그인이 필요합니다."':''}>글쓰기</button></div></div><div class="list-head"><div style="text-align:center">${isFullAdmin?'선택':'번호'}</div><div style="text-align:center">탭</div><div>제목</div><div style="text-align:center">작성자</div><div style="text-align:center">작성일</div><div style="text-align:center">조회수</div><div style="text-align:center">댓글</div></div>${rows||`<div class="empty">${emptyMessage}</div>`}<div class="pagination">${renderBoardPagination(r.page,r.totalPages)}</div><div class="toolbar"><select id="searchType" class="search-type" aria-label="검색 범위"><option value="title_content" ${state.searchType==='title_content'?'selected':''}>제목+내용</option><option value="author" ${state.searchType==='author'?'selected':''}>작성자</option><option value="comment" ${state.searchType==='comment'?'selected':''}>댓글</option></select><input id="q" maxlength="60" placeholder="${state.searchType==='author'?'작성자 검색':state.searchType==='comment'?'댓글 내용 검색':'제목 또는 내용 검색'}" value="${esc(state.keyword)}"><button class="btn secondary" id="search">검색</button><button class="btn secondary" id="searchReset" ${!state.keyword&&state.searchType==='title_content'?'disabled':''}>초기화</button></div>`;
       bindBoardListEvents();
