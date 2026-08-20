@@ -5774,11 +5774,7 @@
       border-bottom:1px solid rgba(255,255,255,.07);
     }
     .trait-card-title-row-m{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:8px;
-      font-size:12px;
+      display:none;
     }
     .trait-reset-m{
       min-height:25px;
@@ -5794,11 +5790,15 @@
       display:flex;
       align-items:center;
       gap:7px;
-      margin-top:7px;
+      margin-top:0;
       min-height:31px;
       padding:5px 7px;
       border-radius:8px;
       background:rgba(0,0,0,.16);
+    }
+    .trait-current-m .trait-reset-m{
+      flex:0 0 auto;
+      margin-left:auto;
     }
     .trait-current-stage-m{
       flex:0 0 27px;
@@ -5818,25 +5818,83 @@
     }
     .trait-current-stage-m.is-empty,
     .trait-current-value-m.is-empty{color:rgba(233,238,247,.45)}
+    /* 특성 단계 배지(I~V)는 좌측 세로 레일, 옵션 목록은 우측 */
+    .trait-choice-body-m{
+      display:grid;
+      grid-template-columns:42px minmax(0,1fr);
+      min-height:0;
+      border-top:1px solid rgba(255,255,255,.04);
+    }
     .trait-levels-m{
       display:grid;
-      grid-template-columns:repeat(5,1fr);
-      gap:5px;
-      margin-top:7px;
+      grid-template-columns:1fr;
+      grid-template-rows:28px 28px 28px;
+      gap:6px;
+      margin:0;
+      padding:8px 6px 8px 8px;
+      align-content:start;
+      justify-items:center;
+      border-right:1px solid rgba(255,255,255,.07);
+      background:rgba(0,0,0,.08);
+    }
+    .trait-stage-arrow-m{
+      width:100%;
+      min-width:0;
+      height:28px;
+      padding:0;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:7px;
+      background:rgba(255,255,255,.035);
+      color:rgba(233,238,247,.72);
+      font-size:14px;
+      line-height:1;
+      font-weight:900;
+    }
+    .trait-stage-arrow-m:disabled{
+      opacity:.24;
+      cursor:default;
+    }
+
+    /* 가운데 현재 단계는 기존 특성 단계 배지 모양 그대로 사용 */
+    .trait-stage-display-m{
+      width:30px;
+      min-width:30px;
+      max-width:30px;
+      height:24px;
+      min-height:24px;
+      padding:0 5px;
+      align-self:center;
+      justify-self:center;
+      opacity:1;
+      transform:none;
+      pointer-events:none;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.16),
+        0 0 0 1px rgba(255,255,255,.08);
     }
     .trait-level-m{
-      min-height:29px;
+      width:100%;
+      min-width:0;
+      height:38px;
+      min-height:38px;
+      padding:0;
       border:1px solid rgba(255,255,255,.10);
       border-radius:8px;
       background:rgba(255,255,255,.035);
       color:rgba(233,238,247,.65);
-      font-size:11px;
+      font-size:13px;
       font-weight:900;
+      pointer-events:none;
     }
     .trait-level-m.active{
       border-color:rgba(250,204,107,.62);
       background:rgba(250,204,107,.14);
       color:#ffe7a3;
+    }
+    .trait-list-wrap-m{
+      min-width:0;
+      min-height:0;
+      position:relative;
     }
     .trait-list-m{
       display:grid;
@@ -5844,6 +5902,15 @@
       padding:8px;
       max-height:176px;
       overflow:auto;
+    }
+    .trait-list-wrap-m > .trait-empty-m{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .trait-list-wrap-m > .trait-empty-m[hidden]{
+      display:none;
     }
     .trait-option-item-m{
       min-height:33px;
@@ -5868,6 +5935,30 @@
       font-size:11px;
       text-align:center;
     }
+    @media (max-width:380px){
+      .trait-choice-body-m{
+        grid-template-columns:38px minmax(0,1fr);
+      }
+      .trait-levels-m{
+        grid-template-rows:26px 26px 26px;
+        gap:5px;
+        padding-left:6px;
+        padding-right:5px;
+      }
+      .trait-stage-arrow-m{
+        height:26px;
+        font-size:13px;
+      }
+      .trait-stage-display-m{
+        width:28px;
+        min-width:28px;
+        max-width:28px;
+        height:23px;
+        min-height:23px;
+        font-size:11px;
+      }
+    }
+
     .trait-actions-m{
       padding:6px 12px 8px;
       border-top:1px solid rgba(250,204,107,.14);
@@ -7744,54 +7835,63 @@
         
           <section class="trait-card-m">
             <div class="trait-card-head-m">
-              <div class="trait-card-title-row-m">
-                <strong>특성 옵션 1</strong>
-                <button type="button" class="trait-reset-m" data-trait-reset="0">초기화</button>
-              </div>
               <div class="trait-current-m" data-trait-current="0">
                 <span class="trait-current-stage-m is-empty">-</span>
                 <span class="trait-current-value-m is-empty">선택 없음</span>
-              </div>
-              <div class="trait-levels-m" data-trait-index="0">
-                <button type="button" class="trait-level-m stage-1" data-trait-level="1">I</button><button type="button" class="trait-level-m stage-2" data-trait-level="2">II</button><button type="button" class="trait-level-m stage-3" data-trait-level="3">III</button><button type="button" class="trait-level-m stage-4" data-trait-level="4">IV</button><button type="button" class="trait-level-m stage-5" data-trait-level="5">V</button>
+                <button type="button" class="trait-reset-m" data-trait-reset="0">초기화</button>
               </div>
             </div>
-            <div class="trait-list-m" id="traitOptionMList1"></div>
-            <div class="trait-empty-m" data-trait-empty="0" hidden>해당 단계의 특성 옵션이 없습니다.</div>
+            <div class="trait-choice-body-m">
+              <div class="trait-levels-m" data-trait-index="0">
+                <button type="button" class="trait-stage-arrow-m" data-trait-stage-step="1" aria-label="특성 단계 올리기">▲</button>
+                <div class="trait-current-stage-m stage-1 trait-stage-display-m" data-trait-stage-display>I</div>
+                <button type="button" class="trait-stage-arrow-m" data-trait-stage-step="-1" aria-label="특성 단계 내리기">▼</button>
+              </div>
+              <div class="trait-list-wrap-m">
+                <div class="trait-list-m" id="traitOptionMList1"></div>
+                <div class="trait-empty-m" data-trait-empty="0" hidden>해당 단계의 특성 옵션이 없습니다.</div>
+              </div>
+            </div>
           </section>
           <section class="trait-card-m">
             <div class="trait-card-head-m">
-              <div class="trait-card-title-row-m">
-                <strong>특성 옵션 2</strong>
-                <button type="button" class="trait-reset-m" data-trait-reset="1">초기화</button>
-              </div>
               <div class="trait-current-m" data-trait-current="1">
                 <span class="trait-current-stage-m is-empty">-</span>
                 <span class="trait-current-value-m is-empty">선택 없음</span>
-              </div>
-              <div class="trait-levels-m" data-trait-index="1">
-                <button type="button" class="trait-level-m stage-1" data-trait-level="1">I</button><button type="button" class="trait-level-m stage-2" data-trait-level="2">II</button><button type="button" class="trait-level-m stage-3" data-trait-level="3">III</button><button type="button" class="trait-level-m stage-4" data-trait-level="4">IV</button><button type="button" class="trait-level-m stage-5" data-trait-level="5">V</button>
+                <button type="button" class="trait-reset-m" data-trait-reset="1">초기화</button>
               </div>
             </div>
-            <div class="trait-list-m" id="traitOptionMList2"></div>
-            <div class="trait-empty-m" data-trait-empty="1" hidden>해당 단계의 특성 옵션이 없습니다.</div>
+            <div class="trait-choice-body-m">
+              <div class="trait-levels-m" data-trait-index="1">
+                <button type="button" class="trait-stage-arrow-m" data-trait-stage-step="1" aria-label="특성 단계 올리기">▲</button>
+                <div class="trait-current-stage-m stage-1 trait-stage-display-m" data-trait-stage-display>I</div>
+                <button type="button" class="trait-stage-arrow-m" data-trait-stage-step="-1" aria-label="특성 단계 내리기">▼</button>
+              </div>
+              <div class="trait-list-wrap-m">
+                <div class="trait-list-m" id="traitOptionMList2"></div>
+                <div class="trait-empty-m" data-trait-empty="1" hidden>해당 단계의 특성 옵션이 없습니다.</div>
+              </div>
+            </div>
           </section>
           <section class="trait-card-m">
             <div class="trait-card-head-m">
-              <div class="trait-card-title-row-m">
-                <strong>특성 옵션 3</strong>
-                <button type="button" class="trait-reset-m" data-trait-reset="2">초기화</button>
-              </div>
               <div class="trait-current-m" data-trait-current="2">
                 <span class="trait-current-stage-m is-empty">-</span>
                 <span class="trait-current-value-m is-empty">선택 없음</span>
-              </div>
-              <div class="trait-levels-m" data-trait-index="2">
-                <button type="button" class="trait-level-m stage-1" data-trait-level="1">I</button><button type="button" class="trait-level-m stage-2" data-trait-level="2">II</button><button type="button" class="trait-level-m stage-3" data-trait-level="3">III</button><button type="button" class="trait-level-m stage-4" data-trait-level="4">IV</button><button type="button" class="trait-level-m stage-5" data-trait-level="5">V</button>
+                <button type="button" class="trait-reset-m" data-trait-reset="2">초기화</button>
               </div>
             </div>
-            <div class="trait-list-m" id="traitOptionMList3"></div>
-            <div class="trait-empty-m" data-trait-empty="2" hidden>해당 단계의 특성 옵션이 없습니다.</div>
+            <div class="trait-choice-body-m">
+              <div class="trait-levels-m" data-trait-index="2">
+                <button type="button" class="trait-stage-arrow-m" data-trait-stage-step="1" aria-label="특성 단계 올리기">▲</button>
+                <div class="trait-current-stage-m stage-1 trait-stage-display-m" data-trait-stage-display>I</div>
+                <button type="button" class="trait-stage-arrow-m" data-trait-stage-step="-1" aria-label="특성 단계 내리기">▼</button>
+              </div>
+              <div class="trait-list-wrap-m">
+                <div class="trait-list-m" id="traitOptionMList3"></div>
+                <div class="trait-empty-m" data-trait-empty="2" hidden>해당 단계의 특성 옵션이 없습니다.</div>
+              </div>
+            </div>
           </section>
       </div>
       <div class="trait-actions-m">
@@ -7813,54 +7913,63 @@
         
           <section class="trait-card-m">
             <div class="trait-card-head-m">
-              <div class="trait-card-title-row-m">
-                <strong>특성 옵션 1</strong>
-                <button type="button" class="trait-reset-m" data-auto-trait-reset="0">초기화</button>
-              </div>
               <div class="trait-current-m" data-auto-trait-current="0">
                 <span class="trait-current-stage-m is-empty">-</span>
                 <span class="trait-current-value-m is-empty">선택 없음</span>
-              </div>
-              <div class="trait-levels-m" data-auto-trait-index="0">
-                <button type="button" class="trait-level-m stage-1" data-auto-trait-level="1">I</button><button type="button" class="trait-level-m stage-2" data-auto-trait-level="2">II</button><button type="button" class="trait-level-m stage-3" data-auto-trait-level="3">III</button><button type="button" class="trait-level-m stage-4" data-auto-trait-level="4">IV</button><button type="button" class="trait-level-m stage-5" data-auto-trait-level="5">V</button>
+                <button type="button" class="trait-reset-m" data-auto-trait-reset="0">초기화</button>
               </div>
             </div>
-            <div class="trait-list-m" id="traitAutoMList1"></div>
-            <div class="trait-empty-m" data-auto-trait-empty="0" hidden>해당 단계의 특성 옵션이 없습니다.</div>
+            <div class="trait-choice-body-m">
+              <div class="trait-levels-m" data-auto-trait-index="0">
+                <button type="button" class="trait-stage-arrow-m" data-auto-trait-stage-step="1" aria-label="특성 단계 올리기">▲</button>
+                <div class="trait-current-stage-m stage-1 trait-stage-display-m" data-auto-trait-stage-display>I</div>
+                <button type="button" class="trait-stage-arrow-m" data-auto-trait-stage-step="-1" aria-label="특성 단계 내리기">▼</button>
+              </div>
+              <div class="trait-list-wrap-m">
+                <div class="trait-list-m" id="traitAutoMList1"></div>
+                <div class="trait-empty-m" data-auto-trait-empty="0" hidden>해당 단계의 특성 옵션이 없습니다.</div>
+              </div>
+            </div>
           </section>
           <section class="trait-card-m">
             <div class="trait-card-head-m">
-              <div class="trait-card-title-row-m">
-                <strong>특성 옵션 2</strong>
-                <button type="button" class="trait-reset-m" data-auto-trait-reset="1">초기화</button>
-              </div>
               <div class="trait-current-m" data-auto-trait-current="1">
                 <span class="trait-current-stage-m is-empty">-</span>
                 <span class="trait-current-value-m is-empty">선택 없음</span>
-              </div>
-              <div class="trait-levels-m" data-auto-trait-index="1">
-                <button type="button" class="trait-level-m stage-1" data-auto-trait-level="1">I</button><button type="button" class="trait-level-m stage-2" data-auto-trait-level="2">II</button><button type="button" class="trait-level-m stage-3" data-auto-trait-level="3">III</button><button type="button" class="trait-level-m stage-4" data-auto-trait-level="4">IV</button><button type="button" class="trait-level-m stage-5" data-auto-trait-level="5">V</button>
+                <button type="button" class="trait-reset-m" data-auto-trait-reset="1">초기화</button>
               </div>
             </div>
-            <div class="trait-list-m" id="traitAutoMList2"></div>
-            <div class="trait-empty-m" data-auto-trait-empty="1" hidden>해당 단계의 특성 옵션이 없습니다.</div>
+            <div class="trait-choice-body-m">
+              <div class="trait-levels-m" data-auto-trait-index="1">
+                <button type="button" class="trait-stage-arrow-m" data-auto-trait-stage-step="1" aria-label="특성 단계 올리기">▲</button>
+                <div class="trait-current-stage-m stage-1 trait-stage-display-m" data-auto-trait-stage-display>I</div>
+                <button type="button" class="trait-stage-arrow-m" data-auto-trait-stage-step="-1" aria-label="특성 단계 내리기">▼</button>
+              </div>
+              <div class="trait-list-wrap-m">
+                <div class="trait-list-m" id="traitAutoMList2"></div>
+                <div class="trait-empty-m" data-auto-trait-empty="1" hidden>해당 단계의 특성 옵션이 없습니다.</div>
+              </div>
+            </div>
           </section>
           <section class="trait-card-m">
             <div class="trait-card-head-m">
-              <div class="trait-card-title-row-m">
-                <strong>특성 옵션 3</strong>
-                <button type="button" class="trait-reset-m" data-auto-trait-reset="2">초기화</button>
-              </div>
               <div class="trait-current-m" data-auto-trait-current="2">
                 <span class="trait-current-stage-m is-empty">-</span>
                 <span class="trait-current-value-m is-empty">선택 없음</span>
-              </div>
-              <div class="trait-levels-m" data-auto-trait-index="2">
-                <button type="button" class="trait-level-m stage-1" data-auto-trait-level="1">I</button><button type="button" class="trait-level-m stage-2" data-auto-trait-level="2">II</button><button type="button" class="trait-level-m stage-3" data-auto-trait-level="3">III</button><button type="button" class="trait-level-m stage-4" data-auto-trait-level="4">IV</button><button type="button" class="trait-level-m stage-5" data-auto-trait-level="5">V</button>
+                <button type="button" class="trait-reset-m" data-auto-trait-reset="2">초기화</button>
               </div>
             </div>
-            <div class="trait-list-m" id="traitAutoMList3"></div>
-            <div class="trait-empty-m" data-auto-trait-empty="2" hidden>해당 단계의 특성 옵션이 없습니다.</div>
+            <div class="trait-choice-body-m">
+              <div class="trait-levels-m" data-auto-trait-index="2">
+                <button type="button" class="trait-stage-arrow-m" data-auto-trait-stage-step="1" aria-label="특성 단계 올리기">▲</button>
+                <div class="trait-current-stage-m stage-1 trait-stage-display-m" data-auto-trait-stage-display>I</div>
+                <button type="button" class="trait-stage-arrow-m" data-auto-trait-stage-step="-1" aria-label="특성 단계 내리기">▼</button>
+              </div>
+              <div class="trait-list-wrap-m">
+                <div class="trait-list-m" id="traitAutoMList3"></div>
+                <div class="trait-empty-m" data-auto-trait-empty="2" hidden>해당 단계의 특성 옵션이 없습니다.</div>
+              </div>
+            </div>
           </section>
       </div>
       <div class="trait-actions-m">
@@ -14234,8 +14343,15 @@
         traitOptionStagesM[index] = stage;
 
         const levelWrap = traitOptionModalM.querySelector(`[data-trait-index="${index}"]`);
-        levelWrap?.querySelectorAll('[data-trait-level]').forEach((btn) => {
-          btn.classList.toggle('active', Number(btn.dataset.traitLevel) === stage);
+        const stageDisplay = levelWrap?.querySelector('[data-trait-stage-display]');
+        if (stageDisplay) {
+          stageDisplay.classList.remove('stage-1', 'stage-2', 'stage-3', 'stage-4', 'stage-5');
+          stageDisplay.classList.add(`stage-${stage}`);
+          stageDisplay.textContent = traitStageRomanMobile(stage);
+        }
+        levelWrap?.querySelectorAll('[data-trait-stage-step]').forEach((btn) => {
+          const step = Number(btn.dataset.traitStageStep || 0);
+          btn.disabled = (step > 0 && stage >= 5) || (step < 0 && stage <= 1);
         });
 
         const selectedName = String(traitOptionDraftM?.[index]?.name || '').trim();
@@ -14324,11 +14440,13 @@
         return;
       }
 
-      const levelBtn = e.target.closest('[data-trait-level]');
-      if (levelBtn) {
-        const wrap = levelBtn.closest('[data-trait-index]');
+      const stageStepBtn = e.target.closest('[data-trait-stage-step]');
+      if (stageStepBtn) {
+        const wrap = stageStepBtn.closest('[data-trait-index]');
         const index = Math.max(0, Math.min(2, Number(wrap?.dataset.traitIndex || 0)));
-        traitOptionStagesM[index] = normalizeTraitStageMobile(levelBtn.dataset.traitLevel) || 1;
+        const currentStage = normalizeTraitStageMobile(traitOptionStagesM[index] || 1) || 1;
+        const step = Number(stageStepBtn.dataset.traitStageStep || 0);
+        traitOptionStagesM[index] = Math.max(1, Math.min(5, currentStage + step));
         renderTraitOptionModalMobile();
         return;
       }
@@ -14382,8 +14500,15 @@
         traitAutoStagesM[index] = stage;
 
         const levelWrap = traitAutoModalM.querySelector(`[data-auto-trait-index="${index}"]`);
-        levelWrap?.querySelectorAll('[data-auto-trait-level]').forEach((btn) => {
-          btn.classList.toggle('active', Number(btn.dataset.autoTraitLevel) === stage);
+        const stageDisplay = levelWrap?.querySelector('[data-auto-trait-stage-display]');
+        if (stageDisplay) {
+          stageDisplay.classList.remove('stage-1', 'stage-2', 'stage-3', 'stage-4', 'stage-5');
+          stageDisplay.classList.add(`stage-${stage}`);
+          stageDisplay.textContent = traitStageRomanMobile(stage);
+        }
+        levelWrap?.querySelectorAll('[data-auto-trait-stage-step]').forEach((btn) => {
+          const step = Number(btn.dataset.autoTraitStageStep || 0);
+          btn.disabled = (step > 0 && stage >= 5) || (step < 0 && stage <= 1);
         });
 
         const selectedName = String(traitAutoDraftM?.[index]?.name || '').trim();
@@ -14481,11 +14606,13 @@
         return;
       }
 
-      const levelBtn = e.target.closest('[data-auto-trait-level]');
-      if (levelBtn) {
-        const wrap = levelBtn.closest('[data-auto-trait-index]');
+      const stageStepBtn = e.target.closest('[data-auto-trait-stage-step]');
+      if (stageStepBtn) {
+        const wrap = stageStepBtn.closest('[data-auto-trait-index]');
         const index = Math.max(0, Math.min(2, Number(wrap?.dataset.autoTraitIndex || 0)));
-        traitAutoStagesM[index] = normalizeTraitStageMobile(levelBtn.dataset.autoTraitLevel) || 1;
+        const currentStage = normalizeTraitStageMobile(traitAutoStagesM[index] || 1) || 1;
+        const step = Number(stageStepBtn.dataset.autoTraitStageStep || 0);
+        traitAutoStagesM[index] = Math.max(1, Math.min(5, currentStage + step));
         renderTraitAutoModalMobile();
         return;
       }
