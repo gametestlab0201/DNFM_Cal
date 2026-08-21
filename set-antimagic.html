@@ -1475,6 +1475,11 @@
       margin-top: 10px;
     }
 
+    .optimizer-effects + .optimizer-effects {
+      margin-top: 7px;
+    }
+
+
     .optimizer-effect {
       padding: 5px 8px;
       border-radius: 999px;
@@ -1482,6 +1487,19 @@
       border: 1px solid rgba(232,198,90,.20);
       color: rgba(239,222,165,.92);
       font-size: 12px;
+    }
+
+    /* 세트 항마력 / 포인트 항마력은 텍스트 라벨 대신 색으로 구분 */
+    .optimizer-effects--set .optimizer-effect {
+      background: rgba(232,198,90,.10);
+      border-color: rgba(232,198,90,.24);
+      color: rgba(239,222,165,.94);
+    }
+
+    .optimizer-effects--point .optimizer-effect {
+      background: rgba(110,168,255,.10);
+      border-color: rgba(110,168,255,.26);
+      color: rgba(190,215,255,.95);
     }
 
     .optimizer-more {
@@ -1568,6 +1586,7 @@
         padding: 4px 7px;
         font-size: 10px;
       }
+
 
       .optimizer-more {
         font-size: 11px;
@@ -3396,9 +3415,20 @@
               level: variant.level || item.level || 80,
               img: variant.img || item.image || '',
               antimagic: toNum(variant.antimagic),
+              armpoint: toNum(variant.armpoint),
+              accpoint: toNum(variant.accpoint),
+              subpoint: toNum(variant.subpoint),
               category,
             };
-            const dedupeKey = [candidate.name,candidate.type,candidate.rarity,candidate.antimagic].join('\u0001');
+            const dedupeKey = [
+              candidate.name,
+              candidate.type,
+              candidate.rarity,
+              candidate.antimagic,
+              candidate.armpoint,
+              candidate.accpoint,
+              candidate.subpoint
+            ].join('\u0001');
             if (seen[item.slot].has(dedupeKey)) return;
             seen[item.slot].add(dedupeKey);
             bySlot[item.slot].push(candidate);
@@ -3571,12 +3601,72 @@
         });
       });
 
-      return { total, effects };
+      // PC 계산기의 포인트 기반 세트 효과와 동일한 방식:
+      // 방어구 / 악세서리 / 특수장비 포인트를 각각 합산하고,
+      // 각 분류에서 현재 포인트 이하의 가장 높은 단계 1개를 적용한다.
+      const pointSums = { armor:0, accessory:0, special:0 };
+
+      combo.forEach((item) => {
+        pointSums.armor += toNum(item.armpoint);
+        pointSums.accessory += toNum(item.accpoint);
+        pointSums.special += toNum(item.subpoint);
+      });
+
+      const applyPointAntimagic = (pointField, pointTotal, label) => {
+        if (!(pointTotal > 0)) return;
+
+        let bestRow = null;
+        let bestThreshold = 0;
+
+        setRows.forEach((row) => {
+          const threshold = toNum(
+            pointField === 'armpoint'
+              ? (row?.armpoint ?? row?.['방어구포인트'])
+              : pointField === 'accpoint'
+                ? (row?.accpoint ?? row?.['악세포인트'])
+                : (row?.subpoint ?? row?.['특수장비포인트'])
+          );
+
+          if (threshold > 0 && threshold <= pointTotal && threshold > bestThreshold) {
+            bestThreshold = threshold;
+            bestRow = row;
+          }
+        });
+
+        if (!bestRow || !bestThreshold) return;
+
+        const power = getSetRowAntimagic(bestRow);
+        if (!power) return;
+
+        total += power;
+        effects.push({
+          name: label,
+          count: bestThreshold,
+          tier: '포인트',
+          power,
+          pointTotal,
+          isPointEffect: true,
+        });
+      };
+
+      applyPointAntimagic('armpoint', pointSums.armor, '방어구 세트포인트');
+      applyPointAntimagic('accpoint', pointSums.accessory, '악세서리 세트포인트');
+      applyPointAntimagic('subpoint', pointSums.special, '특수장비 세트포인트');
+
+      return { total, effects, pointSums };
     }
 
     function optimizationToken(candidate) {
       const group = OPTIMIZER_GROUP[candidate.slot] || '';
-      return `${group}\u0001${candidate.type}\u0001${candidate.base}\u0001${candidate.tier}`;
+      return [
+        group,
+        candidate.type,
+        candidate.base,
+        candidate.tier,
+        toNum(candidate.armpoint),
+        toNum(candidate.accpoint),
+        toNum(candidate.subpoint)
+      ].join('\u0001');
     }
 
     function addTokenCount(counts, token) {
@@ -3617,6 +3707,9 @@
           level: row.level || 80,
           img: row.img || '',
           antimagic: toNum(row.antimagic),
+          armpoint: toNum(row.armpoint),
+          accpoint: toNum(row.accpoint),
+          subpoint: toNum(row.subpoint),
           season: '2.0',
           category: 'fallback',
           isFallbackRare: true,
@@ -3635,6 +3728,9 @@
         level: 80,
         img: '',
         antimagic: 0,
+        armpoint: 0,
+        accpoint: 0,
+        subpoint: 0,
         season: '2.0',
         category: 'fallback',
         isFallbackRare: true,
@@ -3813,9 +3909,20 @@
               ${itemHtmlList.slice(8, 11).join('')}
             </div>
           `;
-          const effectHtml = combo.effects.length
-            ? combo.effects.map((e) => `<span class="optimizer-effect">${escapeOptimizerHtml(e.name)} ${e.count}세트 +${Number(e.power).toLocaleString('ko-KR')}</span>`).join('')
+          const setEffects = combo.effects.filter((e) => !e.isPointEffect);
+          const pointEffects = combo.effects.filter((e) => e.isPointEffect);
+
+          const setEffectHtml = setEffects.length
+            ? setEffects.map((e) =>
+                `<span class="optimizer-effect">${escapeOptimizerHtml(e.name)} ${e.count}세트 +${Number(e.power).toLocaleString('ko-KR')}</span>`
+              ).join('')
             : '<span class="optimizer-effect">활성 세트 항마력 없음</span>';
+
+          const pointEffectHtml = pointEffects.length
+            ? pointEffects.map((e) =>
+                `<span class="optimizer-effect">${escapeOptimizerHtml(e.name)} ${Number(e.count || 0).toLocaleString('ko-KR')}P +${Number(e.power).toLocaleString('ko-KR')}</span>`
+              ).join('')
+            : '<span class="optimizer-effect">활성 포인트 항마력 없음</span>';
           const comboSignature = optimizerComboSignature(combo);
           const isChecked = comboSignature === pageState.selectedOptimizerComboSignature;
 
@@ -3834,7 +3941,12 @@
               <span class="optimizer-combo-total">총 ${Number(combo.total).toLocaleString('ko-KR')}</span>
             </div>
             <div class="optimizer-items">${itemsHtml}</div>
-            <div class="optimizer-effects">${effectHtml}</div>`;
+            <div class="optimizer-effects optimizer-effects--set">
+              ${setEffectHtml}
+            </div>
+            <div class="optimizer-effects optimizer-effects--point">
+              ${pointEffectHtml}
+            </div>`;
 
           const checkbox = el.querySelector('.optimizer-combo-check');
           checkbox?.addEventListener('change', () => chooseOptimizerCombo(combo, checkbox));
