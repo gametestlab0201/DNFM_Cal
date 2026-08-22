@@ -5940,9 +5940,14 @@
     .trait-list-m{
       display:grid;
       gap:5px;
-      padding:8px;
+      padding:8px 8px 30px;
       max-height:176px;
       overflow:auto;
+
+      /* ✅ 내부 스크롤 구조는 그대로 유지.
+         마지막 옵션이 하단에 딱 붙어 가려지지 않도록
+         스크롤 가능한 하단 여유만 추가한다. */
+      scroll-padding-bottom:30px;
     }
     .trait-list-wrap-m > .trait-empty-m{
       min-height:100%;
