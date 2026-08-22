@@ -3656,27 +3656,245 @@
       return { total, effects, pointSums };
     }
 
-    function optimizationToken(candidate) {
-      const group = OPTIMIZER_GROUP[candidate.slot] || '';
-      return [
-        group,
-        candidate.type,
-        candidate.base,
-        candidate.tier,
-        toNum(candidate.armpoint),
-        toNum(candidate.accpoint),
-        toNum(candidate.subpoint)
-      ].join('\u0001');
+    /*
+      ===== DP 상태 압축 =====
+
+      기존 방식은 장비 하나마다
+      group/type/base/tier/포인트를 통째로 token화하여 개수를 기억했다.
+      최종 세트 계산에 실제로 필요한 정보보다 훨씬 세밀해서
+      후보가 늘면 서로 다른 state가 폭발적으로 증가했다.
+
+      여기서는 최종 evaluateSetAntimagic()이 실제로 사용하는 정보만 저장한다.
+      - 독립 세트: 필요한 최대 세트 단계까지만 exact/base 개수 보존
+      - 세트계열(family): 총 개수 / 상위 개수를 필요한 최대 단계까지만 보존
+      - family의 동적 tier 판정: type/base별 lower/upper 존재 여부(bit)만 보존
+      - 세트포인트: 방어구/악세/특수 각각 최고 포인트 단계까지만 합계 보존
+
+      cap을 넘은 값은 이후 어떤 장비가 추가되어도 세트 결과가 달라지지 않으므로
+      같은 상태로 합칠 수 있다. 따라서 최고 항마력 정확도는 유지된다.
+    */
+
+    function buildOptimizerStateModel(setRows, ruleContext) {
+      const { rowsByType, families, linkedTypes, linkedBases } = ruleContext;
+
+      const exactCaps = new Map();
+      const baseCaps = new Map();
+      const familyCaps = new Map();
+
+      const setMax = (map, key, value) => {
+        const n = Math.max(0, toNum(value));
+        if (!key || !n) return;
+        map.set(key, Math.max(map.get(key) || 0, n));
+      };
+
+      // family가 아닌 독립 세트에서 필요한 exact/base 카운트 상한 계산
+      rowsByType.forEach((rows, type) => {
+        if (!type || linkedTypes.has(type) || linkedTypes.has(stripSetPrefix(type))) return;
+
+        const base = stripSetPrefix(type);
+        let integratedMax = 0;
+
+        rows.forEach((row) => {
+          const n = getSetRowNum(row);
+          if (!(n > 0)) return;
+          const group = getSetRowGroup(row);
+
+          if (group === 'integrated') {
+            integratedMax = Math.max(integratedMax, n);
+            return;
+          }
+
+          if (['armor','accessory','special'].includes(group)) {
+            setMax(exactCaps, `${group}\u0001${type}`, n);
+          }
+        });
+
+        // 통합 세트는 방어구+악세+특수의 합으로 판정되므로
+        // 각 그룹별 exact count도 통합 최고 단계까지는 구분해야 한다.
+        if (integratedMax > 0) {
+          ['armor','accessory','special'].forEach((group) => {
+            setMax(exactCaps, `${group}\u0001${type}`, integratedMax);
+          });
+        }
+
+        // 접두사를 제거한 base 이름 자체에 세트 행이 있으면 base count가 필요하다.
+        if (base && !linkedBases.has(base)) {
+          const baseRows = rowsByType.get(base) || [];
+          baseRows.forEach((row) => {
+            const n = getSetRowNum(row);
+            const group = getSetRowGroup(row);
+            if (n > 0 && ['armor','accessory','special'].includes(group)) {
+              setMax(baseCaps, `${group}\u0001${base}`, n);
+            }
+          });
+        }
+      });
+
+      // rowsByType에 직접 존재하는 base 세트도 누락 없이 수집
+      rowsByType.forEach((rows, base) => {
+        if (!base || linkedBases.has(base)) return;
+        rows.forEach((row) => {
+          const n = getSetRowNum(row);
+          const group = getSetRowGroup(row);
+          if (n > 0 && ['armor','accessory','special'].includes(group)) {
+            setMax(baseCaps, `${group}\u0001${base}`, n);
+          }
+        });
+      });
+
+      // family는 최대로 필요한 세트 단계까지만 total / upper를 기억하면 된다.
+      families.forEach((info, family) => {
+        const maxThreshold = Math.max(0, ...info.rows.map(getSetRowNum).filter((n) => n > 0));
+        if (maxThreshold > 0) familyCaps.set(family, maxThreshold);
+      });
+
+      // 포인트 항마력은 각 계열에서 가장 높은 임계점까지만 구분하면 된다.
+      const pointCaps = { armor:0, accessory:0, special:0 };
+      setRows.forEach((row) => {
+        pointCaps.armor = Math.max(
+          pointCaps.armor,
+          toNum(row?.armpoint ?? row?.['방어구포인트'])
+        );
+        pointCaps.accessory = Math.max(
+          pointCaps.accessory,
+          toNum(row?.accpoint ?? row?.['악세포인트'])
+        );
+        pointCaps.special = Math.max(
+          pointCaps.special,
+          toNum(row?.subpoint ?? row?.['특수장비포인트'])
+        );
+      });
+
+      return {
+        exactCaps,
+        baseCaps,
+        familyCaps,
+        pointCaps,
+        families,
+      };
     }
 
-    function addTokenCount(counts, token) {
-      const next = new Map(counts);
-      next.set(token, (next.get(token) || 0) + 1);
+    function makeInitialOptimizerFeatureState() {
+      return {
+        exact:new Map(),
+        base:new Map(),
+        familyTotal:new Map(),
+        familyUpper:new Map(),
+        familyTierBits:new Map(),
+        pointArmor:0,
+        pointAccessory:0,
+        pointSpecial:0,
+      };
+    }
+
+    function bumpCappedMap(source, key, amount, cap) {
+      if (!key || !(cap > 0) || !(amount > 0)) return source;
+      const before = source.get(key) || 0;
+      const after = Math.min(cap, before + amount);
+      if (after === before) return source;
+      const next = new Map(source);
+      next.set(key, after);
       return next;
     }
 
-    function tokenStateKey(counts) {
-      return [...counts.entries()].sort((a,b) => a[0].localeCompare(b[0])).map(([k,v]) => `${k}\u0002${v}`).join('\u0003');
+    function orBitMap(source, key, bit) {
+      if (!key || !bit) return source;
+      const before = source.get(key) || 0;
+      const after = before | bit;
+      if (after === before) return source;
+      const next = new Map(source);
+      next.set(key, after);
+      return next;
+    }
+
+    function advanceOptimizerFeatureState(feature, candidate, model) {
+      const group = OPTIMIZER_GROUP[candidate.slot] || '';
+      const type = norm(candidate.type);
+      const base = norm(candidate.base || stripSetPrefix(type));
+
+      let exact = feature.exact;
+      let baseMap = feature.base;
+      let familyTotal = feature.familyTotal;
+      let familyUpper = feature.familyUpper;
+      let familyTierBits = feature.familyTierBits;
+
+      if (type && ['armor','accessory','special'].includes(group)) {
+        const exactKey = `${group}\u0001${type}`;
+        const exactCap = model.exactCaps.get(exactKey) || 0;
+        exact = bumpCappedMap(exact, exactKey, 1, exactCap);
+
+        if (base) {
+          const baseKey = `${group}\u0001${base}`;
+          const baseCap = model.baseCaps.get(baseKey) || 0;
+          baseMap = bumpCappedMap(baseMap, baseKey, 1, baseCap);
+        }
+      }
+
+      // family 계산에 필요한 정보만 갱신
+      model.families.forEach((info, family) => {
+        if (!(model.familyCaps.get(family) > 0)) return;
+        if (info.group !== 'integrated' && group !== info.group) return;
+        if (info.group === 'integrated' && !['armor','accessory','special'].includes(group)) return;
+
+        const belongs = info.types.has(type) || (base && info.types.has(base));
+        if (!belongs) return;
+
+        const cap = model.familyCaps.get(family);
+        familyTotal = bumpCappedMap(familyTotal, family, 1, cap);
+
+        if (candidate.tier === 'upper') {
+          familyUpper = bumpCappedMap(familyUpper, family, 1, cap);
+        }
+
+        // rowTier()의 dynamic 판정은 type/base에 lower/upper가 존재하는지만 필요하다.
+        const bit = candidate.tier === 'lower' ? 1 : candidate.tier === 'upper' ? 2 : 0;
+        if (bit) {
+          if (type) familyTierBits = orBitMap(familyTierBits, `${family}\u0001${type}`, bit);
+          if (base) familyTierBits = orBitMap(familyTierBits, `${family}\u0001${base}`, bit);
+        }
+      });
+
+      const pointArmor = model.pointCaps.armor > 0
+        ? Math.min(model.pointCaps.armor, feature.pointArmor + toNum(candidate.armpoint))
+        : 0;
+      const pointAccessory = model.pointCaps.accessory > 0
+        ? Math.min(model.pointCaps.accessory, feature.pointAccessory + toNum(candidate.accpoint))
+        : 0;
+      const pointSpecial = model.pointCaps.special > 0
+        ? Math.min(model.pointCaps.special, feature.pointSpecial + toNum(candidate.subpoint))
+        : 0;
+
+      return {
+        exact,
+        base:baseMap,
+        familyTotal,
+        familyUpper,
+        familyTierBits,
+        pointArmor,
+        pointAccessory,
+        pointSpecial,
+      };
+    }
+
+    function compactMapKey(map) {
+      if (!map?.size) return '';
+      return [...map.entries()]
+        .sort((a,b) => a[0].localeCompare(b[0]))
+        .map(([k,v]) => `${k}\u0002${v}`)
+        .join('\u0003');
+    }
+
+    function optimizerFeatureStateKey(feature) {
+      return [
+        compactMapKey(feature.exact),
+        compactMapKey(feature.base),
+        compactMapKey(feature.familyTotal),
+        compactMapKey(feature.familyUpper),
+        compactMapKey(feature.familyTierBits),
+        feature.pointArmor,
+        feature.pointAccessory,
+        feature.pointSpecial,
+      ].join('\u0004');
     }
 
     function getDefaultRareCandidate(slotKey) {
@@ -3747,10 +3965,9 @@
       return filledSlots;
     }
 
-    // 중간 DP 상태마다 모든 실제 조합 배열(paths)을 보관하면 후보 수가 많을 때
-    // 메모리와 배열 복사가 기하급수적으로 늘어난다.
-    // 계산 정확도는 유지하면서, 각 상태에는 대표 경로만 소수 보관하고
-    // 전체 동률 조합 수는 ways(BigInt)로 별도 집계한다.
+    // 1) 동일 계산 상태의 실제 경로는 대표 샘플만 보관
+    // 2) 계산 상태 자체도 세트 판정에 필요한 최소 정보로 압축
+    // 최고 항마력 정확도는 유지하면서 메모리 사용량을 크게 줄인다.
     const OPTIMIZER_STATE_SAMPLE_LIMIT = 12;
     const OPTIMIZER_RESULT_SAMPLE_LIMIT = 200;
     const OPTIMIZER_YIELD_EVERY = 2500;
@@ -3784,9 +4001,15 @@
     async function findBestAntimagicCombinations(bySlot, onProgress) {
       const filledSlots = fillMissingSlotsWithRare(bySlot);
 
+      // 세트 규칙을 먼저 분석하여 DP가 기억해야 할 최소 상태만 만든다.
+      const setRows = getListArray('set:list');
+      const ruleContext = buildSetRuleContext(setRows);
+      const stateModel = buildOptimizerStateModel(setRows, ruleContext);
+
       let states = new Map();
-      states.set('', {
-        counts:new Map(),
+      const initialFeature = makeInitialOptimizerFeatureState();
+      states.set(optimizerFeatureStateKey(initialFeature), {
+        feature:initialFeature,
         itemPower:0,
         samples:[[]],
         ways:1n,
@@ -3801,8 +4024,8 @@
 
         for (const state of states.values()) {
           for (const candidate of candidates) {
-            const counts = addTokenCount(state.counts, optimizationToken(candidate));
-            const key = tokenStateKey(counts);
+            const feature = advanceOptimizerFeatureState(state.feature, candidate, stateModel);
+            const key = optimizerFeatureStateKey(feature);
             const itemPower = state.itemPower + candidate.antimagic;
             const prev = nextStates.get(key);
 
@@ -3810,14 +4033,13 @@
               const samples = [];
               appendOptimizerSamples(samples, state.samples, candidate);
               nextStates.set(key, {
-                counts,
+                feature,
                 itemPower,
                 samples,
                 ways:state.ways,
               });
             } else if (itemPower === prev.itemPower) {
-              // 계산상 완전히 동일한 상태는 하나로 합치되,
-              // 실제 동률 조합 개수는 정확히 누적한다.
+              // 최종 세트 결과가 동일한 압축 상태끼리만 합친다.
               prev.ways += state.ways;
               appendOptimizerSamples(prev.samples, state.samples, candidate);
             }
@@ -3832,7 +4054,6 @@
                 stateCount:nextStates.size,
                 processedTransitions,
               });
-              // 브라우저가 화면 갱신/입력 처리를 할 수 있도록 메인 스레드를 잠깐 반환한다.
               await yieldOptimizerThread();
             }
           }
@@ -3850,8 +4071,6 @@
         await yieldOptimizerThread();
       }
 
-      const setRows = getListArray('set:list');
-      const ruleContext = buildSetRuleContext(setRows);
       let best = -Infinity;
       let bestCount = 0n;
       const combos = [];
@@ -3861,6 +4080,8 @@
         const representative = state.samples[0];
         if (!representative) continue;
 
+        // 압축 상태는 evaluateSetAntimagic에 필요한 모든 판정 정보를 동일하게
+        // 유지하므로 대표 경로 하나로 해당 state의 세트 항마력을 계산해도 정확하다.
         const setEval = evaluateSetAntimagic(representative, setRows, ruleContext);
         const total = state.itemPower + setEval.total;
 
@@ -3873,8 +4094,6 @@
         if (total === best) {
           bestCount += state.ways;
 
-          // 결과 UI에는 대표 조합만 제한적으로 보관한다.
-          // 점수와 전체 동률 개수(bestCount)는 제한 없이 정확히 계산된다.
           for (const path of state.samples) {
             if (combos.length >= OPTIMIZER_RESULT_SAMPLE_LIMIT) break;
             combos.push({
