@@ -5829,8 +5829,8 @@
     .trait-levels-m{
       display:grid;
       grid-template-columns:1fr;
-      grid-template-rows:28px 28px 28px;
-      gap:6px;
+      grid-template-rows:20px 24px 20px;
+      gap:2px;
       margin:0;
       padding:8px 6px 8px 8px;
       align-content:start;
@@ -5867,7 +5867,7 @@
 
     .trait-stage-drag-spacer-m{
       width:100%;
-      height:28px;
+      height:20px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -5940,14 +5940,21 @@
     .trait-list-m{
       display:grid;
       gap:5px;
-      padding:8px 8px 30px;
+      padding:8px;
       max-height:176px;
       overflow:auto;
+      scroll-padding-bottom:56px;
+    }
 
-      /* ✅ 내부 스크롤 구조는 그대로 유지.
-         마지막 옵션이 하단에 딱 붙어 가려지지 않도록
-         스크롤 가능한 하단 여유만 추가한다. */
-      scroll-padding-bottom:30px;
+    /* ✅ 단순 padding이 아니라 실제 마지막 grid 항목을 하나 더 둔다.
+       모바일 브라우저가 이 공간까지 스크롤 범위로 확실하게 계산하므로
+       마지막 특성 옵션을 충분히 위까지 올려서 볼 수 있다. */
+    .trait-list-m::after{
+      content:"";
+      display:block;
+      height:56px;
+      min-height:56px;
+      pointer-events:none;
     }
     .trait-list-wrap-m > .trait-empty-m{
       min-height:100%;
@@ -5986,14 +5993,17 @@
         grid-template-columns:38px minmax(0,1fr);
       }
       .trait-levels-m{
-        grid-template-rows:26px 26px 26px;
-        gap:5px;
+        grid-template-rows:18px 23px 18px;
+        gap:2px;
         padding-left:6px;
         padding-right:5px;
       }
       .trait-stage-arrow-m{
-        height:26px;
+        height:18px;
         font-size:13px;
+      }
+      .trait-stage-drag-spacer-m{
+        height:18px;
       }
       .trait-stage-display-m{
         width:28px;
