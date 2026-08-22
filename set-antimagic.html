@@ -3747,56 +3747,165 @@
       return filledSlots;
     }
 
-    function findBestAntimagicCombinations(bySlot) {
+    // 중간 DP 상태마다 모든 실제 조합 배열(paths)을 보관하면 후보 수가 많을 때
+    // 메모리와 배열 복사가 기하급수적으로 늘어난다.
+    // 계산 정확도는 유지하면서, 각 상태에는 대표 경로만 소수 보관하고
+    // 전체 동률 조합 수는 ways(BigInt)로 별도 집계한다.
+    const OPTIMIZER_STATE_SAMPLE_LIMIT = 12;
+    const OPTIMIZER_RESULT_SAMPLE_LIMIT = 200;
+    const OPTIMIZER_YIELD_EVERY = 2500;
+
+    function yieldOptimizerThread() {
+      return new Promise((resolve) => {
+        if (typeof requestAnimationFrame === 'function') {
+          requestAnimationFrame(() => resolve());
+        } else {
+          setTimeout(resolve, 0);
+        }
+      });
+    }
+
+    function appendOptimizerSamples(target, source, candidate, limit = OPTIMIZER_STATE_SAMPLE_LIMIT) {
+      if (!Array.isArray(target) || target.length >= limit) return;
+      for (const path of source || []) {
+        target.push(path.concat(candidate));
+        if (target.length >= limit) break;
+      }
+    }
+
+    function formatOptimizerCount(value) {
+      try {
+        return BigInt(value ?? 0).toLocaleString('ko-KR');
+      } catch (_) {
+        return Number(value || 0).toLocaleString('ko-KR');
+      }
+    }
+
+    async function findBestAntimagicCombinations(bySlot, onProgress) {
       const filledSlots = fillMissingSlotsWithRare(bySlot);
 
       let states = new Map();
-      states.set('', { counts:new Map(), itemPower:0, paths:[[]] });
+      states.set('', {
+        counts:new Map(),
+        itemPower:0,
+        samples:[[]],
+        ways:1n,
+      });
 
-      for (const slot of OPTIMIZER_SLOT_ORDER) {
+      let processedTransitions = 0;
+
+      for (let slotIndex = 0; slotIndex < OPTIMIZER_SLOT_ORDER.length; slotIndex++) {
+        const slot = OPTIMIZER_SLOT_ORDER[slotIndex];
+        const candidates = bySlot[slot] || [];
         const nextStates = new Map();
+
         for (const state of states.values()) {
-          for (const candidate of bySlot[slot]) {
+          for (const candidate of candidates) {
             const counts = addTokenCount(state.counts, optimizationToken(candidate));
             const key = tokenStateKey(counts);
             const itemPower = state.itemPower + candidate.antimagic;
             const prev = nextStates.get(key);
-            const newPaths = state.paths.map((path) => path.concat(candidate));
+
             if (!prev || itemPower > prev.itemPower) {
-              nextStates.set(key, { counts, itemPower, paths:newPaths });
+              const samples = [];
+              appendOptimizerSamples(samples, state.samples, candidate);
+              nextStates.set(key, {
+                counts,
+                itemPower,
+                samples,
+                ways:state.ways,
+              });
             } else if (itemPower === prev.itemPower) {
-              prev.paths.push(...newPaths);
+              // 계산상 완전히 동일한 상태는 하나로 합치되,
+              // 실제 동률 조합 개수는 정확히 누적한다.
+              prev.ways += state.ways;
+              appendOptimizerSamples(prev.samples, state.samples, candidate);
+            }
+
+            processedTransitions++;
+            if (processedTransitions % OPTIMIZER_YIELD_EVERY === 0) {
+              onProgress?.({
+                phase:'dp',
+                slot,
+                slotIndex,
+                slotCount:OPTIMIZER_SLOT_ORDER.length,
+                stateCount:nextStates.size,
+                processedTransitions,
+              });
+              // 브라우저가 화면 갱신/입력 처리를 할 수 있도록 메인 스레드를 잠깐 반환한다.
+              await yieldOptimizerThread();
             }
           }
         }
+
         states = nextStates;
+        onProgress?.({
+          phase:'slot-complete',
+          slot,
+          slotIndex,
+          slotCount:OPTIMIZER_SLOT_ORDER.length,
+          stateCount:states.size,
+          processedTransitions,
+        });
+        await yieldOptimizerThread();
       }
 
       const setRows = getListArray('set:list');
       const ruleContext = buildSetRuleContext(setRows);
       let best = -Infinity;
+      let bestCount = 0n;
       const combos = [];
+      let evaluatedStates = 0;
 
-      states.forEach((state) => {
-        const representative = state.paths[0];
+      for (const state of states.values()) {
+        const representative = state.samples[0];
+        if (!representative) continue;
+
         const setEval = evaluateSetAntimagic(representative, setRows, ruleContext);
         const total = state.itemPower + setEval.total;
+
         if (total > best) {
           best = total;
+          bestCount = 0n;
           combos.length = 0;
         }
-        if (total === best) {
-          state.paths.forEach((path) => combos.push({
-            items:path,
-            itemPower:state.itemPower,
-            setPower:setEval.total,
-            total,
-            effects:setEval.effects,
-          }));
-        }
-      });
 
-      return { missing:[], filledSlots, best, combos };
+        if (total === best) {
+          bestCount += state.ways;
+
+          // 결과 UI에는 대표 조합만 제한적으로 보관한다.
+          // 점수와 전체 동률 개수(bestCount)는 제한 없이 정확히 계산된다.
+          for (const path of state.samples) {
+            if (combos.length >= OPTIMIZER_RESULT_SAMPLE_LIMIT) break;
+            combos.push({
+              items:path,
+              itemPower:state.itemPower,
+              setPower:setEval.total,
+              total,
+              effects:setEval.effects,
+            });
+          }
+        }
+
+        evaluatedStates++;
+        if (evaluatedStates % OPTIMIZER_YIELD_EVERY === 0) {
+          onProgress?.({
+            phase:'evaluate',
+            evaluatedStates,
+            totalStates:states.size,
+          });
+          await yieldOptimizerThread();
+        }
+      }
+
+      return {
+        missing:[],
+        filledSlots,
+        best,
+        combos,
+        bestCount,
+        resultSampleLimit:OPTIMIZER_RESULT_SAMPLE_LIMIT,
+      };
     }
 
     function slotLabel(slot) {
@@ -3862,7 +3971,7 @@
         <div class="optimizer-best">
           <span class="optimizer-best-label">최고 항마력</span>
           <strong class="optimizer-best-value">${Number(result.best || 0).toLocaleString('ko-KR')}</strong>
-          <span class="optimizer-best-count">동률 최고 조합 ${combos.length.toLocaleString('ko-KR')}개${filledText}</span>
+          <span class="optimizer-best-count">동률 최고 조합 ${formatOptimizerCount(result.bestCount ?? BigInt(combos.length))}개${result.bestCount > BigInt(combos.length) ? ` · 대표 ${combos.length.toLocaleString('ko-KR')}개 표시` : ''}${filledText}</span>
         </div>
         <div id="optimizerCombos" class="optimizer-combos"></div>
         ${combos.length > 20 ? '<button type="button" id="optimizerMore" class="optimizer-more">더 보기</button>' : ''}
@@ -3971,12 +4080,20 @@
         await new Promise((resolve) => setTimeout(resolve, 0));
         const bySlot = collectActivatedCandidates();
         const activeCount = OPTIMIZER_SLOT_ORDER.reduce((sum, slot) => sum + (bySlot[slot]?.length || 0), 0);
-        const result = findBestAntimagicCombinations(bySlot);
+        const result = await findBestAntimagicCombinations(bySlot, (progress) => {
+          if (progress.phase === 'dp' || progress.phase === 'slot-complete') {
+            const current = Math.min(progress.slotIndex + 1, progress.slotCount);
+            optimizerStatus.textContent = `최고 항마력 조합 계산 중... ${current}/${progress.slotCount}부위 · 상태 ${Number(progress.stateCount || 0).toLocaleString('ko-KR')}개`;
+          } else if (progress.phase === 'evaluate') {
+            optimizerStatus.textContent = `최종 세트/포인트 항마력 비교 중... ${Number(progress.evaluatedStates || 0).toLocaleString('ko-KR')} / ${Number(progress.totalStates || 0).toLocaleString('ko-KR')}`;
+          }
+        });
         renderOptimizerResults(result);
         const filledCount = result.filledSlots?.length || 0;
+        const bestCountText = formatOptimizerCount(result.bestCount ?? BigInt(result.combos.length));
         optimizerStatus.textContent = filledCount
           ? `활성 장비 ${activeCount}개 기준 계산 완료 · 빈 부위 ${filledCount}곳은 일반 레어 장비로 자동 보완했습니다. 원하는 안 하나를 체크하면 장비 페이지에 표시됩니다.`
-          : `활성 장비 ${activeCount}개 기준 계산 완료 · 최고 조합 ${result.combos.length.toLocaleString('ko-KR')}개 · 원하는 안 하나를 체크하면 장비 페이지에 표시됩니다.`;
+          : `활성 장비 ${activeCount}개 기준 계산 완료 · 최고 조합 ${bestCountText}개 · 원하는 안 하나를 체크하면 장비 페이지에 표시됩니다.`;
       } catch (error) {
         console.error('[항마력 최적 조합 계산 실패]', error);
         optimizerStatus.textContent = '계산 중 오류가 발생했습니다. 항마력/세트 시트 데이터를 확인해 주세요.';
