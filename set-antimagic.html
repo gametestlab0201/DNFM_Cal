@@ -3674,7 +3674,26 @@
       같은 상태로 합칠 수 있다. 따라서 최고 항마력 정확도는 유지된다.
     */
 
-    function buildOptimizerStateModel(setRows, ruleContext) {
+    /*
+      ===== 메모리 경량형 DP 상태 =====
+
+      1103에서는 세트 판정에 필요한 정보만 남겼지만,
+      상태 하나가 여러 개의 Map을 품고 있어서 상태 수가 커지면
+      객체/Map 오버헤드 자체가 큰 메모리를 사용했다.
+
+      1104에서는 상태를 고정 길이 Uint32Array 하나로 저장한다.
+      각 배열 칸은 아래 중 하나만 담당한다.
+      - 독립 세트 exact count
+      - base count
+      - family total / upper count
+      - family type의 lower/upper 존재 비트
+      - 방어구/악세/특수 포인트 합계
+
+      각 값은 필요한 최고 단계까지만 cap하므로
+      결과에 영향을 주지 않는 초과값은 같은 상태로 합쳐진다.
+    */
+
+    function buildOptimizerPackedStateModel(setRows, ruleContext) {
       const { rowsByType, families, linkedTypes, linkedBases } = ruleContext;
 
       const exactCaps = new Map();
@@ -3687,7 +3706,7 @@
         map.set(key, Math.max(map.get(key) || 0, n));
       };
 
-      // family가 아닌 독립 세트에서 필요한 exact/base 카운트 상한 계산
+      // family가 아닌 독립 세트 exact/base count의 필요한 최대치
       rowsByType.forEach((rows, type) => {
         if (!type || linkedTypes.has(type) || linkedTypes.has(stripSetPrefix(type))) return;
 
@@ -3701,23 +3720,18 @@
 
           if (group === 'integrated') {
             integratedMax = Math.max(integratedMax, n);
-            return;
-          }
-
-          if (['armor','accessory','special'].includes(group)) {
+          } else if (['armor','accessory','special'].includes(group)) {
             setMax(exactCaps, `${group}\u0001${type}`, n);
           }
         });
 
-        // 통합 세트는 방어구+악세+특수의 합으로 판정되므로
-        // 각 그룹별 exact count도 통합 최고 단계까지는 구분해야 한다.
+        // 통합 세트는 세 그룹 count의 합을 쓰므로 각 그룹도 같은 최대치까지 보존
         if (integratedMax > 0) {
           ['armor','accessory','special'].forEach((group) => {
             setMax(exactCaps, `${group}\u0001${type}`, integratedMax);
           });
         }
 
-        // 접두사를 제거한 base 이름 자체에 세트 행이 있으면 base count가 필요하다.
         if (base && !linkedBases.has(base)) {
           const baseRows = rowsByType.get(base) || [];
           baseRows.forEach((row) => {
@@ -3730,7 +3744,7 @@
         }
       });
 
-      // rowsByType에 직접 존재하는 base 세트도 누락 없이 수집
+      // base 이름으로 직접 존재하는 행도 누락 없이 수집
       rowsByType.forEach((rows, base) => {
         if (!base || linkedBases.has(base)) return;
         rows.forEach((row) => {
@@ -3742,13 +3756,11 @@
         });
       });
 
-      // family는 최대로 필요한 세트 단계까지만 total / upper를 기억하면 된다.
       families.forEach((info, family) => {
         const maxThreshold = Math.max(0, ...info.rows.map(getSetRowNum).filter((n) => n > 0));
         if (maxThreshold > 0) familyCaps.set(family, maxThreshold);
       });
 
-      // 포인트 항마력은 각 계열에서 가장 높은 임계점까지만 구분하면 된다.
       const pointCaps = { armor:0, accessory:0, special:0 };
       setRows.forEach((row) => {
         pointCaps.armor = Math.max(
@@ -3765,136 +3777,215 @@
         );
       });
 
+      const dimensions = [];
+      const caps = [];
+      const exactIndex = new Map();
+      const baseIndex = new Map();
+      const familyTotalIndex = new Map();
+      const familyUpperIndex = new Map();
+      const familyTierIndex = new Map();
+
+      const addDimension = (kind, key, cap, targetMap = null) => {
+        if (!(cap > 0)) return -1;
+        const index = dimensions.length;
+        dimensions.push({ kind, key });
+        caps.push(cap);
+        if (targetMap) targetMap.set(key, index);
+        return index;
+      };
+
+      [...exactCaps.entries()]
+        .sort((a,b) => a[0].localeCompare(b[0]))
+        .forEach(([key, cap]) => addDimension('exact', key, cap, exactIndex));
+
+      [...baseCaps.entries()]
+        .sort((a,b) => a[0].localeCompare(b[0]))
+        .forEach(([key, cap]) => addDimension('base', key, cap, baseIndex));
+
+      const familyEntries = [];
+      [...families.entries()]
+        .sort((a,b) => a[0].localeCompare(b[0]))
+        .forEach(([family, info]) => {
+          const cap = familyCaps.get(family) || 0;
+          if (!(cap > 0)) return;
+
+          const totalIndex = addDimension('familyTotal', family, cap, familyTotalIndex);
+          const upperIndex = addDimension('familyUpper', family, cap, familyUpperIndex);
+
+          const tierKeys = new Set();
+          info.types.forEach((type) => {
+            if (type) tierKeys.add(type);
+            const base = stripSetPrefix(type);
+            if (base) tierKeys.add(base);
+          });
+
+          const tierIndexes = new Map();
+          [...tierKeys].sort((a,b) => a.localeCompare(b)).forEach((key) => {
+            const composite = `${family}\u0001${key}`;
+            const idx = addDimension('familyTierBits', composite, 3, familyTierIndex);
+            tierIndexes.set(key, idx);
+          });
+
+          familyEntries.push({
+            family,
+            info,
+            cap,
+            totalIndex,
+            upperIndex,
+            tierIndexes,
+          });
+        });
+
+      const pointIndex = {
+        armor: addDimension('pointArmor', 'armor', pointCaps.armor),
+        accessory: addDimension('pointAccessory', 'accessory', pointCaps.accessory),
+        special: addDimension('pointSpecial', 'special', pointCaps.special),
+      };
+
+      const capVector = Uint32Array.from(caps);
+      const use32BitKey = caps.some((value) => value > 0xFFFF);
+
       return {
-        exactCaps,
-        baseCaps,
-        familyCaps,
+        dimensions,
+        caps:capVector,
+        size:dimensions.length,
+        exactIndex,
+        baseIndex,
+        familyEntries,
+        pointIndex,
         pointCaps,
-        families,
+        use32BitKey,
       };
     }
 
-    function makeInitialOptimizerFeatureState() {
-      return {
-        exact:new Map(),
-        base:new Map(),
-        familyTotal:new Map(),
-        familyUpper:new Map(),
-        familyTierBits:new Map(),
-        pointArmor:0,
-        pointAccessory:0,
-        pointSpecial:0,
+    function makeInitialOptimizerPackedState(model) {
+      return new Uint32Array(model.size);
+    }
+
+    // 후보 하나가 상태 벡터의 어떤 칸을 어떻게 바꾸는지 미리 계산한다.
+    // DP의 매 transition마다 family 전체를 다시 순회하지 않게 하는 최적화다.
+    function prepareOptimizerCandidateOps(bySlot, model) {
+      OPTIMIZER_SLOT_ORDER.forEach((slot) => {
+        (bySlot[slot] || []).forEach((candidate, candidateIndex) => {
+          const group = OPTIMIZER_GROUP[candidate.slot] || '';
+          const type = norm(candidate.type);
+          const base = norm(candidate.base || stripSetPrefix(type));
+
+          const incOps = [];
+          const bitOps = [];
+
+          const pushInc = (index, amount) => {
+            if (index >= 0 && amount > 0) incOps.push([index, amount]);
+          };
+
+          if (type && ['armor','accessory','special'].includes(group)) {
+            pushInc(model.exactIndex.get(`${group}\u0001${type}`) ?? -1, 1);
+            if (base) pushInc(model.baseIndex.get(`${group}\u0001${base}`) ?? -1, 1);
+          }
+
+          for (const entry of model.familyEntries) {
+            const { info, totalIndex, upperIndex, tierIndexes } = entry;
+            if (info.group !== 'integrated' && group !== info.group) continue;
+            if (info.group === 'integrated' && !['armor','accessory','special'].includes(group)) continue;
+
+            const belongs = info.types.has(type) || (base && info.types.has(base));
+            if (!belongs) continue;
+
+            pushInc(totalIndex, 1);
+            if (candidate.tier === 'upper') pushInc(upperIndex, 1);
+
+            const bit = candidate.tier === 'lower' ? 1 : candidate.tier === 'upper' ? 2 : 0;
+            if (bit) {
+              const typeIndex = tierIndexes.get(type);
+              if (typeIndex !== undefined) bitOps.push([typeIndex, bit]);
+              const baseIndex = tierIndexes.get(base);
+              if (base && baseIndex !== undefined && baseIndex !== typeIndex) bitOps.push([baseIndex, bit]);
+            }
+          }
+
+          pushInc(model.pointIndex.armor, toNum(candidate.armpoint));
+          pushInc(model.pointIndex.accessory, toNum(candidate.accpoint));
+          pushInc(model.pointIndex.special, toNum(candidate.subpoint));
+
+          candidate._optimizerIncOps = incOps;
+          candidate._optimizerBitOps = bitOps;
+          candidate._optimizerChoiceCode = candidateIndex + 1;
+        });
+      });
+    }
+
+    function advanceOptimizerPackedState(vector, candidate, model) {
+      let next = null;
+      const ensureNext = () => {
+        if (!next) next = vector.slice();
+        return next;
       };
-    }
 
-    function bumpCappedMap(source, key, amount, cap) {
-      if (!key || !(cap > 0) || !(amount > 0)) return source;
-      const before = source.get(key) || 0;
-      const after = Math.min(cap, before + amount);
-      if (after === before) return source;
-      const next = new Map(source);
-      next.set(key, after);
-      return next;
-    }
-
-    function orBitMap(source, key, bit) {
-      if (!key || !bit) return source;
-      const before = source.get(key) || 0;
-      const after = before | bit;
-      if (after === before) return source;
-      const next = new Map(source);
-      next.set(key, after);
-      return next;
-    }
-
-    function advanceOptimizerFeatureState(feature, candidate, model) {
-      const group = OPTIMIZER_GROUP[candidate.slot] || '';
-      const type = norm(candidate.type);
-      const base = norm(candidate.base || stripSetPrefix(type));
-
-      let exact = feature.exact;
-      let baseMap = feature.base;
-      let familyTotal = feature.familyTotal;
-      let familyUpper = feature.familyUpper;
-      let familyTierBits = feature.familyTierBits;
-
-      if (type && ['armor','accessory','special'].includes(group)) {
-        const exactKey = `${group}\u0001${type}`;
-        const exactCap = model.exactCaps.get(exactKey) || 0;
-        exact = bumpCappedMap(exact, exactKey, 1, exactCap);
-
-        if (base) {
-          const baseKey = `${group}\u0001${base}`;
-          const baseCap = model.baseCaps.get(baseKey) || 0;
-          baseMap = bumpCappedMap(baseMap, baseKey, 1, baseCap);
-        }
+      for (const [index, amount] of candidate._optimizerIncOps || []) {
+        const before = next ? next[index] : vector[index];
+        const cap = model.caps[index];
+        const after = Math.min(cap, before + amount);
+        if (after !== before) ensureNext()[index] = after;
       }
 
-      // family 계산에 필요한 정보만 갱신
-      model.families.forEach((info, family) => {
-        if (!(model.familyCaps.get(family) > 0)) return;
-        if (info.group !== 'integrated' && group !== info.group) return;
-        if (info.group === 'integrated' && !['armor','accessory','special'].includes(group)) return;
+      for (const [index, bit] of candidate._optimizerBitOps || []) {
+        const before = next ? next[index] : vector[index];
+        const after = before | bit;
+        if (after !== before) ensureNext()[index] = after;
+      }
 
-        const belongs = info.types.has(type) || (base && info.types.has(base));
-        if (!belongs) return;
-
-        const cap = model.familyCaps.get(family);
-        familyTotal = bumpCappedMap(familyTotal, family, 1, cap);
-
-        if (candidate.tier === 'upper') {
-          familyUpper = bumpCappedMap(familyUpper, family, 1, cap);
-        }
-
-        // rowTier()의 dynamic 판정은 type/base에 lower/upper가 존재하는지만 필요하다.
-        const bit = candidate.tier === 'lower' ? 1 : candidate.tier === 'upper' ? 2 : 0;
-        if (bit) {
-          if (type) familyTierBits = orBitMap(familyTierBits, `${family}\u0001${type}`, bit);
-          if (base) familyTierBits = orBitMap(familyTierBits, `${family}\u0001${base}`, bit);
-        }
-      });
-
-      const pointArmor = model.pointCaps.armor > 0
-        ? Math.min(model.pointCaps.armor, feature.pointArmor + toNum(candidate.armpoint))
-        : 0;
-      const pointAccessory = model.pointCaps.accessory > 0
-        ? Math.min(model.pointCaps.accessory, feature.pointAccessory + toNum(candidate.accpoint))
-        : 0;
-      const pointSpecial = model.pointCaps.special > 0
-        ? Math.min(model.pointCaps.special, feature.pointSpecial + toNum(candidate.subpoint))
-        : 0;
-
-      return {
-        exact,
-        base:baseMap,
-        familyTotal,
-        familyUpper,
-        familyTierBits,
-        pointArmor,
-        pointAccessory,
-        pointSpecial,
-      };
+      // 후보가 더 이상 어떤 세트/포인트 상태도 바꾸지 않는다면
+      // 동일 Uint32Array를 재사용해 불필요한 복사를 피한다.
+      return next || vector;
     }
 
-    function compactMapKey(map) {
-      if (!map?.size) return '';
-      return [...map.entries()]
-        .sort((a,b) => a[0].localeCompare(b[0]))
-        .map(([k,v]) => `${k}\u0002${v}`)
-        .join('\u0003');
+    function optimizerPackedStateKey(vector, model) {
+      if (!vector.length) return '';
+
+      // 대부분의 세트 count/포인트 cap은 65535 이하라서
+      // 상태값 하나를 UTF-16 code unit 하나에 직접 압축한다.
+      if (!model.use32BitKey) {
+        let out = '';
+        const CHUNK = 96;
+        for (let i = 0; i < vector.length; i += CHUNK) {
+          out += String.fromCharCode(...vector.subarray(i, Math.min(i + CHUNK, vector.length)));
+        }
+        return out;
+      }
+
+      // 혹시 65535를 넘는 포인트 단계가 생기더라도 충돌하지 않도록 32bit를 2칸으로 저장
+      let out = '';
+      const buf = [];
+      for (let i = 0; i < vector.length; i++) {
+        const value = vector[i] >>> 0;
+        buf.push(value & 0xFFFF, value >>> 16);
+        if (buf.length >= 192) {
+          out += String.fromCharCode(...buf);
+          buf.length = 0;
+        }
+      }
+      if (buf.length) out += String.fromCharCode(...buf);
+      return out;
     }
 
-    function optimizerFeatureStateKey(feature) {
-      return [
-        compactMapKey(feature.exact),
-        compactMapKey(feature.base),
-        compactMapKey(feature.familyTotal),
-        compactMapKey(feature.familyUpper),
-        compactMapKey(feature.familyTierBits),
-        feature.pointArmor,
-        feature.pointAccessory,
-        feature.pointSpecial,
-      ].join('\u0004');
+    function encodeOptimizerPathChoice(candidateIndex) {
+      // 한 부위의 후보 수가 65534개를 넘는 경우는 현실적으로 없지만 안전장치는 둔다.
+      if (candidateIndex < 0 || candidateIndex >= 65534) {
+        throw new Error('optimizer_candidate_count_too_large');
+      }
+      return String.fromCharCode(candidateIndex + 1);
+    }
+
+    function decodeOptimizerPath(pathCode, bySlot) {
+      const items = [];
+      for (let i = 0; i < OPTIMIZER_SLOT_ORDER.length; i++) {
+        const slot = OPTIMIZER_SLOT_ORDER[i];
+        const candidateIndex = (pathCode.charCodeAt(i) || 1) - 1;
+        const candidate = bySlot[slot]?.[candidateIndex];
+        if (!candidate) throw new Error(`optimizer_path_decode_failed:${slot}:${candidateIndex}`);
+        items.push(candidate);
+      }
+      return items;
     }
 
     function getDefaultRareCandidate(slotKey) {
@@ -3965,10 +4056,9 @@
       return filledSlots;
     }
 
-    // 1) 동일 계산 상태의 실제 경로는 대표 샘플만 보관
-    // 2) 계산 상태 자체도 세트 판정에 필요한 최소 정보로 압축
-    // 최고 항마력 정확도는 유지하면서 메모리 사용량을 크게 줄인다.
-    const OPTIMIZER_STATE_SAMPLE_LIMIT = 12;
+    // 상태마다 장비 객체 배열을 여러 개 들고 있지 않는다.
+    // 대표 경로는 11개의 후보 번호를 UTF-16 문자열 11글자로만 보관한다.
+    // 모든 동률 경로의 실제 개수는 ways(BigInt)로 정확히 누적한다.
     const OPTIMIZER_RESULT_SAMPLE_LIMIT = 200;
     const OPTIMIZER_YIELD_EVERY = 2500;
 
@@ -3982,14 +4072,6 @@
       });
     }
 
-    function appendOptimizerSamples(target, source, candidate, limit = OPTIMIZER_STATE_SAMPLE_LIMIT) {
-      if (!Array.isArray(target) || target.length >= limit) return;
-      for (const path of source || []) {
-        target.push(path.concat(candidate));
-        if (target.length >= limit) break;
-      }
-    }
-
     function formatOptimizerCount(value) {
       try {
         return BigInt(value ?? 0).toLocaleString('ko-KR');
@@ -4001,17 +4083,17 @@
     async function findBestAntimagicCombinations(bySlot, onProgress) {
       const filledSlots = fillMissingSlotsWithRare(bySlot);
 
-      // 세트 규칙을 먼저 분석하여 DP가 기억해야 할 최소 상태만 만든다.
       const setRows = getListArray('set:list');
       const ruleContext = buildSetRuleContext(setRows);
-      const stateModel = buildOptimizerStateModel(setRows, ruleContext);
+      const stateModel = buildOptimizerPackedStateModel(setRows, ruleContext);
+      prepareOptimizerCandidateOps(bySlot, stateModel);
 
       let states = new Map();
-      const initialFeature = makeInitialOptimizerFeatureState();
-      states.set(optimizerFeatureStateKey(initialFeature), {
-        feature:initialFeature,
+      const initialVector = makeInitialOptimizerPackedState(stateModel);
+      states.set(optimizerPackedStateKey(initialVector, stateModel), {
+        vector:initialVector,
         itemPower:0,
-        samples:[[]],
+        pathCode:'',
         ways:1n,
       });
 
@@ -4023,25 +4105,24 @@
         const nextStates = new Map();
 
         for (const state of states.values()) {
-          for (const candidate of candidates) {
-            const feature = advanceOptimizerFeatureState(state.feature, candidate, stateModel);
-            const key = optimizerFeatureStateKey(feature);
+          for (let candidateIndex = 0; candidateIndex < candidates.length; candidateIndex++) {
+            const candidate = candidates[candidateIndex];
+            const vector = advanceOptimizerPackedState(state.vector, candidate, stateModel);
+            const key = optimizerPackedStateKey(vector, stateModel);
             const itemPower = state.itemPower + candidate.antimagic;
             const prev = nextStates.get(key);
 
             if (!prev || itemPower > prev.itemPower) {
-              const samples = [];
-              appendOptimizerSamples(samples, state.samples, candidate);
               nextStates.set(key, {
-                feature,
+                vector,
                 itemPower,
-                samples,
+                pathCode:state.pathCode + encodeOptimizerPathChoice(candidateIndex),
                 ways:state.ways,
               });
             } else if (itemPower === prev.itemPower) {
-              // 최종 세트 결과가 동일한 압축 상태끼리만 합친다.
+              // 동일한 계산 상태 + 동일한 단품 항마력의 모든 실제 경로 수만 누적한다.
+              // 장비 배열 자체는 대표 1개만 유지하므로 메모리가 경로 수에 비례해 늘지 않는다.
               prev.ways += state.ways;
-              appendOptimizerSamples(prev.samples, state.samples, candidate);
             }
 
             processedTransitions++;
@@ -4059,7 +4140,10 @@
           }
         }
 
+        // 이전 layer의 state 객체 참조를 즉시 끊어 GC가 회수할 수 있게 한다.
+        states.clear();
         states = nextStates;
+
         onProgress?.({
           phase:'slot-complete',
           slot,
@@ -4077,11 +4161,7 @@
       let evaluatedStates = 0;
 
       for (const state of states.values()) {
-        const representative = state.samples[0];
-        if (!representative) continue;
-
-        // 압축 상태는 evaluateSetAntimagic에 필요한 모든 판정 정보를 동일하게
-        // 유지하므로 대표 경로 하나로 해당 state의 세트 항마력을 계산해도 정확하다.
+        const representative = decodeOptimizerPath(state.pathCode, bySlot);
         const setEval = evaluateSetAntimagic(representative, setRows, ruleContext);
         const total = state.itemPower + setEval.total;
 
@@ -4094,10 +4174,11 @@
         if (total === best) {
           bestCount += state.ways;
 
-          for (const path of state.samples) {
-            if (combos.length >= OPTIMIZER_RESULT_SAMPLE_LIMIT) break;
+          // 화면 표시용 대표 조합만 최대 200개 저장한다.
+          // 최고값 판정이나 동률 개수 계산에는 이 표시 제한이 영향을 주지 않는다.
+          if (combos.length < OPTIMIZER_RESULT_SAMPLE_LIMIT) {
             combos.push({
-              items:path,
+              items:representative,
               itemPower:state.itemPower,
               setPower:setEval.total,
               total,
@@ -4124,6 +4205,7 @@
         combos,
         bestCount,
         resultSampleLimit:OPTIMIZER_RESULT_SAMPLE_LIMIT,
+        packedStateWidth:stateModel.size,
       };
     }
 
