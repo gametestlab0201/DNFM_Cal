@@ -4186,84 +4186,244 @@
       return { total, effects, pointSums };
     }
 
-    function buildOptimizerSuffixBounds(bySlot) {
+    /*
+      ===== 후보 가용성까지 반영한 suffix bound =====
+
+      1105의 상한은 "남은 슬롯 수"를 기준으로 세트 완성 가능성을 넉넉하게 잡았다.
+      1106은 각 남은 슬롯에 실제로 해당 type/base/family 후보가 존재하는지를 미리 계산한다.
+
+      예:
+      남은 슬롯이 5개여도 특정 세트 후보가 실제로 들어있는 슬롯이 2개뿐이라면
+      그 세트는 앞으로 최대 2개만 더 채울 수 있다.
+
+      이 값은 실제 후보 목록에서 직접 계산한 최대 가능 개수이므로
+      Branch & Bound의 정확도를 떨어뜨리지 않는다.
+    */
+    function buildOptimizerSuffixBounds(bySlot, model) {
       const slotCount = OPTIMIZER_SLOT_ORDER.length;
       const suffixMaxItem = new Array(slotCount + 1).fill(0);
-      const suffixGroupCounts = new Array(slotCount + 1);
       const suffixPointMax = new Array(slotCount + 1);
 
-      suffixGroupCounts[slotCount] = { armor:0, accessory:0, special:0 };
+      const suffixExactReach = new Array(slotCount + 1);
+      const suffixBaseReach = new Array(slotCount + 1);
+      const suffixFamilyReach = new Array(slotCount + 1);
+      const suffixFamilyUpperReach = new Array(slotCount + 1);
+
       suffixPointMax[slotCount] = { armor:0, accessory:0, special:0 };
+      suffixExactReach[slotCount] = new Map();
+      suffixBaseReach[slotCount] = new Map();
+      suffixFamilyReach[slotCount] = new Map();
+      suffixFamilyUpperReach[slotCount] = new Map();
+
+      const cloneInc = (source, keys) => {
+        const next = new Map(source);
+        keys.forEach((key) => next.set(key, (next.get(key) || 0) + 1));
+        return next;
+      };
 
       for (let i = slotCount - 1; i >= 0; i--) {
         const slot = OPTIMIZER_SLOT_ORDER[i];
         const group = OPTIMIZER_GROUP[slot];
         const candidates = bySlot[slot] || [];
 
-        const maxItem = candidates.reduce((m, c) => Math.max(m, toNum(c.antimagic)), 0);
-        suffixMaxItem[i] = suffixMaxItem[i + 1] + maxItem;
-
-        const prevGroups = suffixGroupCounts[i + 1];
-        suffixGroupCounts[i] = {
-          armor: prevGroups.armor + (group === 'armor' ? 1 : 0),
-          accessory: prevGroups.accessory + (group === 'accessory' ? 1 : 0),
-          special: prevGroups.special + (group === 'special' ? 1 : 0),
-        };
+        suffixMaxItem[i] =
+          suffixMaxItem[i + 1] +
+          candidates.reduce((m, c) => Math.max(m, toNum(c.antimagic)), 0);
 
         const prevPoint = suffixPointMax[i + 1];
         suffixPointMax[i] = {
-          armor: prevPoint.armor + candidates.reduce((m, c) => Math.max(m, toNum(c.armpoint)), 0),
-          accessory: prevPoint.accessory + candidates.reduce((m, c) => Math.max(m, toNum(c.accpoint)), 0),
-          special: prevPoint.special + candidates.reduce((m, c) => Math.max(m, toNum(c.subpoint)), 0),
+          armor:
+            prevPoint.armor +
+            candidates.reduce((m, c) => Math.max(m, toNum(c.armpoint)), 0),
+          accessory:
+            prevPoint.accessory +
+            candidates.reduce((m, c) => Math.max(m, toNum(c.accpoint)), 0),
+          special:
+            prevPoint.special +
+            candidates.reduce((m, c) => Math.max(m, toNum(c.subpoint)), 0),
         };
+
+        // 한 슬롯에서는 어떤 후보를 골라도 장비는 하나뿐이므로
+        // "이 슬롯에서 해당 상태를 1개 올릴 수 있는가"만 Set으로 계산한다.
+        const exactKeys = new Set();
+        const baseKeys = new Set();
+        const familyKeys = new Set();
+        const familyUpperKeys = new Set();
+
+        candidates.forEach((candidate) => {
+          const type = norm(candidate.type);
+          const base = norm(candidate.base || stripSetPrefix(type));
+
+          if (type && ['armor','accessory','special'].includes(group)) {
+            const exactKey = `${group}\u0001${type}`;
+            if (model.exactIndex.has(exactKey)) exactKeys.add(exactKey);
+
+            if (base) {
+              const baseKey = `${group}\u0001${base}`;
+              if (model.baseIndex.has(baseKey)) baseKeys.add(baseKey);
+            }
+          }
+
+          model.familyEntries.forEach((entry) => {
+            const { family, info } = entry;
+
+            if (info.group !== 'integrated' && group !== info.group) return;
+            if (
+              info.group === 'integrated' &&
+              !['armor','accessory','special'].includes(group)
+            ) return;
+
+            const belongs =
+              info.types.has(type) ||
+              (base && info.types.has(base));
+
+            if (!belongs) return;
+
+            familyKeys.add(family);
+            if (candidate.tier === 'upper') familyUpperKeys.add(family);
+          });
+        });
+
+        suffixExactReach[i] = cloneInc(suffixExactReach[i + 1], exactKeys);
+        suffixBaseReach[i] = cloneInc(suffixBaseReach[i + 1], baseKeys);
+        suffixFamilyReach[i] = cloneInc(suffixFamilyReach[i + 1], familyKeys);
+        suffixFamilyUpperReach[i] = cloneInc(
+          suffixFamilyUpperReach[i + 1],
+          familyUpperKeys
+        );
       }
 
-      return { suffixMaxItem, suffixGroupCounts, suffixPointMax };
+      return {
+        suffixMaxItem,
+        suffixPointMax,
+        suffixExactReach,
+        suffixBaseReach,
+        suffixFamilyReach,
+        suffixFamilyUpperReach,
+      };
     }
 
     /*
-      안전한 세트 항마력 상한.
-      실제 후보 조합으로 동시에 달성 불가능한 효과까지 일부 포함할 수 있으므로
-      값이 실제 최대보다 "크게" 잡힐 수는 있지만 절대 작게 잡히지 않는다.
-      따라서 upperBound < 현재 best 인 가지를 버려도 정확도는 떨어지지 않는다.
+      더 타이트하지만 여전히 안전한 세트 항마력 상한.
+
+      중요한 원칙:
+      - 실제 최대보다 크게 잡히는 것은 허용 (느려질 뿐 정확)
+      - 실제 최대보다 작게 잡히는 것은 금지 (정확도 손상)
+
+      그래서 서로 동시에 달성하기 어려운 효과를 일부 중복해서 더할 수는 있지만,
+      "남은 실제 후보로 도달조차 불가능한 세트 단계"는 이제 상한에서 제거한다.
     */
     function estimatePackedSetUpperBound(vector, depth, setRows, ruleContext, model, bounds) {
-      const { rowsByType, families, linkedTypes, linkedBases } = ruleContext;
-      const remainGroups = bounds.suffixGroupCounts[depth];
-      const remainPoints = bounds.suffixPointMax[depth];
+      const { rowsByType, typeTierIndex, linkedTypes, linkedBases } = ruleContext;
 
-      const readIndex = (index) => index === undefined || index < 0 ? 0 : Number(vector[index] || 0);
-      const readExact = (group, type) => readIndex(model.exactIndex.get(`${group}\u0001${type}`));
-      const readBase = (group, base) => readIndex(model.baseIndex.get(`${group}\u0001${base}`));
+      const readIndex = (index) =>
+        index === undefined || index < 0
+          ? 0
+          : Number(vector[index] || 0);
+
+      const readExact = (group, type) =>
+        readIndex(model.exactIndex.get(`${group}\u0001${type}`));
+
+      const readBase = (group, base) =>
+        readIndex(model.baseIndex.get(`${group}\u0001${base}`));
+
+      const exactReach = bounds.suffixExactReach[depth] || new Map();
+      const baseReach = bounds.suffixBaseReach[depth] || new Map();
+      const familyReach = bounds.suffixFamilyReach[depth] || new Map();
+      const familyUpperReach = bounds.suffixFamilyUpperReach[depth] || new Map();
+      const remainPoints = bounds.suffixPointMax[depth];
 
       let upper = 0;
 
-      // family: 각 단계에서 가능한 행 중 가장 큰 양수 항마력을 상한으로 더한다.
+      // family 세트
       for (const entry of model.familyEntries) {
-        const { info, totalIndex } = entry;
-        const currentTotal = readIndex(totalIndex);
-        const remainingRelevant = info.group === 'integrated'
-          ? remainGroups.armor + remainGroups.accessory + remainGroups.special
-          : (remainGroups[info.group] || 0);
+        const {
+          family,
+          info,
+          totalIndex,
+          upperIndex,
+          tierIndexes,
+        } = entry;
 
-        const possibleTotal = currentTotal + remainingRelevant;
-        const thresholds = [...new Set(info.rows.map(getSetRowNum).filter((n) => n > 0))];
+        const currentTotal = readIndex(totalIndex);
+        const currentUpper = readIndex(upperIndex);
+
+        const possibleTotal =
+          currentTotal + (familyReach.get(family) || 0);
+
+        const possibleUpper =
+          currentUpper + (familyUpperReach.get(family) || 0);
+
+        const rowTierPossibilities = (row) => {
+          const type = getSetRowType(row);
+          const base = stripSetPrefix(type);
+          const explicit = norm(
+            row?.rarity ?? row?.['레어리티'] ?? ''
+          ).toLowerCase();
+
+          if (explicit === '유니크' || explicit === 'unique') {
+            return { lower:true, upper:false };
+          }
+
+          if (['에픽','익시드','epic','exceed'].includes(explicit)) {
+            return { lower:false, upper:true };
+          }
+
+          const staticTier =
+            typeTierIndex.get(type) ||
+            typeTierIndex.get(base);
+
+          if (staticTier === 'lower') return { lower:true, upper:false };
+          if (staticTier === 'upper') return { lower:false, upper:true };
+
+          // 동적 tier 행은 현재 bit 상태와 남은 upper 후보 가능성을 감안해
+          // 가능한 쪽을 모두 허용한다. 상한이 작아지는 위험을 피한다.
+          const typeBits = readIndex(tierIndexes.get(type));
+          const baseBits = readIndex(tierIndexes.get(base));
+          const bits = typeBits || baseBits;
+
+          if (bits === 1) return { lower:true, upper:false };
+          if (bits === 2) return { lower:false, upper:true };
+
+          return { lower:true, upper:true };
+        };
+
+        const thresholds = [
+          ...new Set(info.rows.map(getSetRowNum).filter((n) => n > 0))
+        ];
 
         thresholds.forEach((n) => {
           if (possibleTotal < n) return;
-          const power = Math.max(
-            0,
-            ...info.rows
-              .filter((row) => getSetRowNum(row) === n)
-              .map(getSetRowAntimagic)
-          );
-          upper += power;
+
+          let bestPossiblePower = 0;
+
+          info.rows
+            .filter((row) => getSetRowNum(row) === n)
+            .forEach((row) => {
+              const possibilities = rowTierPossibilities(row);
+              const lowerPossible =
+                possibilities.lower && possibleTotal >= n;
+              const upperPossible =
+                possibilities.upper && possibleUpper >= n;
+
+              if (!lowerPossible && !upperPossible) return;
+
+              bestPossiblePower = Math.max(
+                bestPossiblePower,
+                Math.max(0, getSetRowAntimagic(row))
+              );
+            });
+
+          upper += bestPossiblePower;
         });
       }
 
-      // 독립 exact 세트
+      // family가 없는 독립 exact 세트
       rowsByType.forEach((rows, type) => {
-        if (linkedTypes.has(type) || linkedTypes.has(stripSetPrefix(type))) return;
+        if (
+          linkedTypes.has(type) ||
+          linkedTypes.has(stripSetPrefix(type))
+        ) return;
 
         const current = {
           armor: readExact('armor', type),
@@ -4281,18 +4441,27 @@
 
           if (group === 'integrated') {
             possible =
-              current.armor + current.accessory + current.special +
-              remainGroups.armor + remainGroups.accessory + remainGroups.special;
-          } else if (['armor','accessory','special'].includes(group)) {
-            possible = current[group] + remainGroups[group];
+              current.armor +
+              current.accessory +
+              current.special +
+              (exactReach.get(`armor\u0001${type}`) || 0) +
+              (exactReach.get(`accessory\u0001${type}`) || 0) +
+              (exactReach.get(`special\u0001${type}`) || 0);
+          } else if (
+            ['armor','accessory','special'].includes(group)
+          ) {
+            possible =
+              current[group] +
+              (exactReach.get(`${group}\u0001${type}`) || 0);
           }
 
           if (possible >= n) upper += power;
         });
       });
 
-      // base 세트. exact와 동시에 더해 실제보다 크게 잡힐 수 있으나 상한으로는 안전하다.
+      // base 세트
       const baseTypes = new Set();
+
       model.baseIndex.forEach((_, key) => {
         const split = key.indexOf('\u0001');
         if (split >= 0) baseTypes.add(key.slice(split + 1));
@@ -4300,6 +4469,7 @@
 
       baseTypes.forEach((base) => {
         if (!base || linkedBases.has(base)) return;
+
         const rows = rowsByType.get(base) || [];
 
         rows.forEach((row) => {
@@ -4310,12 +4480,15 @@
           const power = Math.max(0, getSetRowAntimagic(row));
           if (!(n > 0) || !power) return;
 
-          const possible = readBase(group, base) + remainGroups[group];
+          const possible =
+            readBase(group, base) +
+            (baseReach.get(`${group}\u0001${base}`) || 0);
+
           if (possible >= n) upper += power;
         });
       });
 
-      // 포인트는 각 분류별로 가능한 포인트 이하 행 중 가장 큰 항마력을 상한으로 사용
+      // 포인트 기반 세트
       const pointCases = [
         ['armor', 'armpoint', model.pointIndex.armor, '방어구포인트'],
         ['accessory', 'accpoint', model.pointIndex.accessory, '악세포인트'],
@@ -4323,13 +4496,25 @@
       ];
 
       pointCases.forEach(([group, field, index, koreanField]) => {
-        const possiblePoint = readIndex(index) + (remainPoints[group] || 0);
+        const possiblePoint =
+          readIndex(index) +
+          (remainPoints[group] || 0);
+
         let bestPower = 0;
 
         setRows.forEach((row) => {
-          const threshold = toNum(row?.[field] ?? row?.[koreanField]);
-          if (threshold > 0 && threshold <= possiblePoint) {
-            bestPower = Math.max(bestPower, Math.max(0, getSetRowAntimagic(row)));
+          const threshold = toNum(
+            row?.[field] ?? row?.[koreanField]
+          );
+
+          if (
+            threshold > 0 &&
+            threshold <= possiblePoint
+          ) {
+            bestPower = Math.max(
+              bestPower,
+              Math.max(0, getSetRowAntimagic(row))
+            );
           }
         });
 
@@ -4361,6 +4546,665 @@
         itemPower,
         setEval,
       };
+    }
+
+
+    /*
+      ===== 1107: Exact Meet-in-the-Middle 전용 엔진 =====
+
+      11부위를
+        LEFT  = 방어구 5부위
+        RIGHT = 악세서리 3 + 특수장비 3부위
+      로 나눈다.
+
+      각 절반은 실제 후보 조합을 모두 열거한다.
+      최대 원시 조합 수가 대략
+        LEFT  : 11^5  ≈ 16만
+        RIGHT : 10^6  ≈ 100만
+      수준이므로 11부위 전체 1,610억 조합을 직접 보는 것보다 훨씬 작다.
+
+      절반 조합은 "반대편과 결합했을 때 결과를 바꿀 수 있는 교차 상태"가 같으면
+      해당 절반 내부에서 얻는 (단품 항마력 + 로컬 세트/포인트 항마력)이
+      가장 높은 것만 남긴다.
+
+      이 제거는 exact dominance:
+      교차 상태가 같으면 어느 반대편 상태와 결합해도 교차 보너스가 동일하므로
+      로컬 점수가 낮은 절반 조합은 최종 최고값을 절대 만들 수 없다.
+    */
+
+    const OPTIMIZER_MITM_SPLIT = 5;
+    const OPTIMIZER_MITM_YIELD_EVERY = 4000;
+    const OPTIMIZER_MITM_RESULT_LIMIT = 200;
+
+    function buildOptimizerMitmRules(setRows, ruleContext, model) {
+      const {
+        rowsByType,
+        typeTierIndex,
+        families,
+        linkedTypes,
+        linkedBases,
+      } = ruleContext;
+
+      const leftFamilies = [];
+      const rightFamilies = [];
+      const crossFamilies = [];
+
+      const compileFamily = (entry) => {
+        const { family, info, totalIndex, upperIndex, tierIndexes } = entry;
+
+        const thresholds = [
+          ...new Set(info.rows.map(getSetRowNum).filter((n) => n > 0))
+        ].sort((a,b) => a-b);
+
+        const compiledThresholds = thresholds.map((n) => {
+          const rows = info.rows
+            .filter((row) => getSetRowNum(row) === n)
+            .map((row) => {
+              const type = getSetRowType(row);
+              const base = stripSetPrefix(type);
+              const explicit = norm(
+                row?.rarity ?? row?.['레어리티'] ?? ''
+              ).toLowerCase();
+
+              let staticTier = '';
+              if (explicit === '유니크' || explicit === 'unique') {
+                staticTier = 'lower';
+              } else if (
+                ['에픽','익시드','epic','exceed'].includes(explicit)
+              ) {
+                staticTier = 'upper';
+              } else {
+                staticTier =
+                  typeTierIndex.get(type) ||
+                  typeTierIndex.get(base) ||
+                  '';
+              }
+
+              return {
+                row,
+                power:getSetRowAntimagic(row),
+                staticTier,
+                typeIndex:tierIndexes.get(type),
+                baseIndex:tierIndexes.get(base),
+              };
+            });
+
+          return { n, rows };
+        });
+
+        return {
+          family,
+          info,
+          totalIndex,
+          upperIndex,
+          thresholds:compiledThresholds,
+        };
+      };
+
+      model.familyEntries.forEach((entry) => {
+        const compiled = compileFamily(entry);
+        if (entry.info.group === 'armor') leftFamilies.push(compiled);
+        else if (
+          entry.info.group === 'accessory' ||
+          entry.info.group === 'special'
+        ) rightFamilies.push(compiled);
+        else crossFamilies.push(compiled);
+      });
+
+      const independentByGroup = {
+        armor:[],
+        accessory:[],
+        special:[],
+        integrated:[],
+      };
+
+      rowsByType.forEach((rows, type) => {
+        if (
+          linkedTypes.has(type) ||
+          linkedTypes.has(stripSetPrefix(type))
+        ) return;
+
+        const base = stripSetPrefix(type);
+
+        const groups = {
+          armor:[],
+          accessory:[],
+          special:[],
+          integrated:[],
+        };
+
+        rows.forEach((row) => {
+          const group = getSetRowGroup(row);
+          if (!groups[group]) return;
+          groups[group].push({
+            n:getSetRowNum(row),
+            power:getSetRowAntimagic(row),
+            name:getSetRowName(row),
+            row,
+          });
+        });
+
+        Object.keys(groups).forEach((group) => {
+          if (!groups[group].length) return;
+          independentByGroup[group].push({
+            type,
+            base,
+            countIndexes: {
+              armor:model.exactIndex.get(`armor\u0001${type}`),
+              accessory:model.exactIndex.get(`accessory\u0001${type}`),
+              special:model.exactIndex.get(`special\u0001${type}`),
+            },
+            rows:groups[group].sort((a,b) => a.n-b.n),
+          });
+        });
+      });
+
+      const baseByGroup = {
+        armor:[],
+        accessory:[],
+        special:[],
+      };
+
+      const baseTypes = new Set();
+      model.baseIndex.forEach((_, key) => {
+        const split = key.indexOf('\u0001');
+        if (split >= 0) baseTypes.add(key.slice(split + 1));
+      });
+
+      baseTypes.forEach((base) => {
+        if (!base || linkedBases.has(base)) return;
+
+        const rows = rowsByType.get(base) || [];
+
+        ['armor','accessory','special'].forEach((group) => {
+          const compiledRows = rows
+            .filter((row) => getSetRowGroup(row) === group)
+            .map((row) => ({
+              n:getSetRowNum(row),
+              power:getSetRowAntimagic(row),
+              name:getSetRowName(row),
+              row,
+            }))
+            .filter((row) => row.n > 0)
+            .sort((a,b) => a.n-b.n);
+
+          if (!compiledRows.length) return;
+
+          baseByGroup[group].push({
+            base,
+            index:model.baseIndex.get(`${group}\u0001${base}`),
+            rows:compiledRows,
+          });
+        });
+      });
+
+      const buildPointTable = (group, field, koreanField, index) => {
+        const cap =
+          index === undefined || index < 0
+            ? 0
+            : Number(model.caps[index] || 0);
+
+        const table = new Float64Array(cap + 1);
+        const thresholdAt = new Uint32Array(cap + 1);
+
+        for (let point = 1; point <= cap; point++) {
+          let bestThreshold = 0;
+          let bestPower = 0;
+
+          setRows.forEach((row) => {
+            const threshold = toNum(row?.[field] ?? row?.[koreanField]);
+
+            if (
+              threshold > 0 &&
+              threshold <= point &&
+              threshold > bestThreshold
+            ) {
+              bestThreshold = threshold;
+              bestPower = getSetRowAntimagic(row);
+            }
+          });
+
+          table[point] = bestPower;
+          thresholdAt[point] = bestThreshold;
+        }
+
+        return { group, index, cap, table, thresholdAt };
+      };
+
+      const pointRules = {
+        armor:buildPointTable(
+          'armor',
+          'armpoint',
+          '방어구포인트',
+          model.pointIndex.armor
+        ),
+        accessory:buildPointTable(
+          'accessory',
+          'accpoint',
+          '악세포인트',
+          model.pointIndex.accessory
+        ),
+        special:buildPointTable(
+          'special',
+          'subpoint',
+          '특수장비포인트',
+          model.pointIndex.special
+        ),
+      };
+
+      // 반대편과 결합할 때만 의미가 있는 packed dimension.
+      const crossIndexSet = new Set();
+
+      crossFamilies.forEach((family) => {
+        if (family.totalIndex >= 0) crossIndexSet.add(family.totalIndex);
+        if (family.upperIndex >= 0) crossIndexSet.add(family.upperIndex);
+
+        family.thresholds.forEach((threshold) => {
+          threshold.rows.forEach((row) => {
+            if (row.typeIndex !== undefined) crossIndexSet.add(row.typeIndex);
+            if (row.baseIndex !== undefined) crossIndexSet.add(row.baseIndex);
+          });
+        });
+      });
+
+      independentByGroup.integrated.forEach((rule) => {
+        Object.values(rule.countIndexes).forEach((index) => {
+          if (index !== undefined) crossIndexSet.add(index);
+        });
+      });
+
+      const crossIndices = [...crossIndexSet].sort((a,b) => a-b);
+      const crossKinds = crossIndices.map((index) => model.dimensions[index]?.kind || '');
+      const crossCaps = crossIndices.map((index) => Number(model.caps[index] || 0));
+
+      // 교차 효과 전체의 절대 안전한 최대치.
+      // join에서 item score만으로도 현재 best를 못 넘는 pair를 빠르게 중단할 때 사용.
+      let absoluteCrossUpper = 0;
+
+      crossFamilies.forEach((family) => {
+        family.thresholds.forEach((threshold) => {
+          absoluteCrossUpper += Math.max(
+            0,
+            ...threshold.rows.map((row) => Math.max(0, row.power))
+          );
+        });
+      });
+
+      independentByGroup.integrated.forEach((rule) => {
+        rule.rows.forEach((row) => {
+          absoluteCrossUpper += Math.max(0, row.power);
+        });
+      });
+
+      return {
+        leftFamilies,
+        rightFamilies,
+        crossFamilies,
+        independentByGroup,
+        baseByGroup,
+        pointRules,
+        crossIndices,
+        crossKinds,
+        crossCaps,
+        absoluteCrossUpper,
+      };
+    }
+
+    function optimizerMitmRead(vector, index) {
+      return index === undefined || index < 0
+        ? 0
+        : Number(vector[index] || 0);
+    }
+
+    function evaluateOptimizerMitmFamily(vector, family) {
+      const totalCount = optimizerMitmRead(vector, family.totalIndex);
+      if (!totalCount) return 0;
+
+      const upperCount = optimizerMitmRead(vector, family.upperIndex);
+      let total = 0;
+
+      family.thresholds.forEach((threshold) => {
+        const n = threshold.n;
+        let upperPower = null;
+        let lowerPower = null;
+
+        threshold.rows.forEach((compiled) => {
+          let tier = compiled.staticTier;
+
+          if (!tier) {
+            const typeBits = optimizerMitmRead(vector, compiled.typeIndex);
+            const baseBits = optimizerMitmRead(vector, compiled.baseIndex);
+            const bits = typeBits || baseBits;
+
+            if (bits === 1) tier = 'lower';
+            else if (bits === 2) tier = 'upper';
+          }
+
+          if (tier === 'upper') {
+            if (upperPower === null) upperPower = compiled.power;
+          } else if (tier === 'lower') {
+            if (lowerPower === null) lowerPower = compiled.power;
+          }
+        });
+
+        if (upperPower !== null && upperCount >= n) {
+          total += upperPower;
+        } else if (lowerPower !== null && totalCount >= n) {
+          total += lowerPower;
+        }
+      });
+
+      return total;
+    }
+
+    function evaluateOptimizerMitmIndependentLocal(vector, group, rules) {
+      let total = 0;
+      const hit = new Set();
+
+      rules.independentByGroup[group].forEach((rule) => {
+        const count = optimizerMitmRead(vector, rule.countIndexes[group]);
+        if (!count) return;
+
+        rule.rows.forEach((row) => {
+          if (!(row.n > 0) || row.n > count || !row.power) return;
+          total += row.power;
+          hit.add(`${rule.base}\u0001${row.n}`);
+        });
+      });
+
+      rules.baseByGroup[group].forEach((rule) => {
+        const count = optimizerMitmRead(vector, rule.index);
+        if (!count) return;
+
+        rule.rows.forEach((row) => {
+          if (!(row.n > 0) || row.n > count || !row.power) return;
+          if (hit.has(`${rule.base}\u0001${row.n}`)) return;
+          total += row.power;
+        });
+      });
+
+      return total;
+    }
+
+    function evaluateOptimizerMitmLocal(vector, side, rules) {
+      let total = 0;
+
+      const families =
+        side === 'left'
+          ? rules.leftFamilies
+          : rules.rightFamilies;
+
+      families.forEach((family) => {
+        total += evaluateOptimizerMitmFamily(vector, family);
+      });
+
+      if (side === 'left') {
+        total += evaluateOptimizerMitmIndependentLocal(
+          vector,
+          'armor',
+          rules
+        );
+
+        const point = rules.pointRules.armor;
+        const pointValue = optimizerMitmRead(vector, point.index);
+        total += point.table[Math.min(point.cap, pointValue)] || 0;
+      } else {
+        total += evaluateOptimizerMitmIndependentLocal(
+          vector,
+          'accessory',
+          rules
+        );
+        total += evaluateOptimizerMitmIndependentLocal(
+          vector,
+          'special',
+          rules
+        );
+
+        const accessory = rules.pointRules.accessory;
+        const special = rules.pointRules.special;
+
+        const accessoryPoint =
+          optimizerMitmRead(vector, accessory.index);
+        const specialPoint =
+          optimizerMitmRead(vector, special.index);
+
+        total +=
+          accessory.table[
+            Math.min(accessory.cap, accessoryPoint)
+          ] || 0;
+
+        total +=
+          special.table[
+            Math.min(special.cap, specialPoint)
+          ] || 0;
+      }
+
+      return total;
+    }
+
+    function optimizerMitmExtractCross(vector, rules) {
+      const values = new Uint32Array(rules.crossIndices.length);
+
+      for (let i = 0; i < rules.crossIndices.length; i++) {
+        values[i] = vector[rules.crossIndices[i]] || 0;
+      }
+
+      return values;
+    }
+
+    function optimizerMitmCrossKey(values, rules) {
+      if (!values.length) return '';
+
+      let out = '';
+      const use32 = rules.crossCaps.some((cap) => cap > 0xFFFF);
+
+      if (!use32) {
+        const CHUNK = 96;
+        for (let i = 0; i < values.length; i += CHUNK) {
+          out += String.fromCharCode(
+            ...values.subarray(i, Math.min(i + CHUNK, values.length))
+          );
+        }
+        return out;
+      }
+
+      const buf = [];
+      for (let i = 0; i < values.length; i++) {
+        const value = values[i] >>> 0;
+        buf.push(value & 0xFFFF, value >>> 16);
+
+        if (buf.length >= 192) {
+          out += String.fromCharCode(...buf);
+          buf.length = 0;
+        }
+      }
+
+      if (buf.length) out += String.fromCharCode(...buf);
+      return out;
+    }
+
+    function optimizerMitmCombineCross(left, right, rules) {
+      const out = new Uint32Array(rules.crossIndices.length);
+
+      for (let i = 0; i < out.length; i++) {
+        if (rules.crossKinds[i] === 'familyTierBits') {
+          out[i] = (left[i] || 0) | (right[i] || 0);
+        } else {
+          out[i] = Math.min(
+            rules.crossCaps[i],
+            (left[i] || 0) + (right[i] || 0)
+          );
+        }
+      }
+
+      return out;
+    }
+
+    function optimizerMitmCrossToFullVector(crossValues, rules, model) {
+      const vector = new Uint32Array(model.size);
+
+      for (let i = 0; i < rules.crossIndices.length; i++) {
+        vector[rules.crossIndices[i]] = crossValues[i];
+      }
+
+      return vector;
+    }
+
+    function evaluateOptimizerMitmCross(crossValues, rules, model) {
+      if (!crossValues.length) return 0;
+
+      const vector =
+        optimizerMitmCrossToFullVector(crossValues, rules, model);
+
+      let total = 0;
+
+      rules.crossFamilies.forEach((family) => {
+        total += evaluateOptimizerMitmFamily(vector, family);
+      });
+
+      rules.independentByGroup.integrated.forEach((rule) => {
+        const count =
+          optimizerMitmRead(vector, rule.countIndexes.armor) +
+          optimizerMitmRead(vector, rule.countIndexes.accessory) +
+          optimizerMitmRead(vector, rule.countIndexes.special);
+
+        if (!count) return;
+
+        rule.rows.forEach((row) => {
+          if (row.n > 0 && row.n <= count && row.power) {
+            total += row.power;
+          }
+        });
+      });
+
+      return total;
+    }
+
+    function applyOptimizerCandidateInPlace(vector, candidate, model) {
+      const changes = [];
+
+      const write = (index, value) => {
+        const before = vector[index];
+        if (before === value) return;
+        changes.push(index, before);
+        vector[index] = value;
+      };
+
+      for (const [index, amount] of candidate._optimizerIncOps || []) {
+        const before = vector[index];
+        const after = Math.min(
+          model.caps[index],
+          before + amount
+        );
+        write(index, after);
+      }
+
+      for (const [index, bit] of candidate._optimizerBitOps || []) {
+        write(index, vector[index] | bit);
+      }
+
+      return changes;
+    }
+
+    function restoreOptimizerCandidateInPlace(vector, changes) {
+      for (let i = changes.length - 2; i >= 0; i -= 2) {
+        vector[changes[i]] = changes[i + 1];
+      }
+    }
+
+    async function enumerateOptimizerMitmHalf({
+      side,
+      slots,
+      startSlotIndex,
+      bySlot,
+      model,
+      rules,
+      onProgress,
+    }) {
+      const groups = new Map();
+      const vector = new Uint32Array(model.size);
+
+      let rawLeaves = 0;
+      let transitions = 0;
+
+      const dfs = async (depth, itemPower, pathCode) => {
+        if (depth >= slots.length) {
+          rawLeaves++;
+
+          const localBonus =
+            evaluateOptimizerMitmLocal(vector, side, rules);
+
+          const localScore = itemPower + localBonus;
+          const crossValues =
+            optimizerMitmExtractCross(vector, rules);
+
+          const crossKey =
+            optimizerMitmCrossKey(crossValues, rules);
+
+          const prev = groups.get(crossKey);
+
+          if (!prev || localScore > prev.score) {
+            groups.set(crossKey, {
+              score:localScore,
+              itemPower,
+              localBonus,
+              crossValues,
+              pathCode,
+              ways:1n,
+            });
+          } else if (localScore === prev.score) {
+            prev.ways += 1n;
+          }
+
+          if (rawLeaves % OPTIMIZER_MITM_YIELD_EVERY === 0) {
+            onProgress?.({
+              phase:'mitm-half',
+              side,
+              rawLeaves,
+              groupCount:groups.size,
+            });
+            await yieldOptimizerThread();
+          }
+
+          return;
+        }
+
+        const slot = slots[depth];
+        const candidates = bySlot[slot] || [];
+
+        for (
+          let candidateIndex = 0;
+          candidateIndex < candidates.length;
+          candidateIndex++
+        ) {
+          const candidate = candidates[candidateIndex];
+          const changes =
+            applyOptimizerCandidateInPlace(vector, candidate, model);
+
+          transitions++;
+
+          await dfs(
+            depth + 1,
+            itemPower + toNum(candidate.antimagic),
+            pathCode + encodeOptimizerPathChoice(candidateIndex)
+          );
+
+          restoreOptimizerCandidateInPlace(vector, changes);
+        }
+      };
+
+      await dfs(0, 0, '');
+
+      return {
+        groups:[...groups.values()],
+        rawLeaves,
+        transitions,
+        startSlotIndex,
+      };
+    }
+
+    function buildOptimizerMitmFullPathCode(leftCode, rightCode) {
+      return leftCode + rightCode;
     }
 
     function getDefaultRareCandidate(slotKey) {
@@ -4431,14 +5275,9 @@
       return filledSlots;
     }
 
-    // 1105:
-    // - 작은/중간 상태 구간은 기존 exact DP로 동일 상태를 합친다.
-    // - 다음 layer가 너무 커질 것으로 예상되면 더 이상 거대한 Map을 만들지 않고
-    //   그 지점에서 남은 부위를 exact DFS + Branch & Bound로 스트리밍 탐색한다.
-    // 이 전환 기준은 "계산 방법"만 바꿀 뿐 조합을 임의 삭제하지 않는다.
+    // ===== 1107 exact MITM =====
     const OPTIMIZER_RESULT_SAMPLE_LIMIT = 200;
     const OPTIMIZER_YIELD_EVERY = 2500;
-    const OPTIMIZER_STREAM_SWITCH_TRANSITIONS = 1600000;
 
     function yieldOptimizerThread() {
       return new Promise((resolve) => {
@@ -4463,304 +5302,196 @@
 
       const setRows = getListArray('set:list');
       const ruleContext = buildSetRuleContext(setRows);
-      const stateModel = buildOptimizerPackedStateModel(setRows, ruleContext);
-      prepareOptimizerCandidateOps(bySlot, stateModel);
+      const model =
+        buildOptimizerPackedStateModel(setRows, ruleContext);
 
-      const bounds = buildOptimizerSuffixBounds(bySlot);
-      const greedySeed = buildGreedyOptimizerSeed(bySlot, setRows, ruleContext);
+      prepareOptimizerCandidateOps(bySlot, model);
 
-      let best = greedySeed.total;
-      let bestCount = best > -Infinity ? 1n : 0n;
-      const combos = [];
+      // row/filter/map 반복을 실제 탐색 전에 숫자 규칙으로 컴파일.
+      const mitmRules =
+        buildOptimizerMitmRules(setRows, ruleContext, model);
 
-      if (greedySeed.items.length) {
-        combos.push({
-          items:greedySeed.items,
-          itemPower:greedySeed.itemPower,
-          setPower:greedySeed.setEval.total,
-          total:greedySeed.total,
-          effects:greedySeed.setEval.effects,
-        });
-      }
+      const leftSlots =
+        OPTIMIZER_SLOT_ORDER.slice(0, OPTIMIZER_MITM_SPLIT);
 
-      let states = new Map();
-      const initialVector = makeInitialOptimizerPackedState(stateModel);
-      states.set(optimizerPackedStateKey(initialVector, stateModel), {
-        vector:initialVector,
-        itemPower:0,
-        pathCode:'',
-        ways:1n,
+      const rightSlots =
+        OPTIMIZER_SLOT_ORDER.slice(OPTIMIZER_MITM_SPLIT);
+
+      // 1) 방어구 5부위 모든 조합
+      const leftResult = await enumerateOptimizerMitmHalf({
+        side:'left',
+        slots:leftSlots,
+        startSlotIndex:0,
+        bySlot,
+        model,
+        rules:mitmRules,
+        onProgress,
       });
 
-      let processedTransitions = 0;
-      let prunedBranches = 0;
-      let streamStartDepth = OPTIMIZER_SLOT_ORDER.length;
+      onProgress?.({
+        phase:'mitm-half-complete',
+        side:'left',
+        rawLeaves:leftResult.rawLeaves,
+        groupCount:leftResult.groups.length,
+      });
+      await yieldOptimizerThread();
 
-      // ===== 1단계: 압축 DP frontier 생성 =====
-      for (let slotIndex = 0; slotIndex < OPTIMIZER_SLOT_ORDER.length; slotIndex++) {
-        const slot = OPTIMIZER_SLOT_ORDER[slotIndex];
-        const candidates = bySlot[slot] || [];
+      // 2) 악세 + 특수 6부위 모든 조합
+      const rightResult = await enumerateOptimizerMitmHalf({
+        side:'right',
+        slots:rightSlots,
+        startSlotIndex:OPTIMIZER_MITM_SPLIT,
+        bySlot,
+        model,
+        rules:mitmRules,
+        onProgress,
+      });
 
-        const projectedTransitions = states.size * Math.max(1, candidates.length);
+      onProgress?.({
+        phase:'mitm-half-complete',
+        side:'right',
+        rawLeaves:rightResult.rawLeaves,
+        groupCount:rightResult.groups.length,
+      });
+      await yieldOptimizerThread();
 
-        // 이 layer를 Map으로 완전히 물질화하면 메모리가 크게 튈 것으로 보이면
-        // 현재 frontier에서 곧바로 스트리밍 exact 탐색으로 전환한다.
+      const leftGroups =
+        leftResult.groups.sort((a,b) => b.score - a.score);
+
+      const rightGroups =
+        rightResult.groups.sort((a,b) => b.score - a.score);
+
+      // 높은 로컬 점수끼리 먼저 결합해서 best를 빠르게 올린다.
+      // 정렬은 계산 순서만 바꾸며 정확도에는 영향이 없다.
+      let best = -Infinity;
+      let bestCount = 0n;
+      const combos = [];
+
+      let pairChecks = 0;
+      let pairPruned = 0;
+
+      // 같은 최종 교차 상태는 cross bonus도 완전히 같으므로 캐시.
+      const crossBonusCache = new Map();
+
+      const getCrossBonus = (left, right) => {
+        const combined =
+          optimizerMitmCombineCross(
+            left.crossValues,
+            right.crossValues,
+            mitmRules
+          );
+
+        const key =
+          optimizerMitmCrossKey(combined, mitmRules);
+
+        const cached = crossBonusCache.get(key);
+        if (cached !== undefined) {
+          return { bonus:cached, combinedKey:key };
+        }
+
+        const bonus =
+          evaluateOptimizerMitmCross(
+            combined,
+            mitmRules,
+            model
+          );
+
+        crossBonusCache.set(key, bonus);
+
+        return { bonus, combinedKey:key };
+      };
+
+      const maxCross = mitmRules.absoluteCrossUpper;
+
+      for (let li = 0; li < leftGroups.length; li++) {
+        const left = leftGroups[li];
+
         if (
-          slotIndex > 0 &&
-          projectedTransitions > OPTIMIZER_STREAM_SWITCH_TRANSITIONS
+          rightGroups.length &&
+          left.score +
+            rightGroups[0].score +
+            maxCross <
+            best
         ) {
-          streamStartDepth = slotIndex;
-          onProgress?.({
-            phase:'stream-switch',
-            slot,
-            slotIndex,
-            slotCount:OPTIMIZER_SLOT_ORDER.length,
-            stateCount:states.size,
-            projectedTransitions,
-            prunedBranches,
-          });
-          await yieldOptimizerThread();
+          // 이후 left는 score가 더 낮으므로 전부 불가능.
+          pairPruned +=
+            (leftGroups.length - li) * rightGroups.length;
           break;
         }
 
-        const nextStates = new Map();
+        for (let ri = 0; ri < rightGroups.length; ri++) {
+          const right = rightGroups[ri];
 
-        for (const state of states.values()) {
-          for (let candidateIndex = 0; candidateIndex < candidates.length; candidateIndex++) {
-            const candidate = candidates[candidateIndex];
-            const vector = advanceOptimizerPackedState(state.vector, candidate, stateModel);
-            const itemPower = state.itemPower + candidate.antimagic;
+          const itemUpper =
+            left.score + right.score + maxCross;
 
-            // 현재 상태에서 남은 모든 부위를 가장 낙관적으로 잡아도 best 미만이면 제거.
-            // upper bound가 과대평가될 수는 있어도 과소평가되지는 않도록 만든다.
-            const nextDepth = slotIndex + 1;
-            const upperBound =
-              itemPower +
-              bounds.suffixMaxItem[nextDepth] +
-              estimatePackedSetUpperBound(
-                vector,
-                nextDepth,
-                setRows,
-                ruleContext,
-                stateModel,
-                bounds
-              );
+          if (itemUpper < best) {
+            // right도 score 내림차순이므로 이후 pair 모두 불가능.
+            pairPruned += rightGroups.length - ri;
+            break;
+          }
 
-            if (upperBound < best) {
-              prunedBranches++;
-              continue;
-            }
+          const { bonus } = getCrossBonus(left, right);
+          const total = left.score + right.score + bonus;
 
-            const key = optimizerPackedStateKey(vector, stateModel);
-            const prev = nextStates.get(key);
+          pairChecks++;
 
-            if (!prev || itemPower > prev.itemPower) {
-              nextStates.set(key, {
-                vector,
+          if (total > best) {
+            best = total;
+            bestCount = 0n;
+            combos.length = 0;
+          }
+
+          if (total === best) {
+            const ways = left.ways * right.ways;
+            bestCount += ways;
+
+            if (combos.length < OPTIMIZER_MITM_RESULT_LIMIT) {
+              const pathCode =
+                buildOptimizerMitmFullPathCode(
+                  left.pathCode,
+                  right.pathCode
+                );
+
+              const items =
+                decodeOptimizerPath(pathCode, bySlot);
+
+              // 결과 표시 effects는 최종 대표 조합에서 기존 정식 evaluator로 산출.
+              // 탐색 점수와 별개로 UI 표기를 기존 계산 규칙 그대로 유지한다.
+              const itemPower =
+                items.reduce(
+                  (sum, item) =>
+                    sum + toNum(item.antimagic),
+                  0
+                );
+
+              const setEval =
+                evaluateSetAntimagic(
+                  items,
+                  setRows,
+                  ruleContext
+                );
+
+              combos.push({
+                items,
                 itemPower,
-                pathCode:state.pathCode + encodeOptimizerPathChoice(candidateIndex),
-                ways:state.ways,
+                setPower:setEval.total,
+                total:itemPower + setEval.total,
+                effects:setEval.effects,
               });
-            } else if (itemPower === prev.itemPower) {
-              prev.ways += state.ways;
-            }
-
-            processedTransitions++;
-            if (processedTransitions % OPTIMIZER_YIELD_EVERY === 0) {
-              onProgress?.({
-                phase:'dp',
-                slot,
-                slotIndex,
-                slotCount:OPTIMIZER_SLOT_ORDER.length,
-                stateCount:nextStates.size,
-                processedTransitions,
-                prunedBranches,
-              });
-              await yieldOptimizerThread();
             }
           }
-        }
 
-        states.clear();
-        states = nextStates;
-
-        onProgress?.({
-          phase:'slot-complete',
-          slot,
-          slotIndex,
-          slotCount:OPTIMIZER_SLOT_ORDER.length,
-          stateCount:states.size,
-          processedTransitions,
-          prunedBranches,
-        });
-        await yieldOptimizerThread();
-
-        if (!states.size) break;
-      }
-
-      let evaluatedLeaves = 0;
-
-      const registerLeaf = (vector, itemPower, pathCode, ways) => {
-        const setEval = evaluatePackedSetAntimagic(vector, setRows, ruleContext, stateModel);
-        const total = itemPower + setEval.total;
-
-        if (total > best) {
-          best = total;
-          bestCount = 0n;
-          combos.length = 0;
-        }
-
-        if (total === best) {
-          bestCount += ways;
-
-          if (combos.length < OPTIMIZER_RESULT_SAMPLE_LIMIT) {
-            const items = decodeOptimizerPath(pathCode, bySlot);
-            combos.push({
-              items,
-              itemPower,
-              setPower:setEval.total,
-              total,
-              effects:setEval.effects,
-            });
-          }
-        }
-      };
-
-      // ===== 2단계 A: 전 부위를 DP로 끝냈다면 final state만 평가 =====
-      if (streamStartDepth >= OPTIMIZER_SLOT_ORDER.length) {
-        let evaluatedStates = 0;
-
-        for (const state of states.values()) {
-          registerLeaf(state.vector, state.itemPower, state.pathCode, state.ways);
-
-          evaluatedStates++;
-          if (evaluatedStates % OPTIMIZER_YIELD_EVERY === 0) {
+          if (pairChecks % OPTIMIZER_MITM_YIELD_EVERY === 0) {
             onProgress?.({
-              phase:'evaluate',
-              evaluatedStates,
-              totalStates:states.size,
-              prunedBranches,
-            });
-            await yieldOptimizerThread();
-          }
-        }
-      } else {
-        // ===== 2단계 B: 남은 부위는 Map을 만들지 않고 DFS 스트리밍 =====
-        const candidateOrders = Object.create(null);
-
-        for (let i = streamStartDepth; i < OPTIMIZER_SLOT_ORDER.length; i++) {
-          const slot = OPTIMIZER_SLOT_ORDER[i];
-          const candidates = bySlot[slot] || [];
-          candidateOrders[slot] = candidates
-            .map((_, index) => index)
-            .sort((a,b) => toNum(candidates[b].antimagic) - toNum(candidates[a].antimagic));
-        }
-
-        let searchSteps = 0;
-
-        const dfs = async (depth, vector, itemPower, pathCode, ways) => {
-          if (depth >= OPTIMIZER_SLOT_ORDER.length) {
-            registerLeaf(vector, itemPower, pathCode, ways);
-            evaluatedLeaves++;
-
-            if (evaluatedLeaves % OPTIMIZER_YIELD_EVERY === 0) {
-              onProgress?.({
-                phase:'stream',
-                depth,
-                evaluatedLeaves,
-                frontierStates:states.size,
-                prunedBranches,
-              });
-              await yieldOptimizerThread();
-            }
-            return;
-          }
-
-          const upperBound =
-            itemPower +
-            bounds.suffixMaxItem[depth] +
-            estimatePackedSetUpperBound(
-              vector,
-              depth,
-              setRows,
-              ruleContext,
-              stateModel,
-              bounds
-            );
-
-          if (upperBound < best) {
-            prunedBranches++;
-            return;
-          }
-
-          const slot = OPTIMIZER_SLOT_ORDER[depth];
-          const candidates = bySlot[slot] || [];
-          const order = candidateOrders[slot] || candidates.map((_, index) => index);
-
-          for (const candidateIndex of order) {
-            const candidate = candidates[candidateIndex];
-            const nextVector = advanceOptimizerPackedState(vector, candidate, stateModel);
-            const nextItemPower = itemPower + candidate.antimagic;
-            const nextDepth = depth + 1;
-
-            const childUpper =
-              nextItemPower +
-              bounds.suffixMaxItem[nextDepth] +
-              estimatePackedSetUpperBound(
-                nextVector,
-                nextDepth,
-                setRows,
-                ruleContext,
-                stateModel,
-                bounds
-              );
-
-            if (childUpper < best) {
-              prunedBranches++;
-              continue;
-            }
-
-            searchSteps++;
-            if (searchSteps % OPTIMIZER_YIELD_EVERY === 0) {
-              onProgress?.({
-                phase:'stream',
-                depth:nextDepth,
-                evaluatedLeaves,
-                frontierStates:states.size,
-                prunedBranches,
-                searchSteps,
-              });
-              await yieldOptimizerThread();
-            }
-
-            await dfs(
-              nextDepth,
-              nextVector,
-              nextItemPower,
-              pathCode + encodeOptimizerPathChoice(candidateIndex),
-              ways
-            );
-          }
-        };
-
-        let frontierIndex = 0;
-        for (const state of states.values()) {
-          await dfs(
-            streamStartDepth,
-            state.vector,
-            state.itemPower,
-            state.pathCode,
-            state.ways
-          );
-
-          frontierIndex++;
-          if (frontierIndex % 250 === 0) {
-            onProgress?.({
-              phase:'stream-frontier',
-              frontierIndex,
-              frontierTotal:states.size,
-              evaluatedLeaves,
-              prunedBranches,
+              phase:'mitm-join',
+              leftIndex:li + 1,
+              leftTotal:leftGroups.length,
+              rightIndex:ri + 1,
+              rightTotal:rightGroups.length,
+              pairChecks,
+              pairPruned,
+              crossCache:crossBonusCache.size,
             });
             await yieldOptimizerThread();
           }
@@ -4773,10 +5504,14 @@
         best,
         combos,
         bestCount,
-        resultSampleLimit:OPTIMIZER_RESULT_SAMPLE_LIMIT,
-        packedStateWidth:stateModel.size,
-        prunedBranches,
-        streamStartDepth,
+        resultSampleLimit:OPTIMIZER_MITM_RESULT_LIMIT,
+        packedStateWidth:model.size,
+        mitmLeftRaw:leftResult.rawLeaves,
+        mitmRightRaw:rightResult.rawLeaves,
+        mitmLeftGroups:leftGroups.length,
+        mitmRightGroups:rightGroups.length,
+        mitmPairChecks:pairChecks,
+        mitmPairPruned:pairPruned,
       };
     }
 
@@ -4953,16 +5688,14 @@
         const bySlot = collectActivatedCandidates();
         const activeCount = OPTIMIZER_SLOT_ORDER.reduce((sum, slot) => sum + (bySlot[slot]?.length || 0), 0);
         const result = await findBestAntimagicCombinations(bySlot, (progress) => {
-          if (progress.phase === 'dp' || progress.phase === 'slot-complete') {
-            const current = Math.min(progress.slotIndex + 1, progress.slotCount);
-            optimizerStatus.textContent = `최고 항마력 조합 계산 중... ${current}/${progress.slotCount}부위 · 상태 ${Number(progress.stateCount || 0).toLocaleString('ko-KR')}개 · 가지치기 ${Number(progress.prunedBranches || 0).toLocaleString('ko-KR')}개`;
-          } else if (progress.phase === 'stream-switch') {
-            const current = Math.min(progress.slotIndex + 1, progress.slotCount);
-            optimizerStatus.textContent = `메모리 절약 분할 탐색으로 전환... ${current}/${progress.slotCount}부위 · 기준 상태 ${Number(progress.stateCount || 0).toLocaleString('ko-KR')}개`;
-          } else if (progress.phase === 'stream' || progress.phase === 'stream-frontier') {
-            optimizerStatus.textContent = `분할 Branch & Bound 탐색 중... 완료 조합 ${Number(progress.evaluatedLeaves || 0).toLocaleString('ko-KR')}개 · 가지치기 ${Number(progress.prunedBranches || 0).toLocaleString('ko-KR')}개`;
-          } else if (progress.phase === 'evaluate') {
-            optimizerStatus.textContent = `최종 세트/포인트 항마력 비교 중... ${Number(progress.evaluatedStates || 0).toLocaleString('ko-KR')} / ${Number(progress.totalStates || 0).toLocaleString('ko-KR')}`;
+          if (progress.phase === 'mitm-half') {
+            const sideText = progress.side === 'left' ? '방어구 5부위' : '악세/특수 6부위';
+            optimizerStatus.textContent = `${sideText} 분할 계산 중... 원시 조합 ${Number(progress.rawLeaves || 0).toLocaleString('ko-KR')}개 · 압축 상태 ${Number(progress.groupCount || 0).toLocaleString('ko-KR')}개`;
+          } else if (progress.phase === 'mitm-half-complete') {
+            const sideText = progress.side === 'left' ? '방어구' : '악세/특수';
+            optimizerStatus.textContent = `${sideText} 분할 계산 완료 · 원시 조합 ${Number(progress.rawLeaves || 0).toLocaleString('ko-KR')}개 → 교차 상태 ${Number(progress.groupCount || 0).toLocaleString('ko-KR')}개`;
+          } else if (progress.phase === 'mitm-join') {
+            optimizerStatus.textContent = `분할 결과 결합 중... ${Number(progress.leftIndex || 0).toLocaleString('ko-KR')} / ${Number(progress.leftTotal || 0).toLocaleString('ko-KR')} · 실제 비교 ${Number(progress.pairChecks || 0).toLocaleString('ko-KR')}개 · 생략 ${Number(progress.pairPruned || 0).toLocaleString('ko-KR')}개`;
           }
         });
         renderOptimizerResults(result);
