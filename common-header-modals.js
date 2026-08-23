@@ -594,11 +594,105 @@
     });
   }
 
+  let replyCheckInFlight = false;
+  let lastReplyCheckAt = 0;
+  const REPLY_CHECK_INTERVAL_MS = 60 * 1000;
+
+  function openReplyPopup(info) {
+    if (!info || typeof info !== 'object') return;
+
+    const modal = document.getElementById('chm-replyModal');
+    if (!modal) return;
+
+    const original = document.getElementById('chm-replyOriginal');
+    const answer = document.getElementById('chm-replyAnswer');
+    const dontShow = document.getElementById('chm-replyDontShow');
+
+    if (original) original.textContent = String(info.talk || '(문의 내용 없음)');
+    if (answer) answer.textContent = String(info.reply || '');
+    if (dontShow) dontShow.checked = false;
+
+    window.__chmPendingReplyRow = Number(info.row) || null;
+    show('chm-replyModal');
+  }
+
+  async function checkPendingReply({ force = false } = {}) {
+    const token = getToken();
+
+    // 비로그인은 mail 시트 답장 팝업을 받을 수 없다.
+    if (!token || token.startsWith('GUEST.')) return null;
+
+    const now = Date.now();
+    if (replyCheckInFlight) return null;
+    if (!force && lastReplyCheckAt && (now - lastReplyCheckAt) < REPLY_CHECK_INTERVAL_MS) return null;
+
+    replyCheckInFlight = true;
+    lastReplyCheckAt = now;
+
+    try {
+      // 기존 백엔드 login_ping이 mail 시트의 reply/popup 상태를 함께 내려준다.
+      const res = await apiJSON('login_ping', {});
+      if (res?.ok && res?.pendingReply) {
+        openReplyPopup(res.pendingReply);
+        return res.pendingReply;
+      }
+    } catch (error) {
+      // 답장 확인 실패가 페이지 이용 자체를 방해하지 않도록 조용히 처리한다.
+      console.warn('[common reply check] login_ping failed:', error);
+    } finally {
+      replyCheckInFlight = false;
+    }
+
+    return null;
+  }
+
+  function bindReplyPopup() {
+    const confirmButton = document.getElementById('chm-replyConfirmBtn');
+    if (!confirmButton || confirmButton.dataset.commonBound) return;
+    confirmButton.dataset.commonBound = '1';
+
+    confirmButton.addEventListener('click', async () => {
+      const dontShow = document.getElementById('chm-replyDontShow');
+      const row = Number(window.__chmPendingReplyRow || 0);
+      const shouldAck = !!dontShow?.checked && row >= 2;
+
+      // 체크하지 않은 경우에는 이번에만 닫고 popup=Y는 그대로 둔다.
+      if (!shouldAck) {
+        hide('chm-replyModal');
+        return;
+      }
+
+      try {
+        confirmButton.disabled = true;
+        const res = await apiJSON('contact_ack', { row });
+        if (!res?.ok) throw new Error(res?.error || 'contact_ack_fail');
+
+        window.__chmPendingReplyRow = null;
+        hide('chm-replyModal');
+      } catch (error) {
+        console.warn('[common reply ack] failed:', error);
+        alert('답장 확인 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      } finally {
+        confirmButton.disabled = false;
+      }
+    });
+  }
+
   function init() {
     if (window.__COMMON_HEADER_MODALS_INITIALIZED__) return;
     window.__COMMON_HEADER_MODALS_INITIALIZED__ = true;
     ensureMount();
     bindContactSend();
+    bindReplyPopup();
+
+    // 페이지 진입 시 한 번 확인하고, 같은 페이지를 오래 열어둔 경우에는
+    // 다시 포커스를 얻을 때 최대 1분 간격으로 새 답장을 확인한다.
+    setTimeout(() => checkPendingReply({ force: true }), 0);
+    window.addEventListener('focus', () => checkPendingReply());
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') checkPendingReply();
+    });
+
     document.getElementById('chm-boardNicknameEditSave')?.addEventListener('click', saveBoardNicknameEdit);
     document.getElementById('chm-boardNicknameEditInput')?.addEventListener('keydown', event => {
       if (event.key === 'Enter') {
@@ -634,6 +728,7 @@
         show('chm-oneLinerModal');
         const c=document.getElementById('chm-oneLinerCooldown'); if(c) c.textContent='현재 페이지에서는 로그인 정보를 확인한 뒤 이용할 수 있습니다.';
       },
+      checkPendingReply(force = true) { return checkPendingReply({ force }); },
       close: hide,
     };
     document.addEventListener('click', e => {
@@ -642,6 +737,7 @@
       if (t.closest?.('[data-faq-close]')) hide('chm-faqModal');
       if (t.closest?.('[data-faqans-close]')) hide('chm-faqAnswerModal');
       if (t.closest?.('[data-faqans-back]')) { hide('chm-faqAnswerModal'); window.CommonHeaderModals.openFaq(); }
+      if (t.closest?.('[data-reply-close]')) hide('chm-replyModal');
       if (t.closest?.('[data-my-usage-close]')) hide('chm-myUsageInfoModal');
       if (t.closest?.('[data-board-nickname-edit]')) openBoardNicknameEditModal();
       if (t.closest?.('[data-one-liner-edit]')) {
