@@ -607,7 +607,26 @@
       }
     });
     window.CommonHeaderModals = {
-      openContact() { show('chm-contactModal'); document.getElementById('chm-contactTalk')?.focus(); },
+      openContact() {
+        const token = getToken();
+        const isGuest = !token || token.startsWith('GUEST.');
+        const guestField = document.getElementById('chm-contactGuestField');
+        const guestNickname = document.getElementById('chm-contactGuestNickname');
+        const talk = document.getElementById('chm-contactTalk');
+
+        // 비로그인/GUEST 문의일 때만 닉네임 입력란을 표시한다.
+        guestField?.classList.toggle('show', isGuest);
+        if (guestNickname) {
+          guestNickname.disabled = !isGuest;
+          guestNickname.setAttribute('aria-hidden', isGuest ? 'false' : 'true');
+        }
+
+        show('chm-contactModal');
+        setTimeout(() => {
+          if (isGuest) guestNickname?.focus();
+          else talk?.focus();
+        }, 0);
+      },
       openFaq() { show('chm-faqModal'); loadFaq(); },
       openUsage() { show('chm-myUsageInfoModal'); loadUsage(); },
       openOneLiner() {
