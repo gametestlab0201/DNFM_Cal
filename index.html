@@ -1180,11 +1180,53 @@
       margin-top: 0;
     }
 
+    /* 메인 비주얼/공지 영역과 bottom 배너 사이의 PIN 로그인 진입 */
+    .main-pin-login-row {
+      width: 100%;
+      height: 8px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      margin-top: 2px;
+      overflow: hidden;
+    }
+
+    .main-pin-login-btn {
+      /* 관리자만 위치를 아는 비밀 진입 버튼: 화면에는 완전히 보이지 않게 유지 */
+      appearance: none;
+      width: 56px;
+      height: 8px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: transparent;
+      opacity: 0;
+      box-shadow: none;
+      outline: none;
+      cursor: default;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .main-pin-login-btn:hover,
+    .main-pin-login-btn:focus,
+    .main-pin-login-btn:focus-visible,
+    .main-pin-login-btn:active,
+    .main-pin-login-btn:disabled {
+      border: 0;
+      background: transparent;
+      color: transparent;
+      opacity: 0;
+      box-shadow: none;
+      outline: none;
+      cursor: default;
+    }
+
     /* 로그인 메인 하단 가로형 유튜브 홍보 배너 */
     .login-bottom-promo {
       width: 100%;
       display: block;
-      margin-top: 16px;
+      margin-top: 4px;
       text-decoration: none;
       cursor: pointer;
       overflow: hidden;
@@ -1221,7 +1263,7 @@
 
     @media (max-width: 980px) {
       .login-bottom-promo {
-        margin-top: 12px;
+        margin-top: 4px;
         border-radius: 10px;
       }
 
@@ -10273,10 +10315,10 @@
                   <li>계산기 사용법 <a class="guide-video-link" href="https://www.youtube.com/channel/UCijUV3SuVe_qErzBpdOmKIA/join" target="_blank"
                       rel="noopener">영상</a> 보러가기! </li>
                   <li>08.19 <span class="notice-badge">게임실험연구소 던파모바일 2.0 계산기</span> 오픈!</li>
-                  <li>08.21 캐릭터 3종 계산 추가</li>
-                  <li>08.22 불여우셋 크리티컬 오류 수정</li>
-                  <li>08.23 <span class="notice-badge">항마력 최적화 계산기</span> 오픈!</li>
-                  <li>08.23 항마력 계산기 메모리 최적화 패치</li>
+                  <li>08.19 밀짚인형 세트 모타피 중복 버그 수정</li>
+                  <li>08.19 엘다/베르딜/스쿨디 세트 버그 수정</li>
+                  <li>08.20 [모바일] 11세트 선택 불가능 현상 수정</li>
+                  <li>08.20 [모바일] 특성옵션 선택 UI 변경</li>
 
                 </ul>
               </div>
@@ -10288,6 +10330,11 @@
               </div>
             </aside>
           </div>
+        </div>
+
+        <div class="main-pin-login-row">
+          <button id="btnMainPinLogin" class="main-pin-login-btn" type="button"
+            aria-label="관리자 로그인">PIN 로그인</button>
         </div>
 
         <!-- 광고 승인 전: 로그인 메인 하단 유튜브 홍보 배너 -->
@@ -10398,6 +10445,53 @@
 
     const SETTING_STATUS_URL = './setting-analyzer/index.html';
     const MAIN_AUTH_API = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
+
+    async function mainPinLogin() {
+      const pin = prompt('PIN 번호를 입력해주세요.');
+      if (pin == null) return;
+
+      const cleanPin = String(pin || '').trim();
+      if (!cleanPin) {
+        alert('PIN 번호를 입력해주세요.');
+        return;
+      }
+
+      const button = document.getElementById('btnMainPinLogin');
+
+      try {
+        if (button) {
+          button.disabled = true;
+          button.textContent = '확인 중...';
+        }
+
+        const response = await fetch(`${MAIN_AUTH_API}?type=admin_pin_login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin: cleanPin })
+        });
+
+        const result = await response.json().catch(() => ({
+          ok: false,
+          message: '서버 응답을 확인하지 못했습니다.'
+        }));
+
+        if (!response.ok || !result?.ok || !result?.token) {
+          throw new Error(result?.message || result?.error || 'PIN 로그인이 실패했습니다.');
+        }
+
+        // 백엔드가 발급한 ADMINPIN 세션 토큰을 기존 로그인 성공 흐름에 태운다.
+        window.onGoogleCredential?.({ credential: result.token });
+      } catch (error) {
+        console.error('[main-pin-login]', error);
+        alert(error?.message || 'PIN 로그인이 실패했습니다.');
+      } finally {
+        if (button) {
+          button.disabled = false;
+          button.textContent = 'PIN 로그인';
+        }
+      }
+    }
+
     let settingStatusResearchAllowed = false;
     let settingStatusAccessChecked = false;
 
@@ -10471,6 +10565,8 @@
       setupMainQuickCharacterThumbFallbacks();
       updateSettingStatusCardAccess();
       refreshSettingStatusResearchAccess();
+
+      document.getElementById('btnMainPinLogin')?.addEventListener('click', mainPinLogin);
 
       const settingCard = document.getElementById('btnMainQuickSettingStatus');
       settingCard?.addEventListener('click', () => {

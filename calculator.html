@@ -28820,6 +28820,280 @@ try {
       return s;
     }
 
+
+    // ============================================================
+    // 구형 저장슬롯 호환 복구
+    // - 삭제된 몬스터명은 현재 monster:list의 기본 몬스터로 교체
+    // - 시즌/등급 정보가 빠진 핵심 장비는 현재 장비 시트 데이터로 재수화
+    // ============================================================
+    function _normalizePresetLookupName_pc(v) {
+      return String(v ?? '')
+        .normalize('NFC')
+        .replace(/[\u200B-\u200D\u2060\uFEFF]/g, '')
+        .trim();
+    }
+
+    function repairLoadedPresetMonster_pc(s) {
+      if (!s || typeof s !== 'object') return false;
+
+      const src =
+        (window.CORE?.lists?.['monster:list']) ||
+        (window.CORE_DATA?.['monster:list']) ||
+        [];
+
+      const rows = Array.isArray(src) ? src : [];
+      const names = rows
+        .map((x) => _normalizePresetLookupName_pc(
+          typeof x === 'string'
+            ? x
+            : (x?.monName ?? x?.['몬스터명'] ?? x?.monsterName ?? x?.name ?? '')
+        ))
+        .filter(Boolean);
+
+      if (!names.length) return false;
+
+      const current = _normalizePresetLookupName_pc(
+        s?.monster?.name ||
+        s.monsterName ||
+        s?.lastFinalCompute?.computePayload?.monster?.name ||
+        ''
+      );
+
+      if (current && names.includes(current)) {
+        s.monster = {
+          ...(s.monster && typeof s.monster === 'object' ? s.monster : {}),
+          name: current
+        };
+        s.monsterName = current;
+
+        const sel = document.getElementById('selMonster');
+        if (sel && Array.from(sel.options || []).some(o => String(o.value || '').trim() === current)) {
+          sel.value = current;
+        }
+        return false;
+      }
+
+      const defaultName = _normalizePresetLookupName_pc(
+        rows.find((x) => String(x?.base ?? x?.['기본여부'] ?? '').trim() === '기본')?.monName ||
+        rows.find((x) => String(x?.base ?? x?.['기본여부'] ?? '').trim() === '기본')?.['몬스터명'] ||
+        (names.includes('거대누골') ? '거대누골' : names[0])
+      );
+
+      if (!defaultName) return false;
+
+      s.monster = { name: defaultName };
+      s.monsterName = defaultName;
+
+      // 삭제된 몬스터가 lastFinalCompute에 남아 다시 살아나는 것도 방지
+      if (s.lastFinalCompute?.computePayload?.monster) {
+        s.lastFinalCompute.computePayload.monster = { name: defaultName };
+      }
+
+      const sel = document.getElementById('selMonster');
+      if (sel && Array.from(sel.options || []).some(o => String(o.value || '').trim() === defaultName)) {
+        sel.value = defaultName;
+      }
+
+      return true;
+    }
+
+    async function repairLoadedPresetEquipment_pc(s) {
+      if (!s || typeof s !== 'object') {
+        return { changed: false, constraintsReady: false, unresolvedSlots: [] };
+      }
+
+      s.selections = (s.selections && typeof s.selections === 'object') ? s.selections : {};
+      s.equips = (s.equips && typeof s.equips === 'object') ? s.equips : {};
+      s.equip = (s.equip && typeof s.equip === 'object') ? s.equip : {};
+
+      const slots = ['weapon', 'top', 'bracelet', 'earring'];
+      const unresolvedSlots = [];
+      let changed = false;
+
+      const hasCurrentConstraintMeta = (slotKey, item) => {
+        if (!item || typeof item !== 'object') return true; // 미착용 슬롯
+        const raw = item?._raw || item?.raw || {};
+        const season = String(
+          item?.season ??
+          item?.['시즌'] ??
+          raw?.season ??
+          raw?.['시즌'] ??
+          ''
+        ).trim();
+        const rarity = String(
+          item?.rarity ??
+          item?.['레어리티'] ??
+          item?.['희귀도'] ??
+          item?.['등급'] ??
+          raw?.rarity ??
+          raw?.['레어리티'] ??
+          raw?.['희귀도'] ??
+          raw?.['등급'] ??
+          ''
+        ).trim();
+
+        if (slotKey === 'weapon') {
+          const level = Number(
+            String(
+              item?.level ??
+              item?.levelVal ??
+              raw?.['레벨제한'] ??
+              raw?.['렙제'] ??
+              raw?.level ??
+              raw?.reqLevel ??
+              ''
+            ).replace(/[^\d.-]/g, '')
+          );
+          return !!rarity && Number.isFinite(level);
+        }
+
+        return !!season && !!rarity;
+      };
+
+      for (const slotKey of slots) {
+        const saved = s.selections?.[slotKey] || s.equips?.[slotKey] || s.equip?.[slotKey] || null;
+        const savedName = _normalizePresetLookupName_pc(saved?.name ?? saved?.['이름'] ?? '');
+        if (!savedName) continue;
+
+        try {
+          if (typeof ensureLoaded === 'function') {
+            await ensureLoaded(slotKey);
+          }
+        } catch (e) {
+          console.warn('[preset compat pc] current equipment load failed:', slotKey, e);
+        }
+
+        // 중요:
+        // 현재 PC의 활성 ensureLoaded()는 DB.itemsBySlot이 아니라 window.DBEquip을 채운다.
+        // 따라서 실제 아이템 피커와 같은 getItemsForSlot()을 1순위로 사용한다.
+        let rows = [];
+        try {
+          if (typeof getItemsForSlot === 'function') {
+            rows = getItemsForSlot(
+              slotKey,
+              slotKey === 'weapon'
+                ? (s?.currentCharacter?.jobGroup || s?.currentCharacter?.jobGroupLabel || '')
+                : ''
+            );
+          }
+        } catch (_) {}
+
+        // 이전 로더 캐시도 fallback으로만 허용
+        if (!Array.isArray(rows) || !rows.length) {
+          rows = Array.isArray(DB?.itemsBySlot?.[slotKey]) ? DB.itemsBySlot[slotKey] : [];
+        }
+
+        // CORE.lists 원문에서도 마지막 한 번 더 찾는다.
+        if ((!Array.isArray(rows) || !rows.length) &&
+            typeof _getListArray === 'function' &&
+            typeof _mapEquipRow === 'function') {
+          try {
+            rows = _getListArray(slotKey)
+              .filter((r) => r && (r['이름'] || r.name || r.title))
+              .map(_mapEquipRow);
+          } catch (_) {}
+        }
+
+        const current = (Array.isArray(rows) ? rows : []).find((item) =>
+          _normalizePresetLookupName_pc(item?.name ?? item?.['이름'] ?? '') === savedName
+        );
+
+        if (!current) {
+          // 저장본 자체에 이미 시즌/등급 메타가 충분하면 굳이 실패 취급하지 않는다.
+          if (!hasCurrentConstraintMeta(slotKey, saved)) {
+            unresolvedSlots.push(slotKey);
+          }
+          continue;
+        }
+
+        const raw = current?._raw || current?.raw || {};
+        const season = String(
+          current?.season ??
+          current?.['시즌'] ??
+          raw?.season ??
+          raw?.['시즌'] ??
+          ''
+        ).trim();
+        const rarity = String(
+          current?.rarity ??
+          current?.['레어리티'] ??
+          current?.['희귀도'] ??
+          current?.['등급'] ??
+          raw?.rarity ??
+          raw?.['레어리티'] ??
+          raw?.['희귀도'] ??
+          raw?.['등급'] ??
+          ''
+        ).trim();
+
+        const hydrated = {
+          ...(saved && typeof saved === 'object' ? saved : {}),
+          ...current,
+          ...(season ? { season } : {}),
+          ...(rarity ? { rarity } : {}),
+          _raw: raw,
+          raw
+        };
+
+        s.selections[slotKey] = hydrated;
+        s.equips[slotKey] = { ...hydrated };
+        s.equip[slotKey] = { ...hydrated };
+        changed = true;
+
+        if (!hasCurrentConstraintMeta(slotKey, hydrated)) {
+          unresolvedSlots.push(slotKey);
+        }
+      }
+
+      return {
+        changed,
+        constraintsReady: unresolvedSlots.length === 0,
+        unresolvedSlots
+      };
+    }
+
+    async function repairLoadedPresetCompatibility_pc(s) {
+      const monsterChanged = repairLoadedPresetMonster_pc(s);
+      const equipment = await repairLoadedPresetEquipment_pc(s);
+
+      // 최신 장비의 시즌/레어리티/레벨 메타를 확보한 뒤에만
+      // 과거 customSkills 값을 현재 규칙으로 정리한다.
+      // 메타를 못 찾았는데 먼저 enforce하면 정상 저장값까지 비워질 수 있다.
+      if (equipment.constraintsReady) {
+        try {
+          if (typeof enforceCustomSkillConstraints === 'function') {
+            enforceCustomSkillConstraints();
+          }
+        } catch (e) {
+          console.warn('[preset compat pc] custom skill constraints failed:', e);
+        }
+      } else {
+        console.warn(
+          '[preset compat pc] constraint cleanup skipped; equipment metadata unresolved:',
+          equipment.unresolvedSlots
+        );
+      }
+
+      // 보정된 현재 state를 기준으로 버튼 값/표시를 즉시 다시 맞춘다.
+      try {
+        if (typeof applyCustomOptUIFromState === 'function') {
+          applyCustomOptUIFromState();
+        } else if (typeof refreshUniqueEffectSlotVisibility === 'function') {
+          refreshUniqueEffectSlotVisibility();
+        }
+      } catch (e) {
+        console.warn('[preset compat pc] custom option UI refresh failed:', e);
+      }
+
+      return {
+        changed: !!(monsterChanged || equipment.changed),
+        monsterChanged,
+        equipmentChanged: equipment.changed,
+        constraintsReady: equipment.constraintsReady,
+        unresolvedSlots: equipment.unresolvedSlots
+      };
+    }
+
     function normalizePresetStateForSave_pc(rawState) {
       const raw = rawState || {};
       const snap = _clonePlain_pc(raw);
@@ -29555,6 +29829,14 @@ try {
         enforceWeaponJobGroupCompatibility_pc(s);
       } catch (e) {
         console.warn('[applyFrontPresetState] 무기 직업군 호환 검증 실패:', e);
+      }
+
+      // 4-2) 구형 저장슬롯 호환 복구
+      // 삭제된 몬스터 / 시즌·등급 정보가 빠진 장비를 현재 데이터 기준으로 보정한다.
+      try {
+        await repairLoadedPresetCompatibility_pc(s);
+      } catch (e) {
+        console.warn('[applyFrontPresetState] preset compatibility repair failed:', e);
       }
 
       // 5) 장비 슬롯 타일 UI 반영

@@ -17166,6 +17166,10 @@
       const selections = window.state.selections;
       const cs = window.state.customSkills;
 
+      // 구형 프리셋 복원 중 현재 장비 메타를 아직 못 찾은 경우
+      // 과거 정상 customSkills 값을 먼저 지우지 않는다.
+      const compatMetaReady = window.state.__presetCompatConstraintsReady !== false;
+
       // 무기: 레어/유니크 불가, 그 외 70레벨 이상 에픽 또는 침식만 허용
       const weapon = selections.weapon || null;
       if (!isWeaponUniqueEligibleMobile(weapon)) {
@@ -17185,7 +17189,7 @@
       ].forEach(([slotKey]) => {
         const item = selections[slotKey] || null;
         const ok = !!item && isSeason5EquipmentItemMobile(item) && isExceedEquipmentItemMobile(item);
-        if (!ok) _clearMobileOtherUnique(slotKey);
+        if (!ok && compatMetaReady) _clearMobileOtherUnique(slotKey);
       });
 
       refreshWeaponUniqueOptionVisibilityMobile();
@@ -21179,6 +21183,217 @@ function buildSynergyPayloadMobile() {
       return s;
     }
 
+
+    // ============================================================
+    // 구형 저장슬롯 호환 복구 (Mobile)
+    // - 삭제된 몬스터는 현재 목록의 기본값으로 교체
+    // - 시즌/등급 정보가 빠진 핵심 장비는 CORE 최신 행으로 재수화
+    // ============================================================
+    function _normalizePresetLookupName_mobile(v) {
+      return String(v ?? '')
+        .normalize('NFC')
+        .replace(/[\u200B-\u200D\u2060\uFEFF]/g, '')
+        .trim();
+    }
+
+    function _getMobileCurrentEquipRows(slotKey) {
+      const lists =
+        (window.CORE && (window.CORE.data || window.CORE)?.lists) ||
+        (window.CORE_DATA && (window.CORE_DATA.data || window.CORE_DATA)?.lists) ||
+        null;
+
+      if (!lists) return [];
+
+      let rows =
+        lists[`${slotKey}:list`] ??
+        lists[`${slotKey}:lists`] ??
+        lists[slotKey] ??
+        [];
+
+      if (rows && typeof rows === 'object' && Array.isArray(rows.rows)) {
+        rows = rows.rows;
+      }
+      return Array.isArray(rows) ? rows : [];
+    }
+
+    function _mapCurrentEquipRowForPreset_mobile(row, slotKey) {
+      if (!row || typeof row !== 'object') return null;
+
+      const name = _normalizePresetLookupName_mobile(row?.name ?? row?.['이름'] ?? row?.title ?? '');
+      if (!name) return null;
+
+      const num = (v) => {
+        const n = Number(String(v ?? '').replace(/[^\d.-]/g, ''));
+        return Number.isFinite(n) ? n : null;
+      };
+
+      return {
+        name,
+        code: String(row?.code ?? row?.Code ?? row?.itemCode ?? row?.key ?? row?.id ?? '').trim() || null,
+        img: String(row?.img ?? row?.image ?? row?.['이미지'] ?? '').trim() || '',
+        image: String(row?.image ?? row?.img ?? row?.['이미지'] ?? '').trim() || '',
+        imgSrc: String(row?.image ?? row?.img ?? row?.['이미지'] ?? '').trim() || '',
+        desc: String(row?.desc ?? row?.description ?? row?.['설명'] ?? '').trim(),
+        rarity: String(row?.rarity ?? row?.['레어리티'] ?? row?.['희귀도'] ?? row?.['등급'] ?? '').trim(),
+        season: String(row?.season ?? row?.['시즌'] ?? '').trim(),
+        type: String(row?.type ?? row?.['종류'] ?? row?.category ?? '').trim(),
+        level: num(row?.level ?? row?.reqLevel ?? row?.['레벨제한'] ?? row?.['렙제'] ?? row?.['레벨']),
+        slot: slotKey,
+        _raw: row,
+        raw: row
+      };
+    }
+
+    function repairLoadedPresetMonster_mobile(s) {
+      if (!s || typeof s !== 'object') return false;
+
+      const rows = Array.isArray(window.CORE?.lists?.['monster:list'])
+        ? window.CORE.lists['monster:list']
+        : [];
+
+      const names = rows
+        .map((x) => _normalizePresetLookupName_mobile(
+          typeof x === 'string'
+            ? x
+            : (x?.['몬스터명'] ?? x?.monName ?? x?.monsterName ?? x?.name ?? '')
+        ))
+        .filter(Boolean);
+
+      if (!names.length) return false;
+
+      const current = _normalizePresetLookupName_mobile(
+        s?.monster?.name ||
+        s.monsterName ||
+        s?.lastFinalCompute?.computePayload?.monster?.name ||
+        ''
+      );
+
+      if (current && names.includes(current)) {
+        s.monsterName = current;
+        s.monster = {
+          ...(s.monster && typeof s.monster === 'object' ? s.monster : {}),
+          name: current
+        };
+        return false;
+      }
+
+      const defaultName = _normalizePresetLookupName_mobile(
+        rows.find((x) => String(x?.base ?? x?.['기본여부'] ?? '').trim() === '기본')?.['몬스터명'] ||
+        rows.find((x) => String(x?.base ?? x?.['기본여부'] ?? '').trim() === '기본')?.monName ||
+        names[0]
+      );
+
+      if (!defaultName) return false;
+
+      s.monsterName = defaultName;
+      s.monster = { name: defaultName };
+
+      if (s.lastFinalCompute?.computePayload?.monster) {
+        s.lastFinalCompute.computePayload.monster = { name: defaultName };
+      }
+
+      const sel = document.getElementById('selMonsterM');
+      if (sel && Array.from(sel.options || []).some(o => String(o.value || '').trim() === defaultName)) {
+        sel.value = defaultName;
+      }
+
+      return true;
+    }
+
+    function repairLoadedPresetEquipment_mobile(s) {
+      if (!s || typeof s !== 'object') {
+        return { changed: false, constraintsReady: false, unresolvedSlots: [] };
+      }
+
+      s.selections = (s.selections && typeof s.selections === 'object') ? s.selections : {};
+      s.equips = (s.equips && typeof s.equips === 'object') ? s.equips : {};
+      s.equip = (s.equip && typeof s.equip === 'object') ? s.equip : {};
+
+      const slots = ['weapon', 'top', 'bracelet', 'earring'];
+      const unresolvedSlots = [];
+      let changed = false;
+
+      const hasMeta = (slotKey, item) => {
+        if (!item || typeof item !== 'object') return true;
+        const raw = item?._raw || item?.raw || {};
+        const season = String(
+          item?.season ?? item?.['시즌'] ?? raw?.season ?? raw?.['시즌'] ?? ''
+        ).trim();
+        const rarity = String(
+          item?.rarity ?? item?.['레어리티'] ?? item?.['희귀도'] ?? item?.['등급'] ??
+          raw?.rarity ?? raw?.['레어리티'] ?? raw?.['희귀도'] ?? raw?.['등급'] ?? ''
+        ).trim();
+
+        if (slotKey === 'weapon') {
+          const level = Number(
+            String(
+              item?.level ?? item?.levelVal ??
+              raw?.['레벨제한'] ?? raw?.['렙제'] ?? raw?.level ?? raw?.reqLevel ?? ''
+            ).replace(/[^\d.-]/g, '')
+          );
+          return !!rarity && Number.isFinite(level);
+        }
+        return !!season && !!rarity;
+      };
+
+      for (const slotKey of slots) {
+        const saved = s.selections?.[slotKey] || s.equips?.[slotKey] || s.equip?.[slotKey] || null;
+        const savedName = _normalizePresetLookupName_mobile(saved?.name ?? saved?.['이름'] ?? '');
+        if (!savedName) continue;
+
+        const currentRow = _getMobileCurrentEquipRows(slotKey).find((row) =>
+          _normalizePresetLookupName_mobile(row?.name ?? row?.['이름'] ?? row?.title ?? '') === savedName
+        );
+
+        if (!currentRow) {
+          if (!hasMeta(slotKey, saved)) unresolvedSlots.push(slotKey);
+          continue;
+        }
+
+        const current = _mapCurrentEquipRowForPreset_mobile(currentRow, slotKey);
+        if (!current) {
+          if (!hasMeta(slotKey, saved)) unresolvedSlots.push(slotKey);
+          continue;
+        }
+
+        const hydrated = {
+          ...(saved && typeof saved === 'object' ? saved : {}),
+          ...current
+        };
+
+        s.selections[slotKey] = hydrated;
+        s.equips[slotKey] = { ...hydrated };
+        s.equip[slotKey] = { ...hydrated };
+        changed = true;
+
+        if (!hasMeta(slotKey, hydrated)) unresolvedSlots.push(slotKey);
+      }
+
+      return {
+        changed,
+        constraintsReady: unresolvedSlots.length === 0,
+        unresolvedSlots
+      };
+    }
+
+    function repairLoadedPresetCompatibility_mobile(s) {
+      const monsterChanged = repairLoadedPresetMonster_mobile(s);
+      const equipment = repairLoadedPresetEquipment_mobile(s);
+
+      // loadFromFpresetSlot_mobile에서 state에 실제 적용된 뒤
+      // enforceCustomSkillConstraintsMobile()가 다시 호출된다.
+      // 최신 메타 확보 실패 여부를 남겨서 그 전에는 과거 값을 섣불리 지우지 않게 한다.
+      s.__presetCompatConstraintsReady = equipment.constraintsReady;
+
+      return {
+        changed: !!(monsterChanged || equipment.changed),
+        monsterChanged,
+        equipmentChanged: equipment.changed,
+        constraintsReady: equipment.constraintsReady,
+        unresolvedSlots: equipment.unresolvedSlots
+      };
+    }
+
     function normalizePresetStateForSave_mobile(rawState) {
       const raw = rawState || {};
       const snap = _clonePlain_mobile(raw);
@@ -21867,6 +22082,15 @@ function buildSynergyPayloadMobile() {
 
       const rawState = res.state || {};
 
+      // ✅ 구형 저장슬롯 호환 복구
+      // 현재 monster/equipment 경량목록을 확보한 뒤 삭제 몬스터와 장비 시즌 정보를 보정한다.
+      await initMobileAllLightListsOnce();
+      try {
+        repairLoadedPresetCompatibility_mobile(rawState);
+      } catch (e) {
+        console.warn('[mobile fpreset_load] preset compatibility repair failed:', e);
+      }
+
       // ✅ PC 저장본에서는 selections가 실제 장비 본체이므로
       //    모바일 로드 직후 selections를 기준으로 equip / equips를 통일한다.
       const EQUIP_SLOTS = [
@@ -21936,6 +22160,7 @@ function buildSynergyPayloadMobile() {
           imgSrc: String(sel.img || sel.image || sel['이미지'] || '').trim() || '',
           desc: String(sel.desc || sel['설명'] || '').trim(),
           rarity: String(sel.rarity || sel['레어리티'] || sel['희귀도'] || sel['등급'] || '').trim(),
+          season: String(sel.season || sel['시즌'] || sel?._raw?.season || sel?._raw?.['시즌'] || '').trim(),
           type: String(sel.type || sel['타입'] || sel['종류'] || '').trim(),
           level: (sel.level == null || sel.level === '' || Number.isNaN(Number(sel.level))) ? null : Number(sel.level),
           prefixLabel: (sel.prefixLabel == null ? '' : String(sel.prefixLabel).trim())
