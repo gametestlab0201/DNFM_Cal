@@ -6094,6 +6094,66 @@
     }
 
     .solo-party-overlay,
+    /* ✅ SPECIAL_USER 전용: 장비 부위별 전체 초기화 버튼
+       슬롯 내부가 아닌 row/cell에 붙여 장비 재렌더링 시 삭제되지 않게 한다. */
+    .slot-row,
+    .mini-cell {
+      position: relative;
+    }
+
+    .slot-part-reset-btn {
+      position: absolute;
+      z-index: 40;
+      display: none;
+      min-width: 34px;
+      height: 18px;
+      padding: 0 5px;
+      border: 1px solid rgba(248, 113, 113, 0.72);
+      border-radius: 999px;
+      background: rgba(69, 10, 10, 0.92);
+      color: #fecaca;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 16px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      box-shadow: 0 2px 7px rgba(0, 0, 0, 0.35);
+    }
+
+    /* 좌측 장비열은 슬롯의 오른쪽 위, 우측 장비열은 슬롯의 왼쪽 위 */
+    .slot-row.left > .slot-part-reset-btn {
+      right: 2px;
+      top: 2px;
+    }
+
+    .slot-row.right > .slot-part-reset-btn {
+      left: 2px;
+      top: 2px;
+    }
+
+    /* 가운데 미니 슬롯 */
+    .mini-cell > .slot-part-reset-btn {
+      right: 2px;
+      top: 2px;
+    }
+
+    .slot-part-reset-btn:hover {
+      background: rgba(127, 29, 29, 0.98);
+      border-color: rgba(252, 165, 165, 0.95);
+      color: #fff;
+    }
+
+    .slot-part-reset-btn:active {
+      transform: scale(0.96);
+    }
+
+    .slot-part-reset-btn.is-visible {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .calculator-reset-overlay {
       position: absolute;
       top: 10px;
@@ -13722,6 +13782,13 @@ if (/[\r\n]/.test(nickname)) {
       updateSynergyEffectButtonVisibility();
 
       if (btnSkillDamage) btnSkillDamage.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+
+      // ✅ 부위별 전체 초기화 버튼도 special_user / research_user에게만 노출
+      try {
+        if (typeof window.syncPerSlotResetButtonsVisibility === 'function') {
+          window.syncPerSlotResetButtonsVisibility();
+        }
+      } catch (_) {}
       // ✅ 크리100/투함포 체크박스는 전체 공개
       if (rowDmgOpt) rowDmgOpt.style.display = 'flex';
       if (btnAutoSet) btnAutoSet.style.display = hasSpecialLike ? 'inline-flex' : 'none';
@@ -18803,6 +18870,273 @@ showModal($uniqueEffectModal, false);
       C1: 'aura', C2: 'title', C3: 'creature', C4: 'artifact', L6: 'earring', R6: 'magestone'
     };
     window.SLOT_MAP = SLOT_MAP;   // 브라우저 전역 객체, SLOT_MAP을 전역 변수로 등록 = 다른 스크립트 파일이나 브라우저 콘솔에서도 접근 가능
+
+    /* =========================================================
+       SPECIAL_USER 전용: 장비 부위별 전체 초기화
+       - 해당 부위 장비 + 강화 + 마법부여 + 엠블렘 + 연마 + 특성옵션 초기화
+       - 무기/상의/팔찌/귀걸이는 연결된 고유효과도 함께 초기화
+       - 캐릭터/다른 부위/스킬트리/수련일지 등은 건드리지 않는다.
+       ========================================================= */
+    function clearCustomEffectForEquipmentSlot_pc(slotKey) {
+      const s = window.state || (window.state = {});
+      s.customSkills = s.customSkills && typeof s.customSkills === 'object'
+        ? s.customSkills
+        : {};
+
+      const cs = s.customSkills;
+
+      if (slotKey === 'weapon') {
+        cs.type = '';
+        cs.customType = '';
+        cs.weaponType = '';
+        cs.weaponName = '';
+        s.customOptLabel = null;
+        try { __customOptSelected = null; } catch (_) {}
+      }
+
+      if (slotKey === 'top') {
+        cs.armorType = '';
+        s.customArmor = { type: '' };
+        s.customArmorLabel = null;
+        try { __armorCustomOptSelected = null; } catch (_) {}
+      }
+
+      if (slotKey === 'bracelet') {
+        cs.braceletType = '';
+        s.customBraceletLabel = null;
+        try { __braceletCustomOptSelected = null; } catch (_) {}
+      }
+
+      if (slotKey === 'earring') {
+        cs.earringType = '';
+        s.customEarring = { type: '' };
+        s.customEarringLabel = null;
+        try { __earringCustomOptSelected = null; } catch (_) {}
+      }
+    }
+
+    function resetEquipmentSlotVisual_pc(slotKey, domCode) {
+      const slotEl = document.querySelector(`#calc-view .slot[data-slot="${domCode}"]`);
+      if (slotEl) {
+        const baseLabel =
+          (typeof SLOT_BASE_LABELS === 'object' && SLOT_BASE_LABELS && SLOT_BASE_LABELS[domCode])
+            ? SLOT_BASE_LABELS[domCode]
+            : (slotEl.dataset.baseLabel || (typeof labelForSlot === 'function' ? labelForSlot(slotKey) : slotKey));
+
+        const labelEl = document.createElement('span');
+        labelEl.className = 'slot-label';
+        labelEl.textContent = baseLabel;
+
+        slotEl.innerHTML = '';
+        slotEl.appendChild(labelEl);
+
+        slotEl.classList.remove('selected', 'has-item', 'active');
+        slotEl.removeAttribute('title');
+      }
+
+      const row = slotEl?.closest('.slot-row');
+      if (row) {
+        const enhBtn = row.querySelector('.outer-rects .rect[data-role="enhance"]');
+        const traitBtn = row.querySelector('.outer-rects .rect[data-role="trait"]');
+        const enchantBtn = row.querySelector('.outer-rects .rect[data-role="enchant"]');
+        const refineBtn = row.querySelector('.outer-rects .rect[data-role="refine"]');
+
+        if (enhBtn) {
+          enhBtn.textContent = '강화 설정';
+          enhBtn.classList.remove('selected', 'active');
+        }
+        if (traitBtn) {
+          traitBtn.textContent = '특성 옵션';
+          traitBtn.classList.remove('selected', 'active', 'has-trait-stages');
+        }
+        if (enchantBtn && !enchantBtn.hasAttribute('data-unused')) {
+          enchantBtn.textContent = '마법 부여';
+          enchantBtn.classList.remove('selected', 'active');
+        }
+        if (refineBtn) {
+          refineBtn.textContent = '연마 설정';
+          refineBtn.classList.remove('selected', 'active');
+          refineBtn.disabled = false;
+          refineBtn.removeAttribute('data-unused');
+          refineBtn.removeAttribute('aria-disabled');
+          refineBtn.style.pointerEvents = '';
+        }
+
+        row.querySelectorAll('.seal-captions, .enh-caption, .enchant-caption, .refine-caption')
+          .forEach((el) => el.remove());
+      }
+
+      // 칭호는 mini-cell 안에 마법부여 버튼이 있으므로 별도 처리
+      if (slotKey === 'title') {
+        const cell = slotEl?.closest('.mini-cell');
+        const enchantBtn = cell?.querySelector('.outer-rects .rect[data-role="enchant"]')
+          || cell?.querySelector('.outer-rects .rect:nth-child(1)');
+        if (enchantBtn) {
+          enchantBtn.textContent = '마법 부여';
+          enchantBtn.classList.remove('selected', 'active', 'disabled', 'is-disabled');
+          enchantBtn.disabled = false;
+          enchantBtn.style.pointerEvents = '';
+          enchantBtn.dataset.role = 'enchant';
+        }
+        cell?.querySelectorAll('.enchant-caption').forEach((el) => el.remove());
+      }
+
+      // 삭제한 슬롯의 엠블렘은 refreshAllDots()만으로는 키가 사라져 다시 그려지지 않으므로 DOM도 직접 비운다.
+      document.querySelectorAll(`#calc-view .emblem-dot[data-slot="${slotKey}"]`).forEach((dot) => {
+        dot.innerHTML = '';
+        dot.classList.remove('selected', 'active', 'filled', 'has-emblem', 'has-img');
+        dot.classList.add('empty');
+        dot.style.removeProperty('--emblem');
+        dot.removeAttribute('title');
+
+        const cap = dot.nextElementSibling;
+        if (cap?.classList?.contains('emblem-caption')) {
+          cap.textContent = '';
+          cap.style.display = 'none';
+        }
+      });
+    }
+
+    function resetEquipmentSlotAll_pc(slotKey, domCode) {
+      if (!window.__IS_SPECIAL_USER__) return;
+
+      const s = window.state || (window.state = {});
+      s.selections ||= {};
+      s.enh ||= {};
+      s.seals ||= {};
+      s.enchants ||= {};
+      s.emblems ||= {};
+      s.refines ||= {};
+      s.traitOptions ||= {};
+      s.slotVer ||= {};
+
+      // ✅ 해당 부위에 직접 귀속된 모든 상태 제거
+      delete s.selections[slotKey];
+      delete s.enh[slotKey];
+      delete s.seals[slotKey];          // 과거 저장본 호환용 상태도 함께 제거
+      delete s.enchants[slotKey];
+      delete s.emblems[slotKey];
+      delete s.refines[slotKey];
+      delete s.traitOptions[slotKey];
+      delete s.slotVer[slotKey];
+
+      // 혹시 구형 상태가 남아 있는 경우까지 함께 정리
+      if (s.equip && typeof s.equip === 'object') delete s.equip[slotKey];
+      if (s.equips && typeof s.equips === 'object') delete s.equips[slotKey];
+      if (s.customOptions && typeof s.customOptions === 'object') delete s.customOptions[slotKey];
+
+      clearCustomEffectForEquipmentSlot_pc(slotKey);
+      resetEquipmentSlotVisual_pc(slotKey, domCode);
+
+      // 공용 렌더러를 통해 연결 UI 최종 동기화
+      try { refreshEnhLabelsFromState?.(); } catch (_) {}
+      try { refreshAllTraitOptionButtonSummaries?.(); } catch (_) {}
+      try { refreshSealLabelsFromState?.(); } catch (_) {}
+      try { refreshSealCaptionsFromState?.(); } catch (_) {}
+      try { applyCustomOptUIFromState?.(); } catch (_) {}
+      try { enforceCustomSkillConstraints?.(); } catch (_) {}
+      try { refreshUniqueEffectSlotVisibility?.(); } catch (_) {}
+      try { updateEquipDescPreview?.(); } catch (_) {}
+
+      // 이전 계산 결과를 새 상태의 결과로 오해하지 않도록 상세 결과 캐시만 비운다.
+      s.lastComputeBreakdown = [];
+      s.lastComputeObjBreakdown = [];
+      s.lastComputeCoeffs = {};
+      s.lastComputeMeta = null;
+
+      if (typeof toast === 'function') {
+        const label = (typeof labelForSlot === 'function') ? labelForSlot(slotKey) : slotKey;
+        toast(`${label} 부위를 초기화했습니다.`);
+      }
+    }
+
+    function ensurePerSlotResetButtons_pc() {
+      const map = window.SLOT_MAP || {};
+
+      document.querySelectorAll('#calc-view .slot[data-slot]').forEach((slotEl) => {
+        const domCode = String(slotEl.getAttribute('data-slot') || '').trim();
+        const slotKey = map[domCode];
+        if (!slotKey) return;
+
+        // 중요: 버튼은 slot 내부가 아니라 그 바깥 컨테이너에 붙인다.
+        // slot.innerHTML은 장비 렌더링 중 여러 번 교체되기 때문에 내부에 넣으면 사라진다.
+        const host =
+          slotEl.closest('.slot-row') ||
+          slotEl.closest('.mini-cell') ||
+          slotEl.parentElement;
+
+        if (!host) return;
+
+        let btn = host.querySelector(`:scope > .slot-part-reset-btn[data-reset-slot="${domCode}"]`);
+        if (!btn) {
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'slot-part-reset-btn';
+          btn.dataset.resetSlot = domCode;
+          btn.textContent = '초기화';
+
+          const partLabel =
+            (typeof labelForSlot === 'function') ? labelForSlot(slotKey) : slotKey;
+
+          btn.setAttribute('aria-label', `${partLabel} 부위 전체 초기화`);
+          btn.title = '이 부위의 장비와 연결된 강화·마법부여·엠블렘·연마·특성옵션·고유효과를 초기화합니다.';
+
+          btn.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (!window.__IS_SPECIAL_USER__) return;
+
+            const currentPartLabel =
+              (typeof labelForSlot === 'function') ? labelForSlot(slotKey) : slotKey;
+
+            const ok = window.confirm(
+              `${currentPartLabel} 부위를 초기화할까요?\n` +
+              '장비와 이 부위에 연결된 강화, 마법부여, 엠블렘, 연마, 특성옵션, 고유효과가 함께 초기화됩니다.'
+            );
+            if (!ok) return;
+
+            resetEquipmentSlotAll_pc(slotKey, domCode);
+          });
+
+          host.appendChild(btn);
+        }
+      });
+
+      window.syncPerSlotResetButtonsVisibility();
+    }
+
+    window.syncPerSlotResetButtonsVisibility = function syncPerSlotResetButtonsVisibility() {
+      const show = !!window.__IS_SPECIAL_USER__;
+      document.querySelectorAll('#calc-view .slot-part-reset-btn').forEach((btn) => {
+        btn.classList.toggle('is-visible', show);
+        btn.hidden = !show;
+      });
+    };
+
+    window.resetEquipmentSlotAll_pc = resetEquipmentSlotAll_pc;
+
+    // DOM 준비 시점과 상관없이 버튼을 확실하게 생성한다.
+    const bootPerSlotResetButtons_pc = () => {
+      ensurePerSlotResetButtons_pc();
+      window.syncPerSlotResetButtonsVisibility();
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootPerSlotResetButtons_pc, { once: true });
+    } else {
+      bootPerSlotResetButtons_pc();
+    }
+
+    // 로그인/권한 판정 뒤에도 다시 한 번 동기화
+    window.addEventListener('calculator-access-ready', bootPerSlotResetButtons_pc);
+
+    // 저장슬롯 불러오기/장비 UI 재렌더 후에도 host 바깥 버튼이 유지되는지 보장
+    window.addEventListener('load', () => {
+      bootPerSlotResetButtons_pc();
+      setTimeout(bootPerSlotResetButtons_pc, 0);
+      setTimeout(bootPerSlotResetButtons_pc, 300);
+    }, { once: true });
 
     const ALLOWED_WEAPON_TYPES = {
       slayer: ['소검', '도', '둔기', '대검', '광검'],
@@ -37383,20 +37717,24 @@ return `
   
 
     // ===== 콘텐츠 복사 방지 =====
-    // 계산기 입력/텍스트 편집 요소는 정상적으로 사용할 수 있게 예외 처리한다.
+    // 일반 이용자는 기존대로 차단하되, special_user 계열 권한은 복사를 허용한다.
+    // 기존 권한 정책상 research_user도 window.__IS_SPECIAL_USER__에 포함된다.
     (() => {
       const isEditableTarget = (target) =>
         target instanceof Element &&
         !!target.closest('input, textarea, select, option, [contenteditable="true"]');
 
+      const canCopyContent = () => !!window.__IS_SPECIAL_USER__;
+
       // 우클릭 메뉴 차단
       document.addEventListener('contextmenu', (event) => {
-        if (isEditableTarget(event.target)) return;
+        if (canCopyContent() || isEditableTarget(event.target)) return;
         event.preventDefault();
       }, { capture: true });
 
       // 이미지 끌어서 저장/복사하는 동작 차단
       document.addEventListener('dragstart', (event) => {
+        if (canCopyContent()) return;
         if (event.target instanceof Element && event.target.closest('img')) {
           event.preventDefault();
         }
@@ -37404,7 +37742,7 @@ return `
 
       // 일반 콘텐츠 복사 차단. 입력창/텍스트영역 안의 사용자가 입력한 값은 복사 가능.
       document.addEventListener('copy', (event) => {
-        if (isEditableTarget(event.target)) return;
+        if (canCopyContent() || isEditableTarget(event.target)) return;
         event.preventDefault();
       }, { capture: true });
     })();
