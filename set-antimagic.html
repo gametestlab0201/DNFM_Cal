@@ -1607,14 +1607,38 @@
         justify-content: center;
       }
 
+      /* 세트장비 11세트: 모바일에서는 분류명을 장비 위쪽에 표시 */
+      .integrated-equipment-group {
+        display: block;
+        min-height: 0;
+      }
+
+      .integrated-equipment-label {
+        padding-left: 3px;
+        margin-bottom: 6px;
+        font-size: 14px;
+        line-height: 1.2;
+      }
+
+      .integrated-equipment-group .equipment-row {
+        justify-content: flex-start;
+        margin-top: 0;
+        padding: 0 3px 3px;
+        overflow-x: visible;
+      }
+
+      .integrated-equipment-groups {
+        gap: 13px;
+      }
+
       .equipment-slot {
-        width: 70px;
-        height: 70px;
-        min-width: 70px;
-        min-height: 70px;
-        max-width: 70px;
-        max-height: 70px;
-        flex-basis: 70px;
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
+        min-height: 60px;
+        max-width: 60px;
+        max-height: 60px;
+        flex-basis: 60px;
       }
 
       /* 이미지는 슬롯을 그대로 가득 채워 빈 여백 없이 밀착 */
@@ -1623,10 +1647,10 @@
         height: 100% !important;
       }
 
-      /* 최적화 결과 아이콘도 58px에서 아주 조금만 축소 */
+      /* 최적화 결과 장비 아이콘도 모바일에서 같은 비율로 축소 */
       .optimizer-item-img {
-        width: 56px;
-        height: 56px;
+        width: 48px;
+        height: 48px;
       }
 
       /* 최적화 결과: 방어구 5 → 악세서리 3 → 특수장비 3 */
