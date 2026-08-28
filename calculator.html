@@ -6093,7 +6093,15 @@
       position: relative;
     }
 
-    .solo-party-overlay,
+    /* ✅ 1190 정상 구조 복구:
+       솔플/파티 토글은 카드 레이아웃을 차지하지 않고 좌측 상단 오버레이로 유지 */
+    .solo-party-overlay {
+      position: absolute;
+      top: 10px;
+      z-index: 3;
+      pointer-events: none;
+    }
+
     /* ✅ SPECIAL_USER 전용: 장비 부위별 전체 초기화 버튼
        슬롯 내부가 아닌 row/cell에 붙여 장비 재렌더링 시 삭제되지 않게 한다. */
     .slot-row,
@@ -11208,7 +11216,7 @@
   <div id="skillDamageModal" class="modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
     <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="skillDamageDlgTitle"
-      style="width:min(960px,96vw);">
+      style="width:min(1160px,97vw);">
       <header>
         <h2 id="skillDamageDlgTitle">스킬별 데미지</h2>
         <button type="button" class="close" data-close aria-label="닫기">✕</button>
@@ -11225,6 +11233,8 @@
                 <th style="text-align:right; padding:8px 10px;">사용횟수</th>
                 <th style="text-align:right; padding:8px 10px;">합계 데미지</th>
                 <th style="text-align:right; padding:8px 10px;">1회 데미지</th>
+                <th style="text-align:right; padding:8px 10px;">DPS</th>
+                <th style="text-align:right; padding:8px 10px;">DPS/SP</th>
                 <th style="text-align:right; padding:8px 10px;">점유율</th>
               </tr>
             </thead>
@@ -13673,6 +13683,7 @@ if (/[\r\n]/.test(nickname)) {
       lastComputeBreakdown: [],
       lastComputeObjBreakdown: [],
       lastComputeCoeffs: {},
+      lastComputeSkillStateResult: null, // ✅ SPECIAL_USER 데미지 보기: 백엔드 최종 쿨타임(cdFinal) 원본
       lastComputeMeta: null,
 
       // 🔹 자동계산에 사용할 세트 선택 상태
@@ -19042,6 +19053,7 @@ showModal($uniqueEffectModal, false);
       s.lastComputeBreakdown = [];
       s.lastComputeObjBreakdown = [];
       s.lastComputeCoeffs = {};
+      s.lastComputeSkillStateResult = null;
       s.lastComputeMeta = null;
 
       if (typeof toast === 'function') {
@@ -32012,6 +32024,11 @@ try {
         state.lastComputeBreakdown = Array.isArray(resCompute.breakdown) ? resCompute.breakdown : [];
         state.lastComputeObjBreakdown = Array.isArray(resCompute.objBreakdown) ? resCompute.objBreakdown : [];
         state.lastComputeCoeffs = coeffsForAdj;
+        // ✅ final_compute 내부 skill_state_set에서 확정된 스킬별 최종 쿨타임(cdFinal) 보존
+        state.lastComputeSkillStateResult =
+          (resCompute && typeof resCompute.skillStateResult === 'object' && resCompute.skillStateResult)
+            ? resCompute.skillStateResult
+            : null;
 
         state.lastComputeMeta = {
           total,          // ✅ 보정 후 최종값
@@ -33061,6 +33078,42 @@ try {
         currentSkills.map(s => [String(s?.name || '').trim(), String(s?.img || '').trim()])
       );
 
+      // ✅ 현재 스킬트리 원본: SP 사용량 계산용
+      const skillRowMap = new Map(
+        currentSkills.map(s => [String(s?.name || '').trim(), s])
+      );
+
+      // ✅ 백엔드 final_compute → skill_state_set에서 확정된 실제 최종 쿨타임 사용
+      //    프론트에서 별도로 쿨감 공식을 재계산하지 않는다.
+      const skillStateResult = state.lastComputeSkillStateResult || {};
+      const skillDebugRows = Array.isArray(skillStateResult?.skillsDebug)
+        ? skillStateResult.skillsDebug
+        : [];
+      const skillCooldownMap = new Map(
+        skillDebugRows.map(s => [
+          String(s?.name || '').trim(),
+          Math.max(0, Number(s?.cdFinal || 0) || 0)
+        ])
+      );
+
+      const getUsedSpForSkill = (skillName) => {
+        const row = skillRowMap.get(String(skillName || '').trim());
+        if (!row || !row.id) return 0;
+
+        const currentLv = Math.max(0, Number(state.skillLv?.[row.id] || 0) || 0);
+        const minLv = Math.max(0, Number(row.minLv ?? 0) || 0);
+        const spPerLv = Math.max(0, Number(row.sp || 0) || 0);
+
+        // 현재 계산기의 SP 규칙: 최소 기본레벨은 무료, 그 위 투자분만 SP 사용
+        return Math.max(0, currentLv - minLv) * spPerLv;
+      };
+
+      // "소수점 넷째자리에서 반올림" → 소수점 셋째자리까지 표시
+      const fmtDpsMetric = (value) => {
+        const n = Number(value);
+        return Number.isFinite(n) ? n.toFixed(3) : '-';
+      };
+
       const forceCrit100 = !!m.forceCrit100;
       const tohampo12 = !!m.tohampo12;
       const critForceRatio = Number(m.critForceRatio || 1) || 1;
@@ -33449,6 +33502,27 @@ try {
           ? '-'
           : _fmtSkillDmgNum(r.dmgPerUseFinal);
 
+        // ✅ DPS = 1회 최종 데미지 ÷ 최종 쿨타임 ÷ 1,000,000,000
+        // merged 기본공격/상변행, 쿨타임 0인 스킬은 산출하지 않는다.
+        const skillNameKey = String(r.name || '').trim();
+        const finalCooldown = Math.max(0, Number(skillCooldownMap.get(skillNameKey) || 0) || 0);
+        const perUseDamage = Number(r.dmgPerUseFinal || 0) || 0;
+        const usedSp = getUsedSpForSkill(skillNameKey);
+
+        const dpsValue =
+          (!hideUseAndPerUse && perUseDamage > 0 && finalCooldown > 0)
+            ? (perUseDamage / finalCooldown / 1_000_000_000)
+            : null;
+
+        // ✅ DPS/SP = 위 DPS ÷ 해당 스킬에 실제 투자한 SP
+        const dpsPerSpValue =
+          (dpsValue != null && usedSp > 0)
+            ? ((dpsValue / usedSp) * 1000)
+            : null;
+
+        const displayDps = dpsValue == null ? '-' : fmtDpsMetric(dpsValue);
+        const displayDpsPerSp = dpsPerSpValue == null ? '-' : fmtDpsMetric(dpsPerSpValue);
+
         const iconHtml = hideSkillImageForResearch ? '' : `
           <img
             src="${r.img}"
@@ -33471,6 +33545,8 @@ try {
       <td style="padding:8px 10px; text-align:right;">${displayUses}</td>
       <td style="padding:8px 10px; text-align:right; font-weight:700;">${_fmtSkillDmgNum(r.sumFinal)}</td>
       <td style="padding:8px 10px; text-align:right;">${displayPerUse}</td>
+      <td style="padding:8px 10px; text-align:right; color:#a7f3d0;">${displayDps}</td>
+      <td style="padding:8px 10px; text-align:right; color:#fde68a;">${displayDpsPerSp}</td>
       <td style="padding:8px 10px; text-align:right; color:#93c5fd;">${ratio.toFixed(2)}%</td>
     </tr>
   `;
