@@ -6088,14 +6088,14 @@
       font-weight: 600;
     }
 
-    /* ✅ 캐릭터 카드 상단: 좌측 솔플/파티, 우측 초기화 */
+    /* ✅ 캐릭터 카드 상단: 좌측 솔플/파티, 우측 초기화
+       - 1190의 정상 구조를 그대로 복구 */
     .character-card {
       position: relative;
     }
 
-    /* ✅ 1190 정상 구조 복구:
-       솔플/파티 토글은 카드 레이아웃을 차지하지 않고 좌측 상단 오버레이로 유지 */
-    .solo-party-overlay {
+    .solo-party-overlay,
+    .calculator-reset-overlay {
       position: absolute;
       top: 10px;
       z-index: 3;
@@ -6103,7 +6103,7 @@
     }
 
     /* ✅ SPECIAL_USER 전용: 장비 부위별 전체 초기화 버튼
-       슬롯 내부가 아닌 row/cell에 붙여 장비 재렌더링 시 삭제되지 않게 한다. */
+       캐릭터 카드 오버레이 선택자와 완전히 분리한다. */
     .slot-row,
     .mini-cell {
       position: relative;
@@ -6160,13 +6160,6 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-    }
-
-    .calculator-reset-overlay {
-      position: absolute;
-      top: 10px;
-      z-index: 3;
-      pointer-events: none;
     }
 
     .solo-party-overlay {

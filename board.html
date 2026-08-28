@@ -5917,7 +5917,7 @@ async function list(page=1,push=true,silentRefresh=false){
     btn.textContent=willOpen?'[상세닫기]':'[상세보기]';
   });
 
-  async function view(id,push=true){
+  async function view(id,push=true,forceRefresh=false){
     panel.classList.add('detail-view');
     const postId=Number(id);
 
@@ -5927,7 +5927,10 @@ async function list(page=1,push=true,silentRefresh=false){
     if(currentPostId!==postId){
       calcShareDetailExpandedState=false;
     }
-    const cached=getCachedBoardDetail(postId);
+
+    // ✅ 댓글 등록/수정/삭제 직후에는 오래된 메모리/sessionStorage 상세 캐시를 쓰지 않고
+    // 서버에서 최신 board_get을 받아 즉시 화면에 반영한다.
+    const cached=forceRefresh?null:getCachedBoardDetail(postId);
     // 새로고침/직접접속에서도 '게시글을 불러오는 중...' 문구로 화면을 덮지 않는다.
     // 캐시가 있으면 즉시 본문을 그리고, 없으면 현재 패널을 유지한 채 서버 응답을 기다린다.
     try{
@@ -5967,7 +5970,7 @@ async function list(page=1,push=true,silentRefresh=false){
       panel.querySelector('#editMeta')?.addEventListener('click',()=>editPostMeta(r.post));
       panel.querySelector('#edit')?.addEventListener('click',()=>edit(r.post));
       panel.querySelector('#delete')?.addEventListener('click',async e=>{if(!confirm('이 게시글을 삭제하시겠습니까? 삭제 후 목록에서 보이지 않습니다.'))return;const btn=e.currentTarget;setButtonBusy(btn,true,'삭제 중');try{await api('board_delete',{id:r.post.id});await list(state.page)}catch(err){alert(err.message);setButtonBusy(btn,false)}});
-      panel.querySelector('#commentSubmit').onclick=async e=>{const btn=e.currentTarget,value=panel.querySelector('#comment').value.trim(),status=panel.querySelector('#commentStatus');if(!value){status.textContent='댓글 내용을 입력해주세요.';return}await ensureBoardNickname(async()=>{setButtonBusy(btn,true,'등록 중');try{status.textContent='댓글을 등록하는 중...';await api('board_comment_create',{id:r.post.id,content:value});await view(r.post.id,false)}catch(err){if(err.code==='board_nickname_required'){boardNicknameCache=null;openBoardNicknameModal(()=>panel.querySelector('#commentSubmit')?.click());return}status.textContent=err.message;setButtonBusy(btn,false)}})};
+      panel.querySelector('#commentSubmit').onclick=async e=>{const btn=e.currentTarget,value=panel.querySelector('#comment').value.trim(),status=panel.querySelector('#commentStatus');if(!value){status.textContent='댓글 내용을 입력해주세요.';return}await ensureBoardNickname(async()=>{setButtonBusy(btn,true,'등록 중');try{status.textContent='댓글을 등록하는 중...';await api('board_comment_create',{id:r.post.id,content:value});await view(r.post.id,false,true)}catch(err){if(err.code==='board_nickname_required'){boardNicknameCache=null;openBoardNicknameModal(()=>panel.querySelector('#commentSubmit')?.click());return}status.textContent=err.message;setButtonBusy(btn,false)}})};
       panel.querySelectorAll('[data-cedit]').forEach(btn=>btn.onclick=async()=>{
         const comment=(r.post.comments||[]).find(item=>Number(item.id)===Number(btn.dataset.cedit));
         if(!comment)return;
@@ -5978,13 +5981,13 @@ async function list(page=1,push=true,silentRefresh=false){
         setButtonBusy(btn,true,'수정 중');
         try{
           await api('board_comment_update',{id:r.post.id,commentId:Number(btn.dataset.cedit),content});
-          await view(r.post.id,false);
+          await view(r.post.id,false,true);
         }catch(err){
           alert(err.message);
           setButtonBusy(btn,false);
         }
       });
-      panel.querySelectorAll('[data-cdel]').forEach(btn=>btn.onclick=async()=>{if(!confirm('이 댓글을 삭제하시겠습니까?'))return;setButtonBusy(btn,true,'삭제 중');try{await api('board_comment_delete',{id:r.post.id,commentId:Number(btn.dataset.cdel)});await view(r.post.id,false)}catch(err){alert(err.message);setButtonBusy(btn,false)}});
+      panel.querySelectorAll('[data-cdel]').forEach(btn=>btn.onclick=async()=>{if(!confirm('이 댓글을 삭제하시겠습니까?'))return;setButtonBusy(btn,true,'삭제 중');try{await api('board_comment_delete',{id:r.post.id,commentId:Number(btn.dataset.cdel)});await view(r.post.id,false,true)}catch(err){alert(err.message);setButtonBusy(btn,false)}});
     }catch(e){renderError(e.message)}
   }
 
