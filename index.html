@@ -10039,6 +10039,65 @@
       text-shadow: 0 2px 7px rgba(0,0,0,.92);
     }
 
+    /* ✅ 세팅 종합토론방: 마지막 확인 이후 새 게시글 표시 */
+    .main-board-new-badge {
+      position: absolute;
+      top: 9px;
+      left: 9px;
+      z-index: 5;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 24px;
+      padding: 3px 9px 4px;
+      border: 1px solid rgba(255, 210, 214, .92);
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff465e 0%, #d7193f 58%, #9f0d2d 100%);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: -.025em;
+      text-shadow: 0 1px 3px rgba(83, 0, 18, .85);
+      box-shadow:
+        0 0 0 1px rgba(255, 83, 109, .30),
+        0 0 10px rgba(255, 55, 86, .75),
+        0 0 20px rgba(255, 37, 75, .42),
+        0 4px 10px rgba(0, 0, 0, .34),
+        inset 0 1px 0 rgba(255, 255, 255, .34);
+      pointer-events: none;
+      animation: mainBoardNewBadgePulse 1.8s ease-in-out infinite;
+    }
+
+    .main-board-new-badge::before {
+      content: "●";
+      margin-right: 4px;
+      color: #fff4a8;
+      font-size: 8px;
+      line-height: 1;
+      text-shadow: 0 0 6px rgba(255, 240, 120, .95);
+    }
+
+    .main-board-new-badge[hidden] {
+      display: none !important;
+    }
+
+    @keyframes mainBoardNewBadgePulse {
+      0%, 100% {
+        transform: scale(1);
+        filter: brightness(1);
+      }
+      50% {
+        transform: scale(1.06);
+        filter: brightness(1.12);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .main-board-new-badge { animation: none; }
+    }
+
     .main-quick-card__desc {
       display: block;
       margin-top: 4px;
@@ -10238,6 +10297,7 @@
 
             <a class="main-quick-card main-quick-card--board" href="./board.html">
               <img class="main-quick-card__thumb" src="img/character/card/소드마스터.png" data-thumb-files="소드마스터.png|소드마스터.webp|소드마스터.jpg|소마.png|소마.webp|소마.jpg" alt="소드마스터 썸네일" />
+              <span class="main-board-new-badge" id="mainBoardNewBadge" hidden>새 글</span>
               <span class="main-quick-card__content">
                 <span class="main-quick-card__title">세팅 종합토론방</span>
                 <span class="main-quick-card__desc">캐릭별 세팅 질문과 정보 공유</span>
@@ -10445,6 +10505,79 @@
     const SETTING_STATUS_URL = './setting-analyzer/index.html';
     const MAIN_AUTH_API = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
 
+    // ✅ 게시판 새 글 배지
+    // 게시판과 동일 origin의 localStorage 키를 공유한다.
+    const BOARD_LAST_SEEN_POST_KEY = 'dnfm_board_last_seen_post_id_v1';
+
+    function getMainBoardLastSeenPostId() {
+      try {
+        return Math.max(0, Number(localStorage.getItem(BOARD_LAST_SEEN_POST_KEY) || 0) || 0);
+      } catch (_) {
+        return 0;
+      }
+    }
+
+    function setMainBoardLastSeenPostId(postId) {
+      const id = Math.max(0, Number(postId) || 0);
+      if (!id) return;
+      try {
+        localStorage.setItem(BOARD_LAST_SEEN_POST_KEY, String(id));
+      } catch (_) {}
+    }
+
+    function paintMainBoardNewBadge(show) {
+      const badge = document.getElementById('mainBoardNewBadge');
+      if (!badge) return;
+      badge.hidden = !show;
+    }
+
+    async function refreshMainBoardNewBadge() {
+      // 메인 렌더를 막지 않는 독립 백그라운드 요청.
+      try {
+        const response = await fetch(`${MAIN_AUTH_API}?type=board_list`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            page: 1,
+            pageSize: 20,
+            keyword: '',
+            searchType: 'title_content',
+            category: ''
+          })
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        if (!data?.ok || !Array.isArray(data.items) || !data.items.length) {
+          paintMainBoardNewBadge(false);
+          return;
+        }
+
+        // 공지/일반글 구분 없이 현재 1페이지에 내려온 글 중 가장 큰 게시글 ID를 최신 기준으로 사용.
+        const latestPostId = data.items.reduce(
+          (maxId, item) => Math.max(maxId, Number(item?.id || 0) || 0),
+          0
+        );
+        if (!latestPostId) return;
+
+        const lastSeenPostId = getMainBoardLastSeenPostId();
+
+        // 이 기능을 처음 사용하는 브라우저는 현재 최신글을 기준점으로 저장한다.
+        // 기존 과거 글 때문에 첫 접속부터 "새 글"이 뜨는 것을 방지한다.
+        if (!lastSeenPostId) {
+          setMainBoardLastSeenPostId(latestPostId);
+          paintMainBoardNewBadge(false);
+          return;
+        }
+
+        paintMainBoardNewBadge(latestPostId > lastSeenPostId);
+      } catch (error) {
+        // 배지 확인 실패가 메인 이용에 영향을 주지 않게 조용히 무시한다.
+        console.debug('[main-board-new-badge]', error);
+      }
+    }
+
     async function mainPinLogin() {
       const pin = prompt('PIN 번호를 입력해주세요.');
       if (pin == null) return;
@@ -10565,6 +10698,9 @@
       updateSettingStatusCardAccess();
       refreshSettingStatusResearchAccess();
 
+      // 화면 표시와 무관하게 백그라운드에서 게시판 최신 글 여부만 1회 확인한다.
+      refreshMainBoardNewBadge();
+
       document.getElementById('btnMainPinLogin')?.addEventListener('click', mainPinLogin);
 
       const settingCard = document.getElementById('btnMainQuickSettingStatus');
@@ -10579,6 +10715,11 @@
       document.addEventListener('gsi:issued', refreshSettingStatusResearchAccess);
       window.addEventListener('storage', (event) => {
         if (event.key === 'id_token') refreshSettingStatusResearchAccess();
+
+        // 다른 탭에서 게시판을 확인하면 메인의 "새 글" 배지도 즉시 동기화한다.
+        if (event.key === BOARD_LAST_SEEN_POST_KEY) {
+          refreshMainBoardNewBadge();
+        }
       });
 
       document.getElementById('btnMainQuickCalculator')?.addEventListener('click', () => {

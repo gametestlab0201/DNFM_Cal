@@ -2759,6 +2759,27 @@
   'use strict';
   const WEBAPP_URL = 'https://dnf-backend.gogo456654.workers.dev';
   const panel = document.getElementById('boardPanel');
+
+  // ✅ 메인 "새 글" 배지와 공유하는 마지막 게시판 확인 게시글 ID
+  const BOARD_LAST_SEEN_POST_KEY = 'dnfm_board_last_seen_post_id_v1';
+
+  function markBoardLatestPostSeen(items) {
+    if (!Array.isArray(items) || !items.length) return;
+
+    const latestPostId = items.reduce(
+      (maxId, item) => Math.max(maxId, Number(item?.id || 0) || 0),
+      0
+    );
+    if (!latestPostId) return;
+
+    try {
+      const prev = Math.max(0, Number(localStorage.getItem(BOARD_LAST_SEEN_POST_KEY) || 0) || 0);
+      if (latestPostId > prev) {
+        localStorage.setItem(BOARD_LAST_SEEN_POST_KEY, String(latestPostId));
+      }
+    } catch (_) {}
+  }
+
   const CATEGORIES = ['귀검사','격투가','거너','마법사','프리스트','워리어','마창사','도적','기타잡담'];
   const PREFIXES = {
     '귀검사':['소울','버서커','웨펀','아수라','소마','암제','검마','베본','블레'],
@@ -3876,6 +3897,18 @@ async function list(page=1,push=true,silentRefresh=false){
     try{
       const r=await api('board_list',{page:state.page,pageSize:20,keyword:state.keyword,searchType:state.searchType,category:state.category},{silent:silentRefresh});
       state.page=Number(r.page||state.page||1); state.totalPages=r.totalPages||1; state.me=r.me||null;
+
+      // ✅ 게시판 홈 1페이지를 확인한 순간 최신 글을 읽은 기준점으로 기록.
+      // 공지사항도 동일하게 게시글 ID 비교에 포함한다.
+      if(
+        state.page===1 &&
+        !state.category &&
+        !state.keyword &&
+        state.searchType==='title_content'
+      ){
+        markBoardLatestPostSeen(r.items||[]);
+      }
+
       if(push) setUrl({page:state.page>1?state.page:'',q:state.keyword,search:state.searchType!=='title_content'?state.searchType:'',cat:state.category});
       const isFullAdmin=!!r.me?.isAdmin;
       const rows=(r.items||[]).map(x=>{const category=x.isNotice?'공지':(CATEGORIES.includes(x.category)?x.category:'기타잡담');const calcCardIcon=x.hasCalcSnapshot?'<span class="calc-card-list-icon" title="캐릭터카드 첨부" aria-label="캐릭터카드 첨부"></span>':'';return `<div class="list-row ${x.isNotice?'notice-row':''}" data-id="${Number(x.id)}"><div class="list-no">${isFullAdmin?`<input class="admin-post-check" type="checkbox" value="${Number(x.id)}" aria-label="${Number(x.id)}번 게시글 선택">`:(x.isNotice?'—':Number(x.id))}</div><div class="category-cell"><span class="category-badge ${x.isNotice?'notice':''}" data-category="${esc(category)}">${esc(category)}</span></div><div class="list-title">${x.isNotice?'<span class="mobile-notice-prefix">공지</span>':''}${x.prefix?`<span class="prefix-label">[${esc(x.prefix)}]</span>`:''}${esc(x.title)}${calcCardIcon}${Number(x.commentCount||0)?`<span class="comment-count">[${Number(x.commentCount)}]</span>`:''}<div class="mobile-meta"><span class="mobile-category">${esc(category)}</span><span>${authorCrown(x.author)}${esc(x.author?.nickname||'이용자')}</span><span>${fmtListDate(x.createdAt, x.isNotice)}</span><span>조회 ${Number(x.viewCount||0)}</span></div></div><div class="meta desktop-only">${authorCrown(x.author)}${esc(x.author?.nickname||'이용자')}</div><div class="meta desktop-only">${fmtListDate(x.createdAt, x.isNotice)}</div><div class="meta desktop-only">${Number(x.viewCount||0)}</div><div class="meta desktop-only">${Number(x.commentCount||0)}</div></div>`}).join('');
