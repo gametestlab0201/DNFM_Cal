@@ -9861,11 +9861,15 @@
       }
 
       // 2) change 이벤트(중복 바인딩 방지)
+      // PC와 동일하게 canonical state.avatar를 즉시 갱신하고 avatarSel은 호환용 미러로 유지한다.
       if (aSel && !aSel.dataset.boundAvatar) {
         aSel.addEventListener('change', () => {
           const st = (window.state = window.state || {});
+          const value = String(aSel.value || '').trim();
+          st.avatar = st.avatar || {};
           st.avatarSel = st.avatarSel || {};
-          st.avatarSel.avatarName = String(aSel.value || '').trim();
+          st.avatar.avatarName = value;
+          st.avatarSel.avatarName = value;
         });
         aSel.dataset.boundAvatar = '1';
       }
@@ -9873,8 +9877,11 @@
       if (iSel && !iSel.dataset.boundImprint) {
         iSel.addEventListener('change', () => {
           const st = (window.state = window.state || {});
+          const value = String(iSel.value || '').trim();
+          st.avatar = st.avatar || {};
           st.avatarSel = st.avatarSel || {};
-          st.avatarSel.imprintName = String(iSel.value || '').trim();
+          st.avatar.imprintName = value;
+          st.avatarSel.imprintName = value;
         });
         iSel.dataset.boundImprint = '1';
       }
@@ -19398,13 +19405,17 @@ function buildSynergyPayloadMobile() {
       // 일반 스킬룬 / 특수 스킬룬은 폐기된 기능이므로 final_compute payload에서 제외한다.
 
       // 7) 아바타/무기압 — PC canonical = state.avatar
-      const avatarSource =
-        (s.avatar && typeof s.avatar === 'object')
-          ? s.avatar
-          : ((s.avatarSel && typeof s.avatarSel === 'object') ? s.avatarSel : {});
+      // 계산 직전 DOM의 실제 선택값을 최우선으로 읽어 canonical state와 동기화한다.
+      const avatarDomName = String(document.getElementById('selAvatarM')?.value || '').trim();
+      const imprintDomName = String(document.getElementById('selImprintM')?.value || '').trim();
+      const avatarState = (s.avatar && typeof s.avatar === 'object') ? s.avatar : {};
+      const avatarLegacy = (s.avatarSel && typeof s.avatarSel === 'object') ? s.avatarSel : {};
+
       const avatarPayload = {};
-      if (avatarSource.avatarName) avatarPayload.avatarName = String(avatarSource.avatarName).trim();
-      if (avatarSource.imprintName) avatarPayload.imprintName = String(avatarSource.imprintName).trim();
+      const avatarName = avatarDomName || String(avatarState.avatarName || avatarLegacy.avatarName || '').trim();
+      const imprintName = imprintDomName || String(avatarState.imprintName || avatarLegacy.imprintName || '').trim();
+      if (avatarName) avatarPayload.avatarName = avatarName;
+      if (imprintName) avatarPayload.imprintName = imprintName;
 
       // canonical mirror
       s.avatar = { ...avatarPayload };
