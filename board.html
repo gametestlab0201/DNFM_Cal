@@ -2760,23 +2760,33 @@
   const WEBAPP_URL = 'https://dnf-backend.gogo456654.workers.dev';
   const panel = document.getElementById('boardPanel');
 
-  // ✅ 메인 "새 글" 배지와 공유하는 마지막 게시판 확인 게시글 ID
-  const BOARD_LAST_SEEN_POST_KEY = 'dnfm_board_last_seen_post_id_v1';
+  // ✅ 메인 "새 글" 배지와 공유하는 마지막 게시판 확인 마커
+  // 삭제된 게시글 번호가 재사용되어도 구분할 수 있도록 작성시각 + ID를 저장한다.
+  const BOARD_LAST_SEEN_MARKER_KEY = 'dnfm_board_last_seen_post_marker_v2';
+  const BOARD_MARKER_MIGRATION_DONE_KEY = 'dnfm_board_marker_migration_done_v2';
 
-  function markBoardLatestPostSeen(items) {
-    if (!Array.isArray(items) || !items.length) return;
+  function normalizeBoardPostMarker(value) {
+    if (!value || typeof value !== 'object') return null;
 
-    const latestPostId = items.reduce(
-      (maxId, item) => Math.max(maxId, Number(item?.id || 0) || 0),
-      0
-    );
-    if (!latestPostId) return;
+    const id = Math.max(0, Number(value.id || 0) || 0);
+    const createdAt = String(value.createdAt || '').trim();
+    const createdMs = Date.parse(createdAt);
+
+    if (!createdAt || !Number.isFinite(createdMs)) return null;
+    return { id, createdAt, createdMs };
+  }
+
+  function markBoardLatestPostSeen(marker) {
+    const latest = normalizeBoardPostMarker(marker);
+    if (!latest) return;
 
     try {
-      const prev = Math.max(0, Number(localStorage.getItem(BOARD_LAST_SEEN_POST_KEY) || 0) || 0);
-      if (latestPostId > prev) {
-        localStorage.setItem(BOARD_LAST_SEEN_POST_KEY, String(latestPostId));
-      }
+      localStorage.setItem(
+        BOARD_LAST_SEEN_MARKER_KEY,
+        JSON.stringify({ id: latest.id, createdAt: latest.createdAt })
+      );
+      // 게시판 홈을 실제로 확인한 시점에만 v1→v2 마이그레이션 완료 처리.
+      localStorage.setItem(BOARD_MARKER_MIGRATION_DONE_KEY, '1');
     } catch (_) {}
   }
 
@@ -3898,15 +3908,15 @@ async function list(page=1,push=true,silentRefresh=false){
       const r=await api('board_list',{page:state.page,pageSize:20,keyword:state.keyword,searchType:state.searchType,category:state.category},{silent:silentRefresh});
       state.page=Number(r.page||state.page||1); state.totalPages=r.totalPages||1; state.me=r.me||null;
 
-      // ✅ 게시판 홈 1페이지를 확인한 순간 최신 글을 읽은 기준점으로 기록.
-      // 공지사항도 동일하게 게시글 ID 비교에 포함한다.
+      // ✅ 게시판 홈 1페이지를 확인한 순간 서버가 내려준 전역 최신글 마커를 기록.
+      // 공지/일반글 모두 포함하며, 삭제된 글 번호가 재사용되어도 작성시각으로 구분한다.
       if(
         state.page===1 &&
         !state.category &&
         !state.keyword &&
         state.searchType==='title_content'
       ){
-        markBoardLatestPostSeen(r.items||[]);
+        markBoardLatestPostSeen(r.latestPost);
       }
 
       if(push) setUrl({page:state.page>1?state.page:'',q:state.keyword,search:state.searchType!=='title_content'?state.searchType:'',cat:state.category});

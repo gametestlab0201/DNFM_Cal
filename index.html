@@ -10506,23 +10506,68 @@
     const MAIN_AUTH_API = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
 
     // ✅ 게시판 새 글 배지
-    // 게시판과 동일 origin의 localStorage 키를 공유한다.
-    const BOARD_LAST_SEEN_POST_KEY = 'dnfm_board_last_seen_post_id_v1';
+    // ID 단독 비교는 삭제된 글 번호가 재사용될 때 새 글을 놓칠 수 있으므로
+    // 작성시각 + ID 마커를 게시판과 같은 localStorage 키로 공유한다.
+    const BOARD_LAST_SEEN_MARKER_KEY = 'dnfm_board_last_seen_post_marker_v2';
+    const BOARD_LEGACY_LAST_SEEN_POST_KEY = 'dnfm_board_last_seen_post_id_v1';
+    const BOARD_MARKER_MIGRATION_DONE_KEY = 'dnfm_board_marker_migration_done_v2';
 
-    function getMainBoardLastSeenPostId() {
+    function hasMainBoardLegacySeenState() {
       try {
-        return Math.max(0, Number(localStorage.getItem(BOARD_LAST_SEEN_POST_KEY) || 0) || 0);
+        const value = localStorage.getItem(BOARD_LEGACY_LAST_SEEN_POST_KEY);
+        return value !== null && String(value).trim() !== '';
       } catch (_) {
-        return 0;
+        return false;
       }
     }
 
-    function setMainBoardLastSeenPostId(postId) {
-      const id = Math.max(0, Number(postId) || 0);
-      if (!id) return;
+    function isMainBoardMarkerMigrationDone() {
       try {
-        localStorage.setItem(BOARD_LAST_SEEN_POST_KEY, String(id));
+        return localStorage.getItem(BOARD_MARKER_MIGRATION_DONE_KEY) === '1';
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function normalizeMainBoardPostMarker(value) {
+      if (!value || typeof value !== 'object') return null;
+
+      const id = Math.max(0, Number(value.id || 0) || 0);
+      const createdAt = String(value.createdAt || '').trim();
+      const createdMs = Date.parse(createdAt);
+
+      if (!createdAt || !Number.isFinite(createdMs)) return null;
+      return { id, createdAt, createdMs };
+    }
+
+    function getMainBoardLastSeenMarker() {
+      try {
+        const raw = localStorage.getItem(BOARD_LAST_SEEN_MARKER_KEY);
+        return raw ? normalizeMainBoardPostMarker(JSON.parse(raw)) : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function setMainBoardLastSeenMarker(marker) {
+      const normalized = normalizeMainBoardPostMarker(marker);
+      if (!normalized) return;
+
+      try {
+        localStorage.setItem(
+          BOARD_LAST_SEEN_MARKER_KEY,
+          JSON.stringify({ id: normalized.id, createdAt: normalized.createdAt })
+        );
       } catch (_) {}
+    }
+
+    function isMainBoardMarkerNewer(latest, seen) {
+      const a = normalizeMainBoardPostMarker(latest);
+      const b = normalizeMainBoardPostMarker(seen);
+      if (!a || !b) return false;
+
+      if (a.createdMs !== b.createdMs) return a.createdMs > b.createdMs;
+      return a.id !== b.id;
     }
 
     function paintMainBoardNewBadge(show) {
@@ -10549,29 +10594,34 @@
         if (!response.ok) return;
 
         const data = await response.json();
-        if (!data?.ok || !Array.isArray(data.items) || !data.items.length) {
+        if (!data?.ok) return;
+
+        // 백엔드가 전체 활성 게시글에서 따로 계산한 최신 작성시각 마커를 사용한다.
+        // 따라서 공지 우선 정렬, 페이지 크기, 삭제된 ID 재사용에 영향을 받지 않는다.
+        const latestMarker = normalizeMainBoardPostMarker(data.latestPost);
+        if (!latestMarker) {
           paintMainBoardNewBadge(false);
           return;
         }
 
-        // 공지/일반글 구분 없이 현재 1페이지에 내려온 글 중 가장 큰 게시글 ID를 최신 기준으로 사용.
-        const latestPostId = data.items.reduce(
-          (maxId, item) => Math.max(maxId, Number(item?.id || 0) || 0),
-          0
-        );
-        if (!latestPostId) return;
+        const lastSeenMarker = getMainBoardLastSeenMarker();
 
-        const lastSeenPostId = getMainBoardLastSeenPostId();
+        // 기존 v1 사용자는 v2 마커가 이미 생성되어 있어도,
+        // 게시판 홈을 다시 확인하기 전까지는 현재 최신글을 "새 글"로 한 번 보여준다.
+        // 2360에서 v2 기준점이 먼저 저장된 브라우저도 이 분기로 복구된다.
+        if (hasMainBoardLegacySeenState() && !isMainBoardMarkerMigrationDone()) {
+          paintMainBoardNewBadge(true);
+          return;
+        }
 
-        // 이 기능을 처음 사용하는 브라우저는 현재 최신글을 기준점으로 저장한다.
-        // 기존 과거 글 때문에 첫 접속부터 "새 글"이 뜨는 것을 방지한다.
-        if (!lastSeenPostId) {
-          setMainBoardLastSeenPostId(latestPostId);
+        // 완전 신규 브라우저(v1 기록도 없음)는 현재 최신글을 최초 기준점으로 저장한다.
+        if (!lastSeenMarker) {
+          setMainBoardLastSeenMarker(latestMarker);
           paintMainBoardNewBadge(false);
           return;
         }
 
-        paintMainBoardNewBadge(latestPostId > lastSeenPostId);
+        paintMainBoardNewBadge(isMainBoardMarkerNewer(latestMarker, lastSeenMarker));
       } catch (error) {
         // 배지 확인 실패가 메인 이용에 영향을 주지 않게 조용히 무시한다.
         console.debug('[main-board-new-badge]', error);
@@ -10717,7 +10767,10 @@
         if (event.key === 'id_token') refreshSettingStatusResearchAccess();
 
         // 다른 탭에서 게시판을 확인하면 메인의 "새 글" 배지도 즉시 동기화한다.
-        if (event.key === BOARD_LAST_SEEN_POST_KEY) {
+        if (
+          event.key === BOARD_LAST_SEEN_MARKER_KEY ||
+          event.key === BOARD_MARKER_MIGRATION_DONE_KEY
+        ) {
           refreshMainBoardNewBadge();
         }
       });
