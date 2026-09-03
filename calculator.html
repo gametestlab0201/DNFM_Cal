@@ -11212,7 +11212,13 @@
       style="width:min(1160px,97vw);">
       <header>
         <h2 id="skillDamageDlgTitle">스킬별 데미지</h2>
-        <button type="button" class="close" data-close aria-label="닫기">✕</button>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button id="btnResearchExcelExport" type="button" class="btnetc"
+            style="display:none; height:30px; padding:0 11px; font-size:12px; font-weight:800;">
+            Excel로 내보내기
+          </button>
+          <button type="button" class="close" data-close aria-label="닫기">✕</button>
+        </div>
       </header>
 
       <div style="padding:12px 14px 14px;">
@@ -13774,6 +13780,7 @@ if (/[\r\n]/.test(nickname)) {
 
       // ✅ [특정 유저 전용 유지] 아래 버튼들은 special_user / research_user 공통 허용
       const btnSkillDamage = document.getElementById('btnSkillDamageViewer');
+      const btnResearchExcel = document.getElementById('btnResearchExcelExport');
       const rowDmgOpt = document.getElementById('specialDamageOptRow');
       const btnAutoSet = document.getElementById('btnAutoSetSweepSelected');
       const btnMacroSetGeneral = document.getElementById('btnMacroSetGeneral');
@@ -13786,6 +13793,7 @@ if (/[\r\n]/.test(nickname)) {
       updateSynergyEffectButtonVisibility();
 
       if (btnSkillDamage) btnSkillDamage.style.display = hasSpecialLike ? 'inline-flex' : 'none';
+      if (btnResearchExcel) btnResearchExcel.style.display = isResearchUser ? 'inline-flex' : 'none';
 
       // ✅ 부위별 전체 초기화 버튼도 special_user / research_user에게만 노출
       try {
@@ -31805,7 +31813,12 @@ try {
             ownerKey = k.replace(/\s+/g, '');
           }
 
-          const out = { ownerKey, window: timeKey };
+          const out = {
+            ownerKey,
+            window: timeKey,
+            // ✅ research_user: 백엔드 skill_uses 타임라인을 건너뛰고 모든 실제 스킬을 정확히 1회 사용
+            researchOneUse: !!window.__IS_RESEARCH_USER__
+          };
 
           if (state?.customSkills) {
             out.customSkills = state.customSkills;
@@ -33044,7 +33057,418 @@ try {
       return Number.isFinite(ratio) && ratio > 0 ? ratio : 1;
     }
 
-    function openSkillDamageViewerModal() {
+    function _rankEqDescending(values) {
+      const nums = (values || []).map(v => Number(v));
+      return nums.map((v, idx) => {
+        if (!Number.isFinite(v)) return null;
+        let rank = 1;
+        for (let i = 0; i < nums.length; i++) {
+          if (i === idx || !Number.isFinite(nums[i])) continue;
+          if (nums[i] > v) rank += 1;
+        }
+        return rank;
+      });
+    }
+
+    function _sanitizeExcelFilePart(v) {
+      return String(v || '')
+        .replace(/[\\/:*?"<>|]/g, '_')
+        .replace(/\s+/g, ' ')
+        .trim() || '캐릭터';
+    }
+
+    function _researchExcelTimestamp() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      return (
+        pad(d.getMonth() + 1) +
+        pad(d.getDate()) +
+        pad(d.getHours()) +
+        pad(d.getMinutes())
+      );
+    }
+
+    async function _ensureExcelJSLoaded() {
+      if (window.ExcelJS) return window.ExcelJS;
+
+      const src = 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';
+
+      await new Promise((resolve, reject) => {
+        const old = document.querySelector('script[data-research-exceljs="1"]');
+        if (old) {
+          old.addEventListener('load', resolve, { once: true });
+          old.addEventListener('error', reject, { once: true });
+          if (window.ExcelJS) resolve();
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.dataset.researchExceljs = '1';
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('ExcelJS 로드 실패'));
+        document.head.appendChild(script);
+      });
+
+      if (!window.ExcelJS) throw new Error('ExcelJS를 사용할 수 없습니다.');
+      return window.ExcelJS;
+    }
+
+    async function _imageUrlToExcelBase64(url) {
+      const src = String(url || '').trim();
+      if (!src) return null;
+
+      try {
+        const response = await fetch(src, { cache: 'force-cache' });
+        if (!response.ok) throw new Error('image_fetch_' + response.status);
+
+        const blob = await response.blob();
+        return await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result || ''));
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      } catch (_) {
+        return null;
+      }
+    }
+
+    async function exportResearchDamageExcel() {
+      if (!window.__IS_RESEARCH_USER__) {
+        toast('research_user 전용 기능입니다.');
+        return;
+      }
+
+      const baseRows = Array.isArray(state.lastResearchExcelRows)
+        ? state.lastResearchExcelRows
+        : [];
+
+      if (!baseRows.length) {
+        toast('먼저 계산하기 후 데미지 보기를 열어주세요.');
+        return;
+      }
+
+      // ✅ 동일한 현재 무기를 유지한 채 무기 고유효과만 자동 교체해서 비교한다.
+      const weaponName = (typeof getCurrentWeaponName === 'function')
+        ? String(getCurrentWeaponName() || '').trim()
+        : String(state?.selections?.weapon?.name || '').trim();
+
+      if (!weaponName) {
+        toast('무기를 먼저 선택해 주세요.');
+        return;
+      }
+
+      const btn = document.getElementById('btnResearchExcelExport');
+      const oldText = btn?.textContent || 'Excel로 내보내기';
+
+      // 요청한 비교 순서: 고유효과 없음 + 5종
+      const sweepTypes = ['없음', '분쇄', '광채', '강타', '선명', '참격'];
+
+      const backupCustomSkills = state?.customSkills
+        ? JSON.parse(JSON.stringify(state.customSkills))
+        : {};
+      const backupUniqueOnOff = !!state?.uniqueOnOff;
+      const restoreTargetId = String(state?.lastComputeMeta?.targetId || '');
+
+      // Excel에서 실제 보이는 값 기준으로 같은 스킬인지 판정한다.
+      // 이렇게 하면 부동소수점 미세 오차 때문에 같은 값이 중복 행으로 생기는 것을 막는다.
+      const displaySignature = (r) => {
+        const dmg = Math.round((Number(r?.damage || 0) || 0) / 1_000_000);
+        const dps = r?.dps == null ? '' : ((Number(r.dps) || 0) * 1_000).toFixed(2);
+        const dpsSp = r?.dpsPerSp == null ? '' : ((Number(r.dpsPerSp) || 0) * 1_000).toFixed(2);
+        const addedLv = Math.max(0, Number(r?.addedSkillLv || 0) || 0);
+        return `${dmg}|${dps}|${dpsSp}|${addedLv}`;
+      };
+
+      try {
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = '고유효과 비교 계산 중…';
+        }
+
+        // 자동 비교 중에는 계산값 시트 log_damage가 6번 쌓이지 않도록 잠시 OFF.
+        // 실제 최종 데미지 계산에는 uniqueOnOff가 관여하지 않고 로그 적재에만 사용된다.
+        state.uniqueOnOff = false;
+
+        const sweepResults = [];
+
+        for (let i = 0; i < sweepTypes.length; i++) {
+          const effect = sweepTypes[i];
+
+          if (btn) {
+            btn.textContent = `고유효과 비교 ${i + 1}/${sweepTypes.length}…`;
+          }
+
+          if (!state.customSkills || typeof state.customSkills !== 'object') {
+            state.customSkills = {};
+          }
+
+          if (effect === '없음') {
+            state.customSkills.type = '';
+            state.customSkills.weaponName = '';
+          } else {
+            state.customSkills.type = effect;
+            state.customSkills.weaponName = weaponName;
+          }
+
+          // 같은 장비/스킬트리에서 고유효과만 바꿔 실제 final_compute를 수행한다.
+          await computeViaBackend(null);
+
+          // 방금 계산 결과를 기존 research Excel 행 생성 로직으로 변환한다.
+          // silent=true라서 모달을 다시 열지는 않는다.
+          openSkillDamageViewerModal({ silent: true });
+
+          const rowsNow = Array.isArray(state.lastResearchExcelRows)
+            ? state.lastResearchExcelRows.map(r => ({ ...r }))
+            : [];
+
+          sweepResults.push({ effect, rows: rowsNow });
+        }
+
+        // ===== 같은 스킬의 6개 상태를 합쳐 중복 제거 =====
+        // 스킬 이름 기준으로 모은 뒤, 표시값이 같은 상태는 한 행으로 합친다.
+        const skillMap = new Map();
+
+        for (const result of sweepResults) {
+          for (const r of result.rows) {
+            const name = String(r?.name || '').trim();
+            if (!name) continue;
+
+            if (!skillMap.has(name)) {
+              skillMap.set(name, {
+                name,
+                reqLevel: Math.max(0, Number(r?.reqLevel || 0) || 0),
+                variants: []
+              });
+            }
+
+            skillMap.get(name).variants.push({
+              effect: result.effect,
+              row: { ...r },
+              signature: displaySignature(r)
+            });
+          }
+        }
+
+        const rows = [];
+
+        for (const skill of skillMap.values()) {
+          // sweep 순서를 유지하면서 같은 표시값끼리 그룹화
+          const groups = [];
+          const bySig = new Map();
+
+          for (const v of skill.variants) {
+            let g = bySig.get(v.signature);
+            if (!g) {
+              g = { signature: v.signature, variants: [] };
+              bySig.set(v.signature, g);
+              groups.push(g);
+            }
+            g.variants.push(v);
+          }
+
+          // 6상태 전부 같으면 1행만 '공통'으로 표시
+          if (groups.length === 1) {
+            const rep = groups[0].variants.find(v => v.effect === '없음') || groups[0].variants[0];
+            rows.push({ ...rep.row, uniqueEffect: '공통' });
+            continue;
+          }
+
+          // 값이 달라지는 스킬은 서로 다른 결과값마다 한 행씩 출력
+          // '없음'과 같은 그룹은 기준값이므로 '없음'으로 표시한다.
+          for (const g of groups) {
+            const baseline = g.variants.find(v => v.effect === '없음');
+            const rep = baseline || g.variants[0];
+            const label = baseline
+              ? '없음'
+              : g.variants.map(v => v.effect).join('/');
+
+            rows.push({ ...rep.row, uniqueEffect: label });
+          }
+        }
+
+        // ✅ 6개 고유효과 비교/중복 제거가 모두 끝난 최종 Excel 행을 기준으로 순위를 다시 계산한다.
+        // 각 고유효과별 개별 계산에서 만들어졌던 기존 순위는 사용하지 않는다.
+        const finalDamageRanks = _rankEqDescending(rows.map(r => r.damage));
+        const finalDpsRanks = _rankEqDescending(rows.map(r => r.dps));
+        const finalDpsPerSpRanks = _rankEqDescending(rows.map(r => r.dpsPerSp));
+
+        rows.forEach((r, i) => {
+          r.damageRank = finalDamageRanks[i];
+          r.dpsRank = finalDpsRanks[i];
+          r.dpsPerSpRank = finalDpsPerSpRanks[i];
+        });
+
+        // 스킬 렙제 → 기존 스킬 순서 → 같은 스킬 안에서는 없음/분쇄/광채/강타/선명/참격 순
+        const effectOrder = new Map(sweepTypes.map((v, i) => [v, i]));
+        rows.sort((a, b) => {
+          const lv = Number(a.reqLevel || 0) - Number(b.reqLevel || 0);
+          if (lv !== 0) return lv;
+
+          const an = String(a.name || '');
+          const bn = String(b.name || '');
+          if (an !== bn) {
+            const ao = Number(a._originalOrder || 0);
+            const bo = Number(b._originalOrder || 0);
+            if (ao !== bo) return ao - bo;
+            return an.localeCompare(bn, 'ko');
+          }
+
+          const ae = String(a.uniqueEffect || '');
+          const be = String(b.uniqueEffect || '');
+          const ai = ae === '공통' ? -1 : (effectOrder.get(ae) ?? 99);
+          const bi = be === '공통' ? -1 : (effectOrder.get(be) ?? 99);
+          return ai - bi;
+        });
+
+        if (btn) btn.textContent = 'Excel 생성 중…';
+
+        const ExcelJS = await _ensureExcelJSLoaded();
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = '게임실험연구소';
+        workbook.created = new Date();
+
+        const ws = workbook.addWorksheet('스킬 데미지 분석', {
+          views: [{ state: 'frozen', ySplit: 1 }]
+        });
+
+        ws.columns = [
+          { header: '스킬 이미지', key: 'image', width: 12 },
+          { header: '스킬명', key: 'name', width: 34 },
+          { header: '1회 데미지', key: 'damage', width: 20 },
+          { header: '데미지 순위', key: 'damageRank', width: 14 },
+          { header: 'DPS', key: 'dps', width: 14 },
+          { header: 'DPS 순위', key: 'dpsRank', width: 12 },
+          { header: 'DPS/SP', key: 'dpsPerSp', width: 14 },
+          { header: 'DPS/SP 순위', key: 'dpsPerSpRank', width: 14 },
+          { header: '추가 스킬레벨', key: 'addedSkillLv', width: 15 },
+        ];
+
+        const header = ws.getRow(1);
+        header.height = 24;
+        header.font = { bold: true, size: 14 };
+        header.alignment = { vertical: 'middle', horizontal: 'center' };
+
+        rows.forEach((r, idx) => {
+          const rowNo = idx + 2;
+          const effectLabel = String(r.uniqueEffect || '');
+          const excelSkillName =
+            effectLabel && effectLabel !== '공통' && effectLabel !== '없음'
+              ? `${r.name} (${effectLabel})`
+              : r.name;
+
+          const row = ws.addRow({
+            image: '',
+            name: excelSkillName,
+            // ✅ Excel 표시 단위 변환
+            damage: Number(r.damage || 0) / 1_000_000,
+            damageRank: Number(r.damageRank || 0) || '',
+            dps: r.dps == null ? '' : Number(r.dps) * 1_000,
+            dpsRank: r.dpsRank == null ? '' : Number(r.dpsRank),
+            dpsPerSp: r.dpsPerSp == null ? '' : Number(r.dpsPerSp) * 1_000,
+            dpsPerSpRank: r.dpsPerSpRank == null ? '' : Number(r.dpsPerSpRank),
+            addedSkillLv: Number(r.addedSkillLv || 0),
+          });
+
+          row.height = 22;
+          row.font = { size: 14 };
+          row.alignment = { vertical: 'middle' };
+
+          // 1회 데미지 정수 / DPS, DPS-SP 소수 둘째자리
+          ws.getCell(`C${rowNo}`).numFmt = '#,##0';
+          ws.getCell(`E${rowNo}`).numFmt = '0.00';
+          ws.getCell(`G${rowNo}`).numFmt = '0.00';
+
+          for (const col of ['C','D','E','F','G','H','I']) {
+            ws.getCell(`${col}${rowNo}`).alignment = {
+              vertical: 'middle',
+              horizontal: 'center'
+            };
+          }
+        });
+
+        // 같은 스킬 이미지는 중복 행이어도 각 행에 표시한다.
+        for (let i = 0; i < rows.length; i++) {
+          const dataUrl = await _imageUrlToExcelBase64(rows[i].img);
+          if (!dataUrl) continue;
+
+          const m = /^data:image\/(png|jpeg|jpg);base64,(.+)$/i.exec(dataUrl);
+          if (!m) continue;
+
+          const extension = /jpe?g/i.test(m[1]) ? 'jpeg' : 'png';
+          const imageId = workbook.addImage({
+            base64: dataUrl,
+            extension
+          });
+
+          ws.addImage(imageId, {
+            tl: { col: 0, row: i + 1 },
+            ext: { width: 20, height: 20 },
+            editAs: 'oneCell'
+          });
+        }
+
+        ws.autoFilter = {
+          from: 'A1',
+          to: `I${rows.length + 1}`
+        };
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob(
+          [buffer],
+          { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
+        );
+
+        const charName = _sanitizeExcelFilePart(
+          state?.currentCharacter?.name ||
+          state?.lastComputeMeta?.characterName ||
+          '캐릭터'
+        );
+        const filename =
+          `${charName}_고유효과비교_${_researchExcelTimestamp()}.xlsx`;
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+
+        toast('고유효과 비교 Excel 파일을 생성했습니다.');
+      } catch (e) {
+        console.error('[research excel unique sweep export]', e);
+        toast('고유효과 비교 Excel 파일 생성에 실패했습니다.');
+      } finally {
+        // 사용자가 원래 선택해 둔 고유효과/로그 토글을 복원한다.
+        state.customSkills = backupCustomSkills
+          ? JSON.parse(JSON.stringify(backupCustomSkills))
+          : {};
+        state.uniqueOnOff = backupUniqueOnOff;
+
+        // 마지막 sweep(참격)의 계산 캐시가 남지 않도록 원래 상태로 한 번 재계산한다.
+        try {
+          await computeViaBackend(restoreTargetId || null);
+          openSkillDamageViewerModal({ silent: true });
+        } catch (restoreErr) {
+          console.warn('[research excel unique sweep restore compute]', restoreErr);
+        }
+
+        try { applyCustomOptUIFromState?.(); } catch (_) { }
+        try { updateEquipDescPreview?.(); } catch (_) { }
+
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = oldText;
+        }
+      }
+    }
+
+    function openSkillDamageViewerModal(options = {}) {
+      const silent = !!options?.silent;
       if (!window.__IS_SPECIAL_USER__) {
         toast('권한이 없습니다.');
         return;
@@ -33064,6 +33488,11 @@ try {
 
       bindSkillDamageModalCloseOnce();
 
+      const excelBtn = document.getElementById('btnResearchExcelExport');
+      if (excelBtn) {
+        excelBtn.style.display = window.__IS_RESEARCH_USER__ ? 'inline-flex' : 'none';
+      }
+
       const m = state.lastComputeMeta || {};
       const C = state.lastComputeCoeffs || {};
       const currentSkills = skillsForCurrentChar(Array.isArray(ST2.rows) ? ST2.rows : []);
@@ -33076,17 +33505,46 @@ try {
         currentSkills.map(s => [String(s?.name || '').trim(), s])
       );
 
+      // ✅ 구분 공란 판정은 skill:list/KV가 아니라 실제 계산 스냅샷의 rawKind를 사용한다.
+      // 과거 KV 캐시에 공란 구분이 '스킬'로 저장되어 있어도 영향을 받지 않는다.
+
       // ✅ 백엔드 final_compute → skill_state_set에서 확정된 실제 최종 쿨타임 사용
       //    프론트에서 별도로 쿨감 공식을 재계산하지 않는다.
       const skillStateResult = state.lastComputeSkillStateResult || {};
       const skillDebugRows = Array.isArray(skillStateResult?.skillsDebug)
         ? skillStateResult.skillsDebug
         : [];
+
+      // ✅ 실제 스킬 시트 원본 '구분'이 공란인 스킬명
+      const blankKindSkillNames = new Set(
+        skillDebugRows
+          .filter(s => !String(s?.rawKind ?? '').trim())
+          .map(s => String(s?.name || '').trim())
+          .filter(Boolean)
+      );
+
       const skillCooldownMap = new Map(
         skillDebugRows.map(s => [
           String(s?.name || '').trim(),
           Math.max(0, Number(s?.cdFinal || 0) || 0)
         ])
+      );
+      const skillAddedLevelMap = new Map(
+        skillDebugRows.map(s => [
+          String(s?.name || '').trim(),
+          Math.max(0, Number(s?.addedSkillLv || 0) || 0)
+        ])
+      );
+
+      // ✅ Excel 정렬용 스킬 렙제
+      // PC 스킬트리에 표시되는 reqLevel(ST2.rows[].level)을 기준으로 사용한다.
+      const skillRequiredLevelMap = new Map(
+        (Array.isArray(ST2?.rows) ? ST2.rows : [])
+          .map(s => [
+            String(s?.name || '').trim(),
+            Math.max(0, Number(s?.level || 0) || 0)
+          ])
+          .filter(([name]) => !!name)
       );
 
       const getUsedSpForSkill = (skillName) => {
@@ -33206,6 +33664,11 @@ try {
         const kind = String(r?.kind || '-');
         const uses = Number(r?.uses || 0);
 
+        // ✅ 스킬 시트 '구분' 공란 스킬은 본체/귀속 상변 모두 데미지보기와 Excel에서 제외
+        if (blankKindSkillNames.has(name)) {
+          continue;
+        }
+
         const dmgPerUseRaw = Number(r?.dmgPerUse || 0);
         const sumRaw = Number(r?.sum || 0);
 
@@ -33320,6 +33783,17 @@ try {
         }
       }
 
+      // ✅ 최종 병합 전에 한 번 더 제거:
+      // 공란 구분 스킬 본체 + 그 스킬에서 나온 귀속 상변(출혈/화상/중독/감전) 모두 제외
+      const visibleRenderedRows = renderedRows.filter(r => {
+        const rowName = String(r?.name || '').trim();
+        const parentName = String(r?.parentSkillName || '').trim();
+
+        if (parentName && blankKindSkillNames.has(parentName)) return false;
+        if (!r?.isSkillStatusRow && blankKindSkillNames.has(rowName)) return false;
+        return true;
+      });
+
       const mergedRows = [];
       let basicAttackBucket = null;
 
@@ -33363,7 +33837,7 @@ try {
         }
       };
 
-      for (const r of renderedRows) {
+      for (const r of visibleRenderedRows) {
         const isBasicAttackRow = (r.kind === '평타' || r.kind === '연결평타');
         const isMergedStatusRow =
           ((r.kind === '옵션상변' || r.kind === '스킬상변') && optionStatusBuckets[r.name]);
@@ -33407,6 +33881,106 @@ try {
       }
 
       mergedRows.sort((a, b) => Number(b.sumFinal || 0) - Number(a.sumFinal || 0));
+
+      // ✅ research_user Excel 분석용 데이터
+      // - 현재 데미지보기의 정렬 순서를 그대로 유지
+      // - 기본공격 / 일반 옵션상변 / 오브젝트는 제외
+      // - 스킬시트 상변종류/2/3에서 나온 '스킬 자체 상변'만 부모 스킬 1회 데미지에 합산
+      if (window.__IS_RESEARCH_USER__) {
+        const skillStatusDamageByParent = new Map();
+
+        for (const rr of visibleRenderedRows) {
+          if (!rr?.isSkillStatusRow || !rr?.parentSkillName) continue;
+          const parent = String(rr.parentSkillName || '').trim();
+          if (!parent) continue;
+          skillStatusDamageByParent.set(
+            parent,
+            Number(skillStatusDamageByParent.get(parent) || 0) + Number(rr.sumFinal || 0)
+          );
+        }
+
+        const exportRows = [];
+
+        for (const rr of mergedRows) {
+          const name = String(rr?.name || '').trim();
+          const kind = String(rr?.kind || '').trim();
+
+          const isExcluded =
+            !name ||
+            name === '기본공격' ||
+            kind === '평타' ||
+            kind === '연결평타' ||
+            kind === '옵션상변' ||
+            kind === '스킬상변' ||
+            rr?.isOptionStatusRow ||
+            rr?.isSkillStatusRow;
+
+          if (isExcluded) continue;
+
+          // research_user는 백엔드에서 실제 스킬을 정확히 1회 사용하므로
+          // 순수 직접 1회 데미지 + 해당 스킬 귀속 상변 전체를 합산한다.
+          const directPerUse = Number(rr.dmgPerUseFinal || 0) || 0;
+          const ownStatusPerUse = Number(skillStatusDamageByParent.get(name) || 0) || 0;
+          const damage = directPerUse + ownStatusPerUse;
+
+          if (!(damage > 0)) continue;
+
+          const finalCooldown = Math.max(
+            0,
+            Number(skillCooldownMap.get(name) || 0) || 0
+          );
+          const usedSp = getUsedSpForSkill(name);
+
+          const dps =
+            finalCooldown > 0
+              ? (damage / finalCooldown / 1_000_000_000)
+              : null;
+
+          const dpsPerSp =
+            (dps != null && usedSp > 0)
+              ? ((dps / usedSp) * 1000)
+              : null;
+
+          exportRows.push({
+            name,
+            img: rr.img || skillImgMap.get(name) || PLACEHOLDER_IMG,
+            damage,
+            dps,
+            dpsPerSp,
+            addedSkillLv: Math.max(
+              0,
+              Number(skillAddedLevelMap.get(name) || 0) || 0
+            ),
+            reqLevel: Math.max(
+              0,
+              Number(skillRequiredLevelMap.get(name) || 0) || 0
+            ),
+            _originalOrder: exportRows.length
+          });
+        }
+
+        const damageRanks = _rankEqDescending(exportRows.map(r => r.damage));
+        const dpsRanks = _rankEqDescending(exportRows.map(r => r.dps));
+        const dpsPerSpRanks = _rankEqDescending(exportRows.map(r => r.dpsPerSp));
+
+        exportRows.forEach((r, i) => {
+          r.damageRank = damageRanks[i];
+          r.dpsRank = dpsRanks[i];
+          r.dpsPerSpRank = dpsPerSpRanks[i];
+        });
+
+        // ✅ Excel 행 순서: 스킬 렙제가 낮은 순서
+        // 같은 렙제끼리는 기존 데미지보기에서 만들어진 순서를 그대로 유지한다.
+        exportRows.sort((a, b) => {
+          const levelDiff = Number(a.reqLevel || 0) - Number(b.reqLevel || 0);
+          if (levelDiff !== 0) return levelDiff;
+          return Number(a._originalOrder || 0) - Number(b._originalOrder || 0);
+        });
+
+        state.lastResearchExcelRows = exportRows;
+      } else {
+        state.lastResearchExcelRows = [];
+      }
 
       // ===== 합계 계산 =====
       const directFinalTotal = directBaseSum * directMul * (forceCrit100 ? critForceRatio : 1);
@@ -33545,7 +34119,7 @@ try {
   `;
       }).join('');
 
-      showModal(modal, true);
+      if (!silent) showModal(modal, true);
     }
 
     const DBSynergy = {
@@ -34657,6 +35231,10 @@ wrap.appendChild(listBox);
 
     document.getElementById('btnSkillDamageViewer')?.addEventListener('click', () => {
       openSkillDamageViewerModal();
+    });
+
+    document.getElementById('btnResearchExcelExport')?.addEventListener('click', () => {
+      exportResearchDamageExcel();
     });
 
     document.getElementById('btn-sum-all-final')?.setAttribute('data-compute-btn', '');
