@@ -7364,30 +7364,6 @@
               </div>
             </div>
 
-            <!-- ✅ 와일드베인/윈드시어 전용: 스킬트리 선택 -->
-            <div id="wildbaneTreeBoxM" class="wb-tree-box is-hidden">
-              <div class="wb-tree-head">
-                <div class="wb-tree-title">스킬선택</div>
-                <button id="btnWildbaneTreeM" class="btn primary" type="button">선택</button>
-              </div>
-
-              <div class="wb-tree-summary">
-                <div>선택 스킬트리 : <b id="wildbaneTreePickM">-</b></div>
-                <div>사이클 횟수 : <b id="wildbaneCyclePickM">-</b> <span class="wb-tree-hint"></span></div>
-              </div>
-            </div>
-
-            <div id="windshearTreeBoxM" class="wb-tree-box is-hidden">
-              <div class="wb-tree-head">
-                <div class="wb-tree-title">스킬선택</div>
-                <button id="btnWindshearTreeM" class="btn primary" type="button">선택</button>
-              </div>
-
-              <div class="wb-tree-summary">
-                <div>선택 스킬트리 : <b id="windshearTreePickM">-</b></div>
-                <div>사이클 횟수 : <b id="windshearCyclePickM">-</b> <span class="wb-tree-hint"></span></div>
-              </div>
-            </div>
             <div id="skillListM" class="skill-list"></div>
 
             <div class="skill-footnote">
@@ -8155,79 +8131,6 @@
       </div>
     </div>
   </div>
-
-  <!-- ▼ 워리어 와일드베인: 스킬트리 2안 선택 모달 (모바일) -->
-  <div id="wildbaneTreeModalM" class="modal" aria-hidden="true">
-    <div class="backdrop" data-wb-close></div>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="wbTreeTitleM" style="width:min(520px,92vw);">
-      <header style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-        <h2 id="wbTreeTitleM" style="margin:0;">스킬트리 선택</h2>
-        <button type="button" class="close" data-wb-close>닫기</button>
-      </header>
-
-      <div class="items" style="padding:14px;">
-        <div style="font-size:13px;color:#fff;line-height:1.45;opacity:.95;">
-          워리어 와일드베인은 <b>스킬을 직접 찍을 수 없고</b>,<br>
-          정형화된 2가지 스킬트리 중 하나를 선택 한 뒤 <b>사이클 횟수</b>를 입력합니다.<br><br>
-          ※ 사이클 횟수 = 0 이면 “시간 기준”으로 자동 계산됩니다.
-        </div>
-
-        <div class="wb-tree-grid">
-          <button type="button" class="wb-tree-btn" data-wb-tree="파파초">파파초</button>
-          <button type="button" class="wb-tree-btn" data-wb-tree="파빨초">파빨초</button>
-        </div>
-
-        <div class="wb-cycle-wrap">
-          <div class="wb-cycle-label">사이클 횟수 직접 입력</div>
-          <input id="wbCycleCountM" class="wb-cycle-input" type="number" inputmode="numeric" min="0" step="1" value="0"
-            placeholder="0">
-        </div>
-
-        <button id="btnWildbaneTreeApplyM" class="btn primary" type="button" style="width:100%;margin-top:12px;">
-          선택하기
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ▼ 워리어 윈드시어: 스킬트리 3안 선택 모달 (모바일) -->
-  <div id="windshearTreeModalM" class="modal" aria-hidden="true">
-    <div class="backdrop" data-ws-close></div>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="wsTreeTitleM" style="width:min(520px,92vw);">
-      <header style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-        <h2 id="wsTreeTitleM" style="margin:0;">스킬트리 선택</h2>
-        <button type="button" class="close" data-ws-close>닫기</button>
-      </header>
-
-      <div class="items" style="padding:14px;">
-        <div style="font-size:13px;color:#fff;line-height:1.45;opacity:.95;">
-          워리어 윈드시어는 <b>스킬을 직접 찍는 방식이 아니라</b>,<br>
-          정형화된 3가지 스킬트리 중 하나를 선택 한 뒤 <b>사이클 횟수</b>를 입력합니다.<br><br>
-          ※ 사이클 횟수 = 0 이면 “시간 기준”으로 자동 계산됩니다.
-        </div>
-
-        <div class="wb-tree-grid" style="margin-top:12px;">
-          <button type="button" class="wb-tree-btn" data-ws-tree="A">파파파파빨</button>
-          <button type="button" class="wb-tree-btn" data-ws-tree="B">초초초초빨</button>
-          <button type="button" class="wb-tree-btn" data-ws-tree="C">파파파초빨</button>
-        </div>
-
-        <!-- ✅ 사이클 횟수 입력 -->
-        <div class="wb-cycle-wrap" style="margin-top:12px;">
-          <div class="wb-cycle-label">사이클 횟수 직접 입력</div>
-          <div class="wb-cycle-row">
-            <input id="wsCycleCountM" class="wb-cycle-input" type="number" inputmode="numeric" min="0" step="1"
-              value="0" placeholder="0">
-          </div>
-        </div>
-
-        <div class="modal-foot" style="margin-top:12px;">
-          <button id="btnWindshearTreeApplyM" class="st-apply-btn" type="button" style="width:100%;">설정 하기</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
 
   <div id="toast" class="toast"></div>
 
@@ -9963,183 +9866,6 @@
     }
 
 
-    function openWildbaneTreeModalMobile() {
-      const modal = document.getElementById('wildbaneTreeModalM');
-      if (!modal) return;
-
-      const s = (window.state || (window.state = {}));
-
-      // 기본값 보정
-      s.wildbaneTreePreset = String(s.wildbaneTreePreset || '파파초').trim() || '파파초';
-      s.wildbaneCycleCount = Number.isFinite(+s.wildbaneCycleCount) ? Math.max(0, Math.floor(+s.wildbaneCycleCount)) : 0;
-
-      // 임시값(모달에서 선택 중)
-      s._wbTreeTemp = s.wildbaneTreePreset;
-      s._wbCycleCountTemp = s.wildbaneCycleCount;
-
-      // 버튼 active 반영
-      modal.querySelectorAll('[data-wb-tree]').forEach(btn => {
-        btn.classList.toggle('wb-active', btn.dataset.wbTree === s._wbTreeTemp);
-      });
-
-      // 입력값 반영
-      const inp = modal.querySelector('#wbCycleCountM');
-      if (inp) inp.value = String(s._wbCycleCountTemp ?? 0);
-
-      modal.classList.add('show');
-      modal.setAttribute('aria-hidden', 'false');
-    }
-
-    // ✅ 와일드베인 모달 바인딩(1회)
-    function bindWildbaneTreeModalMobile() {
-      const modal = document.getElementById('wildbaneTreeModalM');
-      if (!modal || modal.dataset.bound) return;
-      modal.dataset.bound = '1';
-
-      const close = () => {
-        modal.classList.remove('show');
-        modal.setAttribute('aria-hidden', 'true');
-      };
-
-      // 닫기(배경/닫기 버튼)
-      modal.querySelectorAll('[data-wb-close]').forEach(el => {
-        el.addEventListener('click', close);
-      });
-
-      // 트리 버튼 선택
-      modal.querySelectorAll('[data-wb-tree]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const s = (window.state || (window.state = {}));
-          s._wbTreeTemp = btn.dataset.wbTree;
-
-          modal.querySelectorAll('[data-wb-tree]').forEach(b => {
-            b.classList.toggle('wb-active', b.dataset.wbTree === s._wbTreeTemp);
-          });
-        });
-      });
-
-      // 사이클 입력
-      const inp = modal.querySelector('#wbCycleCountM');
-      if (inp) {
-        inp.addEventListener('input', () => {
-          const s = (window.state || (window.state = {}));
-          const v = Math.floor(Number(inp.value || 0));
-          s._wbCycleCountTemp = Math.max(0, isFinite(v) ? v : 0);
-        });
-      }
-
-      // 선택 확정
-      document.getElementById('btnWildbaneTreeApplyM')?.addEventListener('click', () => {
-        const s = (window.state || (window.state = {}));
-
-        s.wildbaneTreePreset = String(s._wbTreeTemp || s.wildbaneTreePreset || '파파초').trim() || '파파초';
-        s.wildbaneCycleCount = Math.max(0, Math.floor(Number(s._wbCycleCountTemp || 0)));
-
-        updateWildbaneTreeSummaryMobile();
-        close();
-        toast('스킬트리가 적용되었습니다.');
-      });
-    }
-
-
-    // ✅ 윈드시어 스킬트리 요약 갱신
-    function updateWindshearTreeSummaryMobile() {
-      const s = window.state || {};
-      const preset = String(s.windshearTreePreset || 'A').trim() || 'A';
-      const cycle = Number.isFinite(+s.windshearCycleCount) ? Math.max(0, Math.floor(+s.windshearCycleCount)) : 0;
-
-      const labelMap = { A: '파파파파빨', B: '초초초초빨', C: '파파파초빨' };
-      const pEl = document.getElementById('windshearTreePickM');
-      const cEl = document.getElementById('windshearCyclePickM');
-
-      if (pEl) pEl.textContent = (labelMap[preset] || preset);
-      if (cEl) cEl.textContent = (cycle > 0 ? `${cycle}회` : '자동');
-    }
-
-    // ✅ 윈드시어 모달 열기
-    function openWindshearTreeModalMobile() {
-      const modal = document.getElementById('windshearTreeModalM');
-      if (!modal) return;
-
-      const s = (window.state || (window.state = {}));
-
-      // 기본값 보정
-      s.windshearTreePreset = String(s.windshearTreePreset || 'A').trim() || 'A';
-      s.windshearCycleCount = Number.isFinite(+s.windshearCycleCount) ? Math.max(0, Math.floor(+s.windshearCycleCount)) : 0;
-
-      // 임시값(모달에서 선택 중)
-      s._wsTreeTemp = s.windshearTreePreset;
-      s._wsCycleCountTemp = s.windshearCycleCount;
-
-      // 버튼 active 반영
-      modal.querySelectorAll('[data-ws-tree]').forEach(btn => {
-        btn.classList.toggle('wb-active', btn.dataset.wsTree === s._wsTreeTemp);
-      });
-
-      // 입력값 반영
-      const inp = modal.querySelector('#wsCycleCountM');
-      if (inp) inp.value = String(s._wsCycleCountTemp ?? 0);
-
-      modal.classList.add('show');
-      modal.setAttribute('aria-hidden', 'false');
-    }
-
-    // ✅ 윈드시어 모달 바인딩(1회)
-    function bindWindshearTreeModalMobile() {
-      const modal = document.getElementById('windshearTreeModalM');
-      if (!modal || modal.dataset.bound) return;
-      modal.dataset.bound = '1';
-
-      const close = () => {
-        modal.classList.remove('show');
-        modal.setAttribute('aria-hidden', 'true');
-      };
-
-      // 닫기(배경/닫기 버튼)
-      modal.querySelectorAll('[data-ws-close]').forEach(el => {
-        el.addEventListener('click', close);
-      });
-
-      // 트리 버튼 선택
-      modal.querySelectorAll('[data-ws-tree]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const s = (window.state || (window.state = {}));
-          s._wsTreeTemp = btn.dataset.wsTree;
-
-          modal.querySelectorAll('[data-ws-tree]').forEach(b => {
-            b.classList.toggle('wb-active', b.dataset.wsTree === s._wsTreeTemp);
-          });
-        });
-      });
-
-      // 사이클 입력
-      const inp = modal.querySelector('#wsCycleCountM');
-      if (inp) {
-        inp.addEventListener('input', () => {
-          const s = (window.state || (window.state = {}));
-          const v = Math.floor(Number(inp.value || 0));
-          s._wsCycleCountTemp = Math.max(0, isFinite(v) ? v : 0);
-        });
-      }
-
-      // 설정 하기
-      modal.querySelector('#btnWindshearTreeApplyM')?.addEventListener('click', () => {
-        const s = (window.state || (window.state = {}));
-        const preset = String(s._wsTreeTemp || 'A').trim() || 'A';
-        const cycle = Number.isFinite(+s._wsCycleCountTemp) ? Math.max(0, Math.floor(+s._wsCycleCountTemp)) : 0;
-
-        s.windshearTreePreset = preset;
-        s.windshearCycleCount = cycle;
-
-        updateWindshearTreeSummaryMobile();
-        close();
-
-        // 토스트 함수가 있으면 사용(없어도 안전)
-        if (typeof toast === 'function') toast('윈드시어 스킬트리 설정이 적용되었습니다.');
-      });
-    }
-
-
     /* =========================
      * ✅ 수련일지 (모바일)
      * - 성안의 봉인
@@ -11107,20 +10833,6 @@
       const elTp = document.getElementById('skillRemainTpM');
       if (!bar || !elSp || !elTp) return;
 
-      // ✅ 와일드베인(스킬트리 선택형)에서는 남은 SP/TP 표시를 사용하지 않음
-      const s0 = window.state || {};
-      const ok0 = String(s0.ownerKey || s0.CurrentSumStats?.ownerKey || '').trim()
-        || (String(s0.currentCharacter?.jobGroupLabel || s0.currentCharacter?.jobGroup || '').trim()
-          + String(s0.currentCharacter?.name || s0.currentCharacter?.charName || '').trim()
-        ).replace(/\s+/g, '');
-
-      if (ok0 === '워리어와일드베인') {
-        bar.classList.add('is-hidden');
-        elSp.textContent = '-';
-        elTp.textContent = '-';
-        return;
-      }
-
       const { totalSP, totalTP } = _getCharTotalSpTp();
       const hasAny = Number.isFinite(totalSP) || Number.isFinite(totalTP);
 
@@ -11839,26 +11551,6 @@
           toast('스킬이 초기화되었습니다.');
         });
       }
-
-      // (4) 워리어 와일드베인: 스킬트리 선택 버튼/모달
-      const wbBtn = document.getElementById('btnWildbaneTreeM');
-      if (wbBtn && !wbBtn.dataset.bound) {
-        wbBtn.dataset.bound = '1';
-        wbBtn.addEventListener('click', () => {
-          openWildbaneTreeModalMobile();
-        });
-      }
-      bindWildbaneTreeModalMobile();
-
-      // (5) 워리어 윈드시어: 스킬트리 선택 버튼/모달  ✅ 추가
-      const wsBtn = document.getElementById('btnWindshearTreeM');
-      if (wsBtn && !wsBtn.dataset.bound) {
-        wsBtn.dataset.bound = '1';
-        wsBtn.addEventListener('click', () => {
-          openWindshearTreeModalMobile();
-        });
-      }
-      bindWindshearTreeModalMobile();
     }
 
     // ✅ 공백 제거 정규화(스킬명/캐릭키 비교용)
@@ -12060,8 +11752,6 @@
       }
 
       // ✅ 워리어 와일드베인/윈드시어 UI 처리(402 유지)
-      const wbBox = document.getElementById('wildbaneTreeBoxM');
-      const wsBox = document.getElementById('windshearTreeBoxM');
       const remainBar = document.getElementById('skillRemainBarM');
       const footnote = document.querySelector('#pageSkill .skill-footnote');
 
@@ -12081,8 +11771,6 @@
       );
 
       const isFMech = (ownerKeyNow === '여거너메카닉');
-      const isWildbane = (ownerKeyNow === '워리어와일드베인');
-      const isWindshear = (ownerKeyNow === '워리어윈드시어');
 
       const bladePresetSel = document.getElementById('mobileBladeWafflePreset');
       if (bladePresetSel) {
@@ -12120,30 +11808,7 @@
         // ✅ 남격투가스트리트파이터일 때만 노출
         brawlerDetonationWrap.hidden = !isMaleStreetFighter;
       }
-
-      if (isWildbane) {
-        wsBox?.classList.add('is-hidden');
-        wbBox?.classList.remove('is-hidden');
-        remainBar?.classList.add('is-hidden');
-        footnote?.classList.add('is-hidden');
-        listEl.innerHTML = '';
-        updateWildbaneTreeSummaryMobile?.();
-        return;
-      }
-
-      if (isWindshear) {
-        wbBox?.classList.add('is-hidden');
-        wsBox?.classList.remove('is-hidden');
-        remainBar?.classList.add('is-hidden');
-        footnote?.classList.add('is-hidden');
-        listEl.innerHTML = '';
-        updateWindshearTreeSummaryMobile?.();
-        return;
-      }
-
-      // 그 외 캐릭터: 트리 UI 숨기고 일반 스킬 UI 표시
-      wbBox?.classList.add('is-hidden');
-      wsBox?.classList.add('is-hidden');
+      // 모든 캐릭터: 일반 스킬 UI 표시
       remainBar?.classList.remove('is-hidden');
       footnote?.classList.remove('is-hidden');
 
@@ -18116,12 +17781,6 @@
 
       const payload = { ownerKey, skills, patchBefore };
 
-      // ✅ 워리어윈드시어는 트리 선택값도 같이 보낸다
-      if (ownerKey === '워리어윈드시어') {
-        const presetRaw = String(s.windshearTreePreset || 'A').trim() || 'A';
-        payload.windshearTreePreset = presetRaw; // A / B / C
-      }
-
       const res = await apiJSON('skill_state_set', payload);
       if (!res?.ok) throw new Error(res?.message || res?.error || 'skill_state_set_failed');
       return res;
@@ -18142,42 +17801,10 @@
 
       const timeKey = String(s.timeKey || '180');
 
-      // ✅ 와일드베인 / 윈드시어 스킬트리 선택값도 함께 전송(백엔드 uses 계산에 반영)
-      const isWB = (ownerKey === '워리어와일드베인');
-      const isWS = (ownerKey === '워리어윈드시어');
-
-      const extra = {};
-      if (isWB) {
-        const preset = String(s.wildbaneTreePreset || '파파초').trim() || '파파초';
-        const cycle = Number.isFinite(+s.wildbaneCycleCount) ? Math.max(0, Math.floor(+s.wildbaneCycleCount)) : 0;
-
-        extra.wildbaneTreePreset = preset;
-        extra.wbTree = preset; // 호환용
-        extra.wildbaneCycleCount = cycle;
-        extra.wbCycleCount = cycle; // 호환용
-      }
-      if (isWS) {
-        const presetRaw = String(s.windshearTreePreset || 'A').trim() || 'A';
-        const cycle = Number.isFinite(+s.windshearCycleCount) ? Math.max(0, Math.floor(+s.windshearCycleCount)) : 0;
-
-        // ✅ 모바일(A/B/C) → 백엔드 skill_uses 기대값(트리A/B/C)으로 변환
-        const wsPresetForUses =
-          (presetRaw === 'A') ? '트리A' :
-            (presetRaw === 'B') ? '트리B' :
-              (presetRaw === 'C') ? '트리C' :
-                presetRaw;
-
-        extra.windshearTreePreset = wsPresetForUses;
-        extra.wsTree = wsPresetForUses; // 호환용
-        extra.windshearCycleCount = cycle;
-        extra.wsCycleCount = cycle; // 호환용
-      }
-
       const res = await apiJSON('skill_uses', {
         ownerKey,
         window: timeKey,
         wantDbg: false,
-        ...extra,
       });
 
       if (!res?.ok) throw new Error(res?.message || res?.error || 'skill_uses_failed');
@@ -19674,11 +19301,6 @@ function buildSynergyPayloadMobile() {
 
         const skillStatePayload = { ownerKey, skills, patchBefore };
 
-        if (ownerKey === '워리어윈드시어') {
-          const presetRaw = String(s.windshearTreePreset || 'A').trim() || 'A';
-          skillStatePayload.windshearTreePreset = presetRaw; // A / B / C
-        }
-
         const skillUsesPayload = {
           ownerKey,
           window: timeKey,
@@ -19687,30 +19309,6 @@ function buildSynergyPayloadMobile() {
         // ✅ PC final_compute와 동일: skill_uses 쪽은 현재 state.customSkills 원본을 사용
         if (s?.customSkills) {
           skillUsesPayload.customSkills = s.customSkills;
-        }
-
-        if (ownerKey === '워리어와일드베인') {
-          const preset = String(s.wildbaneTreePreset || '파파초').trim() || '파파초';
-          const cycle = Number.isFinite(+s.wildbaneCycleCount) ? Math.max(0, Math.floor(+s.wildbaneCycleCount)) : 0;
-
-          skillUsesPayload.wildbaneTreePreset = preset;
-          skillUsesPayload.wildbaneCycleCount = cycle;
-          skillUsesPayload.wildbaneCycleEnabled = (cycle > 0);
-        }
-
-        if (ownerKey === '워리어윈드시어') {
-          const presetRaw = String(s.windshearTreePreset || 'A').trim() || 'A';
-          const cycle = Number.isFinite(+s.windshearCycleCount) ? Math.max(0, Math.floor(+s.windshearCycleCount)) : 0;
-
-          const wsPresetForUses =
-            (presetRaw === 'A') ? '트리A' :
-              (presetRaw === 'B') ? '트리B' :
-                (presetRaw === 'C') ? '트리C' :
-                  presetRaw;
-
-          skillUsesPayload.windshearTreePreset = wsPresetForUses;
-          skillUsesPayload.windshearCycleCount = cycle;
-          skillUsesPayload.windshearCycleEnabled = (cycle > 0);
         }
 
         // ✅ 몬스터는 "현재 드롭다운 선택(monsterName)"을 항상 최우선으로 사용
