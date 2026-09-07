@@ -10265,16 +10265,29 @@
 <body>
   <script>
     (() => {
-      const token = sessionStorage.getItem('id_token') || localStorage.getItem('id_token');
+      let token = sessionStorage.getItem('id_token') || localStorage.getItem('id_token');
 
-      // 직접 URL 진입 여부를 표시한다.
-      // 저장된 토큰이 있으면 기존 로그인/연구원 흐름을 유지하고,
-      // 토큰이 없으면 이후 DOM 준비 후 기존 enterGuestCalculator() 경로를 자동 실행한다.
-      window.__DIRECT_PC_ENTRY_WITHOUT_TOKEN__ = !token;
+      // calculator.html 직접 진입 + 저장된 토큰 없음:
+      // 다른 초기 로더들이 waitForIdToken()을 호출하기 전에 게스트 토큰을 한 번만 생성한다.
+      // 이후 기존 로그인/복귀 흐름이 이 토큰으로 PC 계산기를 자동 부팅하므로
+      // 메인에서 비로그인으로 계산기에 들어온 것과 같은 public/guest 권한이 적용된다.
+      if (!token) {
+        const uuid = (window.crypto && typeof window.crypto.randomUUID === 'function')
+          ? window.crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
 
-      if (token) {
-        sessionStorage.setItem('return_to_calculator', 'pc');
+        token = `GUEST.${uuid}`;
+        sessionStorage.setItem('id_token', token);
+        localStorage.removeItem('id_token');
+
+        window.idToken = token;
+        window.__GUEST_MODE__ = true;
+        window.__ADMIN_PIN_LOGIN_MODE__ = false;
       }
+
+      // 기존 저장 토큰(연구원/일반/게스트)도 calculator.html 직접 진입이면
+      // 기존 복귀 루트를 이용해 PC 계산기를 자동으로 연다.
+      sessionStorage.setItem('return_to_calculator', 'pc');
     })();
   </script>
   <!-- 로딩 오버레이 (기본 hidden) -->
@@ -13880,8 +13893,17 @@ if (/[\r\n]/.test(nickname)) {
     try {
       const hasTrees = (state.skillTrees && typeof state.skillTrees === 'object');
 
-      // ownerKey(=charKey) 우선, 없으면 currentCharacter.ownerKey 보조
-      const _ok = String(ownerKey || '').replace(/\s+/g, '');
+      // 현재 캐릭터 키를 안전하게 계산한다.
+      // 이 블록은 renderSkillTreeBands() 바깥에서도 실행될 수 있으므로
+      // 지역변수 ownerKey를 직접 참조하지 않는다.
+      const _ok = String(
+        state?._stOwnerKey ||
+        state?.currentCharacter?.ownerKey ||
+        [
+          state?.currentCharacter?.jobGroupLabel || state?.currentCharacter?.jobGroup || '',
+          state?.currentCharacter?.name || ''
+        ].filter(Boolean).join('')
+      ).replace(/\s+/g, '');
       const _ck = String(state?.currentCharacter?.ownerKey || '').replace(/\s+/g, '');
       const treeStore = hasTrees ? (state.skillTrees[_ok] || state.skillTrees[_ck]) : null;
 
@@ -30556,10 +30578,18 @@ try {
 
     // 서버에서 프리셋 목록 메타 가져와서 버튼 UI 동기화
     async function refreshPresetSlotsFromServer() {
-      // 게스트/일반 공개 이용자는 저장슬롯 기능 대상이 아니므로
-      // member 전용 fpreset_list API를 호출하지 않는다.
+      // 게스트/일반 공개 이용자는 저장슬롯 기능 대상이 아니다.
+      // 권한 판정 전이라도 GUEST 토큰이면 member 전용 API를 호출하지 않는다.
       const role = window.__userRole || {};
+      const currentToken = String(
+        window.idToken ||
+        sessionStorage.getItem('id_token') ||
+        localStorage.getItem('id_token') ||
+        ''
+      ).trim();
+
       if (
+        currentToken.startsWith('GUEST.') ||
         window.__GUEST_MODE__ === true ||
         role.accessTier === 'public' ||
         role.canUsePreset === false
@@ -35208,20 +35238,6 @@ wrap.appendChild(listBox);
         if (btn && btn.dataset.bound !== '1') {
           btn.dataset.bound = '1';
           btn.addEventListener('click', enterGuestCalculator);
-        }
-
-        // 주소창에서 calculator.html 로 직접 들어왔고 저장된 토큰이 전혀 없으면
-        // 메인에서 '로그인 없이 계산기 이용하기'를 누른 것과 같은 기존 게스트 진입 경로를 자동 실행한다.
-        if (
-          window.__DIRECT_PC_ENTRY_WITHOUT_TOKEN__ === true &&
-          window.__DIRECT_PC_GUEST_BOOT_DONE__ !== true
-        ) {
-          window.__DIRECT_PC_GUEST_BOOT_DONE__ = true;
-          setTimeout(() => {
-            enterGuestCalculator().catch((err) => {
-              console.error('[direct-guest-entry]', err);
-            });
-          }, 0);
         }
       });
 
