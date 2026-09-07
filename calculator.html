@@ -10266,11 +10266,13 @@
   <script>
     (() => {
       const token = sessionStorage.getItem('id_token') || localStorage.getItem('id_token');
-      if (!token) {
-        location.replace('./');
-        return;
+
+      // 직접 진입 시 비로그인 사용자를 메인으로 강제 이동시키지 않는다.
+      // 이후 waitForIdToken()에서 저장된 토큰이 없으면 GUEST 토큰을 자동 생성해
+      // 비로그인 상태에서도 계산기를 이용할 수 있도록 처리한다.
+      if (token) {
+        sessionStorage.setItem('return_to_calculator', 'pc');
       }
-      sessionStorage.setItem('return_to_calculator', 'pc');
     })();
   </script>
   <!-- 로딩 오버레이 (기본 hidden) -->
@@ -33223,7 +33225,14 @@ try {
           .filter(([name]) => !!name)
       );
 
-      const getUsedSpForSkill = (skillName) => {
+      const researchOwnerKey = (() => {
+        const fromSum = String(state?.CurrentSumStats?.ownerKey || '').replace(/\s+/g, '');
+        if (fromSum) return fromSum;
+        const cc = state?.currentCharacter || {};
+        return (String(cc.jobGroupLabel || cc.jobGroup || '') + String(cc.name || '')).replace(/\s+/g, '');
+      })();
+
+      const getSingleUsedSpForSkill = (skillName) => {
         const row = skillRowMap.get(String(skillName || '').trim());
         if (!row || !row.id) return 0;
 
@@ -33233,6 +33242,30 @@ try {
 
         // 현재 계산기의 SP 규칙: 최소 기본레벨은 무료, 그 위 투자분만 SP 사용
         return Math.max(0, currentLv - minLv) * spPerLv;
+      };
+
+      const getUsedSpForSkill = (skillName) => {
+        const name = String(skillName || '').trim();
+        let usedSp = getSingleUsedSpForSkill(name);
+
+        // ✅ 소울브링어 '귀참'은 귀참 드라이브를 찍어야 강화되므로
+        // 연구용 DPS/SP 분모에 귀참 드라이브 투자 SP까지 합산한다.
+        if (researchOwnerKey === '남귀검사소울브링어' && name === '귀참') {
+          usedSp += getSingleUsedSpForSkill('귀참 드라이브');
+        }
+
+        return usedSp;
+      };
+
+      const getResearchCombatSeconds = () => {
+        const raw = String(m?.timeKey || state?.timeKey || '1m').trim().toLowerCase();
+        const match = /^(\d+(?:\.\d+)?)(s|m|h)$/.exec(raw);
+        if (!match) return 60;
+
+        const value = Math.max(0, Number(match[1]) || 0);
+        if (match[2] === 'h') return value * 3600;
+        if (match[2] === 'm') return value * 60;
+        return value;
       };
 
       // "소수점 넷째자리에서 반올림" → 소수점 셋째자리까지 표시
@@ -33607,10 +33640,23 @@ try {
           );
           const usedSp = getUsedSpForSkill(name);
 
-          const dps =
-            finalCooldown > 0
+          const combatSeconds = getResearchCombatSeconds();
+          const isAsuraWave =
+            researchOwnerKey === '남귀검사아수라' && name === '살의의 파동';
+          const usesForDps = isAsuraWave
+            ? Math.max(0, Math.round(combatSeconds * 2))
+            : null;
+
+          // ✅ 살의의 파동은 쿨타임형 스킬이 아니라 0.5초마다 1회 발생한다.
+          // 따라서 연구용 DPS는 '1틱 데미지 × (전투시간×2회) ÷ 전투시간'으로 계산한다.
+          // 그 외 스킬은 기존처럼 1회 데미지 ÷ 최종 쿨타임을 사용한다.
+          const dps = isAsuraWave
+            ? (combatSeconds > 0
+              ? ((damage * usesForDps) / combatSeconds / 1_000_000_000)
+              : null)
+            : (finalCooldown > 0
               ? (damage / finalCooldown / 1_000_000_000)
-              : null;
+              : null);
 
           const dpsPerSp =
             (dps != null && usedSp > 0)
@@ -33737,9 +33783,19 @@ try {
         const isMergedBasic = (r.name === '기본공격');
         const isMergedStatusRow = !!r.isOptionStatusRow || !!r.isSkillStatusRow || r.kind === '옵션상변' || r.kind === '스킬상변';
         const hideUseAndPerUse = isMergedBasic || isMergedStatusRow;
+        const skillNameKey = String(r.name || '').trim();
+        const combatSecondsForRow = getResearchCombatSeconds();
+        const isAsuraWaveRow =
+          researchOwnerKey === '남귀검사아수라' && skillNameKey === '살의의 파동';
+        const asuraWaveUses = isAsuraWaveRow
+          ? Math.max(0, Math.round(combatSecondsForRow * 2))
+          : null;
+
         const displayUses = hideUseAndPerUse
           ? '-'
-          : (forceUseOneNames.has(String(r.name || '').trim()) ? 1 : r.uses);
+          : (isAsuraWaveRow
+            ? asuraWaveUses
+            : (forceUseOneNames.has(skillNameKey) ? 1 : r.uses));
 
         const displayPerUse = (hideUseAndPerUse || !Number(r.dmgPerUseFinal))
           ? '-'
@@ -33747,14 +33803,19 @@ try {
 
         // ✅ DPS = 1회 최종 데미지 ÷ 최종 쿨타임 ÷ 1,000,000,000
         // merged 기본공격/상변행, 쿨타임 0인 스킬은 산출하지 않는다.
-        const skillNameKey = String(r.name || '').trim();
         const finalCooldown = Math.max(0, Number(skillCooldownMap.get(skillNameKey) || 0) || 0);
         const perUseDamage = Number(r.dmgPerUseFinal || 0) || 0;
         const usedSp = getUsedSpForSkill(skillNameKey);
 
         const dpsValue =
-          (!hideUseAndPerUse && perUseDamage > 0 && finalCooldown > 0)
-            ? (perUseDamage / finalCooldown / 1_000_000_000)
+          (!hideUseAndPerUse && perUseDamage > 0)
+            ? (isAsuraWaveRow
+              ? (combatSecondsForRow > 0
+                ? ((perUseDamage * asuraWaveUses) / combatSecondsForRow / 1_000_000_000)
+                : null)
+              : (finalCooldown > 0
+                ? (perUseDamage / finalCooldown / 1_000_000_000)
+                : null))
             : null;
 
         // ✅ DPS/SP = 위 DPS ÷ 해당 스킬에 실제 투자한 SP
