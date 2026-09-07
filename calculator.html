@@ -30589,9 +30589,13 @@ try {
 
     // 서버에서 프리셋 목록 메타 가져와서 버튼 UI 동기화
     async function refreshPresetSlotsFromServer() {
-      // 게스트/일반 공개 이용자는 저장슬롯 기능 대상이 아니다.
-      // 권한 판정 전이라도 GUEST 토큰이면 member 전용 API를 호출하지 않는다.
-      const role = window.__userRole || {};
+      // 저장슬롯 목록은 프론트의 임시 권한값이 아니라
+      // 실제 토큰을 기준으로 백엔드(fpreset_list)가 최종 판정하도록 한다.
+      //
+      // 이유:
+      // gsi:issued 이벤트는 loginPingOnce()가 끝나기 전에 발생하므로,
+      // 이 시점의 window.__userRole 이 아직 public/미설정일 수 있다.
+      // 프론트 role만 보고 차단하면 정상 연구원도 저장슬롯 목록을 못 불러온다.
       const currentToken = String(
         window.idToken ||
         sessionStorage.getItem('id_token') ||
@@ -30599,27 +30603,42 @@ try {
         ''
       ).trim();
 
-      if (
-        currentToken.startsWith('GUEST.') ||
-        window.__GUEST_MODE__ === true ||
-        role.accessTier === 'public' ||
-        role.canUsePreset === false
-      ) {
+      // 진짜 비로그인 게스트만 member 전용 API 호출을 생략한다.
+      if (currentToken.startsWith('GUEST.')) {
         presetSlots.data = {};
         updatePresetButtonsUI();
         return;
       }
 
+      // 아직 토큰 자체가 없다면 로그인 토큰 발급 후 gsi:issued에서 다시 시도된다.
+      if (!currentToken) {
+        return;
+      }
+
       try {
         const res = await apiJSON('fpreset_list');
+
         if (!res.ok) {
+          // 일반/비연구원 Google 계정은 정상적으로 member_required가 올 수 있다.
+          // 이 경우 서버 데이터 삭제가 아니라 단순 권한 거절이므로 조용히 빈 UI만 유지한다.
+          const errCode = String(res.error || res.code || '').trim();
+          if (
+            errCode === 'member_required' ||
+            errCode === 'forbidden' ||
+            Number(res.code) === 403
+          ) {
+            presetSlots.data = {};
+            updatePresetButtonsUI();
+            return;
+          }
+
           console.warn('fpreset_list 실패:', res.error || res.message);
           return;
         }
 
         const list = Array.isArray(res.items) ? res.items : [];
 
-        // 🔧 const presetSlots 를 재할당하지 말고, data만 갈아끼운다
+        // 서버에서 정상 응답받은 목록으로만 프론트 표시 데이터를 갱신한다.
         presetSlots.data = {};
         for (const it of list) {
           const key = String(it.slot);
