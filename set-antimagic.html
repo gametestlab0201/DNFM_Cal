@@ -2747,7 +2747,46 @@
     }
 
     function getStoredIdToken() {
-      return sessionStorage.getItem('id_token') || localStorage.getItem('id_token') || '';
+      const loginToken =
+        sessionStorage.getItem('id_token') ||
+        localStorage.getItem('id_token') ||
+        '';
+
+      // 실제 로그인 토큰이 있으면 기존 인증을 그대로 사용한다.
+      if (loginToken) {
+        try { localStorage.removeItem('antimagic_guest_token'); } catch (_) {}
+        return loginToken;
+      }
+
+      // 비로그인 사용자는 항마력 계산기 전용 GUEST 토큰을 발급하여 재사용한다.
+      // 백엔드 verifyAuthTokenCached()가 GUEST.* 토큰을 이미 지원하므로
+      // init / my_usage_info 등의 기존 API 흐름을 그대로 이용할 수 있다.
+      let guestToken = '';
+      try {
+        guestToken = localStorage.getItem('antimagic_guest_token') || '';
+      } catch (_) {}
+
+      if (!guestToken || !/^GUEST\.[A-Za-z0-9_-]{8,}$/.test(guestToken)) {
+        let rand = '';
+
+        try {
+          if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+            rand = window.crypto.randomUUID().replace(/-/g, '');
+          }
+        } catch (_) {}
+
+        if (!rand) {
+          rand = `${Date.now()}_${Math.random().toString(36).slice(2, 18)}`;
+        }
+
+        guestToken = `GUEST.${rand}`;
+
+        try {
+          localStorage.setItem('antimagic_guest_token', guestToken);
+        } catch (_) {}
+      }
+
+      return guestToken;
     }
 
     function cleanUrl(src) {
