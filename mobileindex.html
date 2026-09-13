@@ -11700,6 +11700,7 @@
       );
 
       const isFMech = (ownerKeyNow === '여거너메카닉');
+      const isWindshear = (ownerKeyNow === '워리어윈드시어');
 
       const bladePresetSel = document.getElementById('mobileBladeWafflePreset');
       if (bladePresetSel) {
@@ -11872,6 +11873,8 @@
         if (!skillName) continue;
 
         const normSkillName = String(skillName || '').replace(/\s+/g, '');
+        const isNasirVirtual = isWindshear &&
+          normSkillName === String('강림 : 나시르').replace(/\s+/g, '');
 
         // ✅ 스트라이커: 본 크러셔는 SP 직접 조작 불가 + SP 소모 0
         const isBoneCrusher = (isStriker && normSkillName === '본크러셔');
@@ -11914,9 +11917,10 @@
 
         // ✅ 남격투가스트라이커 충전스킬 여부
         const isChargeSkill = isStriker && isChargeSkillRowMobile(r);
-        const chargeStage = isChargeSkill
-          ? normalizeChargeFromNodeMobile(cur)
-          : 0;
+        // ✅ 나시르는 chargeStage를 모드값으로 사용: 0=노충전, 1=풀충전
+        const chargeStage = isNasirVirtual
+          ? (Number(cur?.chargeStage ?? 0) >= 1 ? 1 : 0)
+          : (isChargeSkill ? normalizeChargeFromNodeMobile(cur) : 0);
 
         // ✅ cap/cost 포함 저장 + 충전/이중개방 상태 유지
         store[skillName] = {
@@ -12041,6 +12045,45 @@
           return line;
         };
 
+        const mkNasirModeCtrl = () => {
+          const line = document.createElement('div');
+          line.className = 'skill-ctrl skill-nasir-mode-ctrl';
+
+          const lbl = document.createElement('span');
+          lbl.className = 'lbl c-charge';
+          lbl.textContent = '충전';
+
+          const sel = document.createElement('select');
+          sel.className = 'm-action-btn skill-nasir-mode-select';
+          sel.style.minWidth = '86px';
+
+          const optNormal = document.createElement('option');
+          optNormal.value = 'normal';
+          optNormal.textContent = '노충전';
+          const optFull = document.createElement('option');
+          optFull.value = 'full';
+          optFull.textContent = '풀충전';
+          sel.appendChild(optNormal);
+          sel.appendChild(optFull);
+          sel.value = Number(store[skillName]?.chargeStage ?? 0) >= 1 ? 'full' : 'normal';
+
+          sel.addEventListener('change', (e) => {
+            e.stopPropagation();
+            const node = store[skillName] || {};
+            const full = sel.value === 'full';
+            store[skillName] = {
+              ...node,
+              chargeStage: full ? 1 : 0,
+              chargeStageIndex: full ? 10 : 0,
+            };
+            if (typeof onSkillTreeChanged === 'function') onSkillTreeChanged();
+          });
+
+          line.appendChild(lbl);
+          line.appendChild(sel);
+          return line;
+        };
+
         const mkExtremeChargeRow = () => {
           const wrap = document.createElement('label');
           wrap.className = 'skill-extreme-row';
@@ -12076,6 +12119,11 @@
         right.appendChild(mkCtrl('TP', 'tp', {
           min: 'tp-min', dec: 'tp-dec', inc: 'tp-inc', max: 'tp-max'
         }, !(tpMax > 0 && tpCost > 0))); // TP 최대치와 TP 비용이 둘 다 있어야 활성
+
+        // ✅ 워리어윈드시어 나시르: TP 아래에 노충전/풀충전 드롭다운 표시
+        if (isNasirVirtual) {
+          right.appendChild(mkNasirModeCtrl());
+        }
 
         // ✅ 남격투가스트라이커 충전스킬: TP 아래에 충전 UI + 이중개방 체크박스 표시
         if (isChargeSkill) {
@@ -17686,8 +17734,16 @@
             v?.chargeStage ?? normalizeChargeFromNodeMobile(v)
           );
 
+          const isNasirVirtual =
+            ownerKey === '워리어윈드시어' &&
+            String(name || '').normalize('NFC').replace(/\s+/g, '') ===
+              String('강림 : 나시르').normalize('NFC').replace(/\s+/g, '');
+          const outboundName = isNasirVirtual
+            ? (chargeStage >= 1 ? '강림 : 나시르(풀충전)' : '강림 : 나시르(노충전)')
+            : name;
+
           skills.push({
-            name,
+            name: outboundName,
             lv,
             tp,
 
@@ -19214,8 +19270,16 @@ function buildSynergyPayloadMobile() {
               ? _stripPresetSkillKeyToName_mobile(skillKey)
               : skillKey;
 
+            const isNasirVirtual =
+              ownerKey === '워리어윈드시어' &&
+              String(name || '').normalize('NFC').replace(/\s+/g, '') ===
+                String('강림 : 나시르').normalize('NFC').replace(/\s+/g, '');
+            const outboundName = isNasirVirtual
+              ? (chargeStage >= 1 ? '강림 : 나시르(풀충전)' : '강림 : 나시르(노충전)')
+              : name;
+
             skills.push({
-              name,
+              name: outboundName,
               lv,
               tp,
               chargeStage,
