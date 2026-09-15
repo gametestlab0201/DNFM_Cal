@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="icon" type="image/png" href="img/gametestlab.png?v=20260530">
+  <link rel="shortcut icon" type="image/png" href="img/gametestlab.png?v=20260530">
+  <link rel="apple-touch-icon" href="img/gametestlab.png?v=20260530">
+  <link rel="stylesheet" href="./common-font.css?v=20260821">
+  <link rel="stylesheet" href="./common-header.css?v=20260805-3">
+  <link rel="stylesheet" href="./common-header-modals.css?v=20260805-3">
+
+  <title>세라 → 테라 변환 효율 계산기 | 게임실험연구소</title>
+
+  <style>
+    :root{
+      --bg:#100d09;
+      --bg2:#171109;
+      --panel:#17120d;
+      --panel2:#1d1710;
+      --panel3:#21190f;
+      --line:#4c3920;
+      --line2:#6b4f26;
+      --gold:#d8a94d;
+      --gold2:#f1ce7a;
+      --gold3:#9d6f26;
+      --text:#f4ead4;
+      --muted:#a89b85;
+      --purple:#ff35e8;
+      --purple2:#c995ff;
+      --tera:#8dffd9;
+      --danger:#ff6f5f;
+      --shadow:0 12px 34px rgba(0,0,0,.42);
+    }
+
+    *{box-sizing:border-box}
+    html,body{min-height:100%}
+    body{
+      margin:0;
+      color:var(--text);
+      font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif;
+      background:
+        radial-gradient(900px 430px at 75% -120px,rgba(151,105,41,.16),transparent 70%),
+        linear-gradient(180deg,#15100b 0%,#0e0b08 100%);
+    }
+
+    button,input{font:inherit}
+    button{cursor:pointer}
+
+    /* ===== 페이지 전체 ===== */
+    .market-shell{
+      width:min(1580px,calc(100% - 18px));
+      margin:10px auto 36px;
+      border:1px solid rgba(112,82,38,.55);
+      background:linear-gradient(180deg,rgba(26,20,13,.98),rgba(14,11,8,.985));
+      box-shadow:0 22px 60px rgba(0,0,0,.46);
+      min-height:760px;
+      overflow:hidden;
+    }
+
+    /* ===== 상단 제목 ===== */
+    .market-hero{
+      position:relative;
+      display:flex;
+      align-items:center;
+      min-height:205px;
+      padding:24px 28px 22px;
+      border-bottom:1px solid rgba(174,126,54,.45);
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 78% 50%,rgba(213,156,60,.08),transparent 26%),
+        linear-gradient(90deg,rgba(34,24,14,.98) 0%,rgba(24,18,12,.96) 48%,rgba(18,14,10,.98) 100%);
+    }
+
+    .market-hero::after{
+      content:"";
+      position:absolute;
+      left:0;right:0;bottom:-1px;
+      height:1px;
+      background:linear-gradient(90deg,transparent,#d9a84e 30%,#e7c06f 50%,#d9a84e 70%,transparent);
+      opacity:.55;
+    }
+
+    .market-hero > *{
+      position:relative;
+      z-index:2;
+    }
+
+    .market-hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(90deg,rgba(0,0,0,.10),transparent 42%,rgba(0,0,0,.04) 100%);
+      z-index:1;
+    }
+
+    .hero-text{
+      max-width:min(58%,760px);
+      padding-right:20px;
+    }
+
+    .hero-visual-frame{
+      position:absolute;
+      right:24px;
+      bottom:0;
+      width:min(40%,520px);
+      height:185px;
+       overflow:visible;
+      z-index:1;
+      pointer-events:none;
+    }
+
+    .hero-visual{
+      position:absolute;
+      right:-10px;
+      bottom:-186px;
+      width:120%;
+      max-width:none;
+      height:auto;
+      object-fit:contain;
+      transform-origin:right bottom;
+      filter:drop-shadow(0 8px 24px rgba(0,0,0,.35));
+    }
+
+    .hero-icon{
+      width:64px;height:64px;
+      flex:0 0 auto;
+      margin-right:18px;
+      border:1px solid rgba(229,186,100,.38);
+      transform:rotate(45deg);
+      background:
+        radial-gradient(circle at 35% 30%,rgba(255,239,187,.34),transparent 32%),
+        linear-gradient(135deg,#8a6429,#2b1b0c);
+      box-shadow:0 0 28px rgba(213,158,62,.18);
+    }
+
+    .hero-icon::before{
+      content:"";
+      display:block;
+      width:28px;height:28px;
+      margin:17px;
+      border:2px solid #f3d58a;
+      transform:rotate(-45deg);
+      clip-path:polygon(50% 0,100% 42%,77% 100%,23% 100%,0 42%);
+      background:linear-gradient(180deg,#fff2bc,#b37a25);
+    }
+
+    .hero-text h1{
+      margin:0;
+      font-size:clamp(25px,2.6vw,39px);
+      font-weight:950;
+      letter-spacing:-.045em;
+      color:#f7df9a;
+      text-shadow:0 2px 10px rgba(0,0,0,.75);
+    }
+
+    .hero-text p{
+      margin:8px 0 0;
+      color:#b8aa94;
+      font-size:12px;
+      line-height:1.6;
+      word-break:keep-all;
+    }
+
+    .hero-home-btn{
+      margin-left:auto;
+      align-self:flex-start;
+      border:1px solid rgba(205,158,76,.4);
+      background:#17120d;
+      color:#d9c6a1;
+      padding:8px 13px;
+      border-radius:3px;
+      font-size:11px;
+      font-weight:850;
+    }
+    .hero-home-btn:hover{
+      border-color:#c99742;
+      color:#fff0c1;
+      background:#21170d;
+    }
+
+    /* ===== 3단 레이아웃 ===== */
+    .market-body{
+      display:grid;
+      grid-template-columns:210px minmax(0,1fr) 310px;
+      min-height:650px;
+    }
+
+    /* ===== 좌측 메뉴 ===== */
+    .market-side{
+      border-right:1px solid rgba(116,83,38,.45);
+      background:
+        radial-gradient(circle at 50% 12%,rgba(198,144,57,.07),transparent 18%),
+        linear-gradient(180deg,#16120e,#0f0c09);
+      padding:14px 0 24px;
+    }
+
+    .side-main-title{
+      padding:10px 20px 14px;
+      color:#8f806a;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.08em;
+    }
+
+    .side-item{
+      position:relative;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      width:100%;
+      min-height:52px;
+      padding:0 20px;
+      border:0;
+      border-top:1px solid transparent;
+      border-bottom:1px solid transparent;
+      background:transparent;
+      color:#ae9c80;
+      text-align:left;
+      font-size:14px;
+      font-weight:850;
+    }
+
+    .side-item .ico{
+      width:26px;
+      text-align:center;
+      font-size:18px;
+      opacity:.9;
+    }
+
+    .side-item:hover{
+      color:#ecdba8;
+      background:rgba(179,124,41,.07);
+    }
+
+    .side-item.active{
+      color:#fff2bf;
+      background:
+        linear-gradient(90deg,rgba(225,170,66,.38),rgba(174,118,35,.15) 65%,transparent);
+      border-top-color:rgba(239,190,88,.22);
+      border-bottom-color:rgba(239,190,88,.22);
+      box-shadow:inset 4px 0 0 #e5b24d;
+    }
+
+    .side-item.active::after{
+      content:"";
+      position:absolute;
+      right:0;
+      top:0;bottom:0;
+      width:1px;
+      background:linear-gradient(180deg,transparent,#e0ae4f,transparent);
+    }
+
+    .side-divider{
+      height:1px;
+      margin:12px 16px;
+      background:linear-gradient(90deg,transparent,rgba(156,112,50,.45),transparent);
+    }
+
+    .side-note{
+      margin:26px 18px 0;
+      padding:13px 12px;
+      border:1px solid rgba(133,96,45,.26);
+      background:rgba(255,255,255,.015);
+      color:#756b5d;
+      font-size:9px;
+      line-height:1.65;
+    }
+
+    /* ===== 중앙 ===== */
+    .market-center{
+      min-width:0;
+      padding:12px 12px 18px;
+      background:
+        radial-gradient(700px 400px at 50% 0%,rgba(129,86,28,.05),transparent 70%),
+        #120f0b;
+    }
+
+    .market-list-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      min-height:48px;
+      padding:0 14px;
+      margin-bottom:8px;
+      border:1px solid rgba(112,81,38,.55);
+      background:linear-gradient(180deg,#21190f,#17120d);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
+    }
+
+    .market-list-title{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:17px;
+      font-weight:950;
+      color:#ebd5a0;
+    }
+
+    .market-list-title::before{
+      content:"◆";
+      color:#dfad4d;
+      font-size:14px;
+      text-shadow:0 0 12px rgba(223,173,77,.5);
+    }
+
+    .head-right{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .count-text{
+      color:#8f806a;
+      font-size:10px;
+      white-space:nowrap;
+    }
+
+    .ghost-btn{
+      border:1px solid rgba(146,105,49,.5);
+      background:#17120d;
+      color:#bca984;
+      padding:7px 10px;
+      border-radius:2px;
+      font-size:10px;
+      font-weight:850;
+    }
+    .ghost-btn:hover{
+      color:#ffe7a9;
+      border-color:#bd8740;
+    }
+
+    .product-list{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+    }
+
+    .product-row{
+      position:relative;
+      display:grid;
+      grid-template-columns:minmax(280px,1.45fr) 90px 92px minmax(155px,.9fr) 135px 118px;
+      min-height:104px;
+      border:1px solid rgba(97,70,35,.5);
+      background:
+        linear-gradient(180deg,rgba(31,24,16,.96),rgba(19,15,11,.98));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.015);
+      overflow:hidden;
+    }
+
+    .product-row:hover{
+      border-color:rgba(179,128,51,.62);
+      background:linear-gradient(180deg,rgba(39,29,17,.98),rgba(22,16,11,.99));
+    }
+
+    .product-row.is-best{
+      border-color:rgba(226,173,70,.86);
+      box-shadow:
+        inset 0 0 0 1px rgba(241,197,102,.08),
+        0 0 18px rgba(216,164,63,.08);
+    }
+
+    .hot-ribbon{
+      display:none;
+      position:absolute;
+      left:-26px;
+      top:8px;
+      width:90px;
+      transform:rotate(-45deg);
+      z-index:4;
+      background:#a71c10;
+      color:#fff1d3;
+      text-align:center;
+      font-size:9px;
+      font-weight:950;
+      padding:2px 0;
+      border-top:1px solid #f18d65;
+      border-bottom:1px solid #f18d65;
+    }
+    .product-row.is-best .hot-ribbon{display:block}
+
+    /* ===== 구매수량 조건부 보상 상품 ===== */
+    .product-row.reward-row{
+      margin-top:-2px;
+      margin-left:24px;
+      min-height:92px;
+      border-color:rgba(135,95,45,.46);
+      background:
+        linear-gradient(180deg,rgba(40,28,17,.90),rgba(21,16,11,.96));
+    }
+
+    .product-row.reward-row::before{
+      content:"└";
+      position:absolute;
+      left:-19px;
+      top:25px;
+      color:#9e7740;
+      font-size:18px;
+      font-weight:900;
+    }
+
+    .product-row.reward-row .product-name{
+      color:#e8c77b;
+    }
+
+    .reward-condition{
+      color:#f0d58f;
+      font-size:11px;
+      font-weight:900;
+      line-height:1.45;
+    }
+
+    .reward-once{
+      margin-top:3px;
+      color:#8f806c;
+      font-size:8px;
+    }
+
+    .reward-tag{
+      border-color:rgba(218,163,65,.50);
+      background:#3a2a13;
+      color:#f4cf75;
+    }
+
+    .combo-rewards{
+      margin-top:5px;
+      color:#d9b968;
+      font-size:8px;
+      line-height:1.45;
+    }
+
+    .cell{
+      min-width:0;
+      border-left:1px solid rgba(90,64,31,.32);
+      padding:10px 9px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+    .cell:first-of-type{border-left:0}
+
+    .product-main{
+      display:grid;
+      grid-template-columns:78px minmax(0,1fr);
+      gap:12px;
+      align-items:center;
+      padding-left:10px;
+    }
+
+    .item-img-wrap{
+      width:78px;height:78px;
+      border:2px solid #8f2384;
+      background:#080706;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.05),
+        0 0 8px rgba(201,54,202,.16);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    /* ===== 상품 이미지 등급별 테두리 =====
+       PC 계산기의 장비 등급 테두리 색상과 동일 */
+    .item-img-wrap.market-rarity-epic,
+    .item-img-wrap.market-rarity-unique,
+    .item-img-wrap.market-rarity-rare{
+      border:2px solid transparent;
+      box-sizing:border-box;
+      background-clip:padding-box,border-box;
+      background-origin:border-box;
+    }
+
+    .item-img-wrap.market-rarity-epic{
+      background-image:
+        linear-gradient(#0f0d0b,#0f0d0b),
+        linear-gradient(135deg,#fff06a 0%,#ffd133 22%,#ffab09 45%,#d87806 73%,#8f5007 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(16,11,6,.82),
+        0 0 0 0.5px rgba(244,183,31,.50),
+        0 0 1px rgba(255,216,88,.36),
+        0 0 3px rgba(235,140,16,.10);
+    }
+
+    .item-img-wrap.market-rarity-unique{
+      background-image:
+        linear-gradient(#100c10,#100c10),
+        linear-gradient(135deg,#ff7de3 0%,#ef53ce 28%,#c8349f 56%,#882b78 79%,#572254 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(16,10,16,.82),
+        0 0 0 0.5px rgba(221,72,181,.48),
+        0 0 1px rgba(255,129,231,.34),
+        0 0 3px rgba(198,51,159,.09);
+    }
+
+    .item-img-wrap.market-rarity-rare{
+      background-image:
+        linear-gradient(#0e0b12,#0e0b12),
+        linear-gradient(135deg,#ce9cff 0%,#ad6df5 28%,#8751d7 55%,#6235a5 79%,#412771 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(14,10,18,.82),
+        0 0 0 0.5px rgba(155,99,230,.48),
+        0 0 1px rgba(196,148,255,.34),
+        0 0 3px rgba(123,76,201,.09);
+    }
+
+    .item-img{
+      width:100%;height:100%;
+      object-fit:contain;
+      padding:3px;
+      background:
+        radial-gradient(circle,rgba(255,255,255,.04),transparent 62%);
+    }
+
+    .img-fallback{
+      color:#655c51;
+      font-size:8px;
+      font-weight:800;
+      text-align:center;
+      line-height:1.3;
+    }
+
+    .product-name{
+      color:var(--purple);
+      font-size:15px;
+      line-height:1.3;
+      font-weight:950;
+      text-shadow:0 1px 4px rgba(0,0,0,.8);
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .product-sub{
+      margin-top:5px;
+      color:#8d8170;
+      font-size:9px;
+      line-height:1.35;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+
+    .tag-row{
+      margin-top:7px;
+      display:flex;
+      gap:5px;
+      flex-wrap:wrap;
+    }
+
+    .tag{
+      padding:2px 7px;
+      border:1px solid rgba(153,102,164,.45);
+      border-radius:2px;
+      background:#33203c;
+      color:#d7b8ff;
+      font-size:8px;
+      font-weight:850;
+    }
+
+    .tag.gray{
+      border-color:rgba(122,112,94,.4);
+      background:#29251f;
+      color:#b8ad9a;
+    }
+
+    .cell-label{
+      color:#9b8e7a;
+      font-size:9px;
+      font-weight:800;
+      margin-bottom:5px;
+      white-space:nowrap;
+    }
+
+    .sera-value{
+      display:flex;
+      align-items:center;
+      gap:5px;
+      color:#efe3cb;
+      font-size:15px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    .currency-badge{
+      display:inline-block;
+      object-fit:contain;
+      vertical-align:middle;
+      flex:0 0 auto;
+    }
+
+    .sera-badge{
+      width:20px;
+      height:20px;
+    }
+
+    .tera-badge{
+      width:20px;
+      height:20px;
+    }
+
+    .input-badge{
+      position:absolute;
+      left:6px;
+      top:50%;
+      transform:translateY(-50%);
+      width:18px;
+      height:18px;
+      pointer-events:none;
+    }
+
+    .limit-value{
+      color:#c2b49e;
+      font-size:11px;
+      font-weight:850;
+      line-height:1.45;
+      white-space:pre-line;
+    }
+
+    .sell-stack{
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+    }
+
+    .sell-item-name{
+      color:#8f806c;
+      font-size:8px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .price-wrap{
+      position:relative;
+      width:100%;
+    }
+
+    .price-input{
+      width:100%;
+      height:38px;
+      border:1px solid rgba(131,105,72,.72);
+      border-radius:2px;
+      outline:0;
+      background:#0c0d0c;
+      color:#f7f2e8;
+      padding:0 9px 0 25px;
+      font-size:12px;
+      font-weight:900;
+      text-align:right;
+      box-shadow:inset 0 0 12px rgba(0,0,0,.5);
+    }
+
+    .price-input:focus{
+      border-color:#d5a447;
+      box-shadow:0 0 0 1px rgba(213,164,71,.35),inset 0 0 12px rgba(0,0,0,.5);
+    }
+
+    .price-input.is-fixed{
+      cursor:not-allowed;
+      color:#f3d475;
+      border-color:rgba(207,162,79,.65);
+      background:
+        linear-gradient(180deg,rgba(67,48,20,.32),rgba(20,15,9,.72));
+      opacity:1;
+      -webkit-text-fill-color:#f3d475;
+    }
+
+    .fixed-price-label{
+      margin-top:3px;
+      color:#c99a42;
+      font-size:8px;
+      font-weight:850;
+      text-align:right;
+      white-space:nowrap;
+    }
+
+    .tera-gem{
+      display:none;
+    }
+
+    .price-unit{
+      position:absolute;
+      right:7px;
+      bottom:-12px;
+      color:#6b665e;
+      font-size:7px;
+      display:none;
+    }
+
+    .metric-value{
+      color:#efd76d;
+      font-size:14px;
+      font-weight:950;
+      line-height:1.2;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .metric-value.eff{
+      color:#f1cb69;
+    }
+
+    .metric-value.empty{
+      color:#696158;
+      font-size:10px;
+      font-weight:800;
+    }
+
+    .metric-sub{
+      margin-top:4px;
+      color:#71685d;
+      font-size:8px;
+    }
+
+    .state-box{
+      padding:40px 18px;
+      border:1px dashed rgba(118,86,44,.45);
+      color:#8f816e;
+      text-align:center;
+      font-size:11px;
+      line-height:1.7;
+    }
+    .state-box.error{color:#ff9f93}
+
+    /* ===== 우측 패널 ===== */
+    .market-right{
+      border-left:1px solid rgba(116,83,38,.45);
+      background:
+        radial-gradient(circle at 50% 7%,rgba(228,167,64,.07),transparent 18%),
+        linear-gradient(180deg,#17120d,#0f0c09);
+      padding:12px 12px 18px;
+    }
+
+    .right-box{
+      border:1px solid rgba(127,91,40,.65);
+      background:linear-gradient(180deg,#21190f,#14100c);
+      margin-bottom:10px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
+    }
+
+    .right-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      min-height:42px;
+      padding:0 12px;
+      border-bottom:1px solid rgba(112,80,36,.45);
+      color:#efd698;
+      font-size:13px;
+      font-weight:950;
+    }
+
+    .right-body{
+      padding:12px;
+    }
+
+    .budget-big{
+      position:relative;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      border:1px solid rgba(126,91,40,.42);
+      background:#0e0c09;
+      padding:10px;
+    }
+
+    .budget-currency-img{
+      width:42px;
+      height:42px;
+      object-fit:contain;
+      flex:0 0 auto;
+    }
+
+    .budget-input{
+      width:100%;
+      min-width:0;
+      height:42px;
+      border:0;
+      outline:0;
+      background:transparent;
+      color:#fff1c6;
+      text-align:right;
+      font-size:25px;
+      font-weight:950;
+      letter-spacing:-.03em;
+    }
+
+    .budget-unit{
+      margin-top:5px;
+      text-align:right;
+      color:#7f7463;
+      font-size:8px;
+    }
+
+    .calc-desc{
+      color:#8e826f;
+      font-size:9px;
+      line-height:1.5;
+      margin-bottom:9px;
+    }
+
+    .calc-button{
+      width:100%;
+      height:42px;
+      border:1px solid #d0a151;
+      background:
+        linear-gradient(180deg,#e7c36d,#b17a25);
+      color:#231706;
+      font-size:12px;
+      font-weight:950;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.35),
+        0 4px 12px rgba(0,0,0,.28);
+    }
+    .calc-button:hover{filter:brightness(1.06)}
+    .calc-button:disabled{filter:grayscale(1);opacity:.5;cursor:not-allowed}
+
+    .result-empty{
+      color:#70675c;
+      font-size:9px;
+      line-height:1.6;
+      text-align:center;
+      padding:12px 5px 8px;
+    }
+
+    .result-crown{
+      border:1px solid rgba(201,146,55,.5);
+      background:
+        radial-gradient(circle at 50% 0%,rgba(225,171,67,.08),transparent 55%),
+        #14100b;
+      padding:12px;
+    }
+
+    .result-kicker{
+      color:#cfa44f;
+      font-size:9px;
+      font-weight:900;
+      margin-bottom:5px;
+    }
+
+    .result-main-value{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:7px;
+      color:#f1ca65;
+      font-size:24px;
+      font-weight:950;
+      letter-spacing:-.035em;
+    }
+
+    .result-tera-img{
+      width:24px;
+      height:24px;
+      object-fit:contain;
+      flex:0 0 auto;
+    }
+
+    .result-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:7px;
+      margin-top:10px;
+    }
+
+    .result-mini{
+      border-top:1px solid rgba(112,82,40,.35);
+      padding-top:7px;
+    }
+
+    .result-mini-label{
+      color:#786f63;
+      font-size:8px;
+    }
+
+    .result-mini-value{
+      margin-top:3px;
+      color:#d9c9aa;
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .combo-title{
+      margin:12px 0 7px;
+      color:#c9b48b;
+      font-size:10px;
+      font-weight:900;
+    }
+
+    .combo-list{
+      border-top:1px solid rgba(112,80,36,.35);
+    }
+
+    .combo-row{
+      display:grid;
+      grid-template-columns:36px minmax(0,1fr);
+      gap:8px;
+      padding:8px 0;
+      border-bottom:1px solid rgba(91,66,34,.3);
+    }
+
+    .combo-img{
+      width:36px;height:36px;
+      border:1px solid #6e245f;
+      background:#0b0908;
+      object-fit:contain;
+    }
+
+    .combo-img.market-rarity-epic,
+    .combo-img.market-rarity-unique,
+    .combo-img.market-rarity-rare{
+      border:1px solid transparent;
+      box-sizing:border-box;
+      background-clip:padding-box,border-box;
+      background-origin:border-box;
+    }
+
+    .combo-img.market-rarity-epic{
+      background-image:
+        linear-gradient(#0f0d0b,#0f0d0b),
+        linear-gradient(135deg,#fff06a 0%,#ffd133 22%,#ffab09 45%,#d87806 73%,#8f5007 100%);
+    }
+
+    .combo-img.market-rarity-unique{
+      background-image:
+        linear-gradient(#100c10,#100c10),
+        linear-gradient(135deg,#ff7de3 0%,#ef53ce 28%,#c8349f 56%,#882b78 79%,#572254 100%);
+    }
+
+    .combo-img.market-rarity-rare{
+      background-image:
+        linear-gradient(#0e0b12,#0e0b12),
+        linear-gradient(135deg,#ce9cff 0%,#ad6df5 28%,#8751d7 55%,#6235a5 79%,#412771 100%);
+    }
+
+    .combo-info{min-width:0}
+    .combo-name{
+      color:#d63ad1;
+      font-size:9px;
+      font-weight:900;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .combo-values{
+      margin-top:4px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      color:#9d8f7b;
+      font-size:8px;
+    }
+
+    .combo-values b{
+      color:#ddc477;
+      font-weight:900;
+    }
+
+    .reset-btn{
+      width:100%;
+      margin-top:8px;
+      height:31px;
+      border:1px solid rgba(144,101,41,.55);
+      background:#100d09;
+      color:#bba883;
+      font-size:9px;
+      font-weight:850;
+    }
+
+    /* ===== 반응형 ===== */
+    @media(max-width:1180px){
+      .market-body{
+        grid-template-columns:170px minmax(0,1fr) 270px;
+      }
+
+      .product-row{
+        grid-template-columns:minmax(240px,1.4fr) 82px 82px minmax(140px,.9fr) 118px 105px;
+      }
+
+      .product-name{font-size:13px}
+      .item-img-wrap{width:66px;height:66px}
+      .product-main{grid-template-columns:66px minmax(0,1fr)}
+    }
+
+    @media(max-width:980px){
+      .market-shell{width:calc(100% - 10px)}
+      .market-body{
+        grid-template-columns:150px minmax(0,1fr);
+      }
+      .market-right{
+        grid-column:1 / -1;
+        border-left:0;
+        border-top:1px solid rgba(116,83,38,.45);
+        display:grid;
+        grid-template-columns:1fr 1.3fr;
+        gap:10px;
+      }
+      .right-box{margin-bottom:0}
+
+      .product-row{
+        grid-template-columns:minmax(225px,1.3fr) 74px 78px minmax(130px,.9fr) 110px 96px;
+      }
+      .cell{padding:8px 6px}
+      .cell-label{font-size:8px}
+      .sera-value{font-size:12px}
+      .metric-value{font-size:12px}
+      .price-input{font-size:10px}
+    }
+
+    @media(max-width:760px){
+      .market-shell{
+        width:100%;
+        margin:0;
+        border-left:0;border-right:0;
+      }
+
+      .market-hero{
+        min-height:136px;
+        padding:14px 12px;
+      }
+      .hero-icon{width:44px;height:44px;margin-right:12px}
+      .hero-icon::before{width:20px;height:20px;margin:10px}
+      .hero-text{
+        max-width:calc(100% - 120px);
+        padding-right:8px;
+      }
+      .hero-text h1{font-size:20px}
+      .hero-text p{font-size:9px}
+      .hero-home-btn{padding:6px 8px;font-size:9px}
+      .hero-visual-frame{
+        right:6px;
+        width:108px;
+        height:118px;
+      }
+      .hero-visual{
+        right:-14px;
+        bottom:-18px;
+        width:132%;
+        max-width:none;
+      }
+
+      .market-body{
+        display:block;
+      }
+
+      .market-side{
+        border-right:0;
+        border-bottom:1px solid rgba(116,83,38,.45);
+        padding:6px;
+        display:flex;
+        gap:5px;
+        overflow-x:auto;
+      }
+
+      .side-main-title,.side-divider,.side-note{display:none}
+      .side-item{
+        flex:0 0 auto;
+        min-height:38px;
+        width:auto;
+        padding:0 12px;
+        font-size:10px;
+        border:1px solid rgba(112,81,38,.35);
+      }
+      .side-item .ico{font-size:12px;width:auto}
+      .side-item.active{
+        box-shadow:none;
+      }
+
+      .market-center{padding:8px 6px 12px}
+      .market-list-head{padding:0 9px}
+      .market-list-title{font-size:13px}
+
+      .product-row{
+        display:grid;
+        grid-template-columns:minmax(0,1fr) 104px;
+        min-height:0;
+      }
+
+      .product-main{
+        grid-column:1 / -1;
+        padding:9px;
+        border-bottom:1px solid rgba(90,64,31,.32);
+      }
+
+      .product-row>.cell:nth-child(3),
+      .product-row>.cell:nth-child(4){
+        border-left:0;
+      }
+
+      .product-row>.cell:nth-child(3){grid-column:1}
+      .product-row>.cell:nth-child(4){grid-column:2}
+      .product-row>.cell:nth-child(5){grid-column:1 / -1}
+      .product-row>.cell:nth-child(6){grid-column:1}
+      .product-row>.cell:nth-child(7){grid-column:2}
+
+      .item-img-wrap{width:58px;height:58px}
+      .product-main{grid-template-columns:58px minmax(0,1fr)}
+      .product-name{font-size:12px}
+      .product-sub{font-size:8px}
+      .tag{font-size:7px}
+
+      .cell{
+        min-height:58px;
+        padding:7px 8px;
+        border-top:1px solid rgba(90,64,31,.22);
+      }
+
+      .market-right{
+        display:block;
+        padding:8px;
+      }
+      .right-box{margin-bottom:8px}
+    }
+  </style>
+</head>
+
+<body>
+  <div id="commonSiteHeader" data-root="." data-title="게임실험연구소 던파모바일 2.0"></div>
+  <script src="./common-header-v2.js?v=20260805-3"></script>
+  <script src="./common-header-modals.js?v=20260805-3"></script>
+
+  <div class="market-shell">
+    <section class="market-hero">
+      <div class="hero-icon" aria-hidden="true"></div>
+      <div class="hero-text">
+        <h1>세라 → 테라 변환 효율 계산기</h1>
+        <p>세라 상품을 경매장에 판매했을 때의 실수령 테라와 효율을 비교하고, 보유 세라로 가장 많은 테라를 얻는 조합을 계산합니다.</p>
+      </div>
+      <div class="hero-visual-frame" aria-hidden="true">
+        <img class="hero-visual" src="img/market/tera-hero-visual.png" alt="">
+      </div>
+      <button class="hero-home-btn" type="button" onclick="location.href='./index.html'">메인으로</button>
+    </section>
+
+    <div class="market-body">
+      <!-- 좌측 메뉴 -->
+      <aside class="market-side">
+        <div class="side-main-title">메뉴</div>
+
+        <button class="side-item" type="button" onclick="location.href='./index.html'">
+          <span class="ico">⌂</span>
+          <span>홈</span>
+        </button>
+
+        <button class="side-item active" type="button">
+          <span class="ico">◉</span>
+          <span>세라 → 테라<br>변환 계산기</span>
+        </button>
+
+        <div class="side-divider"></div>
+
+        <button class="side-item active" type="button">
+          <span class="ico">▦</span>
+          <span>전체 상품</span>
+        </button>
+
+        <div class="side-note">
+          경매장 시세는 이용자가 직접 입력합니다.<br>
+          입력값은 현재 브라우저에 저장됩니다.
+        </div>
+      </aside>
+
+      <!-- 중앙 상품 목록 -->
+      <main class="market-center">
+        <div class="market-list-head">
+          <div class="market-list-title">세라 상점 상품 목록</div>
+          <div class="head-right">
+            <span id="productCount" class="count-text">불러오는 중...</span>
+            <button id="clearPricesBtn" class="ghost-btn" type="button">입력 시세 초기화</button>
+          </div>
+        </div>
+
+        <section id="productList" class="product-list" aria-live="polite">
+          <div class="state-box">상품 정보를 불러오고 있습니다.</div>
+        </section>
+      </main>
+
+      <!-- 우측 계산 패널 -->
+      <aside class="market-right">
+        <section class="right-box">
+          <div class="right-head">
+            <span>보유 세라</span>
+          </div>
+          <div class="right-body">
+            <div class="budget-big">
+              <img class="budget-currency-img" src="img/market/세라배지.png" alt="세라">
+              <input id="seraBudget" class="budget-input" type="text" inputmode="numeric" autocomplete="off" value="100,000">
+            </div>
+            <div class="budget-unit">세라</div>
+          </div>
+        </section>
+
+        <section class="right-box">
+          <div class="right-head">
+            <span>최적 구매 조합 계산</span>
+          </div>
+          <div class="right-body">
+            <div class="calc-desc">
+              입력한 경매장 시세와 상품별 구매 제한을 기준으로 가장 많은 테라를 얻을 수 있는 조합을 계산합니다.
+            </div>
+
+            <button id="calculateBtn" class="calc-button" type="button" disabled>자동 계산</button>
+
+            <div id="resultArea">
+              <div class="result-empty">
+                상품들의 경매장 시세를 입력한 뒤<br>
+                자동 계산을 눌러주세요.
+              </div>
+            </div>
+
+            <button id="resetAllBtn" class="reset-btn" type="button">↻ 초기화</button>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const API_BASE = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
+      const STORAGE_PRICE_KEY = 'dnfm_market_prices_v2';
+      const STORAGE_BUDGET_KEY = 'dnfm_market_budget_v2';
+
+      const productListEl = document.getElementById('productList');
+      const productCountEl = document.getElementById('productCount');
+      const budgetEl = document.getElementById('seraBudget');
+      const calcBtn = document.getElementById('calculateBtn');
+      const resultArea = document.getElementById('resultArea');
+      const clearPricesBtn = document.getElementById('clearPricesBtn');
+      const resetAllBtn = document.getElementById('resetAllBtn');
+
+      let rawRows = [];
+      let products = [];
+      let savedPrices = loadJSON(STORAGE_PRICE_KEY, {});
+
+      function loadJSON(key, fallback){
+        try{
+          const v = localStorage.getItem(key);
+          return v ? JSON.parse(v) : fallback;
+        }catch(_){
+          return fallback;
+        }
+      }
+
+      function saveJSON(key, value){
+        try{
+          localStorage.setItem(key, JSON.stringify(value));
+        }catch(_){}
+      }
+
+      function toNumber(value){
+        const n = Number(String(value ?? '').replace(/[^\d.-]/g,''));
+        return Number.isFinite(n) ? n : 0;
+      }
+
+      function formatNumber(value, maxFraction = 0){
+        return Number(value || 0).toLocaleString('ko-KR',{
+          maximumFractionDigits:maxFraction,
+          minimumFractionDigits:0
+        });
+      }
+
+      function formatKoreanUnit(value){
+        const n = Math.max(0, Math.floor(Number(value || 0)));
+        if(!n) return '0';
+
+        const eok = Math.floor(n / 100000000);
+        const man = Math.floor((n % 100000000) / 10000);
+        const rest = n % 10000;
+        const parts = [];
+
+        if(eok) parts.push(`${eok}억`);
+        if(man) parts.push(`${man}만`);
+        if(!eok && !man && rest) parts.push(formatNumber(rest));
+
+        return parts.join(' ');
+      }
+
+      function escapeHTML(value){
+        return String(value ?? '')
+          .replace(/&/g,'&amp;')
+          .replace(/</g,'&lt;')
+          .replace(/>/g,'&gt;')
+          .replace(/"/g,'&quot;')
+          .replace(/'/g,'&#039;');
+      }
+
+      function priceKey(productId, itemKey){
+        return `${productId}::${itemKey}`;
+      }
+
+      function getBudget(){
+        return Math.max(0, Math.floor(toNumber(budgetEl.value)));
+      }
+
+      function normalizeLimit(limitQty, limitType, seraPrice, budget){
+        const type = String(limitType || '').trim().toLowerCase();
+        const qty = Math.max(0, Math.floor(Number(limitQty || 0)));
+        const maxByBudget = Math.floor(budget / Math.max(1, seraPrice));
+
+        const unlimitedWords = ['무제한','제한없음','없음','unlimited'];
+        if(unlimitedWords.some(x => type.includes(x))) return maxByBudget;
+        if(qty <= 0) return maxByBudget;
+
+        return Math.min(qty, maxByBudget);
+      }
+
+      function normalizeProductLinkName(value){
+        return String(value ?? '')
+          .normalize('NFKC')
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g,' ');
+      }
+
+      function groupRows(rows){
+        const map = new Map();
+
+        rows.forEach((row, sourceIndex) => {
+          const id = String(row.id || '').trim();
+          if(!id) return;
+
+          if(!map.has(id)){
+            map.set(id,{
+              id,
+              productName:row.productName || id,
+              seraPrice:Number(row.seraPrice || 0),
+              limitQty:Number(row.limitQty || 0),
+              limitType:row.limitType || '',
+              image:row.image || '',
+              grade:row.grade || row.rarity || row['등급'] || '',
+              mainProduct:String(row.mainProduct || row['메인상품'] || '').trim(),
+              requiredQty:Math.max(0,Math.floor(Number(row.requiredQty || row['필요구매수량'] || 0))),
+              note:row.note || '',
+              description:row.description || row['설명'] || '',
+              sortOrder:Number(row.sortOrder || 999999),
+              sellItems:[],
+              rewards:[]
+            });
+          }
+
+          const p = map.get(id);
+
+          if(!p.image && row.image) p.image = row.image;
+          if(!p.grade && (row.grade || row.rarity || row['등급'])){
+            p.grade = row.grade || row.rarity || row['등급'];
+          }
+          if(!p.mainProduct && (row.mainProduct || row['메인상품'])){
+            p.mainProduct = String(row.mainProduct || row['메인상품'] || '').trim();
+          }
+          if(!p.requiredQty && Number(row.requiredQty || row['필요구매수량'] || 0)){
+            p.requiredQty = Math.max(0,Math.floor(Number(row.requiredQty || row['필요구매수량'] || 0)));
+          }
+          if(!p.note && row.note) p.note = row.note;
+          if(!p.description && (row.description || row['설명'])){
+            p.description = row.description || row['설명'];
+          }
+          if(!p.limitType && row.limitType) p.limitType = row.limitType;
+          if(!p.limitQty && Number(row.limitQty || 0)) p.limitQty = Number(row.limitQty || 0);
+
+          const hasFixedNet =
+            row.fixedNetTera !== null &&
+            row.fixedNetTera !== undefined &&
+            String(row.fixedNetTera).trim() !== '';
+
+          p.sellItems.push({
+            key:sourceIndex,
+            name:row.sellItemName || row.productName || '판매 아이템',
+            qty:Math.max(1,Number(row.sellQty || 1)),
+            feeRate:Math.max(0,Number(row.feeRate || 0)),
+            fixedNetTera:hasFixedNet ? Math.max(0,Number(row.fixedNetTera || 0)) : null
+          });
+        });
+
+        const grouped = [...map.values()].sort((a,b)=>
+          (a.sortOrder - b.sortOrder) || a.id.localeCompare(b.id,'ko')
+        );
+
+        const mainProducts = grouped.filter(p => !String(p.mainProduct || '').trim());
+        const rewardProducts = grouped.filter(p => String(p.mainProduct || '').trim());
+
+        const parentMap = new Map();
+        mainProducts.forEach(p => {
+          parentMap.set(normalizeProductLinkName(p.productName),p);
+          parentMap.set(normalizeProductLinkName(p.id),p);
+        });
+
+        rewardProducts.forEach(reward => {
+          const parent = parentMap.get(normalizeProductLinkName(reward.mainProduct));
+          if(!parent) return;
+
+          // 메인상품 N개 이상 구매 시 이 보상 상품을 딱 1회 획득
+          parent.rewards.push(reward);
+        });
+
+        mainProducts.forEach(p => {
+          p.rewards.sort((a,b)=>
+            (a.requiredQty - b.requiredQty) ||
+            (a.sortOrder - b.sortOrder) ||
+            a.id.localeCompare(b.id,'ko')
+          );
+        });
+
+        return mainProducts;
+      }
+
+      function normalizeMarketGrade(value){
+        const raw = String(value ?? '').trim();
+        const lower = raw.toLowerCase();
+
+        if(raw === '에픽' || lower === 'epic') return '에픽';
+        if(raw === '유니크' || lower === 'unique') return '유니크';
+        if(raw === '레어' || lower === 'rare') return '레어';
+        return raw;
+      }
+
+      function getMarketGradeClass(value){
+        const grade = normalizeMarketGrade(value);
+        if(grade === '에픽') return 'market-rarity-epic';
+        if(grade === '유니크') return 'market-rarity-unique';
+        if(grade === '레어') return 'market-rarity-rare';
+        return '';
+      }
+
+      function getItemPrice(productId, item){
+        return Math.max(0,toNumber(savedPrices[priceKey(productId,item.key)] || 0));
+      }
+
+      function getProductMetrics(product){
+        let complete = true;
+        let gross = 0;
+        let net = 0;
+
+        for(const item of product.sellItems){
+          const hasFixedNet =
+            item.fixedNetTera !== null &&
+            item.fixedNetTera !== undefined &&
+            Number.isFinite(Number(item.fixedNetTera));
+
+          // 시트의 '실수령테라'가 있으면 그 값을 그대로 고정 실수령값으로 사용
+          if(hasFixedNet){
+            const fixedNet = Math.max(0,Number(item.fixedNetTera));
+            net += fixedNet;
+            gross += fixedNet;
+            continue;
+          }
+
+          const price = getItemPrice(product.id,item);
+          if(price <= 0) complete = false;
+
+          const lineGross = price * item.qty;
+          const lineNet = lineGross * (1 - item.feeRate / 100);
+
+          gross += lineGross;
+          net += lineNet;
+        }
+
+        const efficiency = product.seraPrice > 0 ? net / product.seraPrice : 0;
+
+        return { complete,gross,net,efficiency };
+      }
+
+      function getPurchaseOptionMetrics(product, qty){
+        qty = Math.max(0,Math.floor(Number(qty || 0)));
+
+        if(qty === 0){
+          return {
+            complete:true,
+            sera:0,
+            tera:0,
+            baseTera:0,
+            efficiency:0,
+            unlockedRewards:[]
+          };
+        }
+
+        const base = getProductMetrics(product);
+        if(!base.complete){
+          return {
+            complete:false,
+            sera:product.seraPrice * qty,
+            tera:0,
+            baseTera:0,
+            efficiency:0,
+            unlockedRewards:[]
+          };
+        }
+
+        const sera = product.seraPrice * qty;
+        const baseTera = base.net * qty;
+        let tera = baseTera;
+        let complete = true;
+        const unlockedRewards = [];
+
+        for(const reward of (product.rewards || [])){
+          const need = Math.max(1,Math.floor(Number(reward.requiredQty || 0)));
+          if(qty < need) continue;
+
+          const rewardMetrics = getProductMetrics(reward);
+          if(!rewardMetrics.complete){
+            complete = false;
+            continue;
+          }
+
+          // 조건 달성 보상은 구매수량과 무관하게 1회만 획득
+          tera += rewardMetrics.net;
+          unlockedRewards.push({
+            id:reward.id,
+            productName:reward.productName,
+            image:reward.image,
+            grade:reward.grade,
+            requiredQty:need,
+            tera:rewardMetrics.net
+          });
+        }
+
+        return {
+          complete,
+          sera,
+          tera,
+          baseTera,
+          efficiency:sera > 0 ? tera / sera : 0,
+          unlockedRewards
+        };
+      }
+
+      function buildLimitText(product){
+        const t = String(product.limitType || '').trim();
+        const q = Number(product.limitQty || 0);
+
+        if(!t && q <= 0) return '제한 없음';
+        if(['무제한','제한없음','없음'].some(x => t.includes(x))) return '제한 없음';
+
+        if(t && q > 0) return `${t}\n${formatNumber(q)}회`;
+        if(q > 0) return `${formatNumber(q)}회`;
+
+        return t || '제한 없음';
+      }
+
+      function renderProducts(){
+        if(!products.length){
+          productListEl.innerHTML = `
+            <div class="state-box">
+              현재 표시할 상품이 없습니다.<br>
+              구글시트의 <b>경매장</b> 탭 데이터를 확인해주세요.
+            </div>`;
+          productCountEl.textContent = '0개 상품';
+          calcBtn.disabled = true;
+          return;
+        }
+
+        const budget = Math.max(1,getBudget() || 100000);
+
+        const list = products.map(product => {
+          const metrics = getProductMetrics(product);
+          const maxQty = normalizeLimit(
+            product.limitQty,
+            product.limitType,
+            product.seraPrice,
+            budget
+          );
+
+          let bestPotentialEfficiency = 0;
+          let hasAnyValidOption = false;
+
+          for(let qty = 1; qty <= maxQty; qty++){
+            const option = getPurchaseOptionMetrics(product,qty);
+            if(!option.complete || option.tera <= 0) continue;
+            hasAnyValidOption = true;
+            bestPotentialEfficiency = Math.max(bestPotentialEfficiency,option.efficiency);
+          }
+
+          return {
+            product,
+            metrics,
+            bestPotentialEfficiency,
+            hasAnyValidOption
+          };
+        });
+
+        const ready = list.filter(x => x.hasAnyValidOption);
+
+        let bestId = '';
+        if(ready.length){
+          bestId = ready.reduce((best,x)=>
+            x.bestPotentialEfficiency > best.bestPotentialEfficiency ? x : best
+          ).product.id;
+        }
+
+        function renderSellInputs(product){
+          return product.sellItems.map(item => {
+            const key = priceKey(product.id,item.key);
+            const price = getItemPrice(product.id,item);
+            const hasFixedNet =
+              item.fixedNetTera !== null &&
+              item.fixedNetTera !== undefined &&
+              Number.isFinite(Number(item.fixedNetTera));
+
+            if(hasFixedNet){
+              return `
+                <div class="sell-stack">
+                  <div class="sell-item-name" title="${escapeHTML(item.name)}">
+                    ${escapeHTML(item.name)}
+                    ${item.qty > 1 ? ` × ${formatNumber(item.qty)}` : ''}
+                  </div>
+
+                  <div class="price-wrap">
+                    <img class="currency-badge tera-badge input-badge" src="img/market/테라배지.png" alt="테라">
+                    <input
+                      class="price-input is-fixed"
+                      type="text"
+                      value="${formatNumber(Math.round(Number(item.fixedNetTera)))}"
+                      disabled
+                      aria-label="${escapeHTML(item.name)} 고정 실수령 테라">
+                  </div>
+                  <div class="fixed-price-label">고정 실수령 테라</div>
+                </div>
+              `;
+            }
+
+            return `
+              <div class="sell-stack">
+                <div class="sell-item-name" title="${escapeHTML(item.name)}">
+                  ${escapeHTML(item.name)}
+                  ${item.qty > 1 ? ` × ${formatNumber(item.qty)}` : ''}
+                </div>
+
+                <div class="price-wrap">
+                  <img class="currency-badge tera-badge input-badge" src="img/market/테라배지.png" alt="테라">
+                  <input
+                    class="price-input js-market-price"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    data-key="${escapeHTML(key)}"
+                    value="${price ? formatNumber(price) : ''}"
+                    placeholder="시세 입력"
+                    aria-label="${escapeHTML(item.name)} 경매장 가격">
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        function renderImage(product){
+          const gradeClass = getMarketGradeClass(product.grade);
+          const imageHTML = product.image
+            ? `
+              <img class="item-img"
+                   src="${escapeHTML(product.image)}"
+                   alt="${escapeHTML(product.productName)}"
+                   onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+              <div class="img-fallback" style="display:none">이미지<br>없음</div>
+            `
+            : `<div class="img-fallback">이미지<br>없음</div>`;
+
+          return `<div class="item-img-wrap ${gradeClass}">${imageHTML}</div>`;
+        }
+
+        productListEl.innerHTML = list.map(({product,metrics}) => {
+          const isBest = product.id === bestId;
+          const limitText = buildLimitText(product);
+          const sellInputs = renderSellInputs(product);
+
+          const netText = metrics.complete
+            ? `${formatNumber(Math.round(metrics.net))}`
+            : '시세 입력 필요';
+
+          const effText = metrics.complete
+            ? formatNumber(metrics.efficiency,1)
+            : '-';
+
+          const rewardRows = (product.rewards || []).map(reward => {
+            const rewardMetrics = getProductMetrics(reward);
+            const rewardInputs = renderSellInputs(reward);
+            const rewardNetText = rewardMetrics.complete
+              ? formatNumber(Math.round(rewardMetrics.net))
+              : '시세 입력 필요';
+
+            return `
+              <article class="product-row reward-row">
+                <div class="cell product-main">
+                  ${renderImage(reward)}
+
+                  <div>
+                    <div class="product-name" title="${escapeHTML(reward.productName)}">
+                      ${escapeHTML(reward.productName)}
+                    </div>
+
+                    ${reward.description
+                      ? `<div class="product-sub">${escapeHTML(reward.description)}</div>`
+                      : ''}
+
+                    <div class="tag-row">
+                      <span class="tag reward-tag">구매 보상</span>
+                      <span class="tag gray">${escapeHTML(reward.id)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="cell">
+                  <div class="cell-label">획득 조건</div>
+                  <div class="reward-condition">
+                    ${formatNumber(reward.requiredQty)}개 구매
+                  </div>
+                  <div class="reward-once">${escapeHTML(product.productName)} 기준</div>
+                </div>
+
+                <div class="cell">
+                  <div class="cell-label">지급 횟수</div>
+                  <div class="limit-value">1회</div>
+                </div>
+
+                <div class="cell">
+                  <div class="cell-label">현재 경매장 가격 (테라)</div>
+                  ${rewardInputs}
+                </div>
+
+                <div class="cell">
+                  <div class="cell-label">예상 실수령 테라</div>
+                  <div class="metric-value ${rewardMetrics.complete ? '' : 'empty'}">${rewardNetText}</div>
+                  <div class="metric-sub">조건 달성 시 1회 추가</div>
+                </div>
+
+                <div class="cell">
+                  <div class="cell-label">계산 방식</div>
+                  <div class="metric-value eff" style="font-size:11px">보너스</div>
+                  <div class="metric-sub">${formatNumber(reward.requiredQty)}개 이상 구매 시 반영</div>
+                </div>
+              </article>
+            `;
+          }).join('');
+
+          return `
+            <article class="product-row ${isBest ? 'is-best' : ''}">
+              <div class="hot-ribbon">BEST</div>
+
+              <div class="cell product-main">
+                ${renderImage(product)}
+
+                <div>
+                  <div class="product-name" title="${escapeHTML(product.productName)}">
+                    ${escapeHTML(product.productName)}
+                  </div>
+
+                  ${product.description
+                    ? `<div class="product-sub">${escapeHTML(product.description)}</div>`
+                    : ''}
+
+                  <div class="tag-row">
+                    <span class="tag">세라 상품</span>
+                    <span class="tag gray">${escapeHTML(product.id)}</span>
+                    ${(product.rewards || []).length
+                      ? `<span class="tag reward-tag">누적보상 ${(product.rewards || []).length}개</span>`
+                      : ''}
+                  </div>
+                </div>
+              </div>
+
+              <div class="cell">
+                <div class="cell-label">세라 가격</div>
+                <div class="sera-value">
+                  <img class="currency-badge sera-badge" src="img/market/세라배지.png" alt="세라">
+                  ${formatNumber(product.seraPrice)}
+                </div>
+              </div>
+
+              <div class="cell">
+                <div class="cell-label">구매 제한</div>
+                <div class="limit-value">${escapeHTML(limitText)}</div>
+              </div>
+
+              <div class="cell">
+                <div class="cell-label">현재 경매장 가격 (테라)</div>
+                ${sellInputs}
+              </div>
+
+              <div class="cell">
+                <div class="cell-label">예상 실수령 테라</div>
+                <div class="metric-value ${metrics.complete ? '' : 'empty'}">${netText}</div>
+                <div class="metric-sub">상품 1개 판매 기준</div>
+              </div>
+
+              <div class="cell">
+                <div class="cell-label">1세라당 테라</div>
+                <div class="metric-value eff ${metrics.complete ? '' : 'empty'}">${effText}</div>
+                <div class="metric-sub">보상 제외 기본 효율</div>
+              </div>
+            </article>
+            ${rewardRows}
+          `;
+        }).join('');
+
+        const rewardCount = products.reduce((sum,p)=>sum + (p.rewards || []).length,0);
+        productCountEl.textContent =
+          `${products.length}개 상품` +
+          (rewardCount ? ` · 구매보상 ${rewardCount}개` : '') +
+          ` · 계산 가능 ${ready.length}개`;
+
+        calcBtn.disabled = ready.length === 0;
+
+        bindPriceInputs();
+      }
+
+      function bindPriceInputs(){
+        document.querySelectorAll('.js-market-price').forEach(input => {
+          input.addEventListener('focus',() => {
+            const n = toNumber(input.value);
+            input.value = n ? String(n) : '';
+            input.select();
+          });
+
+          input.addEventListener('blur',() => {
+            const key = input.dataset.key;
+            const n = Math.max(0,Math.floor(toNumber(input.value)));
+
+            if(n > 0) savedPrices[key] = n;
+            else delete savedPrices[key];
+
+            saveJSON(STORAGE_PRICE_KEY,savedPrices);
+
+            renderProducts();
+            renderEmptyResult();
+          });
+
+          input.addEventListener('keydown',e => {
+            if(e.key === 'Enter') input.blur();
+          });
+        });
+      }
+
+      function renderEmptyResult(){
+        resultArea.innerHTML = `
+          <div class="result-empty">
+            상품들의 경매장 시세를 입력한 뒤<br>
+            자동 계산을 눌러주세요.
+          </div>
+        `;
+      }
+
+      function optimizeCombination(budget, availableProducts){
+        if(budget <= 0 || !availableProducts.length) return null;
+
+        const gcd = (a,b) => {
+          a = Math.abs(a);
+          b = Math.abs(b);
+          while(b) [a,b] = [b,a % b];
+          return a || 1;
+        };
+
+        let unit = 0;
+        for(const p of availableProducts){
+          unit = gcd(unit,Math.round(p.seraPrice));
+        }
+        unit = Math.max(1,unit);
+
+        const cap = Math.floor(budget / unit);
+
+        let dp = new Float64Array(cap + 1);
+        dp.fill(-1);
+        dp[0] = 0;
+
+        // 상품별로 "0~최대수량 중 하나"를 고르는 다중선택 DP.
+        // 특정 수량에서만 발생하는 1회 보상을 정확하게 반영하기 위해
+        // 기존의 선형 bounded-knapsack 대신 이 방식을 사용한다.
+        const historyPrevBudget = [];
+        const historyQty = [];
+
+        for(let productIndex = 0; productIndex < availableProducts.length; productIndex++){
+          const p = availableProducts[productIndex];
+
+          const options = [];
+          options.push({
+            qty:0,
+            costUnit:0,
+            value:0,
+            metrics:getPurchaseOptionMetrics(p,0)
+          });
+
+          for(let qty = 1; qty <= p.maxQty; qty++){
+            const metrics = getPurchaseOptionMetrics(p,qty);
+            if(!metrics.complete) continue;
+
+            const costUnit = Math.round((p.seraPrice * qty) / unit);
+            if(costUnit <= 0 || costUnit > cap) continue;
+
+            options.push({
+              qty,
+              costUnit,
+              value:metrics.tera,
+              metrics
+            });
+          }
+
+          const next = new Float64Array(cap + 1);
+          next.fill(-1);
+
+          const prevBudgetForThisProduct = new Int32Array(cap + 1);
+          const qtyForThisProduct = new Int32Array(cap + 1);
+          prevBudgetForThisProduct.fill(-1);
+          qtyForThisProduct.fill(-1);
+
+          for(let b = 0; b <= cap; b++){
+            if(dp[b] < 0) continue;
+
+            for(const option of options){
+              const nb = b + option.costUnit;
+              if(nb > cap) continue;
+
+              const cand = dp[b] + option.value;
+
+              if(cand > next[nb] + 0.000001){
+                next[nb] = cand;
+                prevBudgetForThisProduct[nb] = b;
+                qtyForThisProduct[nb] = option.qty;
+              }
+            }
+          }
+
+          historyPrevBudget.push(prevBudgetForThisProduct);
+          historyQty.push(qtyForThisProduct);
+          dp = next;
+        }
+
+        let bestB = 0;
+
+        for(let b = 1; b <= cap; b++){
+          if(dp[b] > dp[bestB] + 0.000001){
+            bestB = b;
+          }else if(
+            Math.abs(dp[b] - dp[bestB]) < 0.000001 &&
+            dp[b] >= 0 &&
+            b < bestB
+          ){
+            bestB = b;
+          }
+        }
+
+        if(dp[bestB] <= 0) return null;
+
+        const counts = new Array(availableProducts.length).fill(0);
+        let cursor = bestB;
+
+        for(let i = availableProducts.length - 1; i >= 0; i--){
+          const qty = historyQty[i][cursor];
+          const prev = historyPrevBudget[i][cursor];
+
+          if(qty < 0 || prev < 0) return null;
+
+          counts[i] = qty;
+          cursor = prev;
+        }
+
+        let usedSera = 0;
+        let totalTera = 0;
+        const combo = [];
+
+        counts.forEach((qty,i) => {
+          if(qty <= 0) return;
+
+          const p = availableProducts[i];
+          const option = getPurchaseOptionMetrics(p,qty);
+
+          if(!option.complete) return;
+
+          usedSera += option.sera;
+          totalTera += option.tera;
+
+          combo.push({
+            id:p.id,
+            productName:p.productName,
+            image:p.image,
+            grade:p.grade,
+            qty,
+            sera:option.sera,
+            tera:option.tera,
+            baseTera:option.baseTera,
+            efficiency:option.efficiency,
+            rewards:option.unlockedRewards || []
+          });
+        });
+
+        combo.sort((a,b)=>b.efficiency - a.efficiency);
+
+        return {
+          usedSera,
+          remainingSera:Math.max(0,budget - usedSera),
+          totalTera,
+          avgEfficiency:usedSera > 0 ? totalTera / usedSera : 0,
+          combo
+        };
+      }
+
+      function calculate(){
+        const budget = getBudget();
+
+        if(budget <= 0){
+          alert('보유 세라를 입력해주세요.');
+          budgetEl.focus();
+          return;
+        }
+
+        const available = products.map(product => {
+          const metrics = getProductMetrics(product);
+
+          return {
+            ...product,
+            ...metrics,
+            maxQty:normalizeLimit(
+              product.limitQty,
+              product.limitType,
+              product.seraPrice,
+              budget
+            )
+          };
+        }).filter(p =>
+          p.complete &&
+          p.seraPrice > 0 &&
+          p.seraPrice <= budget &&
+          p.maxQty > 0
+        );
+
+        if(!available.length){
+          resultArea.innerHTML = `
+            <div class="result-empty" style="color:#ff9f93">
+              계산 가능한 상품이 없습니다.<br>
+              경매장 시세와 보유 세라를 확인해주세요.
+            </div>
+          `;
+          return;
+        }
+
+        const result = optimizeCombination(budget,available);
+
+        if(!result || !result.combo.length){
+          resultArea.innerHTML = `
+            <div class="result-empty" style="color:#ff9f93">
+              최적 구매 조합을 찾지 못했습니다.
+            </div>
+          `;
+          return;
+        }
+
+        const comboHTML = result.combo.map(item => {
+          const gradeClass = getMarketGradeClass(item.grade);
+          const image = item.image
+            ? `<img class="combo-img ${gradeClass}" src="${escapeHTML(item.image)}" alt="">`
+            : `<div class="combo-img ${gradeClass}"></div>`;
+
+          const rewardText = (item.rewards || []).length
+            ? `<div class="combo-rewards">🎁 ${
+                item.rewards.map(r =>
+                  `${escapeHTML(r.productName)} ×1 (+${formatNumber(Math.round(r.tera))} 테라)`
+                ).join('<br>')
+              }</div>`
+            : '';
+
+          return `
+            <div class="combo-row">
+              ${image}
+              <div class="combo-info">
+                <div class="combo-name">
+                  ${escapeHTML(item.productName)} × ${formatNumber(item.qty)}
+                </div>
+                <div class="combo-values">
+                  <span>${formatNumber(item.sera)} 세라</span>
+                  <b>${formatNumber(Math.round(item.tera))} 테라</b>
+                </div>
+                ${rewardText}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        resultArea.innerHTML = `
+          <div class="result-crown">
+            <div class="result-kicker">예상 획득 테라</div>
+
+            <div class="result-main-value">
+              <img class="result-tera-img" src="img/market/테라배지.png" alt="테라">
+              ${formatNumber(Math.round(result.totalTera))}
+            </div>
+
+            <div class="result-grid">
+              <div class="result-mini">
+                <div class="result-mini-label">총 사용 세라</div>
+                <div class="result-mini-value">${formatNumber(result.usedSera)}</div>
+              </div>
+
+              <div class="result-mini">
+                <div class="result-mini-label">남는 세라</div>
+                <div class="result-mini-value">${formatNumber(result.remainingSera)}</div>
+              </div>
+
+              <div class="result-mini">
+                <div class="result-mini-label">평균 효율</div>
+                <div class="result-mini-value">${formatNumber(result.avgEfficiency,1)}</div>
+              </div>
+
+              <div class="result-mini">
+                <div class="result-mini-label">구매 상품 종류</div>
+                <div class="result-mini-value">${formatNumber(result.combo.length)}종</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="combo-title">최적 조합 내역</div>
+          <div class="combo-list">${comboHTML}</div>
+        `;
+      }
+
+      async function loadMarketItems(){
+        productListEl.innerHTML = `<div class="state-box">상품 정보를 불러오고 있습니다.</div>`;
+
+        try{
+          const response = await fetch(`${API_BASE}?type=market_items`,{
+            method:'GET',
+            headers:{'Accept':'application/json'},
+            cache:'no-store'
+          });
+
+          const data = await response.json().catch(()=>null);
+
+          if(!response.ok || !data?.ok || !Array.isArray(data.items)){
+            throw new Error(data?.message || data?.error || `HTTP ${response.status}`);
+          }
+
+          rawRows = data.items;
+          products = groupRows(rawRows);
+
+          renderProducts();
+        }catch(error){
+          console.error('[market_items]',error);
+
+          productCountEl.textContent = '불러오기 실패';
+
+          productListEl.innerHTML = `
+            <div class="state-box error">
+              경매장 상품 정보를 불러오지 못했습니다.<br>
+              백엔드 배포 상태와 경매장 시트를 확인해주세요.<br>
+              <small>${escapeHTML(error?.message || error)}</small>
+            </div>
+          `;
+
+          calcBtn.disabled = true;
+        }
+      }
+
+      // 보유 세라
+      const savedBudget = toNumber(localStorage.getItem(STORAGE_BUDGET_KEY));
+      if(savedBudget > 0) budgetEl.value = formatNumber(savedBudget);
+
+      budgetEl.addEventListener('focus',() => {
+        const n = getBudget();
+        budgetEl.value = n ? String(n) : '';
+        budgetEl.select();
+      });
+
+      budgetEl.addEventListener('blur',() => {
+        const n = getBudget();
+        budgetEl.value = n ? formatNumber(n) : '';
+
+        try{
+          localStorage.setItem(STORAGE_BUDGET_KEY,String(n || ''));
+        }catch(_){}
+
+        renderEmptyResult();
+      });
+
+      budgetEl.addEventListener('keydown',e => {
+        if(e.key === 'Enter') budgetEl.blur();
+      });
+
+      clearPricesBtn.addEventListener('click',() => {
+        if(!confirm('입력한 경매장 시세를 모두 초기화할까요?')) return;
+
+        savedPrices = {};
+        saveJSON(STORAGE_PRICE_KEY,savedPrices);
+
+        renderProducts();
+        renderEmptyResult();
+      });
+
+      resetAllBtn.addEventListener('click',() => {
+        if(!confirm('보유 세라와 경매장 시세를 모두 초기화할까요?')) return;
+
+        savedPrices = {};
+        saveJSON(STORAGE_PRICE_KEY,savedPrices);
+
+        budgetEl.value = '100,000';
+
+        try{
+          localStorage.setItem(STORAGE_BUDGET_KEY,'100000');
+        }catch(_){}
+
+        renderProducts();
+        renderEmptyResult();
+      });
+
+      calcBtn.addEventListener('click',calculate);
+
+      loadMarketItems();
+    })();
+  </script>
+</body>
+</html>

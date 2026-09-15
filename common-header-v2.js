@@ -281,13 +281,13 @@
       window.google.accounts.id.renderButton(host, {
         type: 'standard',
         theme: 'filled_blue',
-        // 모바일에서는 버튼 외곽 크기는 CSS 그대로 두고
-        // Google이 그리는 내부 로고/로그인 텍스트만 한 단계 작게 렌더링한다.
+        // 모바일에서도 Google 로고 + '로그인' 전체 문구가 잘리지 않도록
+        // 최소 폭을 충분히 확보한다. (64px에서는 한글 문구가 잘릴 수 있음)
         size: isMobileHeader ? 'small' : 'medium',
         shape: 'pill',
         text: 'signin',
         logo_alignment: 'left',
-        width: isMobileHeader ? 64 : 104,
+        width: isMobileHeader ? 96 : 104,
         locale: 'ko',
       });
 
