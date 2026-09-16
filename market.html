@@ -343,7 +343,7 @@
     .product-row{
       position:relative;
       display:grid;
-      grid-template-columns:minmax(280px,1.45fr) 90px 92px minmax(155px,.9fr) 135px 118px;
+      grid-template-columns:minmax(280px,1.45fr) 90px 92px 132px 135px 118px;
       min-height:104px;
       border:1px solid rgba(97,70,35,.5);
       background:
@@ -984,7 +984,7 @@
       }
 
       .product-row{
-        grid-template-columns:minmax(240px,1.4fr) 82px 82px minmax(140px,.9fr) 118px 105px;
+        grid-template-columns:minmax(240px,1.4fr) 82px 82px 124px 118px 105px;
       }
 
       .product-name{font-size:13px}
@@ -1008,7 +1008,7 @@
       .right-box{margin-bottom:0}
 
       .product-row{
-        grid-template-columns:minmax(225px,1.3fr) 74px 78px minmax(130px,.9fr) 110px 96px;
+        grid-template-columns:minmax(225px,1.3fr) 74px 78px 116px 110px 96px;
       }
       .cell{padding:8px 6px}
       .cell-label{font-size:8px}
@@ -1175,8 +1175,9 @@
         <div class="market-list-head">
           <div class="market-list-title">세라 상점 상품 목록</div>
           <div class="head-right">
-            <span id="productCount" class="count-text">불러오는 중...</span>
-            <button id="clearPricesBtn" class="ghost-btn" type="button">입력 시세 초기화</button>
+            <span id="marketUpdatedAt" class="count-text">경매장 가격 기준: -</span>
+            <span id="productCount" style="display:none"></span>
+            <button id="clearPricesBtn" class="ghost-btn" type="button">입력 시세 자동화</button>
           </div>
         </div>
 
@@ -1230,11 +1231,12 @@
       'use strict';
 
       const API_BASE = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
-      const STORAGE_PRICE_KEY = 'dnfm_market_prices_v2';
+      const STORAGE_PRICE_KEY = 'dnfm_market_prices_v3_auto';
       const STORAGE_BUDGET_KEY = 'dnfm_market_budget_v2';
 
       const productListEl = document.getElementById('productList');
       const productCountEl = document.getElementById('productCount');
+      const marketUpdatedAtEl = document.getElementById('marketUpdatedAt');
       const budgetEl = document.getElementById('seraBudget');
       const calcBtn = document.getElementById('calculateBtn');
       const resultArea = document.getElementById('resultArea');
@@ -1270,6 +1272,14 @@
           maximumFractionDigits:maxFraction,
           minimumFractionDigits:0
         });
+      }
+
+      function formatMarketUpdatedAt(value){
+        if(!value) return '-';
+        const d = new Date(value);
+        if(Number.isNaN(d.getTime())) return '-';
+
+        return `${d.getMonth()+1}월 ${d.getDate()}일 ${d.getHours()}시`;
       }
 
       function formatKoreanUnit(value){
@@ -1380,6 +1390,7 @@
             name:row.sellItemName || row.productName || '판매 아이템',
             qty:Math.max(1,Number(row.sellQty || 1)),
             feeRate:Math.max(0,Number(row.feeRate || 0)),
+            marketPrice:Math.max(0,Number(row.marketPrice || row['경매장가격'] || 0)),
             fixedNetTera:hasFixedNet ? Math.max(0,Number(row.fixedNetTera || 0)) : null
           });
         });
@@ -1435,7 +1446,11 @@
       }
 
       function getItemPrice(productId, item){
-        return Math.max(0,toNumber(savedPrices[priceKey(productId,item.key)] || 0));
+        const autoPrice = Math.max(0,toNumber(item?.marketPrice || 0));
+        if(autoPrice > 0) return autoPrice;
+
+        const manual = Math.max(0,toNumber(savedPrices[priceKey(productId,item.key)] || 0));
+        return manual;
       }
 
       function getProductMetrics(product){
@@ -2125,7 +2140,7 @@
         productListEl.innerHTML = `<div class="state-box">상품 정보를 불러오고 있습니다.</div>`;
 
         try{
-          const response = await fetch(`${API_BASE}?type=market_items`,{
+          const response = await fetch(`${API_BASE}?type=market_items&t=${Date.now()}`,{
             method:'GET',
             headers:{'Accept':'application/json'},
             cache:'no-store'
@@ -2138,6 +2153,15 @@
           }
 
           rawRows = data.items;
+          marketUpdatedAtEl.textContent =
+            `경매장 가격 기준: ${formatMarketUpdatedAt(data.updatedAt)}`;
+
+          console.log('[market_items] 자동 경매장가격 포함 행',
+            rawRows.filter(row => Number(row.marketPrice || 0) > 0).length,
+            '/',
+            rawRows.length
+          );
+
           products = groupRows(rawRows);
 
           renderProducts();
@@ -2145,6 +2169,7 @@
           console.error('[market_items]',error);
 
           productCountEl.textContent = '불러오기 실패';
+          marketUpdatedAtEl.textContent = '경매장 가격 기준: -';
 
           productListEl.innerHTML = `
             <div class="state-box error">
