@@ -553,7 +553,7 @@
       }
 
       .header-ads .line .tag {
-        font-size: 9px;
+        font-size: 10px;
       }
 
       .sub-alert {
@@ -1341,7 +1341,7 @@
     }
 
     .public-entry-ad-content span {
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 900;
     }
 
@@ -4637,7 +4637,7 @@
     /* ✅ 상단 4개 버튼 폭 동일(4등분) */
     #specialButtonsArea {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 8px;
       width: 100%;
     }
@@ -6916,7 +6916,7 @@
       background: transparent;
       box-shadow: none;
 
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 800;
       line-height: 1;
       color: #f0e6d2;
@@ -9876,7 +9876,12 @@
     /* ===== 메인 비주얼 하단 서비스 선택 영역 ===== */
     .main-service-section {
       margin: 12px auto 30px;
-      width: 100%;
+      /* 기존 5열 카드 1개의 크기를 그대로 유지한 채 6개를 한 줄에 배치 */
+      width: min(1524px, calc(100vw - 32px));
+      max-width: none;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
     .main-service-heading {
@@ -9928,7 +9933,7 @@
 
     .main-quick-menu {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 9px;
       width: 100%;
       max-width: 100%;
@@ -10102,7 +10107,7 @@
       display: block;
       margin-top: 4px;
       color: rgba(217, 225, 238, .74);
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 500;
       line-height: 1.35;
       letter-spacing: -0.025em;
@@ -10136,10 +10141,12 @@
     .main-quick-card--board { --card-accent: #d7a66a; }
     .main-quick-card--calculator { --card-accent: #e6c76d; }
     .main-quick-card--antimagic { --card-accent: #c99cff; }
+    .main-quick-card--terra { --card-accent: #7fd6c2; }
     .main-quick-card--setting { --card-accent: #8fcdb5; }
 
     /* 항마력 최적화 계산기: 추후 오픈 전 공사중 상태 */
-    .main-quick-card--antimagic.is-under-construction {
+    .main-quick-card--antimagic.is-under-construction,
+    .main-quick-card--terra.is-under-construction {
       cursor: not-allowed;
       filter: grayscale(.58) brightness(.62);
       border-color: rgba(255,255,255,.14);
@@ -10147,24 +10154,28 @@
       opacity: .78;
     }
 
-    .main-quick-card--antimagic.is-under-construction:hover {
+    .main-quick-card--antimagic.is-under-construction:hover,
+    .main-quick-card--terra.is-under-construction:hover {
       transform: none;
       border-color: rgba(255,255,255,.18);
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.035);
     }
 
-    .main-quick-card--antimagic.is-under-construction::before {
+    .main-quick-card--antimagic.is-under-construction::before,
+    .main-quick-card--terra.is-under-construction::before {
       opacity: .32;
       filter: grayscale(1);
     }
 
-    .main-quick-card--antimagic.is-under-construction .main-quick-card__action {
+    .main-quick-card--antimagic.is-under-construction .main-quick-card__action,
+    .main-quick-card--terra.is-under-construction .main-quick-card__action {
       color: #ffd98a;
       border-color: rgba(255,217,138,.32);
       background: rgba(255,217,138,.07);
     }
 
-    .main-quick-card--antimagic.is-under-construction .main-quick-card__action::after {
+    .main-quick-card--antimagic.is-under-construction .main-quick-card__action::after,
+    .main-quick-card--terra.is-under-construction .main-quick-card__action::after {
       content: "🚧";
       transform: none !important;
       margin-left: 2px;
@@ -10175,6 +10186,7 @@
     .main-quick-card--board,
     .main-quick-card--calculator,
     .main-quick-card--antimagic,
+    .main-quick-card--terra,
     .main-quick-card--setting {
       border-color: color-mix(in srgb, var(--card-accent) 48%, transparent);
     }
@@ -10238,6 +10250,7 @@
       .main-quick-menu { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
       .main-quick-card {
         min-height: 108px;
+        aspect-ratio: auto;
         padding: 13px 14px 13px 42%;
       }
       .main-quick-card__title { font-size: 16px; }
@@ -10252,6 +10265,7 @@
       .main-quick-menu { grid-template-columns: 1fr; gap: 10px; }
       .main-quick-card {
         min-height: 104px;
+        aspect-ratio: auto;
         padding: 13px 14px 13px 42%;
         border-radius: 13px;
       }
@@ -10273,7 +10287,7 @@
       <div class="wrap">
         <div class="main-title-kicker">GAME TEST LAB · DNFM 2.0</div>
         <h1 class="top-title">게임실험연구소 던전앤파이터 모바일 <span style="color:#ffdf6b">2.0</span></h1>
-        <div class="main-service-subtitle">데미지 계산부터 항마력 최적화, 캐릭터 세팅현황, 세팅 공유와 토론까지 한곳에서 이용해보세요.</div>
+        <div class="main-service-subtitle">데미지 계산부터 항마력 최적화, 테라 효율 계산, 캐릭터 세팅현황, 세팅 공유와 토론까지 한곳에서 이용해보세요.</div>
 <!-- 상단 소개문 아래 주요 서비스 선택 영역 -->
         <section class="main-service-section" aria-labelledby="mainServiceTitle">
           <div class="main-service-heading">
@@ -10325,6 +10339,19 @@
                 <span class="main-quick-card__title">항마력 최적화 계산기</span>
                 <span class="main-quick-card__desc">보유 장비로 구성 가능한 최고 항마력 조합 탐색</span>
                 <span class="main-quick-card__action">최적화 시작</span>
+              </span>
+            </a>
+
+            <a class="main-quick-card main-quick-card--terra is-under-construction"
+               href="./terra.html" aria-disabled="true" tabindex="-1" onclick="return false;">
+              <img class="main-quick-card__thumb"
+                   src="img/character/card/여크루.png"
+                   data-thumb-files="여크루.png|여크루.webp|여크루.jpg"
+                   alt="여크루 썸네일" />
+              <span class="main-quick-card__content">
+                <span class="main-quick-card__title">테라 효율 계산기</span>
+                <span class="main-quick-card__desc">상품별 테라 환산 효율을 비교하고 가장 유리한 선택 확인</span>
+                <span class="main-quick-card__action">준비중</span>
               </span>
             </a>
 
