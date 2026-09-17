@@ -10341,6 +10341,9 @@
 
             <button id="btnSpecialSpec" class="btnetc" type="button" style="display:none;">특수장비</button>
             <button id="btnUniqueBulk" class="btnetc" type="button" style="display:none;">고유효과</button>
+
+            <!-- ✅ PIN 로그인 전용: 로컬 DNFM 수신기에서 현재 캐릭터 장비+강화 자동 적용 테스트 -->
+            <button id="btnDnfmReceiverImport" class="btnetc" type="button" style="display:none;">게임 세팅 불러오기</button>
           </div>
         </div>
 
@@ -35300,15 +35303,1157 @@ wrap.appendChild(listBox);
         }
       });
 
+      // ===== PIN 로그인 전용: DNFM 로컬 수신기 연결 테스트 =====
+      const DNFM_RECEIVER_STATUS_URL = 'http://127.0.0.1:4243/api/status';
+      const DNFM_RECEIVER_TOKEN_KEY = 'dnfm_receiver_token_session';
+
+      function updateDnfmReceiverImportButtonVisibility() {
+        const btn = document.getElementById('btnDnfmReceiverImport');
+        if (!btn) return;
+        btn.style.display = window.__ADMIN_PIN_LOGIN_MODE__ === true ? 'inline-flex' : 'none';
+      }
+
+      function getDnfmReceiverToken() {
+        return String(sessionStorage.getItem(DNFM_RECEIVER_TOKEN_KEY) || '').trim();
+      }
+
+      function askDnfmReceiverToken() {
+        const token = prompt('DNFM 수신기의 연결 코드(Connection code)를 입력해주세요.\n\n수신기를 다시 실행해 연결 코드가 바뀐 경우에만 다시 입력하면 됩니다.');
+        if (token == null) return '';
+        const clean = String(token).trim();
+        if (clean) sessionStorage.setItem(DNFM_RECEIVER_TOKEN_KEY, clean);
+        return clean;
+      }
+
+      async function fetchDnfmReceiverStatus(token) {
+        return fetch(DNFM_RECEIVER_STATUS_URL, {
+          method: 'GET',
+          headers: {
+            'X-DNFM-Token': token
+          },
+          cache: 'no-store'
+        });
+      }
+
+      function normalizeDnfmEquipNameForMatch(value) {
+        return String(value || '')
+          .normalize('NFC')
+          .replace(/\s+/g, '')
+          .trim();
+      }
+
+      const DNFM_PART_TO_SLOT = {
+        '무기': 'weapon',
+        '머리어깨': 'headshoulder',
+        '상의': 'top',
+        '하의': 'bottom',
+        '허리': 'belt',
+        '신발': 'shoes',
+        '팔찌': 'bracelet',
+        '목걸이': 'necklace',
+        '반지': 'ring',
+        '보조장비': 'sub',
+        '마법석': 'magestone',
+        '귀걸이': 'earring',
+        '칭호': 'title',
+      };
+
+      const DNFM_SLOT_LABEL = {
+        weapon: '무기',
+        headshoulder: '머리어깨',
+        top: '상의',
+        bottom: '하의',
+        belt: '허리',
+        shoes: '신발',
+        bracelet: '팔찌',
+        necklace: '목걸이',
+        ring: '반지',
+        sub: '보조장비',
+        magestone: '마법석',
+        earring: '귀걸이',
+        title: '칭호',
+      };
+
+      const DNFM_SLOT_TO_UI = {
+        weapon: 'R1',
+        headshoulder: 'L1',
+        top: 'L2',
+        bottom: 'L3',
+        belt: 'L4',
+        shoes: 'L5',
+        earring: 'L6',
+        bracelet: 'R2',
+        necklace: 'R3',
+        ring: 'R4',
+        sub: 'R5',
+        magestone: 'R6',
+        title: 'C2',
+      };
+
+      function getDnfmReceiverEnhancements(character) {
+        const parts = Array.isArray(character?.equippedParts) ? character.equippedParts : [];
+        const result = [];
+
+        for (const part of parts) {
+          const partName = String(part?.part || '').trim();
+          const slotKey = DNFM_PART_TO_SLOT[partName];
+          if (!slotKey || slotKey === 'title') continue;
+
+          // 현재 수신기 구조에서는 강화 수치가 equipmentEntries가 아니라
+          // 짝으로 묶인 enchantEntries의 upgrade 필드에 들어온다.
+          const enchantEntries = Array.isArray(part?.enchantEntries) ? part.enchantEntries : [];
+          const entryWithUpgrade = enchantEntries.find((entry) => {
+            const n = Number(entry?.upgrade);
+            return Number.isFinite(n) && n >= 0;
+          }) || null;
+
+          if (!entryWithUpgrade) {
+            result.push({ partName, slotKey, level: null, raw: null });
+            continue;
+          }
+
+          result.push({
+            partName,
+            slotKey,
+            level: Number(entryWithUpgrade.upgrade),
+            raw: entryWithUpgrade,
+          });
+        }
+
+        return result;
+      }
+
+      async function applyDnfmEnhancementToSlot(slotKey, level) {
+        const enhLevel = Number(level);
+        if (!Number.isFinite(enhLevel) || enhLevel < 0) {
+          return { ok: false, reason: '수신 강화 수치 없음' };
+        }
+
+        if (typeof ensureEnhLoaded !== 'function' ||
+            typeof enhTypeForSlot !== 'function') {
+          throw new Error('계산기의 강화 데이터 함수를 찾지 못했습니다.');
+        }
+
+        await ensureEnhLoaded();
+
+        const type = enhTypeForSlot(slotKey);
+        if (!type) {
+          return { ok: false, reason: '강화 대상이 아닌 슬롯' };
+        }
+
+        const rawList = window.DBEnh?.byType?.[type];
+        const list = Array.isArray(rawList) ? rawList : [];
+        if (!list.length) {
+          return { ok: false, reason: `${type} 목록 없음` };
+        }
+
+        let opt = null;
+        if (typeof findEnhByExactGang === 'function') {
+          opt = findEnhByExactGang(list, enhLevel);
+        }
+        if (!opt && typeof matchEnhByLevelName === 'function') {
+          opt = matchEnhByLevelName(list, enhLevel);
+        }
+        if (!opt) {
+          return { ok: false, reason: `${enhLevel}강 옵션 매칭 실패` };
+        }
+
+        window.state = window.state || {};
+        state.enh ||= {};
+        state.enh[slotKey] = {
+          name: opt.name,
+          type: opt.type || type,
+          levelVal: opt.levelVal ?? String(enhLevel),
+          level: opt.level_num ?? enhLevel,
+          raw: opt.raw ?? null,
+        };
+
+        if (typeof firstEnhButtonFor === 'function') {
+          const btn = firstEnhButtonFor(slotKey);
+          if (btn) btn.textContent = opt.name;
+        }
+
+        return { ok: true, name: opt.name, level: enhLevel };
+      }
+
+      async function applyDnfmReceiverEnhancements(character) {
+        const enhancements = getDnfmReceiverEnhancements(character);
+        const bySlot = new Map(enhancements.map((it) => [it.slotKey, it]));
+        const order = [
+          'weapon',
+          'headshoulder', 'top', 'bottom', 'belt', 'shoes',
+          'bracelet', 'necklace', 'ring',
+          'sub', 'magestone', 'earring'
+        ];
+
+        const success = [];
+        const skipped = [];
+        const failed = [];
+
+        for (const slotKey of order) {
+          const recv = bySlot.get(slotKey);
+          if (!recv || recv.level == null) {
+            skipped.push({ slotKey, reason: '수신 강화 수치 없음' });
+            continue;
+          }
+
+          try {
+            const result = await applyDnfmEnhancementToSlot(slotKey, recv.level);
+            if (result.ok) {
+              success.push({ slotKey, level: recv.level, name: result.name });
+            } else {
+              failed.push({ slotKey, level: recv.level, reason: result.reason });
+            }
+          } catch (error) {
+            failed.push({
+              slotKey,
+              level: recv.level,
+              reason: error?.message || String(error)
+            });
+          }
+        }
+
+        return { success, skipped, failed, total: order.length };
+      }
+
+
+      // ===== DNFM 마법부여 옵션 매칭 =====
+      // 수신기의 카드/보주 이름은 계산기 데이터와 다를 수 있으므로 이름은 매칭에 사용하지 않는다.
+      // 실제 옵션명 + 수치를 공통 키로 정규화하여 같은 옵션 조합을 찾는다.
+      const DNFM_ENCHANT_EPSILON = 1e-9;
+
+      const DNFM_ENCHANT_ALIASES = {
+        str: ['힘'],
+        int: ['지능'],
+        vit: ['체력'],
+        spr: ['정신력'],
+        phys_atk: ['물리공격력', '물리 공격력'],
+        mag_atk: ['마법공격력', '마법 공격력'],
+        atk_speed: ['공격속도', '공격 속도'],
+        move_speed: ['이동속도', '이동 속도'],
+        cast_speed: ['캐스팅속도', '캐스팅 속도'],
+        hp_max: ['HPMAX', 'HP MAX', '최대HP', '최대 HP'],
+        mp_max: ['MPMAX', 'MP MAX', '최대MP', '최대 MP'],
+        phys_def: ['물리방어력', '물리 방어력'],
+        mag_def: ['마법방어력', '마법 방어력'],
+        fire_res: ['화속성저항', '화속성 저항'],
+        water_res: ['수속성저항', '수속성 저항'],
+        light_res: ['명속성저항', '명속성 저항'],
+        dark_res: ['암속성저항', '암속성 저항'],
+        acc: ['적중'],
+        eva: ['회피'],
+        phys_crit: ['물리크리티컬', '물리 크리티컬'],
+        mag_crit: ['마법크리티컬', '마법 크리티컬'],
+        damage_inc: ['데미지증가', '데미지 증가'],
+        add_damage: ['추가데미지', '추가 데미지'],
+        fire_enchant: ['화속성부여', '화속성 부여'],
+        water_enchant: ['수속성부여', '수속성 부여'],
+        light_enchant: ['명속성부여', '명속성 부여'],
+        dark_enchant: ['암속성부여', '암속성 부여'],
+        fire_str: ['화속성강화', '화속성 강화'],
+        water_str: ['수속성강화', '수속성 강화'],
+        light_str: ['명속성강화', '명속성 강화'],
+        dark_str: ['암속성강화', '암속성 강화'],
+        all_str: ['모든속성강화', '모든 속성 강화'],
+        final_damage: ['최종데미지증가', '최종 데미지 증가'],
+        all_type_damage: ['모든타입피해', '모든 타입 피해'],
+      };
+
+      function normalizeDnfmEnchantText(value) {
+        return String(value ?? '')
+          .normalize('NFC')
+          .replace(/[\uFEFF\u00A0\u200B-\u200D\u2060\u180E]/g, '')
+          .replace(/[：:]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      function dnfmEnchantNumber(value) {
+        if (value == null || value === '') return null;
+        if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+        const m = String(value).replace(/,/g, '').match(/[+-]?\d+(?:\.\d+)?/);
+        if (!m) return null;
+        const n = Number(m[0]);
+        return Number.isFinite(n) ? n : null;
+      }
+
+      function dnfmEnchantSet(profile, key, value) {
+        if (!key) return;
+        const n = dnfmEnchantNumber(value);
+        // 속성부여처럼 숫자가 없는 플래그 옵션은 1로 기록한다.
+        const v = n == null ? 1 : n;
+        profile[key] = (profile[key] || 0) + v;
+      }
+
+      function dnfmFindReceiverAliasKey(label) {
+        const compact = normalizeDnfmEnchantText(label).replace(/\s+/g, '').toLowerCase();
+        if (!compact) return null;
+        for (const [key, aliases] of Object.entries(DNFM_ENCHANT_ALIASES)) {
+          for (const alias of aliases) {
+            if (compact === String(alias).replace(/\s+/g, '').toLowerCase()) return key;
+          }
+        }
+        return null;
+      }
+
+      function parseDnfmReceiverEnchantProfile(receiverEnchant) {
+        const profile = {};
+        const chunks = [];
+        const raw = receiverEnchant?.raw || {};
+
+        if (receiverEnchant?.text) chunks.push(String(receiverEnchant.text));
+        if (raw?.text && raw.text !== receiverEnchant?.text) chunks.push(String(raw.text));
+
+        // 수신기가 effects를 배열/객체로 주는 경우도 최대한 흡수한다.
+        const collectEffects = (value) => {
+          if (value == null) return;
+          if (Array.isArray(value)) {
+            value.forEach(collectEffects);
+            return;
+          }
+          if (typeof value === 'object') {
+            const label = value.name ?? value.label ?? value.type ?? value.key ?? value.stat;
+            const amount = value.value ?? value.amount ?? value.val ?? value.level;
+            if (label != null) {
+              const key = dnfmFindReceiverAliasKey(label);
+              if (key) dnfmEnchantSet(profile, key, amount);
+            }
+            if (value.text) chunks.push(String(value.text));
+            for (const [k, v] of Object.entries(value)) {
+              if (['name','label','type','key','stat','value','amount','val','level','text'].includes(k)) continue;
+              if (typeof v === 'number' || typeof v === 'string') {
+                const key = dnfmFindReceiverAliasKey(k);
+                if (key) dnfmEnchantSet(profile, key, v);
+              }
+            }
+            return;
+          }
+          if (typeof value === 'string') chunks.push(value);
+        };
+        // 수신기 v8 실제 구조에서는 effects가 magicEnchantment 바로 아래에 들어온다.
+        collectEffects(receiverEnchant?.effects);
+        collectEffects(receiverEnchant?.effect);
+        collectEffects(receiverEnchant?.options);
+        collectEffects(raw?.effects);
+        collectEffects(raw?.effect);
+        collectEffects(raw?.options);
+
+        const allText = chunks.join('\n');
+        if (allText) {
+          // 긴 이름부터 먼저 검사해 "물리 공격력" 안의 "힘" 같은 오검출을 막는다.
+          const aliasPairs = [];
+          for (const [key, aliases] of Object.entries(DNFM_ENCHANT_ALIASES)) {
+            for (const alias of aliases) aliasPairs.push([key, alias]);
+          }
+          aliasPairs.sort((a, b) => b[1].length - a[1].length);
+
+          for (const [key, alias] of aliasPairs) {
+            const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*');
+            const re = new RegExp(`${escaped}\\s*(?:증가|상승)?\\s*([+＋-]?\\s*\\d+(?:\\.\\d+)?)?\\s*(%)?`, 'gi');
+            let m;
+            while ((m = re.exec(allText))) {
+              const rawNum = m[1] ? m[1].replace(/＋/g, '+').replace(/\s+/g, '') : null;
+              dnfmEnchantSet(profile, key, rawNum);
+            }
+          }
+        }
+
+        // 속성부여 + 해당 속성강화가 같이 있으면 계산기에서는 속성강화로만 비교한다.
+        // 속성부여만 단독이면 generic 속성부여로 비교한다.
+        const elemPairs = [
+          ['fire_enchant', 'fire_str'],
+          ['water_enchant', 'water_str'],
+          ['light_enchant', 'light_str'],
+          ['dark_enchant', 'dark_str'],
+        ];
+        let genericEnchant = 0;
+        for (const [enchantKey, strKey] of elemPairs) {
+          if (profile[enchantKey] && profile[strKey]) {
+            delete profile[enchantKey];
+          } else if (profile[enchantKey]) {
+            genericEnchant = 1;
+            delete profile[enchantKey];
+          }
+        }
+        if (genericEnchant) profile.element_enchant = 1;
+
+        return profile;
+      }
+
+      function parseDnfmCalculatorEnchantNameProfiles(opt) {
+        const name = normalizeDnfmEnchantText(opt?.name || opt?.raw?.name || '');
+        if (!name) return [];
+
+        // 계산기 마부의 name은 "뎀증 10%", "힘/지 50", "물/마공 45"처럼
+        // 실제 옵션을 사람이 읽는 약어로 표현하고 있으므로, 이름 자체를 '옵션 설명'으로 해석한다.
+        const base = {};
+        const comboDefs = [];
+
+        const put = (key, value) => {
+          const n = dnfmEnchantNumber(value);
+          if (n == null) return;
+          base[key] = (base[key] || 0) + n;
+        };
+
+        const findValueAfter = (aliases) => {
+          const sorted = aliases.slice().sort((a, b) => b.length - a.length);
+          for (const alias of sorted) {
+            const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*');
+            const re = new RegExp(`${escaped}\\s*[:=]?\\s*([+＋-]?\\s*\\d+(?:\\.\\d+)?)\\s*(%)?`, 'i');
+            const m = name.match(re);
+            if (m) return dnfmEnchantNumber(String(m[1]).replace(/＋/g, '+').replace(/\s+/g, ''));
+          }
+          return null;
+        };
+
+        // 공용 약어를 먼저 처리한다. 긴 문자열부터 처리해 물/마공 안의 물/마 오검출을 막는다.
+        const strInt = findValueAfter(['힘/지']);
+        if (strInt != null) {
+          comboDefs.push([
+            { str: strInt },
+            { int: strInt },
+            { str: strInt, int: strInt },
+          ]);
+        }
+
+        const physMagAtk = findValueAfter(['물/마공', '물/마']);
+        if (physMagAtk != null) {
+          comboDefs.push([
+            { phys_atk: physMagAtk },
+            { mag_atk: physMagAtk },
+            { phys_atk: physMagAtk, mag_atk: physMagAtk },
+          ]);
+        }
+
+        const physMagCrit = findValueAfter(['물/마크']);
+        if (physMagCrit != null) {
+          comboDefs.push([
+            { phys_crit: physMagCrit },
+            { mag_crit: physMagCrit },
+            { phys_crit: physMagCrit, mag_crit: physMagCrit },
+          ]);
+        }
+
+        const directAliases = {
+          str: ['힘'],
+          int: ['지능'],
+          vit: ['체력'],
+          spr: ['정신력'],
+          phys_atk: ['물공'],
+          mag_atk: ['마공'],
+          atk_speed: ['공속'],
+          move_speed: ['이속'],
+          cast_speed: ['캐속'],
+          hp_max: ['최대HP'],
+          mp_max: ['최대MP'],
+          phys_def: ['물방'],
+          mag_def: ['마방'],
+          fire_res: ['화속저'],
+          water_res: ['수속저'],
+          light_res: ['명속저'],
+          dark_res: ['암속저'],
+          acc: ['적중'],
+          eva: ['회피'],
+          phys_crit: ['물크'],
+          mag_crit: ['마크'],
+          damage_inc: ['뎀증'],
+          add_damage: ['추뎀'],
+          fire_str: ['화속강'],
+          water_str: ['수속강'],
+          light_str: ['명속강'],
+          dark_str: ['암속강'],
+          all_str: ['모속'],
+          final_damage: ['최종뎀'],
+          all_type_damage: ['모타피'],
+        };
+
+        // 공용 약어가 이미 잡힌 영역은 단독 약어를 다시 잡지 않는다.
+        const sharedText = name.replace(/\s+/g, '');
+        const skipStrIntSingles = /힘\/지/.test(sharedText);
+        const skipAtkSingles = /물\/마공|물\/마(?!크)/.test(sharedText);
+        const skipCritSingles = /물\/마크/.test(sharedText);
+
+        for (const [key, aliases] of Object.entries(directAliases)) {
+          if (skipStrIntSingles && (key === 'str' || key === 'int')) continue;
+          if (skipAtkSingles && (key === 'phys_atk' || key === 'mag_atk')) continue;
+          if (skipCritSingles && (key === 'phys_crit' || key === 'mag_crit')) continue;
+          const n = findValueAfter(aliases);
+          if (n != null) put(key, n);
+        }
+
+        // 속성부여는 수치 없는 플래그 옵션이다. 속강이 같이 표기되면 속강 쪽만 사용한다.
+        const hasElementStrength = ['fire_str','water_str','light_str','dark_str','all_str']
+          .some((k) => Number.isFinite(Number(base[k])) && Math.abs(Number(base[k])) > DNFM_ENCHANT_EPSILON);
+        if (!hasElementStrength && /속성\s*부여/.test(name)) {
+          base.element_enchant = 1;
+        }
+
+        let profiles = [{ ...base }];
+        for (const variants of comboDefs) {
+          const next = [];
+          for (const profile of profiles) {
+            for (const variant of variants) next.push({ ...profile, ...variant });
+          }
+          profiles = next;
+        }
+
+        const seen = new Set();
+        return profiles.filter((profile) => {
+          for (const key of Object.keys(profile)) {
+            const v = Number(profile[key]);
+            if (!Number.isFinite(v) || Math.abs(v) <= DNFM_ENCHANT_EPSILON) delete profile[key];
+          }
+          if (!Object.keys(profile).length) return false;
+          const sig = Object.entries(profile).sort(([a],[b]) => a.localeCompare(b)).map(([k,v]) => `${k}:${v}`).join('|');
+          if (seen.has(sig)) return false;
+          seen.add(sig);
+          return true;
+        });
+      }
+
+      function getDnfmCalculatorEnchantProfiles(opt) {
+        const r = opt?.raw || {};
+        const base = {};
+
+        // 실제 CORE.lists['enh:list']의 raw 컬럼명을 기준으로 읽는다.
+        // 약어 컬럼과 한글 원본 컬럼을 모두 허용해 구버전/신버전 데이터를 함께 지원한다.
+        const directMap = {
+          str: ['힘'],
+          int: ['지능'],
+          vit: ['체력'],
+          spr: ['정신력'],
+
+          phys_atk: ['물공', '물리공격력', '물리 공격력'],
+          mag_atk: ['마공', '마법공격력', '마법 공격력'],
+
+          atk_speed: ['공속', '공격속도', '공격 속도'],
+          move_speed: ['이속', '이동속도', '이동 속도'],
+          cast_speed: ['캐속', '캐스팅속도', '캐스팅 속도'],
+
+          hp_max: ['최대HP', 'HP MAX', 'HPMAX'],
+          mp_max: ['최대MP', 'MP MAX', 'MPMAX'],
+          phys_def: ['물방', '물리방어력', '물리 방어력'],
+          mag_def: ['마방', '마법방어력', '마법 방어력'],
+
+          fire_res: ['화속저', '화속성저항', '화속성 저항'],
+          water_res: ['수속저', '수속성저항', '수속성 저항'],
+          light_res: ['명속저', '명속성저항', '명속성 저항'],
+          dark_res: ['암속저', '암속성저항', '암속성 저항'],
+
+          acc: ['적중'],
+          eva: ['회피'],
+          phys_crit: ['물크', '물리크리티컬', '물리 크리티컬'],
+          mag_crit: ['마크', '마법크리티컬', '마법 크리티컬'],
+
+          // 실제 시트 raw 컬럼: 뎀증(%), 추가데미지(%), 최종데미지증가, 모든타입피해
+          damage_inc: ['뎀증', '뎀증(%)', '데미지증가', '데미지 증가'],
+          add_damage: ['추뎀', '추가데미지(%)', '추가데미지', '추가 데미지'],
+
+          // 실제 시트 raw 컬럼은 화/수/명/암을 속성강화 수치로 사용한다.
+          fire_str: ['화속강', '화속성강화', '화속성 강화', '화'],
+          water_str: ['수속강', '수속성강화', '수속성 강화', '수'],
+          light_str: ['명속강', '명속성강화', '명속성 강화', '명'],
+          dark_str: ['암속강', '암속성강화', '암속성 강화', '암'],
+          all_str: ['모속', '모든속성강화', '모든 속성 강화'],
+
+          final_damage: ['최종뎀', '최종데미지증가', '최종 데미지 증가'],
+          all_type_damage: ['모타피', '모든타입피해', '모든 타입 피해'],
+        };
+
+        for (const [key, cols] of Object.entries(directMap)) {
+          for (const col of cols) {
+            const n = dnfmEnchantNumber(r[col] ?? r[`${col}(%)`]);
+            if (n != null && Math.abs(n) > DNFM_ENCHANT_EPSILON) {
+              base[key] = n;
+              break;
+            }
+          }
+        }
+
+        // 공용 컬럼은 사용자 지정 규칙에 따라 여러 가능한 해석을 만든다.
+        // 예: 힘/지 46 → 힘 46 / 지능 46 / 힘+지능 46 모두 매칭 가능.
+        const comboDefs = [];
+        const strInt = dnfmEnchantNumber(r['힘/지'] ?? r['힘/지능'] ?? r['힘지능']);
+        if (strInt != null && Math.abs(strInt) > DNFM_ENCHANT_EPSILON && base.str == null && base.int == null) {
+          comboDefs.push([
+            { str: strInt },
+            { int: strInt },
+            { str: strInt, int: strInt },
+          ]);
+        }
+
+        const physMagAtk = dnfmEnchantNumber(r['물/마'] ?? r['물/마공'] ?? r['물리/마법공격력'] ?? r['물리/마법 공격력']);
+        if (physMagAtk != null && Math.abs(physMagAtk) > DNFM_ENCHANT_EPSILON && base.phys_atk == null && base.mag_atk == null) {
+          comboDefs.push([
+            { phys_atk: physMagAtk },
+            { mag_atk: physMagAtk },
+            { phys_atk: physMagAtk, mag_atk: physMagAtk },
+          ]);
+        }
+
+        const physMagCrit = dnfmEnchantNumber(r['물/마크'] ?? r['물리/마법크리티컬'] ?? r['물리/마법 크리티컬']);
+        if (physMagCrit != null && Math.abs(physMagCrit) > DNFM_ENCHANT_EPSILON && base.phys_crit == null && base.mag_crit == null) {
+          comboDefs.push([
+            { phys_crit: physMagCrit },
+            { mag_crit: physMagCrit },
+            { phys_crit: physMagCrit, mag_crit: physMagCrit },
+          ]);
+        }
+
+        const elemEnchant = r['속성부여'] ?? r['속성 부여'];
+        const hasElementStrength = ['fire_str','water_str','light_str','dark_str','all_str']
+          .some((k) => Number.isFinite(Number(base[k])) && Math.abs(Number(base[k])) > DNFM_ENCHANT_EPSILON);
+        if (!hasElementStrength && elemEnchant != null && String(elemEnchant).trim() !== '' && String(elemEnchant).trim() !== '0') {
+          base.element_enchant = 1;
+        }
+
+        let profiles = [{ ...base }];
+        for (const variants of comboDefs) {
+          const next = [];
+          for (const profile of profiles) {
+            for (const variant of variants) next.push({ ...profile, ...variant });
+          }
+          profiles = next;
+        }
+
+        for (const profile of profiles) {
+          for (const key of Object.keys(profile)) {
+            const v = Number(profile[key]);
+            if (!Number.isFinite(v) || Math.abs(v) <= DNFM_ENCHANT_EPSILON) delete profile[key];
+          }
+        }
+
+        // raw에 없는 옵션(물크/마크/힘/지/물/마공 등)은 계산기 name 자체를 옵션 설명으로 해석해 보완한다.
+        const nameProfiles = parseDnfmCalculatorEnchantNameProfiles(opt);
+        const allProfiles = profiles.concat(nameProfiles);
+
+        // 중복 해석 제거 + 빈 프로필 제거
+        const seen = new Set();
+        return allProfiles.filter((profile) => {
+          if (!profile || !Object.keys(profile).length) return false;
+          const sig = Object.entries(profile).sort(([a],[b]) => a.localeCompare(b)).map(([k,v]) => `${k}:${v}`).join('|');
+          if (seen.has(sig)) return false;
+          seen.add(sig);
+          return true;
+        });
+      }
+
+      function dnfmEnchantProfilesEqual(a, b) {
+        const aKeys = Object.keys(a || {}).sort();
+        const bKeys = Object.keys(b || {}).sort();
+        if (aKeys.length !== bKeys.length) return false;
+        for (let i = 0; i < aKeys.length; i++) {
+          if (aKeys[i] !== bKeys[i]) return false;
+          if (Math.abs(Number(a[aKeys[i]]) - Number(b[bKeys[i]])) > DNFM_ENCHANT_EPSILON) return false;
+        }
+        return true;
+      }
+
+      function formatDnfmEnchantProfile(profile) {
+        const labels = {
+          str:'힘', int:'지능', vit:'체력', spr:'정신력', phys_atk:'물공', mag_atk:'마공',
+          atk_speed:'공속', move_speed:'이속', cast_speed:'캐속', hp_max:'최대HP', mp_max:'최대MP',
+          phys_def:'물방', mag_def:'마방', fire_res:'화속저', water_res:'수속저', light_res:'명속저', dark_res:'암속저',
+          acc:'적중', eva:'회피', phys_crit:'물크', mag_crit:'마크', damage_inc:'뎀증', add_damage:'추뎀',
+          fire_str:'화속강', water_str:'수속강', light_str:'명속강', dark_str:'암속강', all_str:'모속',
+          final_damage:'최종뎀', all_type_damage:'모타피', element_enchant:'속성부여'
+        };
+        return Object.entries(profile || {})
+          .sort(([a],[b]) => a.localeCompare(b))
+          .map(([k,v]) => `${labels[k] || k} ${v}`)
+          .join(', ');
+      }
+
+      function getDnfmReceiverEnchantments(character) {
+        const parts = Array.isArray(character?.equippedParts) ? character.equippedParts : [];
+        const result = [];
+
+        for (const part of parts) {
+          const partName = String(part?.part || '').trim();
+          const slotKey = DNFM_PART_TO_SLOT[partName];
+          if (!slotKey) continue;
+
+          const enchantEntries = Array.isArray(part?.enchantEntries) ? part.enchantEntries : [];
+          let magic = null;
+          for (const entry of enchantEntries) {
+            const m = entry?.magicEnchantment;
+            if (!m || String(m.status || '').toLowerCase() === 'absent') continue;
+            magic = m;
+            break;
+          }
+
+          const names = [];
+          if (magic?.name) names.push(String(magic.name).trim());
+          if (Array.isArray(magic?.items)) {
+            for (const item of magic.items) {
+              if (item?.name) names.push(String(item.name).trim());
+            }
+          }
+
+          const recv = {
+            partName,
+            slotKey,
+            names: [...new Set(names.filter(Boolean))],
+            text: String(magic?.text || '').trim(),
+            status: String(magic?.status || '').trim(),
+            raw: magic,
+          };
+          recv.profile = parseDnfmReceiverEnchantProfile(recv);
+          result.push(recv);
+        }
+
+        return result;
+      }
+
+      async function applyDnfmEnchantToSlot(slotKey, receiverEnchant) {
+        const uiCode = DNFM_SLOT_TO_UI[slotKey];
+        if (!uiCode) return { ok: false, reason: '계산기 슬롯 코드 없음' };
+
+        if (typeof enchantTypeForSlot !== 'function' ||
+            typeof loadEnchantOptions !== 'function' ||
+            typeof applyEnchantSelection !== 'function') {
+          throw new Error('계산기의 마법부여 함수를 찾지 못했습니다.');
+        }
+
+        const typeKey = enchantTypeForSlot(uiCode);
+        if (!typeKey) return { ok: false, reason: '마법부여 대상이 아닌 슬롯' };
+
+        const receiverProfile = receiverEnchant?.profile || parseDnfmReceiverEnchantProfile(receiverEnchant);
+        if (!Object.keys(receiverProfile).length) {
+          return {
+            ok: false,
+            reason: `수신 옵션을 해석하지 못함${receiverEnchant?.text ? `: ${receiverEnchant.text}` : ''}`,
+            skipped: !receiverEnchant?.raw
+          };
+        }
+
+        const list = await loadEnchantOptions(typeKey);
+        if (!Array.isArray(list) || !list.length) {
+          return { ok: false, reason: `${typeKey} 목록 없음` };
+        }
+
+        const matches = list.filter((opt) =>
+          getDnfmCalculatorEnchantProfiles(opt).some((profile) =>
+            dnfmEnchantProfilesEqual(receiverProfile, profile)
+          )
+        );
+
+        if (matches.length === 0) {
+          // 다음 보정이 필요할 때 바로 비교할 수 있도록 계산기 후보 프로필 일부도 함께 남긴다.
+          const sampleProfiles = list.slice(0, 3).map((opt) => {
+            const profiles = getDnfmCalculatorEnchantProfiles(opt);
+            return `${opt?.name || '-'} => ${profiles.map(formatDnfmEnchantProfile).filter(Boolean).join(' / ') || '옵션 없음'}`;
+          });
+          console.warn('[DNFM enchant no match]', {
+            slotKey,
+            typeKey,
+            receiverName: receiverEnchant?.names?.[0] || '',
+            receiverProfile,
+            samples: sampleProfiles
+          });
+          return {
+            ok: false,
+            reason: `옵션 매칭 실패 (${formatDnfmEnchantProfile(receiverProfile) || '해석 옵션 없음'})`,
+            receivedName: receiverEnchant?.names?.[0] || ''
+          };
+        }
+
+        if (matches.length > 1) {
+          return {
+            ok: false,
+            reason: `동일 옵션 후보 ${matches.length}개: ${matches.slice(0, 4).map(x => x.name).join(' / ')}`,
+            receivedName: receiverEnchant?.names?.[0] || ''
+          };
+        }
+
+        const found = matches[0];
+        const prevSlot = state.currentSlotKey;
+        try {
+          state.currentSlotKey = uiCode;
+          await applyEnchantSelection(found);
+        } finally {
+          state.currentSlotKey = prevSlot;
+        }
+
+        return {
+          ok: true,
+          name: String(found.name || ''),
+          receivedName: receiverEnchant?.names?.[0] || '',
+          profileText: formatDnfmEnchantProfile(receiverProfile)
+        };
+      }
+
+      async function applyDnfmReceiverEnchantments(character) {
+        const receiverEnchants = getDnfmReceiverEnchantments(character);
+        const bySlot = new Map(receiverEnchants.map((it) => [it.slotKey, it]));
+        const order = [
+          'weapon',
+          'headshoulder', 'top', 'bottom', 'belt', 'shoes',
+          'bracelet', 'necklace', 'ring',
+          'sub', 'magestone', 'earring',
+          'title'
+        ];
+
+        const success = [];
+        const skipped = [];
+        const failed = [];
+
+        for (const slotKey of order) {
+          const recv = bySlot.get(slotKey);
+          if (!recv || !recv.raw) {
+            skipped.push({ slotKey, reason: '수신 마법부여 없음' });
+            continue;
+          }
+
+          try {
+            const applied = await applyDnfmEnchantToSlot(slotKey, recv);
+            if (applied.ok) {
+              success.push({
+                slotKey,
+                name: applied.name,
+                receivedName: applied.receivedName,
+                text: recv.text,
+                profileText: applied.profileText
+              });
+            } else if (applied.skipped) {
+              skipped.push({ slotKey, reason: applied.reason });
+            } else {
+              failed.push({
+                slotKey,
+                name: applied.receivedName || recv.names?.[0] || '',
+                reason: applied.reason,
+                text: recv.text,
+                profileText: formatDnfmEnchantProfile(recv.profile)
+              });
+            }
+          } catch (error) {
+            failed.push({
+              slotKey,
+              name: recv.names?.[0] || '',
+              reason: error?.message || String(error),
+              text: recv.text,
+              profileText: formatDnfmEnchantProfile(recv.profile)
+            });
+          }
+        }
+
+        return { success, skipped, failed, total: order.length };
+      }
+
+      function getDnfmReceiverEquipment(character) {
+        const parts = Array.isArray(character?.equippedParts) ? character.equippedParts : [];
+        const result = [];
+
+        for (const part of parts) {
+          const partName = String(part?.part || '').trim();
+          const slotKey = DNFM_PART_TO_SLOT[partName];
+          if (!slotKey) continue;
+
+          const entries = Array.isArray(part?.equipmentEntries) ? part.equipmentEntries : [];
+          const equip = entries[0] || null;
+          if (!equip) continue;
+
+          const rawName = String(equip.itemName || equip.name || '').trim();
+          if (!rawName) continue;
+
+          let baseName = rawName;
+          if (slotKey === 'weapon') {
+            // 무기명에 붙는 고유효과 태그는 장비 본체 검색 시 제외한다.
+            // [침식]은 실제 무기명 일부일 수 있으므로 유지한다.
+            baseName = rawName
+              .replace(/\[(?:강타|광채|분쇄|선명)\]/g, '')
+              .replace(/\s+/g, ' ')
+              .trim();
+          }
+
+          result.push({
+            partName,
+            slotKey,
+            rawName,
+            baseName,
+            itemId: String(equip.itemId || '').trim(),
+            raw: equip,
+          });
+        }
+
+        return result;
+      }
+
+      async function findDnfmCalculatorItem(slotKey, receiverEquip, job) {
+        if (typeof ensureEquipListLoaded !== 'function' ||
+            typeof getItemsForSlot !== 'function') {
+          throw new Error('계산기의 장비 목록 함수를 찾지 못했습니다.');
+        }
+
+        const passJob = slotKey === 'weapon' ? job : undefined;
+        await ensureEquipListLoaded(slotKey, passJob);
+        const items = getItemsForSlot(slotKey, passJob);
+
+        const candidates = [receiverEquip.rawName, receiverEquip.baseName]
+          .filter(Boolean)
+          .map(normalizeDnfmEquipNameForMatch);
+
+        const found = items.find((item) => {
+          const itemName = normalizeDnfmEquipNameForMatch(item?.name ?? item?.['이름'] ?? '');
+          return candidates.includes(itemName);
+        }) || null;
+
+        return { found, items };
+      }
+
+      async function applyDnfmReceiverAllEquipment(character) {
+        const receiverEquips = getDnfmReceiverEquipment(character);
+        if (!receiverEquips.length) {
+          alert('수신기 데이터에서 장착 장비를 찾지 못했습니다.');
+          return false;
+        }
+
+        const job = String(
+          window.state?.currentCharacter?.jobGroup ||
+          window.state?.currentCharacter?.jobGroupLabel ||
+          ''
+        ).trim();
+
+        if (!job) {
+          alert('계산기에서 캐릭터를 먼저 선택해주세요.');
+          return false;
+        }
+
+        if (typeof applyItemToSlot !== 'function') {
+          throw new Error('계산기의 장비 적용 함수를 찾지 못했습니다.');
+        }
+
+        const success = [];
+        const failed = [];
+
+        // 계산기 화면 배치와 비슷한 순서로 적용한다.
+        const order = [
+          'weapon',
+          'headshoulder', 'top', 'bottom', 'belt', 'shoes',
+          'bracelet', 'necklace', 'ring',
+          'sub', 'magestone', 'earring',
+          'title'
+        ];
+
+        const bySlot = new Map(receiverEquips.map((it) => [it.slotKey, it]));
+
+        for (const slotKey of order) {
+          const receiverEquip = bySlot.get(slotKey);
+          if (!receiverEquip) {
+            failed.push({ slotKey, reason: '수신 데이터 없음', name: '' });
+            continue;
+          }
+
+          try {
+            const { found, items } = await findDnfmCalculatorItem(slotKey, receiverEquip, job);
+
+            if (!found) {
+              failed.push({
+                slotKey,
+                reason: `계산기 목록에서 이름 매칭 실패 (${items.length}개 검색)`,
+                name: receiverEquip.rawName
+              });
+              continue;
+            }
+
+            const ok = await applyItemToSlot(slotKey, found);
+            if (!ok) {
+              failed.push({
+                slotKey,
+                reason: '슬롯 적용 실패',
+                name: receiverEquip.rawName
+              });
+              continue;
+            }
+
+            success.push({
+              slotKey,
+              receiverName: receiverEquip.rawName,
+              appliedName: String(found.name || found['이름'] || receiverEquip.baseName)
+            });
+          } catch (error) {
+            failed.push({
+              slotKey,
+              reason: error?.message || String(error),
+              name: receiverEquip.rawName
+            });
+          }
+        }
+
+        const successLines = success.map((x) =>
+          `✓ ${DNFM_SLOT_LABEL[x.slotKey] || x.slotKey}: ${x.appliedName}`
+        );
+        const failedLines = failed.map((x) =>
+          `✗ ${DNFM_SLOT_LABEL[x.slotKey] || x.slotKey}: ${x.name || '-'}\n   └ ${x.reason}`
+        );
+
+        return {
+          ok: success.length > 0,
+          success,
+          failed,
+          total: order.length,
+          successLines,
+          failedLines,
+        };
+      }
+
+      async function loadDnfmReceiverCharacterPreview() {
+        if (window.__ADMIN_PIN_LOGIN_MODE__ !== true) return;
+
+        const btn = document.getElementById('btnDnfmReceiverImport');
+        const originalText = btn?.textContent || '게임 세팅 불러오기';
+
+        try {
+          if (btn) {
+            btn.disabled = true;
+            btn.textContent = '수신기 확인 중…';
+          }
+
+          let token = getDnfmReceiverToken();
+          if (!token) token = askDnfmReceiverToken();
+          if (!token) return;
+
+          let response = await fetchDnfmReceiverStatus(token);
+
+          if (response.status === 401 || response.status === 403) {
+            sessionStorage.removeItem(DNFM_RECEIVER_TOKEN_KEY);
+            token = askDnfmReceiverToken();
+            if (!token) return;
+            response = await fetchDnfmReceiverStatus(token);
+          }
+
+          if (!response.ok) {
+            throw new Error(`수신기 응답 오류 (HTTP ${response.status})`);
+          }
+
+          const data = await response.json();
+          const character = data?.character;
+
+          if (!character || character.kind !== 'detail') {
+            alert('수신기에 캐릭터 상세 정보가 없습니다.\n\n수신기를 실행한 뒤 게임에서 캐릭터 정보창을 열어주세요.');
+            return;
+          }
+
+          const receiverEquips = getDnfmReceiverEquipment(character);
+          if (!receiverEquips.length) {
+            alert(
+              `수신기 연결 성공\n\n` +
+              `캐릭터: ${String(character.nickname || '이름 미확인')}\n` +
+              '장착 장비: 확인 실패'
+            );
+            return;
+          }
+
+          const job = String(
+            window.state?.currentCharacter?.jobGroup ||
+            window.state?.currentCharacter?.jobGroupLabel ||
+            ''
+          ).trim();
+
+          if (!job) {
+            alert(
+              '계산기에서 캐릭터를 먼저 선택해주세요.\n\n' +
+              `수신 캐릭터: ${String(character.nickname || '이름 미확인')}\n` +
+              `수신 장비: ${receiverEquips.length}개`
+            );
+            return;
+          }
+
+          const proceed = confirm(
+            `수신기 연결 성공\n\n` +
+            `캐릭터: ${String(character.nickname || '이름 미확인')}\n` +
+            `장착 장비: ${receiverEquips.length}개\n` +
+            `계산기 선택 직업군: ${job}\n\n` +
+            '수신된 장비 13부위, 강화수치, 마법부여를 현재 계산기에 적용할까요?\n\n' +
+            '※ 이번 시험은 장비 본체 + 강화 + 마법부여까지 적용합니다.\n고유효과는 아직 적용하지 않습니다.'
+          );
+          if (!proceed) return;
+
+          if (btn) btn.textContent = '장비 적용 중…';
+          const equipResult = await applyDnfmReceiverAllEquipment(character);
+
+          if (btn) btn.textContent = '강화 적용 중…';
+          const enhResult = await applyDnfmReceiverEnhancements(character);
+
+          if (btn) btn.textContent = '마법부여 적용 중…';
+          const enchantResult = await applyDnfmReceiverEnchantments(character);
+
+          const equipSuccessLines = equipResult?.successLines || [];
+          const equipFailedLines = equipResult?.failedLines || [];
+          const enhSuccessLines = (enhResult?.success || []).map((x) =>
+            `✓ ${DNFM_SLOT_LABEL[x.slotKey] || x.slotKey}: +${x.level} (${x.name})`
+          );
+          const enhFailedLines = (enhResult?.failed || []).map((x) =>
+            `✗ ${DNFM_SLOT_LABEL[x.slotKey] || x.slotKey}: +${x.level ?? '-'}\n   └ ${x.reason}`
+          );
+          const enhSkippedLines = (enhResult?.skipped || []).map((x) =>
+            `- ${DNFM_SLOT_LABEL[x.slotKey] || x.slotKey}: ${x.reason}`
+          );
+          const enchantSuccessLines = (enchantResult?.success || []).map((x) =>
+            `✓ ${DNFM_SLOT_LABEL[x.slotKey] || x.slotKey}: ${x.name}`
+          );
+          const enchantFailedLines = (enchantResult?.failed || []).map((x) =>
+            `✗ ${DNFM_SLOT_LABEL[x.slotKey] || x.slotKey}: ${x.name || '-'}\n   └ ${x.reason}`
+          );
+          const enchantSkippedLines = (enchantResult?.skipped || []).map((x) =>
+            `- ${DNFM_SLOT_LABEL[x.slotKey] || x.slotKey}: ${x.reason}`
+          );
+
+          alert(
+            '게임 세팅 자동 적용 결과\n\n' +
+            `수신 캐릭터: ${String(character.nickname || '이름 미확인')}\n\n` +
+            `[장비] 성공 ${equipResult?.success?.length || 0} / ${equipResult?.total || 13}, 실패 ${equipResult?.failed?.length || 0}\n` +
+            (equipSuccessLines.length ? equipSuccessLines.join('\n') : '적용 성공 장비 없음') +
+            (equipFailedLines.length ? '\n\n[장비 확인 필요]\n' + equipFailedLines.join('\n') : '') +
+            '\n\n' +
+            `[강화] 성공 ${enhResult?.success?.length || 0} / ${enhResult?.total || 12}, 실패 ${enhResult?.failed?.length || 0}, 미수신 ${enhResult?.skipped?.length || 0}\n` +
+            (enhSuccessLines.length ? enhSuccessLines.join('\n') : '적용 성공 강화 없음') +
+            (enhFailedLines.length ? '\n\n[강화 확인 필요]\n' + enhFailedLines.join('\n') : '') +
+            (enhSkippedLines.length ? '\n\n[강화 미수신]\n' + enhSkippedLines.join('\n') : '') +
+            '\n\n' +
+            `[마법부여] 성공 ${enchantResult?.success?.length || 0} / ${enchantResult?.total || 13}, 실패 ${enchantResult?.failed?.length || 0}, 미수신 ${enchantResult?.skipped?.length || 0}\n` +
+            (enchantSuccessLines.length ? enchantSuccessLines.join('\n') : '적용 성공 마법부여 없음') +
+            (enchantFailedLines.length ? '\n\n[마법부여 확인 필요]\n' + enchantFailedLines.join('\n') : '') +
+            (enchantSkippedLines.length ? '\n\n[마법부여 미수신]\n' + enchantSkippedLines.join('\n') : '') +
+            '\n\n※ 장비 본체 + 강화 + 마법부여까지 적용했습니다.\n고유효과는 아직 적용하지 않습니다.'
+          );
+        } catch (error) {
+          console.error('[dnfm-receiver]', error);
+          alert(
+            'DNFM 수신기 연동 중 오류가 발생했습니다.\n\n' +
+            '1. 수신기가 실행 중인지 확인\n' +
+            '2. 연결 코드가 맞는지 확인\n' +
+            '3. 게임에서 캐릭터 정보창을 열었는지 확인\n' +
+            '4. 계산기에서 캐릭터를 먼저 선택했는지 확인\n\n' +
+            `오류: ${error?.message || error}`
+          );
+        } finally {
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = originalText;
+          }
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('btnDnfmReceiverImport');
+        if (btn && btn.dataset.bound !== '1') {
+          btn.dataset.bound = '1';
+          btn.addEventListener('click', loadDnfmReceiverCharacterPreview);
+        }
+        updateDnfmReceiverImportButtonVisibility();
+      });
+
       async function onGoogleCredential({ credential }) {
         try {
           if (!credential) throw new Error("ID 토큰 없음");
           const shouldReturnDirectlyToPc = isReturnToPcRequested();
           const __credentialForMode = String(credential || '').trim();
-          if (!__credentialForMode.startsWith('ADMINPIN.')) {
-            window.__ADMIN_PIN_LOGIN_MODE__ = false;
+          window.__ADMIN_PIN_LOGIN_MODE__ = __credentialForMode.startsWith('ADMINPIN.');
+          if (!window.__ADMIN_PIN_LOGIN_MODE__) {
             window.__CALC_DATA_READY__ = true;
           }
+          updateDnfmReceiverImportButtonVisibility();
           window.idToken = credential; // 토큰 보관
           rememberIdToken(credential);
           document.dispatchEvent(new Event('gsi:issued'));
