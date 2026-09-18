@@ -16231,38 +16231,6 @@ showModal($uniqueEffectModal, false);
       const isMaleStrikerOwner = (String(ownerKey || '').replace(/\s+/g, '') === '남격투가스트라이커');
 
 
-      // ✅ 워리어윈드시어: 강림 : 나시르 가상행 + 노충전/풀충전 선택
-      const isWindshearOwner = (String(ownerKey || '').replace(/\s+/g, '') === '워리어윈드시어');
-      const normNasirSkillNamePc = (v) => String(v ?? '').normalize('NFC').replace(/\s+/g, '');
-      const isNasirVirtualSkillPc = (skill) =>
-        isWindshearOwner && normNasirSkillNamePc(skill?.name) === normNasirSkillNamePc('강림 : 나시르');
-      const getNasirModePc = (skill) =>
-        Number(state.skillChargeStage?.[skill?.id] ?? 0) >= 1 ? 'full' : 'normal';
-      const setNasirModePc = (skill, mode) => {
-        if (!skill?.id) return;
-        const value = String(mode || '').toLowerCase() === 'full' ? 1 : 0;
-        state.skillChargeStage = state.skillChargeStage || {};
-        state.skillChargeStage[skill.id] = value;
-
-        try {
-          const ownerKey2 = String(ownerKey || '').replace(/\s+/g, '');
-          const skillName = String(skill?.name || '').trim();
-          if (ownerKey2 && skillName) {
-            state.skillTrees = state.skillTrees || {};
-            state.skillTrees[ownerKey2] = state.skillTrees[ownerKey2] || {};
-            const prev = state.skillTrees[ownerKey2][skillName] || {};
-            state.skillTrees[ownerKey2][skillName] = {
-              ...prev,
-              chargeStage: value,
-              chargeStageIndex: value * 10,
-            };
-          }
-        } catch (e) {
-          console.warn('[windshear nasir] mode save failed:', e);
-        }
-        onSkillTreeChanged();
-      };
-
       const getExtremeChargeSkillId = () => {
         return state.strikerExtremeChargeSkillId || null;
       };
@@ -16932,9 +16900,6 @@ showModal($uniqueEffectModal, false);
 
           // ✅ 남격투가스트라이커 + 구분=충전스킬 인 스킬만 충전 UI 표시
           const useChargeUi = isMaleStrikerOwner && isChargeSkillRow(s);
-          // ✅ 워리어윈드시어 나시르는 초 단위 대신 노충전/풀충전 드롭다운 사용
-          const useNasirModeUi = isNasirVirtualSkillPc(s);
-
           let chargeValEl = null;
           let chargeMinusBtn = null;
           let chargePlusBtn = null;
@@ -16994,44 +16959,6 @@ showModal($uniqueEffectModal, false);
 
             iconRow.appendChild(chargeBox);
             iconRow.appendChild(extremeRow);
-          }
-
-          // ✅ 워리어윈드시어: 강림 : 나시르 노충전/풀충전 드롭다운
-          let nasirModeSelect = null;
-          if (useNasirModeUi) {
-            const modeBox = document.createElement('div');
-            modeBox.className = 'st2-charge st2-nasir-mode';
-
-            const modeLabel = document.createElement('div');
-            modeLabel.className = 'st2-charge-label';
-            modeLabel.textContent = '충전';
-
-            nasirModeSelect = document.createElement('select');
-            nasirModeSelect.className = 'st2-charge-val';
-            nasirModeSelect.style.width = '78px';
-            nasirModeSelect.style.cursor = 'pointer';
-
-            const optNormal = document.createElement('option');
-            optNormal.value = 'normal';
-            optNormal.textContent = '노충전';
-            const optFull = document.createElement('option');
-            optFull.value = 'full';
-            optFull.textContent = '풀충전';
-            nasirModeSelect.appendChild(optNormal);
-            nasirModeSelect.appendChild(optFull);
-            nasirModeSelect.value = getNasirModePc(s);
-
-            nasirModeSelect.addEventListener('change', (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setNasirModePc(s, nasirModeSelect.value);
-              refreshAllSkillTileButtons();
-            });
-            nasirModeSelect.addEventListener('click', (e) => e.stopPropagation());
-
-            modeBox.appendChild(modeLabel);
-            modeBox.appendChild(nasirModeSelect);
-            iconRow.appendChild(modeBox);
           }
 
           const nameEl = document.createElement('div');
@@ -17128,11 +17055,6 @@ showModal($uniqueEffectModal, false);
             const tp = getTp(s);
             spanCur.textContent = String(cur);
             spanTp.textContent = String(tp);
-
-            // ✅ 워리어윈드시어 나시르 모드 UI 갱신
-            if (useNasirModeUi && nasirModeSelect) {
-              nasirModeSelect.value = getNasirModePc(s);
-            }
 
             // ✅ 남격투가스트라이커 충전 UI 갱신
             if (useChargeUi && chargeValEl) {
@@ -18090,16 +18012,6 @@ showModal($uniqueEffectModal, false);
         return Math.round(clamped * 10) / 10;
       };
 
-      const currentOwnerForSkillSave = (() => {
-        const cc = state.currentCharacter || {};
-        const jg = String(cc.jobGroupLabel || cc.jobGroup || '').trim();
-        const nm = String(cc.name || '').trim();
-        return (jg || nm)
-          ? (jg + nm).replace(/\s+/g, '')
-          : String(state.CurrentSumStats?.ownerKey || '').trim().replace(/\s+/g, '');
-      })();
-      const isWindshearForSkillSave = currentOwnerForSkillSave === '워리어윈드시어';
-
       for (const s of (ST2.rows || [])) {
         const lv = Number(state.skillLv?.[s.id] ?? 0);
         const tp = Number(state.skillTpLv?.[s.id] ?? 0);
@@ -18109,16 +18021,8 @@ showModal($uniqueEffectModal, false);
           // 예: 0, 1.5, 4.7, 10
           const chargeStage = clampChargeSecondsForSave(state.skillChargeStage?.[s.id] ?? 0);
 
-          const isNasirVirtual =
-            isWindshearForSkillSave &&
-            String(s.name || '').normalize('NFC').replace(/\s+/g, '') ===
-              String('강림 : 나시르').normalize('NFC').replace(/\s+/g, '');
-          const outboundName = isNasirVirtual
-            ? (chargeStage >= 1 ? '강림 : 나시르(풀충전)' : '강림 : 나시르(노충전)')
-            : s.name;
-
           arr.push({
-            name: outboundName,
+            name: s.name,
             lv,
             tp,
 
@@ -31556,16 +31460,6 @@ try {
             return Math.round(clamped * 10) / 10;
           };
 
-          const currentOwnerForFinalSkill = (() => {
-            const cc = state.currentCharacter || {};
-            const jg = String(cc.jobGroupLabel || cc.jobGroup || '').trim();
-            const nm = String(cc.name || '').trim();
-            return (jg || nm)
-              ? (jg + nm).replace(/\s+/g, '')
-              : String(state.CurrentSumStats?.ownerKey || '').trim().replace(/\s+/g, '');
-          })();
-          const isWindshearForFinalSkill = currentOwnerForFinalSkill === '워리어윈드시어';
-
           for (const sk of (ST2.rows || [])) {
             const lv = Number(state.skillLv?.[sk.id] ?? 0);
             const tp = Number(state.skillTpLv?.[sk.id] ?? 0);
@@ -31573,16 +31467,8 @@ try {
             if (lv > 0) {
               const chargeStage = clampChargeSecondsForSave(state.skillChargeStage?.[sk.id] ?? 0);
 
-              const isNasirVirtual =
-                isWindshearForFinalSkill &&
-                String(sk.name || '').normalize('NFC').replace(/\s+/g, '') ===
-                  String('강림 : 나시르').normalize('NFC').replace(/\s+/g, '');
-              const outboundName = isNasirVirtual
-                ? (chargeStage >= 1 ? '강림 : 나시르(풀충전)' : '강림 : 나시르(노충전)')
-                : sk.name;
-
               arr.push({
-                name: outboundName,
+                name: sk.name,
                 lv,
                 tp,
                 chargeStage,
