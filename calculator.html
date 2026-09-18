@@ -22556,6 +22556,30 @@ const characterImg = document.getElementById('characterImg');
       }
     }
 
+    // ✅ 만료/무효 Google 토큰 정리
+    // - 오래된 토큰이 남아 계산기 자동 진입이 0%에서 멈추는 현상을 방지한다.
+    // - GUEST / ADMINPIN 토큰은 이 함수로 지우지 않는다.
+    function clearInvalidStoredAuthToken_pc(token) {
+      const badToken = String(token || '').trim();
+      if (!badToken || badToken.startsWith('GUEST.') || badToken.startsWith('ADMINPIN.')) return false;
+
+      if (String(window.idToken || '').trim() === badToken) {
+        window.idToken = null;
+      }
+      if (sessionStorage.getItem('id_token') === badToken) {
+        sessionStorage.removeItem('id_token');
+      }
+      if (localStorage.getItem('id_token') === badToken) {
+        localStorage.removeItem('id_token');
+      }
+
+      window.__loginPingSent = false;
+      window.__loginPingResult = null;
+      window.__GUEST_MODE__ = false;
+      window.__ADMIN_PIN_LOGIN_MODE__ = false;
+      return true;
+    }
+
     function ensureDirectEntryGuestToken_pc() {
       const existing = String(
         window.idToken ||
@@ -36377,6 +36401,36 @@ wrap.appendChild(listBox);
 
           if (!allowed) console.warn("허용 안 됨:", ping);
 
+          // ✅ 저장된 Google 토큰이 만료/무효이면 자동 폐기 후 게스트로 다시 진입
+          // Live Server뿐 아니라 실제 이용자 브라우저에서도 오래된 토큰 때문에
+          // 계산기 로딩이 0%에서 멈추는 상황을 막는다.
+          const authError = String(ping?.error || ping?.message || '').trim().toLowerCase();
+          const authCode = Number(ping?.code || 0);
+          const isInvalidStoredGoogleToken =
+            !allowed &&
+            !__credentialForMode.startsWith('GUEST.') &&
+            !__credentialForMode.startsWith('ADMINPIN.') &&
+            (
+              authCode === 401 ||
+              authError === 'invalid token' ||
+              authError === 'token_verify_fail' ||
+              authError === 'missing token' ||
+              authError.includes('invalid token') ||
+              authError.includes('token_verify')
+            );
+
+          if (isInvalidStoredGoogleToken) {
+            console.warn('[auth] 만료/무효 저장 토큰 감지 → 게스트 세션으로 자동 전환');
+            clearInvalidStoredAuthToken_pc(__credentialForMode);
+
+            // 현재 URL이 계산기 자동 진입 요청이면 이용자를 멈춰 세우지 않고 게스트로 계속 진행한다.
+            if (shouldReturnDirectlyToPc) {
+              const guestToken = ensureDirectEntryGuestToken_pc();
+              await onGoogleCredential({ credential: guestToken });
+              return;
+            }
+          }
+
           if (allowed && shouldReturnDirectlyToPc) {
             try {
               await bootPcCalculatorDirectly();
@@ -36543,8 +36597,15 @@ wrap.appendChild(listBox);
         window.__RESUME_CALCULATOR_DONE__ = true;
         window.__loginPingSent = false;
         window.__loginPingResult = null;
-        try { showOverlay('계산기로 돌아가는 중…'); } catch (_) { }
-        await onGoogleCredential({ credential: token });
+        try {
+          showOverlay('계산기로 돌아가는 중…');
+          await onGoogleCredential({ credential: token });
+        } catch (err) {
+          console.warn('[resumeCalculator] 저장 토큰 복구 실패:', err);
+        } finally {
+          // ✅ 인증 실패/예외가 생겨도 로딩 오버레이에 영구적으로 갇히지 않게 보장
+          hideOverlay();
+        }
       }
 
       setTimeout(() => {
