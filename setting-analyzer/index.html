@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="./common-font.css?v=20260821">
+  <link rel="stylesheet" href="../common-font.css?v=20260821">
   <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&display=swap" rel="stylesheet">
 
 
@@ -1433,6 +1433,11 @@
       background: rgba(255, 255, 255, 0.018);
       overflow: hidden;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+      /* ✅ 성능 최적화: 화면 밖 현황 슬롯의 내부 렌더링은 브라우저가 건너뛴다.
+         DOM/상태는 그대로 유지되며, 화면 근처로 들어오면 자동 렌더링된다. */
+      content-visibility: auto;
+      contain-intrinsic-size: auto 720px;
     }
 
     .analyzer-slot.active {
@@ -3566,6 +3571,17 @@
 
     .setting-box .picked-visual.set-effect-active .picked-label {
       z-index: 3;
+    }
+
+    /* ✅ 성능 최적화: 화면에 보이는 현황 슬롯의 세트효과만 애니메이션 실행 */
+    .analyzer-slot .setting-box .picked-visual.set-effect-active,
+    .analyzer-slot .setting-box .picked-visual.set-effect-active::before {
+      animation-play-state: paused !important;
+    }
+
+    .analyzer-slot.is-in-viewport .setting-box .picked-visual.set-effect-active,
+    .analyzer-slot.is-in-viewport .setting-box .picked-visual.set-effect-active::before {
+      animation-play-state: running !important;
     }
 
     @keyframes activeSetItemShine {
@@ -6273,6 +6289,7 @@
         enchants: {},
         emblems: {},
         traitOptions: {},
+        receiverImport: null,
         ui: { weaponTypeTab: '', emblemTarget: { slot: '', socketIndex: 0 } },
         currentSlotKey: '',
         slotName: ''
@@ -6328,6 +6345,7 @@
       if (typeof updateCurrentSettingGradeBadge === 'function') {
         updateCurrentSettingGradeBadge();
       }
+      receiverImportReport();
     }
 
     function syncAnalyzerSlotNameState(root) {
@@ -6508,6 +6526,7 @@
 
     window.__userRole = window.__userRole || {
       isLoggedIn: false,
+      special_user: false,
       level: 0,
       label: '전임',
       presetSlots: 0,
@@ -7043,6 +7062,7 @@
         window.__userRole = {
           ...(window.__userRole || {}),
           isLoggedIn: true,
+          special_user: !!(res?.special_user ?? res?.specialUser ?? res?.isSpecialUser),
           email: String(res?.email || '').trim().toLowerCase(),
           isRegistered: true,
           accessTier: 'member',
@@ -7056,6 +7076,9 @@
 
         if (typeof updateMyUsageInfoButtonUI === 'function') {
           updateMyUsageInfoButtonUI();
+        }
+        if (typeof updateReceiverImportVisibility === 'function') {
+          updateReceiverImportVisibility();
         }
 
         return {
@@ -7872,7 +7895,7 @@
 
       for (const r of rows) {
         const name = String(r.name ?? r['이름'] ?? '').trim();
-        const type = String(r.type ?? r['종류'] ?? r['타입'] ?? r['분류'] ?? '').trim();
+        const type = String(r.type ?? r['종류'] ?? r['타입'] ?? r['분류'] ?? '').replace(/\s+/g, '');
         if (!name || !type || !emblemTypes.has(type)) continue;
 
         let image = String(r.image ?? r.img ?? r['이미지'] ?? '').trim();
@@ -9806,6 +9829,7 @@
 
           window.__userRole = {
             isLoggedIn: true,
+            special_user: !!(data?.special_user ?? data?.specialUser ?? data?.isSpecialUser),
             level: lvl,
             label,
             presetSlots: Number(data.presetSlots || 0),
@@ -9839,9 +9863,13 @@
           } catch (statusErr) {
             console.warn('[header one_liner_status] 실패:', statusErr);
           }
+          if (typeof updateReceiverImportVisibility === 'function') {
+            updateReceiverImportVisibility();
+          }
         } else {
           window.__userRole = {
             isLoggedIn: false,
+            special_user: false,
             level: 0,
             label: '',
             presetSlots: 0,
@@ -10465,6 +10493,7 @@
       state.enchants = {};
       state.emblems = {};
       state.traitOptions = {};
+      state.receiverImport = null;
       state.ui.weaponTypeTab = '';
       state.ui.emblemTarget = { slot: '', socketIndex: 0 };
 
@@ -10794,17 +10823,23 @@
       return out;
     }
 
-    async function applyAnalyzerPresetState(snap) {
+    async function applyAnalyzerPresetState(snap, expectedRoot = null) {
       if (!snap || typeof snap !== 'object') {
         alert('불러온 프리셋 데이터가 비어 있습니다.');
         return;
       }
 
-      await ensureCoreLoaded();
+      const coreReady = await ensureCoreLoaded();
+      if (expectedRoot && (!expectedRoot.isConnected || activeAnalyzerRoot() !== expectedRoot)) {
+        const error = new Error('불러오는 동안 선택 슬롯이 변경됐습니다. 다시 눌러 주세요.');
+        error.code = 'receiver_target_changed'; throw error;
+      }
+      if (!coreReady) throw new Error('분석기 목록을 불러오지 못했습니다.');
       if (!DB.enchants.ready) buildEnchantCache();
 
       const data = clonePresetPlain(snap);
       resetAnalyzerSelectionsForPreset();
+      state.receiverImport = data.receiverImport || null;
 
       renderAnalyzerCharacterFromPreset(data.currentCharacter || data.character || data.char || {}, data);
 
@@ -10835,6 +10870,7 @@
       if (typeof window.__applySettingCheckVisibility === 'function') {
         window.__applySettingCheckVisibility();
       }
+      receiverImportReport();
     }
 
     const ANALYZER_STATUS_STORAGE_KEY = 'settingAnalyzerStatusState:v1';
@@ -10903,6 +10939,49 @@
       }
     }
 
+    function compactReceiverImportForStorage(meta) {
+      if (!meta || typeof meta !== 'object') return null;
+
+      const source = meta.source && typeof meta.source === 'object' ? meta.source : null;
+      const compactSource = source ? {
+        level: source.level ?? null,
+        power: source.power ?? null,
+        equipment: Array.isArray(source.equipment)
+          ? source.equipment
+              .filter(item => item && item.upgrade != null)
+              .map(item => ({ slotCode: item.slotCode, upgrade: item.upgrade }))
+          : [],
+        trainingJournal: source.trainingJournal ?? null,
+        extensions: {
+          avatars: source.extensions?.avatars ?? null,
+          artifacts: source.extensions?.artifacts ?? null
+        }
+      } : null;
+
+      return {
+        nickname: meta.nickname || '',
+        characterId: meta.characterId || '',
+        receivedAt: meta.receivedAt ?? null,
+        importedAt: meta.importedAt ?? null,
+        report: Array.isArray(meta.report) ? clonePresetPlain(meta.report) : [],
+        source: compactSource
+      };
+    }
+
+    function safeSaveAnalyzerLocalBackup(statusState) {
+      try {
+        localStorage.setItem(ANALYZER_STATUS_STORAGE_KEY, JSON.stringify(statusState));
+        return true;
+      } catch (err) {
+        if (err?.name === 'QuotaExceededError') {
+          console.warn('[setting status local backup skipped] localStorage quota exceeded');
+          return false;
+        }
+        console.warn('[setting status local backup failed]', err);
+        return false;
+      }
+    }
+
     function collectAnalyzerStatusState() {
       const slots = Array.from(document.querySelectorAll('.analyzer-slot')).map((root, idx) => {
         syncAnalyzerSlotNameState(root);
@@ -10915,7 +10994,8 @@
           selections: clonePresetPlain(st.selections || {}),
           enchants: clonePresetPlain(st.enchants || {}),
           emblems: clonePresetPlain(st.emblems || {}),
-          traitOptions: clonePresetPlain(st.traitOptions || {})
+          traitOptions: clonePresetPlain(st.traitOptions || {}),
+          receiverImport: compactReceiverImportForStorage(st.receiverImport)
         };
       });
 
@@ -10925,6 +11005,45 @@
         checks: collectSettingCheckState(),
         slots
       };
+    }
+
+    /* ✅ 세트효과 애니메이션 최적화
+       실제 화면에 들어온 현황 슬롯만 반짝임/광택 애니메이션을 실행한다. */
+    let analyzerViewportObserver = null;
+
+    function observeAnalyzerSlotViewport(root) {
+      if (!root || root.dataset.viewportObserved === '1') return;
+
+      if (!('IntersectionObserver' in window)) {
+        root.classList.add('is-in-viewport');
+        root.dataset.viewportObserved = '1';
+        return;
+      }
+
+      if (!analyzerViewportObserver) {
+        analyzerViewportObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            entry.target.classList.toggle('is-in-viewport', entry.isIntersecting);
+          });
+        }, {
+          root: null,
+          rootMargin: '0px',
+          threshold: 0.01
+        });
+      }
+
+      root.dataset.viewportObserved = '1';
+      analyzerViewportObserver.observe(root);
+    }
+
+    function initAnalyzerViewportAnimationObserver() {
+      document.querySelectorAll('.analyzer-slot').forEach(observeAnalyzerSlotViewport);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAnalyzerViewportAnimationObserver, { once: true });
+    } else {
+      initAnalyzerViewportAnimationObserver();
     }
 
     function createBlankAnalyzerSlot(slotName = '') {
@@ -10950,6 +11069,7 @@
       resetAnalyzerSlotDom(clone);
       syncAnalyzerSlotNameState(clone);
       addWrap.before(clone);
+      observeAnalyzerSlotViewport(clone);
       updateAnalyzerAddButtonState();
       return clone;
     }
@@ -11011,7 +11131,8 @@
           selections: snap.selections || {},
           enchants: snap.enchants || {},
           emblems: snap.emblems || {},
-          traitOptions: snap.traitOptions || {}
+          traitOptions: snap.traitOptions || {},
+          receiverImport: snap.receiverImport || null
         });
       }
 
@@ -11053,18 +11174,30 @@
           serverSaved = true;
         } catch (err) {
           console.warn('[setting_status_save] server save failed, local backup only', err);
-          localStorage.setItem(ANALYZER_STATUS_STORAGE_KEY, JSON.stringify(statusState));
         }
 
         if (serverSaved) {
-          localStorage.setItem(ANALYZER_STATUS_STORAGE_KEY, JSON.stringify(statusState));
+          // 서버 저장이 성공한 경우에는 브라우저 localStorage에 중복 저장하지 않는다.
+          // 이전 버전에서 남아 있던 로컬 백업도 제거해 오래된 데이터/용량 문제를 방지한다.
+          try {
+            localStorage.removeItem(ANALYZER_STATUS_STORAGE_KEY);
+          } catch (localErr) {
+            console.warn('[setting status local backup cleanup failed]', localErr);
+          }
+
           setStatusLoading(100, '현황 저장 완료', '로그인 계정에 현황 슬롯이 저장되었습니다.');
           hideStatusLoading(280);
           alert('현황 슬롯이 계정에 저장되었습니다.');
         } else {
-          setStatusLoading(100, '임시 저장 완료', '브라우저에 현황 슬롯이 임시 저장되었습니다.');
-          hideStatusLoading(280);
-          alert('백엔드에 setting_status_save API가 없어 브라우저에 임시 저장했습니다.\n계정 저장을 사용하려면 백엔드 API 추가가 필요합니다.');
+          // 서버 저장에 실패했을 때만 브라우저에 임시 백업한다.
+          const localBackupSaved = safeSaveAnalyzerLocalBackup(statusState);
+          if (localBackupSaved) {
+            setStatusLoading(100, '임시 저장 완료', '브라우저에 현황 슬롯이 임시 저장되었습니다.');
+            hideStatusLoading(280);
+            alert('백엔드 저장에 실패하여 브라우저에 임시 저장했습니다.');
+          } else {
+            throw new Error('server_and_local_save_failed');
+          }
         }
       } catch (err) {
         console.error('[saveAnalyzerStatusState] error', err);
@@ -11755,7 +11888,291 @@
         setStatusLoading(100, '세팅현황 불러오기 오류', '불러오기 중 오류가 발생했습니다. 새로고침 후 다시 시도해주세요.');
       }
     })();
-  </script>
+  
+/* Shared ordered catalog lookup. Reuse unchanged in analyzer and PC calculator. */
+(function(root){
+'use strict';
+const key=x=>String(x??'').normalize('NFC').replace(/\s+/g,'').toLowerCase();
+function resolveCandidates(rows,request,getName=row=>row.name??row['이름']??''){
+ if(request?.status!=='ready'||!Array.isArray(request.candidates))return {status:'unknown'};
+ for(const candidate of request.candidates){
+  const hits=rows.filter(row=>key(getName(row))===key(candidate));
+  if(hits.length>1)return {status:'ambiguous',candidate};
+  if(hits.length===1)return {status:'matched',candidate,row:hits[0]};
+ }
+ return {status:'missing'};
+}
+const api={resolveCandidates};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.DnfmReceiverMatcher=api;
+})(globalThis);
+
+/* Receiver JSON -> analyzer preset. Only unique catalog matches are applied. */
+(function(root){
+'use strict';
+const matcher=typeof module!=='undefined'&&module.exports?require('./receiver_matcher.js'):root.DnfmReceiverMatcher;
+const slots={11:'weapon',12:'title',13:'top',14:'shoulder',15:'bottom',16:'shoes',17:'belt',18:'necklace',19:'bracelet',20:'ring',21:'sub-equipment',22:'magic-stone',36:'earring'};
+const enchants={65:11,66:12,67:13,68:14,69:15,70:16,71:17,72:18,73:19,74:20,75:21,76:22,77:36};
+const norm=x=>String(x??'').normalize('NFC').replace(/\s+/g,'').toLowerCase();
+const name=x=>String(x?.name??x?.['이름']??x?.title??'');
+const type=x=>String(x?.type??x?.['종류']??x?.['타입']??x?.['분류']??'');
+const clean=x=>norm(x).replace(/-?\[c\d+\]$/i,'');
+const scalar=x=>typeof x==='string'||typeof x==='number';
+function exact(rows,id,names){
+ const ids=rows.filter(r=>id!=null&&[r.gameItemId,r.dnfmItemId,r.itemId].some(v=>scalar(v)&&String(v)===String(id)));
+ if(ids.length===1)return ids[0];if(ids.length>1)return null;
+ const keys=new Set(names.filter(Boolean).map(clean));
+ const hits=rows.filter(r=>{const n=name(r),p=r.prefixLabel??r.prefix??r['접두사']??'';return [n,p+n].some(v=>keys.has(clean(v)))});
+ return hits.length===1?hits[0]:null;
+}
+// The receiver owns game-specific name normalization. The page only looks up its catalog.
+function weaponNameMatch(rows,matchName){
+ const key=clean(matchName);if(!key)return null;
+ const hits=rows.filter(row=>{
+  const prefix=row.prefixLabel??row.prefix??row['접두사']??row['접두사명']??'';
+  const n=name(row),p=String(prefix);
+  return clean(n.startsWith(p)?n:p+n)===key;
+ });
+ return hits.length===1?hits[0]:null;
+}
+function effectKey(x){return norm(x).replace(/물리공격력/g,'물공').replace(/마법공격력/g,'마공').replace(/추가데미지|추가대미지|추뎀/g,'추뎀').replace(/공격시|증가|[,+·]/g,'')}
+function weaponEffectMatch(rows,source){
+ const effects=source.effects??[];
+ if(effects.length===1&&effects[0].type==='additional_damage'){
+  const p=effects[0].percent;
+  const hits=rows.filter(r=>{const n=effectKey(name(r));return n===`추뎀${p}%`||n===`${p}%추뎀`});
+  return hits.length===1?hits[0]:null;
+ }
+ const phy=effects.find(e=>e.type==='physical_attack_increase'),mag=effects.find(e=>e.type==='magical_attack_increase');
+ if(effects.length===2&&phy&&mag&&phy.percent===mag.percent){
+  const p=phy.percent,keys=new Set([`물공${p}%마공${p}%`,`물마공${p}%`,`물공마공${p}%`,`물공/마공${p}%`,`물리/마법공격력${p}%`]);
+  const hits=rows.filter(r=>keys.has(effectKey(name(r))));return hits.length===1?hits[0]:null;
+ }
+ return null;
+}
+// Generic whole-option matching. Alias and grouping rules come from the receiver.
+const optionKey=value=>norm(value).replace(/[+,，、·/]/g,'');
+function optionVariantMatches(label,groups){
+ const key=optionKey(label);if(!key||!Array.isArray(groups)||!groups.length||groups.length>12)return false;
+ const choices=groups.map(g=>Array.isArray(g.aliases)?[...new Set(g.aliases.map(optionKey).filter(Boolean))]:[]);
+ const failed=new Set(),all=(1<<choices.length)-1;
+ function walk(offset,mask){
+  if(mask===all)return offset===key.length;
+  const memo=offset+':'+mask;if(failed.has(memo))return false;
+  for(let i=0;i<choices.length;i++)if(!(mask&(1<<i))){
+   for(const word of choices[i])if(key.startsWith(word,offset)&&walk(offset+word.length,mask|(1<<i)))return true;
+  }
+  failed.add(memo);return false;
+ }
+ return walk(0,0);
+}
+function enchantOptionMatch(rows,magic){
+ const m=magic.matchOptions;if(m?.version!==1||m.status!=='ready'||!Array.isArray(m.variants))return null;
+ const hits=rows.filter(r=>m.variants.some(v=>optionVariantMatches(name(r),v)));
+ return hits.length===1?hits[0]:null;
+}
+function traitNameMatch(rows,entry){
+ if(entry.matchStatus!=='ready'||!Array.isArray(entry.matchNames))return null;
+ const keys=new Set(entry.matchNames.map(optionKey));
+ const hits=rows.filter(r=>Number(r.stage)===entry.matchStage&&keys.has(optionKey(name(r))));
+ return hits.length===1?hits[0]:null;
+}
+function emblemCriteriaMatch(rows,criteria){
+ if(criteria?.status!=='ready')return null;
+ const hits=rows.filter(row=>{
+  const raw=row.raw||row;
+  const label=raw['렙제']??raw.levelVal??raw.level??row.levelVal??'';
+  return norm(type(row)||type(raw))===norm(criteria.type)&&norm(label)===norm(criteria.levelLabel)&&norm(name(row))===norm(criteria.name);
+ });
+ return hits.length===1?hits[0]:null;
+}
+const gearSlots=new Set(Object.values(slots));
+function catalogRarity(row){
+ const raw=row.raw||row;
+ return raw['레어리티']??raw['희귀도']??raw['등급']??raw.rarity??row.rarity??'';
+}
+function resolveCharacter(data,groups){
+ const c=data?.characterClass;
+ if(c?.version!==1||c.status!=='ready')throw Error('수신 데이터에 식별 가능한 직업 정보가 없습니다. 통신기 v20에서 캐릭터 정보를 다시 수신해 주세요. 기존 세팅은 유지됩니다.');
+ const groupKeys=new Set((c.groupAliases||[]).map(norm)),nameKeys=new Set((c.nameAliases||[]).map(norm));
+ const hits=[];
+ for(const group of groups||[]){
+  const title=String(group.title||group.jobGroup||'');
+  if(!groupKeys.has(norm(title)))continue;
+  for(const row of group.items||[]){
+   if(nameKeys.has(norm(name(row))))hits.push({jobGroup:title,jobGroupLabel:title,name:name(row),raw:row});
+  }
+ }
+ if(hits.length!==1)throw Error(`수신 직업 ${c.jobGroup} · ${c.className}에 해당하는 분석기 캐릭터를 하나로 찾지 못했습니다. 기존 세팅은 유지됩니다.`);
+ return hits[0];
+}
+function convert(data,env){
+ if(!data||data.kind!=='detail'||!Array.isArray(data.equipment)||typeof data.nickname!=='string')throw Error('캐릭터 상세 수신 JSON이 아닙니다. 게임에서 캐릭터 정보창을 다시 여세요.');
+ const ext=data.extensions||{},snapshot={currentCharacter:env.currentCharacter||null,selections:{},enchants:{},emblems:{},traitOptions:{}},report=[];
+ const add=(area,item,ok,reason='')=>report.push({area,item:String(item??''),applied:ok,reason});
+ const put=(slot,source,alternatives=[])=>{
+  if(!source)return;
+  let rows=env.items(slot);
+  if(gearSlots.has(slot)&&slot!=='title'){
+   if(!source.rarity||source.rarityStatus==='unknown'){
+    add(slot,source.itemName||source.itemId,false,'수신 장비의 레어리티 미확인: 통신기 v18에서 새로 수신하거나 등급표 확인 필요');return;
+   }
+   rows=rows.filter(row=>norm(catalogRarity(row))===norm(source.rarity));
+   if(!rows.length){add(slot,source.itemName,false,source.rarity+' 레어리티에 해당하는 부위 목록이 없음');return;}
+  }
+  let r=slot==='weapon'?weaponNameMatch(rows,source.matchName??source.itemName):exact(rows,gearSlots.has(slot)?null:source.itemId,[source.matchName??source.itemName,...alternatives]);
+
+  if(r){snapshot.selections[slot]=env.mapItem(r);add(slot,source.itemName||alternatives[0],true)}
+  else add(slot,source.itemName||alternatives[0]||source.itemId,false,'분석기 목록에서 하나로 확정되지 않음');
+ };
+ for(const [code,slot] of Object.entries(slots)){
+  const found=data.equipment.filter(e=>e.slotCode===Number(code));
+  if(found.length===1)put(slot,found[0]);else if(found.length>1)add(slot,'중복 슬롯',false,'동일 슬롯의 장비가 여러 개임');
+ }
+ for(const [key,slot] of [['auras','aura']]){
+  const rows=(ext[key]||[]).filter(e=>e.role!=='appearance');if(rows.length===1)put(slot,rows[0]);else if(rows.length>1)add(slot,'여러 항목',false,'실제 장착을 하나로 확정할 수 없음');
+ }
+ const weaponAvatar=data.weaponAvatarMatch;
+ if(weaponAvatar?.version===1&&weaponAvatar.status==='ready'){
+  const label=weaponAvatar.matchName;
+  if(label==='없음'&&!exact(env.items('weapon-avatar'),null,['없음']))add('weapon-avatar','없음',true,'무기아바타 선택을 비움');
+  else put('weapon-avatar',{itemName:label});
+ }else add('weapon-avatar','무기아바타',false,weaponAvatar?.reason||'통신기 v21에서 새로 수신 필요');
+ const creatures=(ext.creatures||[]).filter(e=>e.slotCode===1000);if(creatures.length===1)put('creature',creatures[0]);
+ const artifact=data.artifactMatch;
+ if(artifact?.version===2&&artifact.status==='ready'){
+  const result=matcher.resolveCandidates(env.items('artifact'),artifact,name);
+  if(result.status==='matched'){
+   snapshot.selections.artifact=env.mapItem(result.row);add('artifact',result.candidate,true);
+  }else if(result.status==='missing'&&artifact.matchName==='없음')add('artifact','없음',true,'아티팩트 선택을 비움');
+  else add('artifact',artifact.matchName,false,result.status==='ambiguous'?'동일 이름의 목록 항목이 여러 개임':'이름 및 대체 후보와 일치하는 목록 항목 없음');
+ }else add('artifact','아티팩트 구성',false,artifact?.reason||'통신기 v23에서 새로 수신 필요');
+ const avatar=data.avatarMatch;
+ if(avatar?.version===1&&typeof avatar.matchName==='string'){
+  if(avatar.matchName==='없음'&&!exact(env.items('avatar'),null,['없음'])){
+   add('avatar','없음',true,'아바타 선택을 비움');
+  }else put('avatar',{itemName:avatar.matchName});
+ }else add('avatar','등급 구성',false,'통신기 v19에서 새로 수신 필요');
+ for(const [code,base] of Object.entries(enchants)){
+  const slot=slots[base],entries=data.equipment.filter(e=>e.slotCode===Number(code));
+  if(entries.length!==1)continue;
+  const m=entries[0].magicEnchantment;if(!m||m.status==='unknown')continue;
+  const rows=env.enchants(slot),r=enchantOptionMatch(rows,m);
+  if(r){snapshot.enchants[slot]=r;add(slot+' 마법부여',m.matchName||m.text,true)}
+  else add(slot+' 마법부여',m.matchName||m.text,false,!m.matchOptions?'통신기 v14에서 새로 수신 필요':m.matchOptions.reason||'전체 옵션과 수치가 일치하는 항목이 없거나 여러 개임');
+ }
+ const socketSeen=new Set();
+ for(const e of ext.emblems||[]){
+  const slot=slots[enchants[e.slotCode]??e.slotCode],i=e.socketIndex;
+  if(!slot||!Number.isInteger(i)||i<0||i>=env.socketCount(slot)){add('엠블렘',e.itemName,false,'소켓 위치 미확인');continue}
+  const key=slot+':'+i;
+  if(socketSeen.has(key)){snapshot.emblems[slot][i]=null;add(slot+' 엠블렘',e.itemName,false,'중복 소켓');continue}socketSeen.add(key);
+  snapshot.emblems[slot]??=new Array(env.socketCount(slot)).fill(null);
+  const rows=env.emblems(slot);let r=e.matchEmblem?emblemCriteriaMatch(rows,e.matchEmblem):exact(rows,e.itemId,[e.itemName]);
+  if(!r&&!e.matchEmblem){const level=String(e.itemName||'').match(/(\d+)단계|(?:^|\s)(\d+)\s*단계/);const candidates=rows.filter(v=>level&&String(v.level_num)===(level[1]||level[2])&&type(v)!=='플래티넘엠블렘'&&norm(e.itemName).includes(norm(type(v))));if(candidates.length===1)r=candidates[0]}
+  if(r){snapshot.emblems[slot][i]=env.mapEmblem(r);add(slot+' 엠블렘 '+(i+1),e.itemName,true)}
+  else add(slot+' 엠블렘 '+(i+1),e.itemName,false,'분석기 엠블렘 목록에 일치 항목 없음');
+ }
+ for(const [code,slot] of Object.entries(slots)){
+  if(!['top','shoulder','bottom','belt','shoes'].includes(slot))continue;
+  const rows=(ext.traitOptions||[]).filter(e=>e.slotCode===Number(code)).sort((a,b)=>a.entryOrder-b.entryOrder);
+  if(!rows.length)continue;
+  const validOrder=rows.length===3&&rows.every((e,i)=>e.entryOrder===i);
+  if(!validOrder||!snapshot.selections[slot]||!env.traitEligible(slot,snapshot.selections[slot])){
+   add(slot+' 특성옵션','',false,'장비 조건 또는 3개 옵션 순서 미확인');continue;
+  }
+  const entries=rows.map(e=>{
+   const stage=e.matchStage??e.stage,r=traitNameMatch(env.traits(stage),e);
+   add(slot+' 특성옵션 '+(e.entryOrder+1),e.matchName||e.effect||e.optionId,!!r,r?'':!e.matchNames?'통신기 v16에서 새로 수신 필요':'같은 단계에서 옵션을 하나로 확정하지 못함');
+   return {stage,name:r?name(r):''};
+  });
+  if(entries.some(e=>e.name))snapshot.traitOptions[slot]={entries};
+ }
+ const metadata={nickname:data.nickname,characterId:data.characterId,receivedAt:data.receivedAt,importedAt:Date.now(),source:data,report};
+ snapshot.receiverImport=metadata;
+ return {snapshot,report};
+}
+const api={resolveCharacter,convert,exact,weaponEffectMatch,weaponNameMatch,enchantOptionMatch,optionVariantMatches,traitNameMatch,emblemCriteriaMatch,catalogRarity};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.DnfmReceiverAdapter=api;
+})(globalThis);
+
+// Runs inside the analyzer's existing script scope.
+function isReceiverSpecialUser(){
+ const info=window.__userRole||{};
+ return info.isLoggedIn===true && info.special_user===true;
+}
+function updateReceiverImportVisibility(){
+ const panel=document.getElementById('receiverImportPanel');
+ if(!panel)return;
+ const allowed=isReceiverSpecialUser();
+ panel.hidden=!allowed;
+ panel.style.display=allowed?'':'none';
+}
+let receiverImportBusy=false;
+function receiverImportReport(){
+ const host=document.getElementById('receiverImportResult');if(!host)return;
+ host.replaceChildren();const meta=state.receiverImport;if(!meta||!Array.isArray(meta.report)||!meta.source)return;
+ const summary=document.createElement('p'),ok=meta.report.filter(r=>r.applied).length;
+ summary.textContent=`${meta.nickname} · ${ok}개 연결 · ${meta.report.length-ok}개 확인 필요 · 수신 ${meta.receivedAt?new Date(meta.receivedAt*1000).toLocaleString():'시각 미포함'}`;host.append(summary);
+ const unresolved=meta.report.filter(r=>!r.applied);
+ if(unresolved.length){const d=document.createElement('details'),s=document.createElement('summary'),ul=document.createElement('ul');s.textContent='연결하지 못한 항목 확인';for(const r of unresolved){const li=document.createElement('li');li.textContent=`${SLOT_LABELS[r.area]||r.area}: ${r.item} — ${r.reason}`;ul.append(li)}d.append(s,ul);host.append(d)}
+ const d=document.createElement('details'),s=document.createElement('summary'),pre=document.createElement('pre');s.textContent='강화·수련일지 등 수신 원본';pre.style.cssText='white-space:pre-wrap;max-height:280px;overflow:auto;word-break:break-all';pre.textContent=JSON.stringify({nickname:meta.nickname,level:meta.source.level,power:meta.source.power,upgrades:meta.source.equipment.filter(e=>e.upgrade!=null).map(e=>({slotCode:e.slotCode,upgrade:e.upgrade})),trainingJournal:meta.source.trainingJournal,avatars:meta.source.extensions?.avatars,artifacts:meta.source.extensions?.artifacts},null,2);d.append(s,pre);host.append(d);
+}
+async function receiverApplyData(data,target){
+ if(!isReceiverSpecialUser())throw Error('수신 세팅 불러오기는 special_user 전용 기능입니다.');
+ if(!target?.isConnected)throw Error('선택한 현황 슬롯이 없어졌습니다. 다시 불러와 주세요.');
+ if(!await ensureCoreLoaded())throw Error('분석기 목록을 불러오지 못했습니다.');
+ if(activeAnalyzerRoot()!==target)throw Error('불러오는 동안 선택 슬롯이 변경됐습니다. 다시 눌러 주세요.');
+ buildCharacterCache();
+ const receivedCharacter=DnfmReceiverAdapter.resolveCharacter(data,DB.chars.groups);
+ if(!DB.enchants.ready)buildEnchantCache();if(!DB.emblems.ready)buildEmblemCache();
+ const env={currentCharacter:clonePresetPlain(receivedCharacter),
+ items:slot=>isAvatarLikeSlot(slot)?listArray('enh').filter(r=>String(r.type??r['종류']??r['타입']??'').trim()===avatarEnhTypeForSlot(slot)):listArray(LIST_SLOT_KEY[slot]||slot),
+ mapItem:mapEquipRow,enchants:slot=>DB.enchants.byType.get(ENCHANT_TYPE[slot])||[],
+ emblems:slot=>(SOCKET_RULES[emblemSlotKey(slot)]||[]).flatMap(t=>DB.emblems.byType.get(t)||[]),
+ mapEmblem:normalizePresetEmblemItem,socketCount:slot=>SOCKET_COUNT(emblemSlotKey(slot)),
+ traits:getAnalyzerTraitRowsForStage,traitEligible:isAnalyzerTraitEligibleArmor};
+ const result=DnfmReceiverAdapter.convert(data,env);
+ result.report.unshift({area:'character',item:receivedCharacter.jobGroup+' '+receivedCharacter.name,applied:true,reason:''});
+ const old={currentCharacter:clonePresetPlain(state.currentCharacter),selections:clonePresetPlain(state.selections),enchants:clonePresetPlain(state.enchants),emblems:clonePresetPlain(state.emblems),traitOptions:clonePresetPlain(state.traitOptions),receiverImport:clonePresetPlain(state.receiverImport)};
+ // Validate the target again after the preset loader awaits its catalog.
+ try{
+  await applyAnalyzerPresetState(result.snapshot,target);
+  if(activeAnalyzerRoot()!==target)throw Error('적용 중 슬롯이 변경되었습니다.');
+  state.receiverImport=result.snapshot.receiverImport;
+  const input=target.querySelector('.analyzer-slot-name');if(input)input.value=data.nickname;syncAnalyzerSlotNameState(target);
+  receiverImportReport();
+ }catch(e){if(e.code!=='receiver_target_changed'&&target.isConnected){setActiveAnalyzerSlot(target);await applyAnalyzerPresetState(old,target)}throw e}
+}
+function mountReceiverImport(){
+ const first=document.querySelector('.analyzer-slot');if(!first||document.getElementById('receiverImportPanel'))return;
+ const panel=document.createElement('section');panel.id='receiverImportPanel';panel.hidden=true;panel.style.cssText='display:none;margin:16px 0;padding:16px;border:1px solid #9a8147;border-radius:12px;background:var(--panel-bg,#161c29);color:var(--text,#eee)';
+ panel.innerHTML='<h3 style="margin:0 0 8px">게임에서 수신한 세팅 불러오기</h3><p style="font-size:13px">통신기 v23를 켜고 캐릭터 정보를 수신한 뒤 사용하세요. 현재 선택한 현황 슬롯의 캐릭터와 장비 세팅을 함께 교체합니다. 직업을 먼저 선택할 필요가 없습니다.</p><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label>연결 코드 <input id="receiverImportToken" type="password" autocomplete="off" style="max-width:240px" placeholder="통신기 시작 창의 연결 코드"></label><button id="receiverImportLive" class="mini-action-btn" type="button">수신 세팅 불러오기</button><button id="receiverImportFile" class="mini-action-btn" type="button">저장 JSON 불러오기</button><input id="receiverImportFileInput" type="file" accept=".json,application/json" hidden></div><p id="receiverImportMessage" role="status" aria-live="polite"></p><div id="receiverImportResult"></div>';
+ first.before(panel);
+ updateReceiverImportVisibility();
+ const live=panel.querySelector('#receiverImportLive'),fileButton=panel.querySelector('#receiverImportFile'),input=panel.querySelector('#receiverImportFileInput'),message=panel.querySelector('#receiverImportMessage');
+ async function run(read){
+  if(!isReceiverSpecialUser()){updateReceiverImportVisibility();return;}
+  if(receiverImportBusy)return;receiverImportBusy=true;live.disabled=fileButton.disabled=true;const target=activeAnalyzerRoot();
+  message.textContent='수신 세팅을 확인하고 있습니다…';
+  try{const data=await read();await receiverApplyData(data,target);message.textContent='불러왔습니다. 확인 필요 항목은 아래 결과를 확인하세요. 저장은 기존 현황 저장 버튼을 이용하세요.'}
+  catch(e){message.textContent=e.message||String(e)}
+  finally{receiverImportBusy=false;live.disabled=fileButton.disabled=false}
+ }
+ live.onclick=()=>run(async()=>{
+  const token=panel.querySelector('#receiverImportToken').value.trim();if(!token)throw Error('통신기의 연결 코드를 입력해 주세요.');
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
+  try{
+   let response;try{response=await fetch('http://127.0.0.1:4243/api/status',{headers:{'X-DNFM-Token':token},cache:'no-store',credentials:'omit',signal:controller.signal})}catch(e){throw Error('통신기에 연결하지 못했습니다. 같은 PC에서 통신기를 실행하고 브라우저의 로컬 네트워크 접근을 확인하세요. 저장 JSON 불러오기도 사용할 수 있습니다.')}
+   if(!response.ok)throw Error(response.status===401?'연결 코드가 맞지 않습니다. 통신기를 재실행했다면 새 코드를 입력하세요.':'통신기가 요청을 거부했습니다 ('+response.status+').');
+   const status=await response.json();if(!status.character)throw Error('수신한 캐릭터가 없습니다. 게임에서 캐릭터 정보창을 여세요.');
+   if(!status.running)throw Error('통신기 수신이 중지되어 있습니다. 수신을 시작하고 캐릭터 정보창을 다시 열어 주세요.');
+   return status.character;
+  }finally{clearTimeout(timer)}
+ });
+ fileButton.onclick=()=>input.click();input.onchange=()=>{const file=input.files[0];input.value='';if(!file)return;run(async()=>{if(file.size>3000000)throw Error('JSON 파일이 너무 큽니다 (최대 3MB).');return JSON.parse(await file.text())})};
+ receiverImportReport();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mountReceiverImport);else mountReceiverImport();
+
+</script>
 
 
   <script>

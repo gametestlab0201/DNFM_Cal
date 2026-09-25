@@ -98,7 +98,7 @@
     }
 
     .hero-text{
-      max-width:min(58%,760px);
+      max-width:min(64%,820px);
       padding-right:20px;
     }
 
@@ -123,29 +123,6 @@
       object-fit:contain;
       transform-origin:right bottom;
       filter:drop-shadow(0 8px 24px rgba(0,0,0,.35));
-    }
-
-    .hero-icon{
-      width:64px;height:64px;
-      flex:0 0 auto;
-      margin-right:18px;
-      border:1px solid rgba(229,186,100,.38);
-      transform:rotate(45deg);
-      background:
-        radial-gradient(circle at 35% 30%,rgba(255,239,187,.34),transparent 32%),
-        linear-gradient(135deg,#8a6429,#2b1b0c);
-      box-shadow:0 0 28px rgba(213,158,62,.18);
-    }
-
-    .hero-icon::before{
-      content:"";
-      display:block;
-      width:28px;height:28px;
-      margin:17px;
-      border:2px solid #f3d58a;
-      transform:rotate(-45deg);
-      clip-path:polygon(50% 0,100% 42%,77% 100%,23% 100%,0 42%);
-      background:linear-gradient(180deg,#fff2bc,#b37a25);
     }
 
     .hero-text h1{
@@ -210,7 +187,7 @@
       position:relative;
       display:flex;
       align-items:center;
-      gap:10px;
+      gap:0;
       width:100%;
       min-height:52px;
       padding:0 20px;
@@ -224,34 +201,17 @@
       font-weight:850;
     }
 
-    .side-item .ico{
-      width:26px;
-      text-align:center;
-      font-size:18px;
-      opacity:.9;
-    }
-
     .side-item:hover{
       color:#ecdba8;
       background:rgba(179,124,41,.07);
     }
 
     .side-item.active{
-      color:#fff2bf;
-      background:
-        linear-gradient(90deg,rgba(225,170,66,.38),rgba(174,118,35,.15) 65%,transparent);
-      border-top-color:rgba(239,190,88,.22);
-      border-bottom-color:rgba(239,190,88,.22);
-      box-shadow:inset 4px 0 0 #e5b24d;
-    }
-
-    .side-item.active::after{
-      content:"";
-      position:absolute;
-      right:0;
-      top:0;bottom:0;
-      width:1px;
-      background:linear-gradient(180deg,transparent,#e0ae4f,transparent);
+      color:#f3eaff;
+      background:linear-gradient(90deg,rgba(151,92,255,.18),rgba(151,92,255,.06) 68%,transparent);
+      border-top-color:rgba(170,118,255,.18);
+      border-bottom-color:rgba(170,118,255,.18);
+      box-shadow:inset 4px 0 0 #9b6cff;
     }
 
     .side-divider{
@@ -281,15 +241,23 @@
 
     .market-list-head{
       display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      min-height:48px;
-      padding:0 14px;
+      flex-direction:column;
+      gap:0;
+      padding:0;
       margin-bottom:8px;
       border:1px solid rgba(112,81,38,.55);
       background:linear-gradient(180deg,#21190f,#17120d);
       box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
+      overflow:hidden;
+    }
+
+    .market-list-topline{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      min-height:48px;
+      padding:0 14px;
     }
 
     .market-list-title{
@@ -301,23 +269,126 @@
       color:#ebd5a0;
     }
 
-    .market-list-title::before{
-      content:"◆";
-      color:#dfad4d;
-      font-size:14px;
-      text-shadow:0 0 12px rgba(223,173,77,.5);
-    }
-
     .head-right{
       display:flex;
       align-items:center;
+      justify-content:flex-end;
       gap:8px;
+      min-width:0;
+      flex:1 1 auto;
+    }
+
+    .market-toolbar{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+      gap:12px;
+      min-height:0;
+      padding:0;
+      border-top:0;
+      background:transparent;
+    }
+
+    .tool-group{
+      display:flex;
+      align-items:center;
+      gap:7px;
+      min-width:0;
+    }
+
+    .tool-label{
+      color:#746a59;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.04em;
+      white-space:nowrap;
+    }
+
+    .tool-divider{
+      width:1px;
+      height:22px;
+      flex:0 0 1px;
+      background:rgba(127,95,52,.32);
     }
 
     .count-text{
-      color:#8f806a;
-      font-size:10px;
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      min-height:30px;
+      padding:0 10px;
+      border:1px solid rgba(223,173,77,.58);
+      border-radius:4px;
+      background:linear-gradient(180deg,rgba(66,47,19,.82),rgba(29,22,12,.9));
+      box-shadow:inset 0 1px 0 rgba(255,230,164,.06),0 0 14px rgba(223,173,77,.08);
+      color:#b9a47c;
+      font-size:9px;
+      font-weight:800;
       white-space:nowrap;
+    }
+    .count-text::before{
+      content:"";
+      width:7px;
+      height:7px;
+      flex:0 0 7px;
+      border-radius:50%;
+      background:#8d826e;
+      box-shadow:0 0 8px rgba(141,130,110,.48);
+      transition:background .18s ease, box-shadow .18s ease;
+    }
+    .count-text.freshness-green::before{
+      background:#45d86c;
+      box-shadow:0 0 9px rgba(69,216,108,.82);
+    }
+    .count-text.freshness-yellow::before{
+      background:#f0c54d;
+      box-shadow:0 0 9px rgba(240,197,77,.82);
+    }
+    .count-text.freshness-red::before{
+      background:#ef5a50;
+      box-shadow:0 0 9px rgba(239,90,80,.84);
+    }
+    .market-updated-label{
+      color:#9f8d69;
+      font-size:9px;
+      font-weight:800;
+    }
+    .market-updated-value{
+      color:#ffe092;
+      font-size:11px;
+      font-weight:950;
+      letter-spacing:.01em;
+      text-shadow:0 0 10px rgba(223,173,77,.18);
+    }
+
+    /* ===== 구매제한 일괄 옵션 ===== */
+    .limit-toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      min-height:30px;
+      padding:0 9px;
+      border:1px solid rgba(146,105,49,.42);
+      border-radius:3px;
+      background:#17120d;
+      color:#c9b994;
+      font-size:10px;
+      font-weight:850;
+      white-space:nowrap;
+      user-select:none;
+      cursor:pointer;
+    }
+    .limit-toggle:hover{
+      color:#ffe7a9;
+      border-color:#bd8740;
+    }
+    .limit-toggle input{
+      width:14px;
+      height:14px;
+      margin:0;
+      accent-color:#d8a94d;
+      cursor:pointer;
     }
 
     .ghost-btn{
@@ -535,6 +606,25 @@
       white-space:nowrap;
     }
 
+
+
+    /* ===== 상품명 등급별 색상 =====
+       기존 장비 등급 테두리 색상과 동일한 계열로 표시 */
+    .product-name.market-rarity-epic,
+    .combo-name.market-rarity-epic{
+      color:#ffd133 !important;
+    }
+
+    .product-name.market-rarity-unique,
+    .combo-name.market-rarity-unique{
+      color:#ef53ce !important;
+    }
+
+    .product-name.market-rarity-rare,
+    .combo-name.market-rarity-rare{
+      color:#ad6df5 !important;
+    }
+
     .product-sub{
       margin-top:5px;
       color:#8d8170;
@@ -568,6 +658,37 @@
       border-color:rgba(122,112,94,.4);
       background:#29251f;
       color:#b8ad9a;
+    }
+
+    .exclude-toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      padding:2px 7px;
+      border:1px solid rgba(239,68,68,.38);
+      border-radius:2px;
+      background:rgba(127,29,29,.22);
+      color:#f2b6b1;
+      font-size:8px;
+      font-weight:850;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .exclude-toggle input{
+      width:11px;
+      height:11px;
+      margin:0;
+      accent-color:#ef4444;
+      cursor:pointer;
+    }
+
+    .product-row.is-excluded{
+      opacity:.52;
+    }
+
+    .product-row.is-excluded .hot-ribbon{
+      display:none !important;
     }
 
     .cell-label{
@@ -662,6 +783,33 @@
       box-shadow:0 0 0 1px rgba(213,164,71,.35),inset 0 0 12px rgba(0,0,0,.5);
     }
 
+    /* 사용자가 직접 덮어쓴 수동 시세 표시 */
+    .price-input.is-manual{
+      border-color:rgba(82,205,214,.88);
+      background:
+        linear-gradient(180deg,rgba(21,72,78,.42),rgba(10,29,32,.92));
+      color:#bffcff;
+      box-shadow:
+        0 0 0 1px rgba(82,205,214,.12),
+        inset 0 0 12px rgba(0,0,0,.46);
+    }
+
+    .price-input.is-manual:focus{
+      border-color:#7fe8ee;
+      box-shadow:
+        0 0 0 2px rgba(82,205,214,.22),
+        inset 0 0 12px rgba(0,0,0,.46);
+    }
+
+    .manual-price-label{
+      margin-top:3px;
+      color:#70dbe1;
+      font-size:8px;
+      font-weight:900;
+      text-align:right;
+      white-space:nowrap;
+    }
+
     .price-input.is-fixed{
       cursor:not-allowed;
       color:#f3d475;
@@ -737,6 +885,25 @@
         radial-gradient(circle at 50% 7%,rgba(228,167,64,.07),transparent 18%),
         linear-gradient(180deg,#17120d,#0f0c09);
       padding:12px 12px 18px;
+    }
+
+    .market-price-status-wrap{
+      margin-bottom:10px;
+    }
+    .market-price-status-wrap .count-text{
+      display:flex;
+      width:100%;
+      min-height:38px;
+      justify-content:flex-start;
+      padding:0 12px;
+      box-sizing:border-box;
+    }
+    .market-price-status-wrap .market-updated-label{
+      font-size:10px;
+    }
+    .market-price-status-wrap .market-updated-value{
+      margin-left:auto;
+      font-size:12px;
     }
 
     .right-box{
@@ -1028,10 +1195,8 @@
         min-height:136px;
         padding:14px 12px;
       }
-      .hero-icon{width:44px;height:44px;margin-right:12px}
-      .hero-icon::before{width:20px;height:20px;margin:10px}
       .hero-text{
-        max-width:calc(100% - 120px);
+        max-width:calc(100% - 96px);
         padding-right:8px;
       }
       .hero-text h1{font-size:20px}
@@ -1071,13 +1236,38 @@
         font-size:10px;
         border:1px solid rgba(112,81,38,.35);
       }
-      .side-item .ico{font-size:12px;width:auto}
       .side-item.active{
-        box-shadow:none;
+        box-shadow:inset 3px 0 0 #9b6cff;
       }
 
       .market-center{padding:8px 6px 12px}
-      .market-list-head{padding:0 9px}
+      .market-list-head{padding:0}
+      .market-list-topline{
+        min-height:44px;
+        padding:7px 9px;
+        align-items:flex-start;
+        flex-direction:column;
+        justify-content:center;
+        gap:7px;
+      }
+      .head-right{width:100%;justify-content:flex-start}
+      .market-toolbar{
+        width:100%;
+        align-items:flex-start;
+        justify-content:flex-start;
+        flex-direction:column;
+        gap:7px;
+        padding:0;
+      }
+      .tool-group{
+        width:100%;
+        flex-wrap:wrap;
+      }
+      .tool-label{width:52px}
+      .tool-divider{display:none}
+      .market-price-status-wrap .count-text{min-height:34px;padding:0 10px}
+      .market-price-status-wrap .market-updated-label{font-size:9px}
+      .market-price-status-wrap .market-updated-value{font-size:11px}
       .market-list-title{font-size:13px}
 
       .product-row{
@@ -1131,7 +1321,6 @@
 
   <div class="market-shell">
     <section class="market-hero">
-      <div class="hero-icon" aria-hidden="true"></div>
       <div class="hero-text">
         <h1>세라 → 테라 변환 효율 계산기</h1>
         <p>세라 상품을 경매장에 판매했을 때의 실수령 테라와 효율을 비교하고, 보유 세라로 가장 많은 테라를 얻는 조합을 계산합니다.</p>
@@ -1148,19 +1337,16 @@
         <div class="side-main-title">메뉴</div>
 
         <button class="side-item" type="button" onclick="location.href='./index.html'">
-          <span class="ico">⌂</span>
           <span>홈</span>
         </button>
 
         <button class="side-item active" type="button">
-          <span class="ico">◉</span>
           <span>세라 → 테라<br>변환 계산기</span>
         </button>
 
         <div class="side-divider"></div>
 
         <button class="side-item active" type="button">
-          <span class="ico">▦</span>
           <span>전체 상품</span>
         </button>
 
@@ -1173,11 +1359,28 @@
       <!-- 중앙 상품 목록 -->
       <main class="market-center">
         <div class="market-list-head">
-          <div class="market-list-title">세라 상점 상품 목록</div>
-          <div class="head-right">
-            <span id="marketUpdatedAt" class="count-text">경매장 가격 기준: -</span>
-            <span id="productCount" style="display:none"></span>
-            <button id="clearPricesBtn" class="ghost-btn" type="button">입력 시세 자동화</button>
+          <div class="market-list-topline">
+            <div class="market-list-title">세라 상점 상품 목록</div>
+            <div class="head-right">
+              <div class="market-toolbar">
+                <div class="tool-group">
+                  <span class="tool-label">계산 옵션</span>
+                  <label class="limit-toggle" title="체크를 해제하면 구매제한을 무시합니다. 단, 제한해제 값이 불가능인 상품은 기존 구매제한이 유지됩니다.">
+                    <input id="purchaseLimitEnabled" type="checkbox" checked>
+                    <span>구매제한 적용</span>
+                  </label>
+                </div>
+
+                <span class="tool-divider" aria-hidden="true"></span>
+
+                <div class="tool-group">
+                  <span class="tool-label">시세 도구</span>
+                  <button id="efficiencySortBtn" class="ghost-btn" type="button" title="현재 입력된 시세 기준으로 1세라당 테라 효율이 높은 순서로 정렬합니다.">1세라당 테라 효율순 정렬</button>
+                  <button id="clearPricesBtn" class="ghost-btn" type="button">입력 시세 자동화</button>
+                </div>
+              </div>
+              <span id="productCount" style="display:none"></span>
+            </div>
           </div>
         </div>
 
@@ -1188,6 +1391,13 @@
 
       <!-- 우측 계산 패널 -->
       <aside class="market-right">
+        <div class="market-price-status-wrap">
+          <span id="marketUpdatedAt" class="count-text">
+            <span class="market-updated-label">경매장 가격 기준</span>
+            <span id="marketUpdatedAtValue" class="market-updated-value">-</span>
+          </span>
+        </div>
+
         <section class="right-box">
           <div class="right-head">
             <span>보유 세라</span>
@@ -1207,7 +1417,7 @@
           </div>
           <div class="right-body">
             <div class="calc-desc">
-              입력한 경매장 시세와 상품별 구매 제한을 기준으로 가장 많은 테라를 얻을 수 있는 조합을 계산합니다.
+              입력한 경매장 시세와 상단의 구매제한 옵션을 기준으로 가장 많은 테라를 얻을 수 있는 조합을 계산합니다.
             </div>
 
             <button id="calculateBtn" class="calc-button" type="button" disabled>자동 계산</button>
@@ -1233,10 +1443,14 @@
       const API_BASE = window.WEBAPP_URL || 'https://dnf-backend.gogo456654.workers.dev';
       const STORAGE_PRICE_KEY = 'dnfm_market_prices_v3_auto';
       const STORAGE_BUDGET_KEY = 'dnfm_market_budget_v2';
+      const STORAGE_EXCLUDED_KEY = 'dnfm_market_excluded_products_v1';
 
       const productListEl = document.getElementById('productList');
       const productCountEl = document.getElementById('productCount');
       const marketUpdatedAtEl = document.getElementById('marketUpdatedAt');
+      const marketUpdatedAtValueEl = document.getElementById('marketUpdatedAtValue');
+      const purchaseLimitEnabledEl = document.getElementById('purchaseLimitEnabled');
+      const efficiencySortBtn = document.getElementById('efficiencySortBtn');
       const budgetEl = document.getElementById('seraBudget');
       const calcBtn = document.getElementById('calculateBtn');
       const resultArea = document.getElementById('resultArea');
@@ -1246,6 +1460,9 @@
       let rawRows = [];
       let products = [];
       let savedPrices = loadJSON(STORAGE_PRICE_KEY, {});
+      let excludedProducts = new Set(loadJSON(STORAGE_EXCLUDED_KEY, []));
+      // 현재 화면의 상품 순서. 수동 시세 입력 시 이 순서를 유지한다.
+      let displayOrder = [];
 
       function loadJSON(key, fallback){
         try{
@@ -1282,6 +1499,38 @@
         return `${d.getMonth()+1}월 ${d.getDate()}일 ${d.getHours()}시`;
       }
 
+      function updateMarketFreshness(value){
+        const classes = ['freshness-green','freshness-yellow','freshness-red'];
+        marketUpdatedAtEl.classList.remove(...classes);
+
+        const baseHelp = '초록: 24시간 이내 · 노랑: 24시간 초과~48시간 이내 · 빨강: 48시간 초과';
+
+        if(!value){
+          marketUpdatedAtEl.title = `기준 시각 정보 없음\n${baseHelp}`;
+          return;
+        }
+
+        const updated = new Date(value);
+        if(Number.isNaN(updated.getTime())){
+          marketUpdatedAtEl.title = `기준 시각을 확인할 수 없음\n${baseHelp}`;
+          return;
+        }
+
+        const ageMs = Math.max(0, Date.now() - updated.getTime());
+        const ageHours = ageMs / 3600000;
+
+        if(ageHours <= 24){
+          marketUpdatedAtEl.classList.add('freshness-green');
+          marketUpdatedAtEl.title = `초록: 최근 24시간 이내에 갱신된 경매장 가격입니다.\n${baseHelp}`;
+        }else if(ageHours <= 48){
+          marketUpdatedAtEl.classList.add('freshness-yellow');
+          marketUpdatedAtEl.title = `노랑: 갱신 후 24시간을 넘었지만 48시간 이내인 경매장 가격입니다.\n${baseHelp}`;
+        }else{
+          marketUpdatedAtEl.classList.add('freshness-red');
+          marketUpdatedAtEl.title = `빨강: 갱신 후 48시간이 지난 경매장 가격입니다.\n${baseHelp}`;
+        }
+      }
+
       function formatKoreanUnit(value){
         const n = Math.max(0, Math.floor(Number(value || 0)));
         if(!n) return '0';
@@ -1307,18 +1556,31 @@
           .replace(/'/g,'&#039;');
       }
 
-      function priceKey(productId, itemKey){
-        return `${productId}::${itemKey}`;
+      function priceKey(productName, itemName){
+        const productKey = normalizeProductLinkName(productName);
+        const itemKey = normalizeProductLinkName(itemName);
+        return `${productKey}::${itemKey}`;
       }
 
       function getBudget(){
         return Math.max(0, Math.floor(toNumber(budgetEl.value)));
       }
 
-      function normalizeLimit(limitQty, limitType, seraPrice, budget){
+      function isPurchaseLimitEnabled(){
+        return purchaseLimitEnabledEl ? purchaseLimitEnabledEl.checked : true;
+      }
+
+      function isLimitUnlockBlocked(value){
+        return String(value ?? '').trim() === '불가능';
+      }
+
+      function normalizeLimit(limitQty, limitType, seraPrice, budget, limitUnlock){
         const type = String(limitType || '').trim().toLowerCase();
         const qty = Math.max(0, Math.floor(Number(limitQty || 0)));
         const maxByBudget = Math.floor(budget / Math.max(1, seraPrice));
+
+        // 상단 체크를 해제해도 시트 '제한해제'가 정확히 '불가능'인 상품은 기존 제한을 강제한다.
+        if(!isPurchaseLimitEnabled() && !isLimitUnlockBlocked(limitUnlock)) return maxByBudget;
 
         const unlimitedWords = ['무제한','제한없음','없음','unlimited'];
         if(unlimitedWords.some(x => type.includes(x))) return maxByBudget;
@@ -1335,20 +1597,47 @@
           .replace(/\s+/g,' ');
       }
 
+      function exclusionKey(productName){
+        return normalizeProductLinkName(productName);
+      }
+
+      function isProductExcluded(product){
+        return excludedProducts.has(exclusionKey(product?.productName));
+      }
+
+      function rewardExclusionKey(parentProduct, rewardProduct){
+        const parentKey = normalizeProductLinkName(parentProduct?.productName);
+        const rewardKey = normalizeProductLinkName(rewardProduct?.productName);
+        if(!parentKey || !rewardKey) return '';
+        return `reward::${parentKey}::${rewardKey}`;
+      }
+
+      function isRewardExcluded(parentProduct, rewardProduct){
+        const key = rewardExclusionKey(parentProduct,rewardProduct);
+        return !!key && excludedProducts.has(key);
+      }
+
+      function saveExcludedProducts(){
+        saveJSON(STORAGE_EXCLUDED_KEY,[...excludedProducts]);
+      }
+
       function groupRows(rows){
         const map = new Map();
 
-        rows.forEach((row, sourceIndex) => {
-          const id = String(row.id || '').trim();
-          if(!id) return;
+        rows.forEach((row) => {
+          const productName = String(row.productName || row['상품명'] || '').trim();
+          if(!productName) return;
 
-          if(!map.has(id)){
-            map.set(id,{
-              id,
-              productName:row.productName || id,
+          const productKey = normalizeProductLinkName(productName);
+          if(!productKey) return;
+
+          if(!map.has(productKey)){
+            map.set(productKey,{
+              productName,
               seraPrice:Number(row.seraPrice || 0),
               limitQty:Number(row.limitQty || 0),
               limitType:row.limitType || '',
+              limitUnlock:String(row.limitUnlock ?? row['제한해제'] ?? '').trim(),
               image:row.image || '',
               grade:row.grade || row.rarity || row['등급'] || '',
               mainProduct:String(row.mainProduct || row['메인상품'] || '').trim(),
@@ -1361,7 +1650,7 @@
             });
           }
 
-          const p = map.get(id);
+          const p = map.get(productKey);
 
           if(!p.image && row.image) p.image = row.image;
           if(!p.grade && (row.grade || row.rarity || row['등급'])){
@@ -1379,6 +1668,7 @@
           }
           if(!p.limitType && row.limitType) p.limitType = row.limitType;
           if(!p.limitQty && Number(row.limitQty || 0)) p.limitQty = Number(row.limitQty || 0);
+          if(isLimitUnlockBlocked(row.limitUnlock ?? row['제한해제'])) p.limitUnlock = '불가능';
 
           const hasFixedNet =
             row.fixedNetTera !== null &&
@@ -1386,7 +1676,6 @@
             String(row.fixedNetTera).trim() !== '';
 
           p.sellItems.push({
-            key:sourceIndex,
             name:row.sellItemName || row.productName || '판매 아이템',
             qty:Math.max(1,Number(row.sellQty || 1)),
             feeRate:Math.max(0,Number(row.feeRate || 0)),
@@ -1395,8 +1684,10 @@
           });
         });
 
+        // 상품 표시 순서는 정렬순서 컬럼에 의존하지 않는다.
+        // 실제 화면에서는 아래 renderProducts()에서 '1세라당 테라' 기준으로 다시 정렬한다.
         const grouped = [...map.values()].sort((a,b)=>
-          (a.sortOrder - b.sortOrder) || a.id.localeCompare(b.id,'ko')
+          a.productName.localeCompare(b.productName,'ko')
         );
 
         const mainProducts = grouped.filter(p => !String(p.mainProduct || '').trim());
@@ -1405,7 +1696,6 @@
         const parentMap = new Map();
         mainProducts.forEach(p => {
           parentMap.set(normalizeProductLinkName(p.productName),p);
-          parentMap.set(normalizeProductLinkName(p.id),p);
         });
 
         rewardProducts.forEach(reward => {
@@ -1419,8 +1709,7 @@
         mainProducts.forEach(p => {
           p.rewards.sort((a,b)=>
             (a.requiredQty - b.requiredQty) ||
-            (a.sortOrder - b.sortOrder) ||
-            a.id.localeCompare(b.id,'ko')
+            a.productName.localeCompare(b.productName,'ko')
           );
         });
 
@@ -1445,12 +1734,18 @@
         return '';
       }
 
-      function getItemPrice(productId, item){
-        const autoPrice = Math.max(0,toNumber(item?.marketPrice || 0));
-        if(autoPrice > 0) return autoPrice;
+      function getManualItemPrice(productName, item){
+        return Math.max(0,toNumber(savedPrices[priceKey(productName,item.name)] || 0));
+      }
 
-        const manual = Math.max(0,toNumber(savedPrices[priceKey(productId,item.key)] || 0));
-        return manual;
+      function getItemPrice(productName, item){
+        // 사용자가 직접 입력한 수동 시세를 최우선으로 사용한다.
+        // 수동값이 없을 때만 서버/시트에서 받은 자동 시세를 사용한다.
+        const manual = getManualItemPrice(productName,item);
+        if(manual > 0) return manual;
+
+        const autoPrice = Math.max(0,toNumber(item?.marketPrice || 0));
+        return autoPrice;
       }
 
       function getProductMetrics(product){
@@ -1472,7 +1767,7 @@
             continue;
           }
 
-          const price = getItemPrice(product.id,item);
+          const price = getItemPrice(product.productName,item);
           if(price <= 0) complete = false;
 
           const lineGross = price * item.qty;
@@ -1523,6 +1818,9 @@
           const need = Math.max(1,Math.floor(Number(reward.requiredQty || 0)));
           if(qty < need) continue;
 
+          // 종속 보상 상품이 제외되어 있으면 조건을 만족해도 합산하지 않는다.
+          if(isRewardExcluded(product,reward)) continue;
+
           const rewardMetrics = getProductMetrics(reward);
           if(!rewardMetrics.complete){
             complete = false;
@@ -1532,7 +1830,6 @@
           // 조건 달성 보상은 구매수량과 무관하게 1회만 획득
           tera += rewardMetrics.net;
           unlockedRewards.push({
-            id:reward.id,
             productName:reward.productName,
             image:reward.image,
             grade:reward.grade,
@@ -1555,16 +1852,19 @@
         const t = String(product.limitType || '').trim();
         const q = Number(product.limitQty || 0);
 
-        if(!t && q <= 0) return '제한 없음';
+        if(!isPurchaseLimitEnabled() && !isLimitUnlockBlocked(product.limitUnlock)) return '제한 해제';
+        if(!t && q <= 0) return isLimitUnlockBlocked(product.limitUnlock) ? '제한 없음' : '제한 없음';
         if(['무제한','제한없음','없음'].some(x => t.includes(x))) return '제한 없음';
 
-        if(t && q > 0) return `${t}\n${formatNumber(q)}회`;
-        if(q > 0) return `${formatNumber(q)}회`;
+        const blockedLabel = !isPurchaseLimitEnabled() && isLimitUnlockBlocked(product.limitUnlock) ? '해제 불가\n' : '';
+        if(t && q > 0) return `${blockedLabel}${t}\n${formatNumber(q)}회`;
+        if(q > 0) return `${blockedLabel}${formatNumber(q)}회`;
 
-        return t || '제한 없음';
+        return `${blockedLabel}${t || '제한 없음'}`;
       }
 
-      function renderProducts(){
+      function renderProducts(options = {}){
+        const preserveOrder = !!options.preserveOrder;
         if(!products.length){
           productListEl.innerHTML = `
             <div class="state-box">
@@ -1580,11 +1880,13 @@
 
         const list = products.map(product => {
           const metrics = getProductMetrics(product);
-          const maxQty = normalizeLimit(
+          const excluded = isProductExcluded(product);
+          const maxQty = excluded ? 0 : normalizeLimit(
             product.limitQty,
             product.limitType,
             product.seraPrice,
-            budget
+            budget,
+            product.limitUnlock
           );
 
           let bestPotentialEfficiency = 0;
@@ -1600,24 +1902,59 @@
           return {
             product,
             metrics,
+            excluded,
             bestPotentialEfficiency,
             hasAnyValidOption
           };
         });
 
+        // 기본/버튼 정렬: 1세라당 테라 효율이 높은 상품부터 정렬
+        // 수동 시세를 입력한 직후에는 현재 화면 순서를 유지해서
+        // 입력 중 행이 갑자기 움직이지 않도록 한다.
+        if(preserveOrder && displayOrder.length){
+          const orderMap = new Map(displayOrder.map((name,index) => [name,index]));
+          list.sort((a,b) => {
+            const ai = orderMap.has(a.product.productName) ? orderMap.get(a.product.productName) : Number.MAX_SAFE_INTEGER;
+            const bi = orderMap.has(b.product.productName) ? orderMap.get(b.product.productName) : Number.MAX_SAFE_INTEGER;
+            if(ai !== bi) return ai - bi;
+            return String(a.product.productName || '').localeCompare(
+              String(b.product.productName || ''),
+              'ko'
+            );
+          });
+        }else{
+          list.sort((a,b) => {
+            const aReady = !!a.metrics.complete;
+            const bReady = !!b.metrics.complete;
+
+            if(aReady !== bReady) return aReady ? -1 : 1;
+
+            if(aReady && bReady){
+              const diff = Number(b.metrics.efficiency || 0) - Number(a.metrics.efficiency || 0);
+              if(Math.abs(diff) > 1e-12) return diff;
+            }
+
+            return String(a.product.productName || '').localeCompare(
+              String(b.product.productName || ''),
+              'ko'
+            );
+          });
+        }
+
         const ready = list.filter(x => x.hasAnyValidOption);
 
-        let bestId = '';
+        let bestProductName = '';
         if(ready.length){
-          bestId = ready.reduce((best,x)=>
+          bestProductName = ready.reduce((best,x)=>
             x.bestPotentialEfficiency > best.bestPotentialEfficiency ? x : best
-          ).product.id;
+          ).product.productName;
         }
 
         function renderSellInputs(product){
           return product.sellItems.map(item => {
-            const key = priceKey(product.id,item.key);
-            const price = getItemPrice(product.id,item);
+            const key = priceKey(product.productName,item.name);
+            const manualPrice = getManualItemPrice(product.productName,item);
+            const price = getItemPrice(product.productName,item);
             const hasFixedNet =
               item.fixedNetTera !== null &&
               item.fixedNetTera !== undefined &&
@@ -1655,7 +1992,7 @@
                 <div class="price-wrap">
                   <img class="currency-badge tera-badge input-badge" src="img/market/테라배지.png" alt="테라">
                   <input
-                    class="price-input js-market-price"
+                    class="price-input js-market-price${manualPrice > 0 ? ' is-manual' : ''}"
                     type="text"
                     inputmode="numeric"
                     autocomplete="off"
@@ -1664,6 +2001,7 @@
                     placeholder="시세 입력"
                     aria-label="${escapeHTML(item.name)} 경매장 가격">
                 </div>
+                ${manualPrice > 0 ? '<div class="manual-price-label">수동 입력</div>' : ''}
               </div>
             `;
           }).join('');
@@ -1684,8 +2022,8 @@
           return `<div class="item-img-wrap ${gradeClass}">${imageHTML}</div>`;
         }
 
-        productListEl.innerHTML = list.map(({product,metrics}) => {
-          const isBest = product.id === bestId;
+        productListEl.innerHTML = list.map(({product,metrics,excluded}) => {
+          const isBest = product.productName === bestProductName;
           const limitText = buildLimitText(product);
           const sellInputs = renderSellInputs(product);
 
@@ -1700,17 +2038,19 @@
           const rewardRows = (product.rewards || []).map(reward => {
             const rewardMetrics = getProductMetrics(reward);
             const rewardInputs = renderSellInputs(reward);
+            const rewardExcluded = isRewardExcluded(product,reward);
+            const rewardExcludeKey = rewardExclusionKey(product,reward);
             const rewardNetText = rewardMetrics.complete
               ? formatNumber(Math.round(rewardMetrics.net))
               : '시세 입력 필요';
 
             return `
-              <article class="product-row reward-row">
+              <article class="product-row reward-row ${rewardExcluded ? 'is-excluded' : ''}">
                 <div class="cell product-main">
                   ${renderImage(reward)}
 
                   <div>
-                    <div class="product-name" title="${escapeHTML(reward.productName)}">
+                    <div class="product-name ${getMarketGradeClass(reward.grade)}" title="${escapeHTML(reward.productName)}">
                       ${escapeHTML(reward.productName)}
                     </div>
 
@@ -1720,7 +2060,10 @@
 
                     <div class="tag-row">
                       <span class="tag reward-tag">구매 보상</span>
-                      <span class="tag gray">${escapeHTML(reward.id)}</span>
+                      <label class="exclude-toggle" title="체크하면 조건을 만족해도 이 보상 상품의 테라는 계산에 합산되지 않습니다.">
+                        <input class="js-product-exclude" type="checkbox" data-exclusion-key="${escapeHTML(rewardExcludeKey)}" ${rewardExcluded ? 'checked' : ''}>
+                        <span>제외</span>
+                      </label>
                     </div>
                   </div>
                 </div>
@@ -1759,14 +2102,14 @@
           }).join('');
 
           return `
-            <article class="product-row ${isBest ? 'is-best' : ''}">
+            <article class="product-row ${isBest ? 'is-best' : ''} ${excluded ? 'is-excluded' : ''}">
               <div class="hot-ribbon">BEST</div>
 
               <div class="cell product-main">
                 ${renderImage(product)}
 
                 <div>
-                  <div class="product-name" title="${escapeHTML(product.productName)}">
+                  <div class="product-name ${getMarketGradeClass(product.grade)}" title="${escapeHTML(product.productName)}">
                     ${escapeHTML(product.productName)}
                   </div>
 
@@ -1776,7 +2119,10 @@
 
                   <div class="tag-row">
                     <span class="tag">세라 상품</span>
-                    <span class="tag gray">${escapeHTML(product.id)}</span>
+                    <label class="exclude-toggle" title="체크하면 이 상품은 최적 구매 조합 계산에서 제외됩니다.">
+                      <input class="js-product-exclude" type="checkbox" data-product-name="${escapeHTML(product.productName)}" ${excluded ? 'checked' : ''}>
+                      <span>제외</span>
+                    </label>
                     ${(product.rewards || []).length
                       ? `<span class="tag reward-tag">누적보상 ${(product.rewards || []).length}개</span>`
                       : ''}
@@ -1818,6 +2164,9 @@
           `;
         }).join('');
 
+        // 다음 수동 입력 시 현재 보이는 순서를 그대로 유지하기 위한 기준
+        displayOrder = list.map(x => x.product.productName);
+
         const rewardCount = products.reduce((sum,p)=>sum + (p.rewards || []).length,0);
         productCountEl.textContent =
           `${products.length}개 상품` +
@@ -1827,6 +2176,7 @@
         calcBtn.disabled = ready.length === 0;
 
         bindPriceInputs();
+        bindExcludeInputs();
       }
 
       function bindPriceInputs(){
@@ -1846,12 +2196,30 @@
 
             saveJSON(STORAGE_PRICE_KEY,savedPrices);
 
-            renderProducts();
+            // 수동 입력 직후에는 자동 재정렬하지 않고 현재 위치를 유지한다.
+            renderProducts({ preserveOrder:true });
             renderEmptyResult();
           });
 
           input.addEventListener('keydown',e => {
             if(e.key === 'Enter') input.blur();
+          });
+        });
+      }
+
+      function bindExcludeInputs(){
+        document.querySelectorAll('.js-product-exclude').forEach(input => {
+          input.addEventListener('change',() => {
+            const key = String(input.dataset.exclusionKey || '').trim()
+              || exclusionKey(input.dataset.productName || '');
+            if(!key) return;
+
+            if(input.checked) excludedProducts.add(key);
+            else excludedProducts.delete(key);
+
+            saveExcludedProducts();
+            renderProducts();
+            renderEmptyResult();
           });
         });
       }
@@ -1994,7 +2362,6 @@
           totalTera += option.tera;
 
           combo.push({
-            id:p.id,
             productName:p.productName,
             image:p.image,
             grade:p.grade,
@@ -2027,7 +2394,9 @@
           return;
         }
 
-        const available = products.map(product => {
+        const available = products
+        .filter(product => !isProductExcluded(product))
+        .map(product => {
           const metrics = getProductMetrics(product);
 
           return {
@@ -2037,7 +2406,8 @@
               product.limitQty,
               product.limitType,
               product.seraPrice,
-              budget
+              budget,
+              product.limitUnlock
             )
           };
         }).filter(p =>
@@ -2086,7 +2456,7 @@
             <div class="combo-row">
               ${image}
               <div class="combo-info">
-                <div class="combo-name">
+                <div class="combo-name ${gradeClass}">
                   ${escapeHTML(item.productName)} × ${formatNumber(item.qty)}
                 </div>
                 <div class="combo-values">
@@ -2153,8 +2523,8 @@
           }
 
           rawRows = data.items;
-          marketUpdatedAtEl.textContent =
-            `경매장 가격 기준: ${formatMarketUpdatedAt(data.updatedAt)}`;
+          marketUpdatedAtValueEl.textContent = formatMarketUpdatedAt(data.updatedAt);
+          updateMarketFreshness(data.updatedAt);
 
           console.log('[market_items] 자동 경매장가격 포함 행',
             rawRows.filter(row => Number(row.marketPrice || 0) > 0).length,
@@ -2169,7 +2539,8 @@
           console.error('[market_items]',error);
 
           productCountEl.textContent = '불러오기 실패';
-          marketUpdatedAtEl.textContent = '경매장 가격 기준: -';
+          marketUpdatedAtValueEl.textContent = '-';
+          updateMarketFreshness('');
 
           productListEl.innerHTML = `
             <div class="state-box error">
@@ -2208,6 +2579,16 @@
         if(e.key === 'Enter') budgetEl.blur();
       });
 
+      purchaseLimitEnabledEl?.addEventListener('change',() => {
+        renderProducts();
+        renderEmptyResult();
+      });
+
+      efficiencySortBtn?.addEventListener('click',() => {
+        // 현재 자동/수동 시세를 모두 반영한 값으로 사용자가 원할 때만 재정렬
+        renderProducts();
+      });
+
       clearPricesBtn.addEventListener('click',() => {
         if(!confirm('입력한 경매장 시세를 모두 초기화할까요?')) return;
 
@@ -2223,6 +2604,9 @@
 
         savedPrices = {};
         saveJSON(STORAGE_PRICE_KEY,savedPrices);
+
+        excludedProducts.clear();
+        saveExcludedProducts();
 
         budgetEl.value = '100,000';
 
