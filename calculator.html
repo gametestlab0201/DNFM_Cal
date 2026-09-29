@@ -188,6 +188,18 @@
         0 0 6px rgba(255, 120, 173, 0.18);
     }
 
+    /* ✅ 장비명 접두사 색상: 인게임 표기와 동일 계열 */
+    .caligo-prefix {
+      color: #9C72F2;
+      font-weight: 900;
+    }
+
+    .lumen-prefix {
+      color: #FDFCBE;
+      font-weight: 900;
+    }
+
+
     /* ✅ 우측 장비 설명란 - 침식 전용 소제목 */
 .slot-tag.slot-erosion {
   color: #ffffff;
@@ -13578,10 +13590,11 @@ if (/[\r\n]/.test(nickname)) {
       const raw = String(name ?? '');
       const safe = escapeHtmlText(raw);
 
-      return safe.replace(
-        /^\[침식\]/,
-        '<span class="erosion-prefix">[침식]</span>'
-      );
+      // 기존 [침식] 표기는 유지하고, 신규 [칼리고]/[루멘] 접두사만 별도 색상 적용
+      return safe
+        .replace(/^\[침식\]/, '<span class="erosion-prefix">[침식]</span>')
+        .replace(/^\[칼리고\]/, '<span class="caligo-prefix">[칼리고]</span>')
+        .replace(/^\[루멘\]/, '<span class="lumen-prefix">[루멘]</span>');
     }
 
     /* ===== 상태/상수 ===== */

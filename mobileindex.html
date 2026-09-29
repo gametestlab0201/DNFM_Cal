@@ -1259,6 +1259,18 @@
       text-align: center;
     }
 
+
+    /* ✅ 장비명 접두사 색상: 인게임 표기와 동일 계열 */
+    .caligo-prefix {
+      color: #9C72F2;
+      font-weight: 900;
+    }
+
+    .lumen-prefix {
+      color: #FDFCBE;
+      font-weight: 900;
+    }
+
     /* ✅ 고유효과(개별) 미니 버튼 */
     .equip-u-mini {
       margin-top: 6px;
@@ -13150,6 +13162,19 @@
       ].includes(String(slot||''));
     }
 
+    function renderSpecialEquipPrefixNameMobile(name) {
+      const safe = String(name ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+      return safe
+        .replace(/^\[칼리고\]/, '<span class="caligo-prefix">[칼리고]</span>')
+        .replace(/^\[루멘\]/, '<span class="lumen-prefix">[루멘]</span>');
+    }
+
     function renderMobileEquipList(slot, items) {
       const titleEl = document.getElementById('equipModalTitle');
       if (titleEl) titleEl.textContent = `${EQUIP_SLOT_LABELS[slot] || slot} 선택`;
@@ -13207,7 +13232,7 @@
         // 이름
         const nm = document.createElement('div');
         nm.className = 'meq-name';
-        nm.textContent = name;
+        nm.innerHTML = renderSpecialEquipPrefixNameMobile(name);
 
         // ✅ 설명 버튼 (rowBtn 안에 넣되, 클릭은 stopPropagation)
         const infoBtn = document.createElement('button');
@@ -13822,7 +13847,7 @@
       // 이미지 아래 “장비이름”
       const nameEl = row.querySelector('.equip-name');
       if (nameEl) {
-        nameEl.textContent = String(it?.name || EQUIP_SLOT_LABELS[slot] || '').trim();
+        nameEl.innerHTML = renderSpecialEquipPrefixNameMobile(String(it?.name || EQUIP_SLOT_LABELS[slot] || '').trim());
       }
 
       // (oca-item에는 아래 요소가 없으니 null이면 그냥 스킵됨)
