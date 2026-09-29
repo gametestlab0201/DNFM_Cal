@@ -6107,6 +6107,32 @@
       transform: translateX(100%);
     }
 
+
+    /* ✅ 악세사리 세트 모달: 목걸이/반지 접두사 조합 드롭다운 */
+    .acc-prefix-mode-select {
+      height: 30px;
+      min-width: 158px;
+      padding: 0 28px 0 10px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      border-radius: 8px;
+      background: #111827;
+      color: #e5e7eb;
+      font-size: 11px;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .acc-prefix-mode-select:focus {
+      border-color: rgba(125, 211, 252, 0.9);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.18);
+    }
+
+    .acc-prefix-mode-select option {
+      background: #111827;
+      color: #e5e7eb;
+    }
+
     /* ✅ 고유효과 ON/OFF 토글 줄 */
     .unique-onoff-row {
       margin-top: 6px;
@@ -11305,6 +11331,15 @@
           <div class="armor-toggle-thumb"></div>
         </div>
 
+        <!-- ✅ 목걸이/반지 [칼리고]/[루멘] 접두사 조합 -->
+        <select id="accPrefixModeSelect" class="acc-prefix-mode-select" aria-label="목걸이 / 반지 접두사 조합">
+          <option value="none" selected>없음</option>
+          <option value="caligo-caligo">[칼리고]+[칼리고]</option>
+          <option value="caligo-lumen">[칼리고]+[루멘]</option>
+          <option value="lumen-caligo">[루멘]+[칼리고]</option>
+          <option value="lumen-lumen">[루멘]+[루멘]</option>
+        </select>
+
         <button type="button" class="btn" data-close style="font-size:12px;padding:4px 8px;">
           닫기
         </button>
@@ -14447,6 +14482,7 @@ if (/[\r\n]/.test(nickname)) {
     const $accSetModal = document.getElementById('accSetModal');
     const $accSetList = document.getElementById('accSetList');
     const $accSetToggle = document.getElementById('accSetToggle');
+    const $accPrefixModeSelect = document.getElementById('accPrefixModeSelect');
 
     const $specSetModal = document.getElementById('specSetModal');
     const $specSetList = document.getElementById('specSetList');
@@ -14947,8 +14983,38 @@ showModal($uniqueEffectModal, false);
     // ✅ 현재 방어구 세트 모드 (익시드 / 에픽)
     //   - 지금은 모양만 바꾸고, 나중에 이 값 보고 필터링에 활용 가능
     let armorSetMode = 'exceed'; // 'exceed' = 익시드, 'epic' = 에픽
+
+    // ✅ 악세사리 세트 모달 목걸이/반지 접두사 조합
+    // none | caligo-caligo | caligo-lumen | lumen-caligo | lumen-lumen
+    let accPrefixMode = 'none';
+    state.accPrefixMode = state.accPrefixMode || accPrefixMode;
+    accPrefixMode = String(state.accPrefixMode || 'none');
+
     let uniqueToggleMode = 'off'; // 'off' | 'on' : 고유효과 ON/OFF 토글 상태
     let soloPartyMode = 'party'; // 'solo' | 'party'
+
+    function syncAccPrefixModeSelectUI() {
+      if (!$accPrefixModeSelect) return;
+      const valid = new Set([
+        'none',
+        'caligo-caligo',
+        'caligo-lumen',
+        'lumen-caligo',
+        'lumen-lumen'
+      ]);
+      if (!valid.has(accPrefixMode)) accPrefixMode = 'none';
+      state.accPrefixMode = accPrefixMode;
+      $accPrefixModeSelect.value = accPrefixMode;
+    }
+
+    $accPrefixModeSelect?.addEventListener('change', () => {
+      accPrefixMode = String($accPrefixModeSelect.value || 'none');
+      state.accPrefixMode = accPrefixMode;
+      window._accSetCardsCache = null;
+      if ($accSetList) renderAccSetModal();
+    });
+
+    syncAccPrefixModeSelectUI();
 
     function updateArmorToggleUI() {
       // 방어구 토글
@@ -15016,6 +15082,9 @@ showModal($uniqueEffectModal, false);
       updateArmorToggleUI();
 
       // ✅ 방어구/악세 세트 목록 모두 현재 모드에 맞게 다시 그리기
+      window._armorSetCardsCache = null;
+      window._accSetCardsCache = null;
+      window._specSetCardsCache = null;
       if ($armorSetList) renderArmorSetModal();
       if ($accSetList) renderAccSetModal();
       if ($specSetList) renderSpecSetModal();
@@ -19610,20 +19679,58 @@ const row =
           const rows = equipBySlot[slotKey] || [];
           let row;
 
+          // ✅ 목걸이/반지는 드롭다운에서 선택한 [칼리고]/[루멘] 접두사 조합을 강제한다.
+          // 앞쪽 = 목걸이, 뒤쪽 = 반지. '없음'이면 접두사 없는 기존 장비만 표시한다.
+          const prefixPlan = {
+            'none':          { necklace: '',       ring: '' },
+            'caligo-caligo': { necklace: '칼리고', ring: '칼리고' },
+            'caligo-lumen':  { necklace: '칼리고', ring: '루멘' },
+            'lumen-caligo':  { necklace: '루멘',   ring: '칼리고' },
+            'lumen-lumen':   { necklace: '루멘',   ring: '루멘' },
+          };
+
+          const plan = prefixPlan[String(accPrefixMode || 'none')] || prefixPlan.none;
+          const desiredPrefix =
+            (slotKey === 'necklace' || slotKey === 'ring')
+              ? plan[slotKey]
+              : null;
+
+          const getPrefix = (r) => {
+            const n = norm(r?.name || r?.['이름'] || '');
+            if (n.startsWith('[칼리고]')) return '칼리고';
+            if (n.startsWith('[루멘]')) return '루멘';
+            return '';
+          };
+
+          const baseCandidates = rows.filter(
+            (r) => norm(r.type) === norm(typeKey) && norm(r.season) === seasonKey
+          );
+
+          const prefixCandidates = (desiredPrefix == null)
+            ? baseCandidates
+            : baseCandidates.filter((r) => getPrefix(r) === desiredPrefix);
+
+          // ✅ 선택한 [칼리고]/[루멘] 버전이 해당 세트/부위에 없으면
+          //    '없음'일 때와 동일하게 접두사 없는 기존 장비로 자동 대체한다.
+          const fallbackCandidates =
+            (slotKey === 'necklace' || slotKey === 'ring')
+              ? baseCandidates.filter((r) => getPrefix(r) === '')
+              : baseCandidates;
+
+          const effectiveCandidates =
+            prefixCandidates.length
+              ? prefixCandidates
+              : fallbackCandidates;
+
           if (mode === 'epic') {
-            // 에픽 모드: 종류 + 레어리티 '에픽' 우선
-            row = rows.find(
-              (r) =>
-                norm(r.type) === norm(typeKey) &&
-                norm(r.season) === seasonKey &&
-                norm(r.rarity || r['레어리티']) === '에픽'
+            // 에픽 모드: 선택한 접두사(또는 fallback 없음) 후보 안에서 에픽 우선
+            row = effectiveCandidates.find(
+              (r) => norm(r.rarity || r['레어리티']) === '에픽'
             );
-            if (!row) {
-              row = rows.find((r) => norm(r.type) === norm(typeKey) && norm(r.season) === seasonKey);
-            }
+            if (!row) row = effectiveCandidates[0];
           } else {
-            // 익시드 모드: 종류만 맞으면 OK
-            row = rows.find((r) => norm(r.type) === norm(typeKey) && norm(r.season) === seasonKey);
+            // 익시드 모드: 선택한 접두사(또는 fallback 없음) 후보 안에서 시트 순서 우선
+            row = effectiveCandidates[0];
           }
 
           if (row) {
