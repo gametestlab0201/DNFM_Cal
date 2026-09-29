@@ -3742,6 +3742,127 @@
       transform: translateY(-50%);
     }
 
+
+    /* ✅ 모바일 악세사리 세트: 루크레이드 접두사 컨트롤 전용 배치 */
+    #mAccSetModal .m-acc-set-titlebar {
+      min-height: 70px;
+      padding: 6px 42px 38px 10px;
+      overflow: visible;
+      z-index: 120;
+    }
+
+    #mAccSetModal .m-acc-set-controls {
+      position: absolute;
+      left: 10px;
+      right: 42px;
+      bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 12px;
+      z-index: 130;
+    }
+
+    #mAccSetModal #mAccSetToggle {
+      position: relative;
+      right: auto;
+      top: auto;
+      transform: none;
+      width: 104px;
+      height: 24px;
+      flex: 0 0 104px;
+    }
+
+    .m-acc-prefix-control-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+      margin-left: 2px;
+    }
+
+    .m-acc-prefix-raid-label {
+      font-size: 9px;
+      font-weight: 900;
+      color: #d8c79a;
+      white-space: nowrap;
+    }
+
+    .m-acc-prefix-dropdown {
+      position: relative;
+      width: 118px;
+      flex: 0 0 118px;
+      z-index: 140;
+    }
+
+    .m-acc-prefix-dropdown-btn {
+      width: 100%;
+      height: 25px;
+      padding: 0 6px 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      border: 1px solid rgba(148,163,184,.42);
+      border-radius: 7px;
+      background: #111827;
+      color: #e5e7eb;
+      font-size: 9px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .m-acc-prefix-dropdown-arrow {
+      font-size: 9px;
+      opacity: .85;
+    }
+
+    .m-acc-prefix-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      width: 132px;
+      z-index: 9999;
+      padding: 4px;
+      border: 1px solid rgba(148,163,184,.38);
+      border-radius: 7px;
+      background: #0f172a;
+      box-shadow: 0 8px 20px rgba(0,0,0,.48);
+    }
+
+    .m-acc-prefix-dropdown.open .m-acc-prefix-dropdown-menu {
+      display: block;
+    }
+
+    .m-acc-prefix-dropdown-option {
+      width: 100%;
+      min-height: 27px;
+      padding: 4px 6px;
+      border: 0;
+      border-radius: 5px;
+      background: transparent;
+      color: #e5e7eb;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .m-acc-prefix-dropdown-option:active,
+    .m-acc-prefix-dropdown-option.is-selected {
+      background: rgba(255,255,255,.09);
+    }
+
+    #mAccSetModal .armor-set-body {
+      position: relative;
+      z-index: 1;
+    }
+
+    #mAccSetModal .armor-set-dialog {
+      overflow: visible;
+    }
+
     /* 토글 트랙 */
     .armor-toggle {
       position: relative;
@@ -6533,15 +6654,48 @@
         <div id="mAccSetModal" class="modal" aria-hidden="true">
           <div class="backdrop"></div>
           <div class="dialog armor-set-dialog" role="dialog" aria-modal="true" aria-labelledby="mAccSetTitle">
-            <header class="armor-set-titlebar">
+            <header class="armor-set-titlebar m-acc-set-titlebar">
               <h2 id="mAccSetTitle">악세사리 세트 선택</h2>
-              <!-- ✅ 익시드/에픽 토글 -->
-              <div id="mAccSetToggle" class="armor-toggle mode-exceed" role="button" tabindex="0"
-                aria-label="익시드/에픽 토글(악세)">
-                <span class="armor-toggle-label armor-toggle-label-exceed">익시드</span>
-                <span class="armor-toggle-label armor-toggle-label-epic">에픽</span>
-                <div class="armor-toggle-thumb"></div>
+
+              <div class="m-acc-set-controls">
+                <!-- ✅ 익시드/에픽 토글 -->
+                <div id="mAccSetToggle" class="armor-toggle mode-exceed" role="button" tabindex="0"
+                  aria-label="익시드/에픽 토글(악세)">
+                  <span class="armor-toggle-label armor-toggle-label-exceed">익시드</span>
+                  <span class="armor-toggle-label armor-toggle-label-epic">에픽</span>
+                  <div class="armor-toggle-thumb"></div>
+                </div>
+
+                <!-- ✅ 루크레이드 목걸이/반지 접두사 조합 -->
+                <div class="m-acc-prefix-control-wrap">
+                  <span class="m-acc-prefix-raid-label">루크레이드</span>
+
+                  <div id="mAccPrefixCustomDropdown" class="m-acc-prefix-dropdown">
+                    <button type="button" id="mAccPrefixDropdownButton" class="m-acc-prefix-dropdown-btn"
+                      aria-haspopup="listbox" aria-expanded="false">
+                      <span id="mAccPrefixDropdownLabel">없음</span>
+                      <span class="m-acc-prefix-dropdown-arrow">▾</span>
+                    </button>
+
+                    <div id="mAccPrefixDropdownMenu" class="m-acc-prefix-dropdown-menu" role="listbox" aria-hidden="true">
+                      <button type="button" class="m-acc-prefix-dropdown-option" data-value="none" role="option">없음</button>
+                      <button type="button" class="m-acc-prefix-dropdown-option" data-value="caligo-caligo" role="option">
+                        <span class="caligo-prefix">[칼리고]</span>+<span class="caligo-prefix">[칼리고]</span>
+                      </button>
+                      <button type="button" class="m-acc-prefix-dropdown-option" data-value="caligo-lumen" role="option">
+                        <span class="caligo-prefix">[칼리고]</span>+<span class="lumen-prefix">[루멘]</span>
+                      </button>
+                      <button type="button" class="m-acc-prefix-dropdown-option" data-value="lumen-caligo" role="option">
+                        <span class="lumen-prefix">[루멘]</span>+<span class="caligo-prefix">[칼리고]</span>
+                      </button>
+                      <button type="button" class="m-acc-prefix-dropdown-option" data-value="lumen-lumen" role="option">
+                        <span class="lumen-prefix">[루멘]</span>+<span class="lumen-prefix">[루멘]</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
+
               <button type="button" class="close" data-mset-close aria-label="닫기">✕</button>
             </header>
 
@@ -16327,20 +16481,53 @@
           const rows = equipBySlot[slotKey] || [];
           let row;
 
+          // ✅ 루크레이드 접두사 드롭다운
+          // 앞쪽 = 목걸이, 뒤쪽 = 반지. '없음'은 접두사 없는 기존 장비.
+          const prefixPlan = {
+            'none':          { necklace: '',       ring: '' },
+            'caligo-caligo': { necklace: '칼리고', ring: '칼리고' },
+            'caligo-lumen':  { necklace: '칼리고', ring: '루멘' },
+            'lumen-caligo':  { necklace: '루멘',   ring: '칼리고' },
+            'lumen-lumen':   { necklace: '루멘',   ring: '루멘' },
+          };
+          const plan = prefixPlan[String(accPrefixModeMobile || 'none')] || prefixPlan.none;
+          const desiredPrefix =
+            (slotKey === 'necklace' || slotKey === 'ring')
+              ? plan[slotKey]
+              : null;
+
+          const getPrefix = (r) => {
+            const n = norm(r?.name || r?.['이름'] || '');
+            if (n.startsWith('[칼리고]')) return '칼리고';
+            if (n.startsWith('[루멘]')) return '루멘';
+            return '';
+          };
+
+          const baseCandidates = rows.filter(
+            (r) => norm(r.type) === norm(typeKey) && norm(r.season) === seasonKey
+          );
+
+          const prefixCandidates = (desiredPrefix == null)
+            ? baseCandidates
+            : baseCandidates.filter((r) => getPrefix(r) === desiredPrefix);
+
+          // 선택한 접두사 버전이 없으면 그 부위만 '없음'의 일반 장비로 대체
+          const fallbackCandidates =
+            (slotKey === 'necklace' || slotKey === 'ring')
+              ? baseCandidates.filter((r) => getPrefix(r) === '')
+              : baseCandidates;
+
+          const effectiveCandidates = prefixCandidates.length
+            ? prefixCandidates
+            : fallbackCandidates;
+
           if (mode === 'epic') {
-            // 에픽 모드: 종류 + 레어리티 '에픽' 우선
-            row = rows.find(
-              (r) =>
-                norm(r.type) === norm(typeKey) &&
-                norm(r.season) === seasonKey &&
-                norm(r.rarity || r['레어리티']) === '에픽'
+            row = effectiveCandidates.find(
+              (r) => norm(r.rarity || r['레어리티']) === '에픽'
             );
-            if (!row) {
-              row = rows.find((r) => norm(r.type) === norm(typeKey) && norm(r.season) === seasonKey);
-            }
+            if (!row) row = effectiveCandidates[0];
           } else {
-            // 익시드 모드: 종류만 맞으면 OK
-            row = rows.find((r) => norm(r.type) === norm(typeKey) && norm(r.season) === seasonKey);
+            row = effectiveCandidates[0];
           }
 
           if (row) {
@@ -16364,6 +16551,48 @@
           }
         }
 
+        // ✅ 실제로 구성된 목걸이/반지 둘 다 접두사 장비일 때만 루크레이드 접두사 세트 설명 연결
+        let lukePrefixSetName = '';
+        let lukePrefixSetDesc = '';
+
+        const neckPiece = pieces.find((p) => p.slot === 'necklace');
+        const ringPiece = pieces.find((p) => p.slot === 'ring');
+        const getPiecePrefix = (p) => {
+          const n = norm(p?.name || p?.item?.name || '');
+          if (n.startsWith('[칼리고]')) return '칼리고';
+          if (n.startsWith('[루멘]')) return '루멘';
+          return '';
+        };
+
+        const np = getPiecePrefix(neckPiece);
+        const rp = getPiecePrefix(ringPiece);
+
+        if (np && rp) {
+          if (np === '칼리고' && rp === '칼리고') lukePrefixSetName = '[칼리고]+[칼리고]';
+          else if (np === '루멘' && rp === '루멘') lukePrefixSetName = '[루멘]+[루멘]';
+          else lukePrefixSetName = '[칼리고]+[루멘]';
+
+          const normalizePrefixSetName = (v) => norm(v).replace(/\s+/g, '');
+          const wanted = normalizePrefixSetName(lukePrefixSetName);
+
+          const prefixRow = setRows.find((r) => {
+            const category = norm(r?.category ?? r?.['분류'] ?? '');
+            if (category !== '접두사') return false;
+
+            const rowName = normalizePrefixSetName(r?.name ?? r?.['이름'] ?? '');
+            if (rowName !== wanted) return false;
+
+            const count = toNum(r?.num ?? r?.['갯수'] ?? r?.setnumber ?? r?.setcnt);
+            return count === 2;
+          });
+
+          if (prefixRow) {
+            lukePrefixSetDesc = (typeof _pickDesc_mobile === 'function')
+              ? _pickDesc_mobile(prefixRow)
+              : String(prefixRow?.desc || prefixRow?.['설명'] || '').trim();
+          }
+        }
+
         cards.push({
           id: typeKey,
           type: typeKey,
@@ -16372,6 +16601,8 @@
           num: info.num,
           desc: info.desc || '',
           descByNum: { ...(info.descByNum || {}) },
+          lukePrefixSetName,
+          lukePrefixSetDesc,
           pieces,
         });
       });
@@ -17317,6 +17548,89 @@
     ========================= */
     let armorSetMode = 'exceed'; // 'exceed' | 'epic'
 
+    // ✅ 루크레이드 악세사리 접두사 조합
+    // 앞쪽 = 목걸이, 뒤쪽 = 반지
+    let accPrefixModeMobile = String(window.state?.accPrefixMode || 'none');
+
+    function renderAccPrefixModeLabelMobile(value) {
+      const v = String(value || 'none');
+      if (v === 'caligo-caligo') return '<span class="caligo-prefix">[칼리고]</span>+<span class="caligo-prefix">[칼리고]</span>';
+      if (v === 'caligo-lumen')  return '<span class="caligo-prefix">[칼리고]</span>+<span class="lumen-prefix">[루멘]</span>';
+      if (v === 'lumen-caligo')  return '<span class="lumen-prefix">[루멘]</span>+<span class="caligo-prefix">[칼리고]</span>';
+      if (v === 'lumen-lumen')   return '<span class="lumen-prefix">[루멘]</span>+<span class="lumen-prefix">[루멘]</span>';
+      return '없음';
+    }
+
+    function syncAccPrefixDropdownMobile() {
+      const valid = new Set(['none','caligo-caligo','caligo-lumen','lumen-caligo','lumen-lumen']);
+      if (!valid.has(accPrefixModeMobile)) accPrefixModeMobile = 'none';
+
+      window.state = window.state || {};
+      window.state.accPrefixMode = accPrefixModeMobile;
+
+      const label = document.getElementById('mAccPrefixDropdownLabel');
+      if (label) label.innerHTML = renderAccPrefixModeLabelMobile(accPrefixModeMobile);
+
+      document.querySelectorAll('#mAccPrefixDropdownMenu .m-acc-prefix-dropdown-option').forEach((btn) => {
+        const selected = String(btn.dataset.value || '') === accPrefixModeMobile;
+        btn.classList.toggle('is-selected', selected);
+        btn.setAttribute('aria-selected', selected ? 'true' : 'false');
+      });
+    }
+
+    function closeAccPrefixDropdownMobile() {
+      const dd = document.getElementById('mAccPrefixCustomDropdown');
+      const btn = document.getElementById('mAccPrefixDropdownButton');
+      const menu = document.getElementById('mAccPrefixDropdownMenu');
+      dd?.classList.remove('open');
+      btn?.setAttribute('aria-expanded', 'false');
+      menu?.setAttribute('aria-hidden', 'true');
+    }
+
+    function setAccPrefixModeMobile(value) {
+      accPrefixModeMobile = String(value || 'none');
+      syncAccPrefixDropdownMobile();
+
+      const accOpen = document.getElementById('mAccSetModal')?.getAttribute('aria-hidden') === 'false';
+      if (accOpen && typeof renderSetModal_mobile === 'function') renderSetModal_mobile('acc');
+    }
+
+    function bindAccPrefixDropdownMobileOnce() {
+      const dd = document.getElementById('mAccPrefixCustomDropdown');
+      const btn = document.getElementById('mAccPrefixDropdownButton');
+      const menu = document.getElementById('mAccPrefixDropdownMenu');
+      if (!dd || !btn || !menu || dd.__bound) return;
+      dd.__bound = 1;
+
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const open = !dd.classList.contains('open');
+        if (open) {
+          dd.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+          menu.setAttribute('aria-hidden', 'false');
+        } else {
+          closeAccPrefixDropdownMobile();
+        }
+      });
+
+      menu.addEventListener('click', (e) => {
+        const option = e.target.closest('.m-acc-prefix-dropdown-option');
+        if (!option) return;
+        e.preventDefault();
+        e.stopPropagation();
+        setAccPrefixModeMobile(option.dataset.value || 'none');
+        closeAccPrefixDropdownMobile();
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!dd.contains(e.target)) closeAccPrefixDropdownMobile();
+      });
+
+      syncAccPrefixDropdownMobile();
+    }
+
     function updateArmorSetToggleUI_mobile() {
       const ids = ['mArmorSetToggle', 'mAccSetToggle', 'mSpecSetToggle'];
       ids.forEach((id) => {
@@ -17375,6 +17689,11 @@
 
     function renderSetModal_mobile(kind) {
       if (typeof updateArmorSetToggleUI_mobile === 'function') updateArmorSetToggleUI_mobile();
+
+      if (kind === 'acc') {
+        bindAccPrefixDropdownMobileOnce();
+        syncAccPrefixDropdownMobile();
+      }
 
       let sets = [];
       let modalId = '';
@@ -17490,7 +17809,14 @@
             ? _pickDesc_mobile(s)
             : String(s?.desc || '').trim();
 
-          const finalDesc = merged.trim() || fallbackDesc || '설명이 없습니다.';
+          let finalDesc = merged.trim() || fallbackDesc || '설명이 없습니다.';
+
+          // ✅ 악세사리 카드가 실제 [칼리고]/[루멘] 두 부위 조합이면
+          // 일반 세트 설명 아래에 루크레이드 접두사 효과도 함께 표시
+          if (kind === 'acc' && s?.lukePrefixSetName && s?.lukePrefixSetDesc) {
+            finalDesc += `\n\n【루크레이드 접두사 효과】\n${String(s.lukePrefixSetName)}\n${String(s.lukePrefixSetDesc)}`;
+          }
+
           openEquipInfoModal(String(s?.name || '세트 설명'), finalDesc);
         });
         header.appendChild(infoBtn);
@@ -17572,6 +17898,8 @@
 
 
     function wireSetButtons_mobile() {
+      bindAccPrefixDropdownMobileOnce();
+
       const a = document.getElementById('btnMSetArmor');
       const b = document.getElementById('btnMSetAcc');
       const c = document.getElementById('btnMSetSpec');
