@@ -162,72 +162,101 @@
     /* ===== 3단 레이아웃 ===== */
     .market-body{
       display:grid;
-      grid-template-columns:210px minmax(0,1fr) 310px;
+      grid-template-columns:178px minmax(0,1fr) 310px;
       min-height:650px;
     }
 
     /* ===== 좌측 메뉴 ===== */
     .market-side{
+      position:relative;
+      overflow:hidden;
       border-right:1px solid rgba(116,83,38,.45);
       background:
-        radial-gradient(circle at 50% 12%,rgba(198,144,57,.07),transparent 18%),
-        linear-gradient(180deg,#16120e,#0f0c09);
-      padding:14px 0 24px;
+        linear-gradient(180deg, rgba(49,36,26,.30), rgba(12,10,8,.97)),
+        radial-gradient(circle at 82% 18%, rgba(222,157,55,.12), transparent 24%),
+        radial-gradient(circle at 72% 74%, rgba(180,122,41,.08), transparent 20%),
+        #0f0b08;
+      box-shadow: inset -1px 0 0 rgba(255,255,255,.02);
+      padding:0;
     }
 
-    .side-main-title{
-      padding:10px 20px 14px;
-      color:#8f806a;
-      font-size:11px;
-      font-weight:900;
-      letter-spacing:.08em;
+    .side-menu-list{
+      margin:0;
+      padding:0;
+      list-style:none;
     }
 
     .side-item{
       position:relative;
       display:flex;
       align-items:center;
-      gap:0;
       width:100%;
-      min-height:52px;
-      padding:0 20px;
+      min-height:86px;
+      padding:0 16px;
       border:0;
-      border-top:1px solid transparent;
-      border-bottom:1px solid transparent;
+      border-bottom:1px solid rgba(132,97,49,.32);
       background:transparent;
-      color:#ae9c80;
+      color:#d4c2a3;
       text-align:left;
-      font-size:14px;
-      font-weight:850;
+      font-family:"DNFForgedBlade", sans-serif;
+      font-size:23px;
+      font-weight:500;
+      letter-spacing:-.05em;
+      line-height:1;
+      cursor:default;
+      transition:background .16s ease,color .16s ease,filter .16s ease;
+    }
+
+    .side-item span{
+      position:relative;
+      z-index:1;
+      display:block;
+      transform:translateY(1px);
     }
 
     .side-item:hover{
-      color:#ecdba8;
-      background:rgba(179,124,41,.07);
+      color:#f1e0bd;
+      background:rgba(255,255,255,.03);
     }
 
-    .side-item.active{
-      color:#f3eaff;
-      background:linear-gradient(90deg,rgba(151,92,255,.18),rgba(151,92,255,.06) 68%,transparent);
-      border-top-color:rgba(170,118,255,.18);
-      border-bottom-color:rgba(170,118,255,.18);
-      box-shadow:inset 4px 0 0 #9b6cff;
+    .side-item.is-main{
+      cursor:pointer;
     }
 
-    .side-divider{
-      height:1px;
-      margin:12px 16px;
-      background:linear-gradient(90deg,transparent,rgba(156,112,50,.45),transparent);
+    .side-item.is-main:hover{
+      background:rgba(255,255,255,.045);
+      color:#fff0cb;
     }
 
-    .side-note{
-      margin:26px 18px 0;
-      padding:13px 12px;
-      border:1px solid rgba(133,96,45,.26);
-      background:rgba(255,255,255,.015);
-      color:#756b5d;
-      font-size:9px;
-      line-height:1.65;
+    .side-item.is-active{
+      color:#171109;
+      text-shadow:0 1px 0 rgba(255,255,255,.28);
+      background:
+        radial-gradient(circle at 16% 48%, rgba(255,248,173,.95) 0%, rgba(255,235,120,.85) 13%, rgba(244,201,76,.58) 30%, rgba(203,148,35,.28) 62%, rgba(133,95,25,.10) 100%),
+        linear-gradient(90deg, #ffef8c 0%, #e3b537 34%, #8b6217 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,243,171,.18);
+    }
+
+    .side-item.is-active::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 14% 26%, rgba(255,255,240,.60) 0 2px, transparent 2.8px),
+        radial-gradient(circle at 26% 60%, rgba(255,248,190,.48) 0 2px, transparent 2.9px),
+        radial-gradient(circle at 43% 39%, rgba(255,250,210,.34) 0 1.8px, transparent 2.8px),
+        radial-gradient(circle at 55% 72%, rgba(255,243,183,.22) 0 1.6px, transparent 2.6px),
+        linear-gradient(90deg, rgba(255,255,255,.16), transparent 42%, transparent 70%, rgba(255,255,255,.08));
+      opacity:.92;
+      mix-blend-mode:screen;
+    }
+
+    .side-item.is-active:hover{
+      color:#171109;
+      background:
+        radial-gradient(circle at 16% 48%, rgba(255,248,173,.95) 0%, rgba(255,235,120,.85) 13%, rgba(244,201,76,.58) 30%, rgba(203,148,35,.28) 62%, rgba(133,95,25,.10) 100%),
+        linear-gradient(90deg, #ffef8c 0%, #e3b537 34%, #8b6217 100%);
     }
 
     /* ===== 중앙 ===== */
@@ -453,6 +482,26 @@
       border-bottom:1px solid #f18d65;
     }
     .product-row.is-best .hot-ribbon{display:block}
+
+    .market-best-ribbon{
+      display:none;
+      position:absolute;
+      left:-26px;
+      top:8px;
+      width:90px;
+      transform:rotate(-45deg);
+      z-index:4;
+      background:#145f52;
+      color:#e6fff8;
+      text-align:center;
+      font-size:9px;
+      font-weight:950;
+      padding:2px 0;
+      border-top:1px solid #59cbb6;
+      border-bottom:1px solid #59cbb6;
+      box-shadow:0 1px 6px rgba(0,0,0,.28);
+    }
+    .product-row.is-market-best .market-best-ribbon{display:block}
 
     /* ===== 구매수량 조건부 보상 상품 ===== */
     .product-row.reward-row{
@@ -967,6 +1016,101 @@
       font-size:8px;
     }
 
+    /* 첫 이용자가 가장 먼저 보유 세라를 입력하도록 유도 */
+    .budget-entry-box{
+      position:relative;
+      overflow:hidden;
+      border-color:rgba(229,183,91,.72);
+      background:
+        radial-gradient(circle at 85% 0%,rgba(212,157,55,.10),transparent 48%),
+        linear-gradient(180deg,#241b10,#15100b);
+      transition:border-color .2s ease,box-shadow .2s ease,background .2s ease;
+    }
+    .budget-entry-box.is-empty{
+      border-color:rgba(247,198,91,.95);
+      box-shadow:0 0 0 1px rgba(247,198,91,.10),0 0 22px rgba(210,151,43,.16),inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    .budget-entry-box.is-empty::after{
+      content:'';
+      position:absolute;
+      inset:-1px;
+      pointer-events:none;
+      border:1px solid rgba(255,216,126,.34);
+      opacity:.7;
+      animation:budgetGuidePulse 1.8s ease-in-out infinite;
+    }
+    @keyframes budgetGuidePulse{
+      0%,100%{opacity:.28;box-shadow:0 0 0 0 rgba(236,182,73,0)}
+      50%{opacity:.9;box-shadow:0 0 18px 1px rgba(236,182,73,.16)}
+    }
+    .budget-entry-box.has-value{
+      border-color:rgba(126,91,40,.65);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
+    }
+    .budget-guide-title{
+      display:flex;
+      align-items:center;
+      gap:7px;
+      margin-bottom:5px;
+      color:#ffe2a1;
+      font-size:12px;
+      font-weight:950;
+    }
+    .budget-guide-step{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:20px;
+      height:20px;
+      border-radius:50%;
+      border:1px solid rgba(230,184,90,.72);
+      background:rgba(181,122,35,.20);
+      color:#ffd77e;
+      font-size:10px;
+      flex:0 0 auto;
+    }
+    .budget-guide-text{
+      margin-bottom:10px;
+      color:#b7a88e;
+      font-size:9px;
+      line-height:1.55;
+    }
+    .budget-entry-box.has-value .budget-guide-text{
+      color:#847a69;
+    }
+    .budget-input-wrap{
+      border-color:rgba(215,161,61,.72);
+      background:linear-gradient(180deg,#100d08,#0b0906);
+      transition:border-color .2s ease,box-shadow .2s ease;
+    }
+    .budget-entry-box.is-empty .budget-input-wrap{
+      border-color:#e4ac45;
+      box-shadow:inset 0 0 0 1px rgba(255,218,133,.08),0 0 14px rgba(204,144,36,.10);
+    }
+    .budget-input::placeholder{
+      color:#b69a66;
+      opacity:.88;
+      font-size:14px;
+      font-weight:800;
+      letter-spacing:-.02em;
+    }
+    .budget-help{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-top:7px;
+      color:#756b5d;
+      font-size:8px;
+      line-height:1.4;
+    }
+    .budget-help strong{color:#ad9361;font-weight:850}
+    .budget-entry-box.has-value .budget-guide-title .budget-guide-step{
+      border-color:rgba(83,164,114,.45);
+      background:rgba(42,118,70,.16);
+      color:#91d7a9;
+    }
+
     .calc-desc{
       color:#8e826f;
       font-size:9px;
@@ -989,6 +1133,38 @@
     }
     .calc-button:hover{filter:brightness(1.06)}
     .calc-button:disabled{filter:grayscale(1);opacity:.5;cursor:not-allowed}
+
+    .option-summary{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px;padding:9px 10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.025)}
+    .option-summary-chip{display:inline-flex;align-items:center;min-height:24px;padding:3px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.045);color:#cfd5df;font-size:11px;font-weight:800;white-space:nowrap}
+    .option-summary-chip.on{border-color:rgba(77,214,160,.32);background:rgba(77,214,160,.09);color:#9af0c9}
+    .option-summary-chip.warn{border-color:rgba(255,205,84,.32);background:rgba(255,205,84,.08);color:#ffe08a}
+    .manual-reset-btn{margin-top:4px;border:0;padding:0;background:transparent;color:#7fe7df;font-size:10px;font-weight:850;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+    .manual-reset-btn:hover{color:#b8fff9}
+    .eff-change{margin-top:5px;font-size:10px;line-height:1.35;color:#9ca7b7}.eff-change b{color:#7fe7df}.eff-change .down{color:#ff9f93}
+    .max-purchase-note{margin-top:4px;font-size:10px;line-height:1.35;color:#aeb7c6}
+    .combo-reason{display:inline-flex;align-items:center;margin-top:5px;padding:2px 7px;border-radius:999px;border:1px solid rgba(159,122,234,.28);background:rgba(159,122,234,.08);color:#cdb7ff;font-size:10px;font-weight:850}
+    .eff-mode-toggle{margin-top:6px;border:1px solid rgba(159,122,234,.28);border-radius:6px;padding:4px 7px;background:rgba(159,122,234,.07);color:#cab6f3;font-size:9px;font-weight:850;cursor:pointer}
+    .eff-mode-toggle:hover{background:rgba(159,122,234,.14);color:#eadfff}
+    .calc-exclusion-reason{margin-top:5px;color:#c59478;font-size:9px;line-height:1.35;min-height:12px}
+    .calc-exclusion-reason:empty{display:none}
+    .trust-badge{display:inline-flex;align-items:center;gap:6px;margin:0 0 9px;padding:5px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.1);font-size:9px;font-weight:900}
+    .trust-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:#7b7f87}
+    .trust-badge.green{color:#99efc0;border-color:rgba(62,205,126,.3);background:rgba(62,205,126,.08)}
+    .trust-badge.green::before{background:#46d884;box-shadow:0 0 7px rgba(70,216,132,.55)}
+    .trust-badge.yellow{color:#ffe08a;border-color:rgba(245,194,61,.32);background:rgba(245,194,61,.08)}
+    .trust-badge.yellow::before{background:#f2c84b;box-shadow:0 0 7px rgba(242,200,75,.5)}
+    .trust-badge.red{color:#ffaaa0;border-color:rgba(239,92,82,.32);background:rgba(239,92,82,.08)}
+    .trust-badge.red::before{background:#ef655b;box-shadow:0 0 7px rgba(239,101,91,.5)}
+    .recommendation-wrap{margin-top:12px;display:grid;gap:10px}
+    .recommendation-card{border:1px solid rgba(112,80,36,.42);background:#100d09;padding:10px;border-radius:8px}
+    .recommendation-card.primary{border-color:rgba(208,161,81,.62);background:linear-gradient(180deg,rgba(208,161,81,.07),#100d09 45%)}
+    .recommendation-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+    .recommendation-title{color:#e4c880;font-size:11px;font-weight:950}
+    .recommendation-desc{margin-top:2px;color:#817665;font-size:8px;line-height:1.4}
+    .recommendation-total{color:#f1ca65;font-size:13px;font-weight:950;white-space:nowrap}
+    .recommendation-stats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}
+    .recommendation-stat{padding:3px 6px;border-radius:999px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);color:#aaa08f;font-size:8px;font-weight:800}
+    .recommendation-combo{border-top:1px solid rgba(112,80,36,.3)}
 
     .result-empty{
       color:#70675c;
@@ -1221,24 +1397,26 @@
       .market-side{
         border-right:0;
         border-bottom:1px solid rgba(116,83,38,.45);
-        padding:6px;
-        display:flex;
-        gap:5px;
+        padding:0;
         overflow-x:auto;
       }
 
-      .side-main-title,.side-divider,.side-note{display:none}
+      .side-menu-list{
+        display:flex;
+        min-width:max-content;
+      }
+
       .side-item{
         flex:0 0 auto;
-        min-height:38px;
-        width:auto;
-        padding:0 12px;
-        font-size:10px;
-        border:1px solid rgba(112,81,38,.35);
+        min-height:48px;
+        padding:0 14px;
+        border-bottom:0;
+        border-right:1px solid rgba(132,97,49,.28);
+        font-size:16px;
+        white-space:nowrap;
       }
-      .side-item.active{
-        box-shadow:inset 3px 0 0 #9b6cff;
-      }
+
+      .side-item.is-active::after{opacity:.75}
 
       .market-center{padding:8px 6px 12px}
       .market-list-head{padding:0}
@@ -1328,31 +1506,30 @@
       <div class="hero-visual-frame" aria-hidden="true">
         <img class="hero-visual" src="img/market/tera-hero-visual.png" alt="">
       </div>
-      <button class="hero-home-btn" type="button" onclick="location.href='./index.html'">메인으로</button>
+      <button class="hero-home-btn" type="button" onclick="confirmGoMain()">메인으로</button>
     </section>
 
-    <div class="market-body">
-      <!-- 좌측 메뉴 -->
-      <aside class="market-side">
-        <div class="side-main-title">메뉴</div>
-
-        <button class="side-item" type="button" onclick="location.href='./index.html'">
-          <span>홈</span>
-        </button>
-
-        <button class="side-item active" type="button">
-          <span>세라 → 테라<br>변환 계산기</span>
-        </button>
-
-        <div class="side-divider"></div>
-
-        <button class="side-item active" type="button">
-          <span>전체 상품</span>
-        </button>
-
-        <div class="side-note">
-          경매장 시세는 이용자가 직접 입력합니다.<br>
-          입력값은 현재 브라우저에 저장됩니다.
+    <div class="market-body">      <!-- 좌측 메뉴 -->
+      <aside class="market-side" aria-label="마켓 메뉴">
+        <div class="side-menu-list" role="menu">
+          <button class="side-item is-main" type="button" role="menuitem" onclick="confirmGoMain()">
+            <span>메인</span>
+          </button>
+          <button class="side-item" type="button" role="menuitem" aria-disabled="true">
+            <span>물품구매</span>
+          </button>
+          <button class="side-item is-active" type="button" role="menuitem" aria-current="page">
+            <span>물품판매</span>
+          </button>
+          <button class="side-item" type="button" role="menuitem" aria-disabled="true">
+            <span>등록물품</span>
+          </button>
+          <button class="side-item" type="button" role="menuitem" aria-disabled="true">
+            <span>이용내역</span>
+          </button>
+          <button class="side-item" type="button" role="menuitem" aria-disabled="true">
+            <span>즐겨찾기</span>
+          </button>
         </div>
       </aside>
 
@@ -1369,6 +1546,7 @@
                     <input id="purchaseLimitEnabled" type="checkbox" checked>
                     <span>구매제한 적용</span>
                   </label>
+                  <button id="clearExcludedBtn" class="ghost-btn" type="button" title="상품과 구매 보상의 제외 체크를 모두 해제합니다.">제외 전체 해제</button>
                 </div>
 
                 <span class="tool-divider" aria-hidden="true"></span>
@@ -1398,16 +1576,26 @@
           </span>
         </div>
 
-        <section class="right-box">
+        <section id="budgetEntryBox" class="right-box budget-entry-box is-empty">
           <div class="right-head">
-            <span>보유 세라</span>
+            <span>보유 세라 입력</span>
           </div>
           <div class="right-body">
-            <div class="budget-big">
-              <img class="budget-currency-img" src="img/market/세라배지.png" alt="세라">
-              <input id="seraBudget" class="budget-input" type="text" inputmode="numeric" autocomplete="off" value="100,000">
+            <div class="budget-guide-title">
+              <span class="budget-guide-step">❗</span>
+              <span>먼저 보유 중인 세라를 입력하세요</span>
             </div>
-            <div class="budget-unit">세라</div>
+            <div class="budget-guide-text">
+              보유 세라를 입력하면 현재 시세를 기준으로 가장 효율적인 구매 조합을 계산할 수 있습니다.
+            </div>
+            <div class="budget-big budget-input-wrap">
+              <img class="budget-currency-img" src="img/market/세라배지.png" alt="세라">
+              <input id="seraBudget" class="budget-input" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="예: 12000" value="" aria-label="보유 세라 입력">
+            </div>
+            <div class="budget-help">
+              <span><strong>숫자만 입력</strong>해 주세요.</span>
+              <span>입력 후 Enter</span>
+            </div>
           </div>
         </section>
 
@@ -1419,6 +1607,7 @@
             <div class="calc-desc">
               입력한 경매장 시세와 상단의 구매제한 옵션을 기준으로 가장 많은 테라를 얻을 수 있는 조합을 계산합니다.
             </div>
+            <div id="optionSummary" class="option-summary" aria-live="polite"></div>
 
             <button id="calculateBtn" class="calc-button" type="button" disabled>자동 계산</button>
 
@@ -1444,6 +1633,7 @@
       const STORAGE_PRICE_KEY = 'dnfm_market_prices_v3_auto';
       const STORAGE_BUDGET_KEY = 'dnfm_market_budget_v2';
       const STORAGE_EXCLUDED_KEY = 'dnfm_market_excluded_products_v1';
+      const MAX_SERA_BUDGET = 999999999;
 
       const productListEl = document.getElementById('productList');
       const productCountEl = document.getElementById('productCount');
@@ -1451,7 +1641,10 @@
       const marketUpdatedAtValueEl = document.getElementById('marketUpdatedAtValue');
       const purchaseLimitEnabledEl = document.getElementById('purchaseLimitEnabled');
       const efficiencySortBtn = document.getElementById('efficiencySortBtn');
+      const clearExcludedBtn = document.getElementById('clearExcludedBtn');
+      const optionSummaryEl = document.getElementById('optionSummary');
       const budgetEl = document.getElementById('seraBudget');
+      const budgetEntryBoxEl = document.getElementById('budgetEntryBox');
       const calcBtn = document.getElementById('calculateBtn');
       const resultArea = document.getElementById('resultArea');
       const clearPricesBtn = document.getElementById('clearPricesBtn');
@@ -1461,8 +1654,17 @@
       let products = [];
       let savedPrices = loadJSON(STORAGE_PRICE_KEY, {});
       let excludedProducts = new Set(loadJSON(STORAGE_EXCLUDED_KEY, []));
+      // 상품별 효율 표시에 누적보상을 포함할지 여부(화면용 상태).
+      const rewardEfficiencyView = new Set();
+      let marketFreshnessState = 'unknown';
       // 현재 화면의 상품 순서. 수동 시세 입력 시 이 순서를 유지한다.
       let displayOrder = [];
+
+      window.confirmGoMain = function confirmGoMain(){
+        if(confirm('사이트 메인으로 가시겠습니까?')){
+          window.location.href = './index.html';
+        }
+      };
 
       function loadJSON(key, fallback){
         try{
@@ -1502,6 +1704,7 @@
       function updateMarketFreshness(value){
         const classes = ['freshness-green','freshness-yellow','freshness-red'];
         marketUpdatedAtEl.classList.remove(...classes);
+        marketFreshnessState = 'unknown';
 
         const baseHelp = '초록: 24시간 이내 · 노랑: 24시간 초과~48시간 이내 · 빨강: 48시간 초과';
 
@@ -1520,15 +1723,65 @@
         const ageHours = ageMs / 3600000;
 
         if(ageHours <= 24){
+          marketFreshnessState = 'green';
           marketUpdatedAtEl.classList.add('freshness-green');
           marketUpdatedAtEl.title = `초록: 최근 24시간 이내에 갱신된 경매장 가격입니다.\n${baseHelp}`;
         }else if(ageHours <= 48){
+          marketFreshnessState = 'yellow';
           marketUpdatedAtEl.classList.add('freshness-yellow');
           marketUpdatedAtEl.title = `노랑: 갱신 후 24시간을 넘었지만 48시간 이내인 경매장 가격입니다.\n${baseHelp}`;
         }else{
+          marketFreshnessState = 'red';
           marketUpdatedAtEl.classList.add('freshness-red');
           marketUpdatedAtEl.title = `빨강: 갱신 후 48시간이 지난 경매장 가격입니다.\n${baseHelp}`;
         }
+      }
+
+      function getMarketTrustHTML(){
+        const map={
+          green:['green','시세 신뢰도 · 최신 (24시간 이내)'],
+          yellow:['yellow','시세 신뢰도 · 주의 (24~48시간)'],
+          red:['red','시세 신뢰도 · 오래됨 (48시간 초과)'],
+          unknown:['','시세 신뢰도 · 기준 시각 없음']
+        };
+        const [cls,text]=map[marketFreshnessState] || map.unknown;
+        return `<div class="trust-badge ${cls}">${text}</div>`;
+      }
+
+      function rewardEfficiencyKey(product){
+        return normalizeProductLinkName(product?.productName);
+      }
+
+      function isRewardEfficiencyShown(product){
+        return rewardEfficiencyView.has(rewardEfficiencyKey(product));
+      }
+
+      function getImportantPurchaseQuantities(product,budget){
+        const maxQty=normalizeLimit(product.limitQty,product.limitType,product.seraPrice,budget,product.limitUnlock);
+        if(maxQty<=0) return [];
+
+        // 기본 효율은 수량이 늘어도 동일하고, 효율이 달라지는 시점은
+        // 누적보상이 새로 해금되는 수량뿐이다. 따라서 1~maxQty를 전부
+        // 순회하지 않고 의미가 있는 지점만 검사한다.
+        const points=new Set([1,maxQty]);
+        for(const reward of (product.rewards||[])){
+          if(isRewardExcluded(product,reward)) continue;
+          const need=Math.max(1,Math.floor(Number(reward.requiredQty||0)));
+          if(need<=maxQty) points.add(need);
+        }
+        return [...points].filter(q=>q>0&&q<=maxQty).sort((a,b)=>a-b);
+      }
+
+      function getBestRewardIncludedEfficiency(product,budget){
+        let best=null;
+        for(const qty of getImportantPurchaseQuantities(product,budget)){
+          const option=getPurchaseOptionMetrics(product,qty);
+          if(!option.complete || option.tera<=0) continue;
+          if(!best || option.efficiency>best.efficiency){
+            best={qty,efficiency:option.efficiency,rewardCount:(option.unlockedRewards||[]).length};
+          }
+        }
+        return best;
       }
 
       function formatKoreanUnit(value){
@@ -1562,8 +1815,43 @@
         return `${productKey}::${itemKey}`;
       }
 
+      function sanitizeIntegerInputValue(value){
+        return String(value ?? '').replace(/[^0-9]/g,'');
+      }
+
+      function enforceIntegerInput(input){
+        if(!input) return;
+        const cleaned = sanitizeIntegerInputValue(input.value);
+        if(input.value !== cleaned) input.value = cleaned;
+      }
+
       function getBudget(){
-        return Math.max(0, Math.floor(toNumber(budgetEl.value)));
+        const digits = sanitizeIntegerInputValue(budgetEl?.value || '');
+        if(!digits) return 0;
+        const n = Number(digits);
+        if(!Number.isFinite(n)) return 0;
+        return Math.min(MAX_SERA_BUDGET, Math.max(0, Math.floor(n)));
+      }
+
+      function enforceBudgetInput(){
+        if(!budgetEl) return 0;
+        const digits = sanitizeIntegerInputValue(budgetEl.value);
+        if(!digits){
+          budgetEl.value = '';
+          return 0;
+        }
+        let n = Number(digits);
+        if(!Number.isFinite(n)) n = 0;
+        n = Math.min(MAX_SERA_BUDGET, Math.max(0, Math.floor(n)));
+        // 입력하는 즉시 천 단위 콤마를 적용한다.
+        budgetEl.value = n ? formatNumber(n) : '';
+        return n;
+      }
+
+      function formatBudgetInput(){
+        const n = getBudget();
+        budgetEl.value = n ? formatNumber(n) : '';
+        return n;
       }
 
       function isPurchaseLimitEnabled(){
@@ -1748,38 +2036,31 @@
         return autoPrice;
       }
 
-      function getProductMetrics(product){
-        let complete = true;
-        let gross = 0;
-        let net = 0;
-
-        for(const item of product.sellItems){
-          const hasFixedNet =
-            item.fixedNetTera !== null &&
-            item.fixedNetTera !== undefined &&
-            Number.isFinite(Number(item.fixedNetTera));
-
-          // 시트의 '실수령테라'가 있으면 그 값을 그대로 고정 실수령값으로 사용
-          if(hasFixedNet){
-            const fixedNet = Math.max(0,Number(item.fixedNetTera));
-            net += fixedNet;
-            gross += fixedNet;
-            continue;
-          }
-
-          const price = getItemPrice(product.productName,item);
-          if(price <= 0) complete = false;
-
-          const lineGross = price * item.qty;
-          const lineNet = lineGross * (1 - item.feeRate / 100);
-
-          gross += lineGross;
-          net += lineNet;
+      function getAutoItemPrice(item){ return Math.max(0,toNumber(item?.marketPrice || 0)); }
+      function hasManualPrice(product){ return (product?.sellItems || []).some(item => getManualItemPrice(product.productName,item) > 0); }
+      function getProductMetricsWithPriceMode(product,useManual){
+        let complete=true,gross=0,net=0;
+        for(const item of (product.sellItems || [])){
+          const hasFixedNet=item.fixedNetTera!==null&&item.fixedNetTera!==undefined&&Number.isFinite(Number(item.fixedNetTera));
+          if(hasFixedNet){ const fixedNet=Math.max(0,Number(item.fixedNetTera)); net+=fixedNet; gross+=fixedNet; continue; }
+          const price=useManual?getItemPrice(product.productName,item):getAutoItemPrice(item);
+          if(price<=0) complete=false;
+          const lineGross=price*item.qty; const lineNet=lineGross*(1-item.feeRate/100); gross+=lineGross; net+=lineNet;
         }
+        const efficiency=product.seraPrice>0?net/product.seraPrice:0;
+        return {complete,gross,net,efficiency};
+      }
+      function updateOptionSummary(){
+        if(!optionSummaryEl) return;
+        const manualCount=Object.values(savedPrices).filter(v=>toNumber(v)>0).length;
+        const excludedCount=excludedProducts.size;
+        const forcedLimitCount=products.filter(p=>isLimitUnlockBlocked(p.limitUnlock)).length;
+        const limitText=isPurchaseLimitEnabled()?'<span class="option-summary-chip on">구매제한 적용</span>':`<span class="option-summary-chip warn">구매제한 해제${forcedLimitCount?` · 강제제한 ${forcedLimitCount}개`:''}</span>`;
+        optionSummaryEl.innerHTML=`${limitText}<span class="option-summary-chip ${excludedCount?'warn':''}">제외 ${formatNumber(excludedCount)}개</span><span class="option-summary-chip ${manualCount?'on':''}">수동시세 ${formatNumber(manualCount)}개</span>`;
+      }
 
-        const efficiency = product.seraPrice > 0 ? net / product.seraPrice : 0;
-
-        return { complete,gross,net,efficiency };
+      function getProductMetrics(product){
+        return getProductMetricsWithPriceMode(product,true);
       }
 
       function getPurchaseOptionMetrics(product, qty){
@@ -1892,11 +2173,12 @@
           let bestPotentialEfficiency = 0;
           let hasAnyValidOption = false;
 
-          for(let qty = 1; qty <= maxQty; qty++){
-            const option = getPurchaseOptionMetrics(product,qty);
-            if(!option.complete || option.tera <= 0) continue;
-            hasAnyValidOption = true;
-            bestPotentialEfficiency = Math.max(bestPotentialEfficiency,option.efficiency);
+          if(maxQty>0){
+            const bestOption=getBestRewardIncludedEfficiency(product,budget);
+            if(bestOption){
+              hasAnyValidOption=true;
+              bestPotentialEfficiency=bestOption.efficiency;
+            }
           }
 
           return {
@@ -1950,6 +2232,25 @@
           ).product.productName;
         }
 
+        // 고정 실수령 테라가 없는(경매장 시세 기반) 상품만 따로 비교한 BEST
+        // 판매 아이템 중 하나라도 fixedNetTera가 있으면 시세 BEST 대상에서 제외한다.
+        const marketPriceReady = ready.filter(({product}) =>
+          Array.isArray(product.sellItems) &&
+          product.sellItems.length > 0 &&
+          product.sellItems.every(item =>
+            item.fixedNetTera === null ||
+            item.fixedNetTera === undefined ||
+            !Number.isFinite(Number(item.fixedNetTera))
+          )
+        );
+
+        let marketBestProductName = '';
+        if(marketPriceReady.length){
+          marketBestProductName = marketPriceReady.reduce((best,x)=>
+            x.bestPotentialEfficiency > best.bestPotentialEfficiency ? x : best
+          ).product.productName;
+        }
+
         function renderSellInputs(product){
           return product.sellItems.map(item => {
             const key = priceKey(product.productName,item.name);
@@ -1995,13 +2296,14 @@
                     class="price-input js-market-price${manualPrice > 0 ? ' is-manual' : ''}"
                     type="text"
                     inputmode="numeric"
+                    pattern="[0-9]*"
                     autocomplete="off"
                     data-key="${escapeHTML(key)}"
                     value="${price ? formatNumber(price) : ''}"
                     placeholder="시세 입력"
                     aria-label="${escapeHTML(item.name)} 경매장 가격">
                 </div>
-                ${manualPrice > 0 ? '<div class="manual-price-label">수동 입력</div>' : ''}
+                ${manualPrice > 0 ? `<div class="manual-price-label">수동 입력</div><button class="manual-reset-btn js-manual-reset" type="button" data-key="${escapeHTML(key)}">자동값으로 복원</button>` : ''}
               </div>
             `;
           }).join('');
@@ -2024,6 +2326,7 @@
 
         productListEl.innerHTML = list.map(({product,metrics,excluded}) => {
           const isBest = product.productName === bestProductName;
+          const isMarketBest = !isBest && product.productName === marketBestProductName;
           const limitText = buildLimitText(product);
           const sellInputs = renderSellInputs(product);
 
@@ -2031,9 +2334,33 @@
             ? `${formatNumber(Math.round(metrics.net))}`
             : '시세 입력 필요';
 
+          const showRewardEfficiency = (product.rewards || []).length > 0 && isRewardEfficiencyShown(product);
+          const rewardIncludedBest = (product.rewards || []).length > 0
+            ? getBestRewardIncludedEfficiency(product,budget)
+            : null;
+          const displayedEfficiency = showRewardEfficiency && rewardIncludedBest
+            ? rewardIncludedBest.efficiency
+            : metrics.efficiency;
           const effText = metrics.complete
-            ? formatNumber(metrics.efficiency,1)
+            ? formatNumber(displayedEfficiency,1)
             : '-';
+          const effModeSub = showRewardEfficiency
+            ? `누적보상 포함 최고 효율${rewardIncludedBest ? ` · ${formatNumber(rewardIncludedBest.qty)}개 구매` : ''}`
+            : '보상 제외 기본 효율';
+          const effToggleHTML = (product.rewards || []).length
+            ? `<button class="eff-mode-toggle js-eff-mode-toggle" type="button" data-product-name="${escapeHTML(product.productName)}">${showRewardEfficiency ? '기본 효율 보기' : '보상 포함 효율 보기'}</button>`
+            : '';
+
+          const autoMetrics = hasManualPrice(product) ? getProductMetricsWithPriceMode(product,false) : null;
+          let efficiencyChangeHTML = '';
+          if(autoMetrics?.complete && metrics.complete && autoMetrics.efficiency > 0){
+            const pct=((metrics.efficiency/autoMetrics.efficiency)-1)*100;
+            const sign=pct>0?'+':'';
+            efficiencyChangeHTML=`<div class="eff-change">자동 ${formatNumber(autoMetrics.efficiency,1)} → 현재 <b>${formatNumber(metrics.efficiency,1)}</b> <span class="${pct<0?'down':''}">(${sign}${formatNumber(pct,1)}%)</span></div>`;
+          }
+          const effectiveMaxQty=excluded?0:normalizeLimit(product.limitQty,product.limitType,product.seraPrice,budget,product.limitUnlock);
+          const maxPurchase=effectiveMaxQty>0?getPurchaseOptionMetrics(product,effectiveMaxQty):null;
+          const maxPurchaseHTML=maxPurchase?.complete&&maxPurchase.tera>0?`<div class="max-purchase-note">최대 ${formatNumber(effectiveMaxQty)}개 · 총 ${formatNumber(Math.round(maxPurchase.tera))} 테라</div>`:'';
 
           const rewardRows = (product.rewards || []).map(reward => {
             const rewardMetrics = getProductMetrics(reward);
@@ -2102,8 +2429,9 @@
           }).join('');
 
           return `
-            <article class="product-row ${isBest ? 'is-best' : ''} ${excluded ? 'is-excluded' : ''}">
+            <article class="product-row ${isBest ? 'is-best' : ''} ${isMarketBest ? 'is-market-best' : ''} ${excluded ? 'is-excluded' : ''}">
               <div class="hot-ribbon">BEST</div>
+              <div class="market-best-ribbon">시세 BEST</div>
 
               <div class="cell product-main">
                 ${renderImage(product)}
@@ -2157,7 +2485,11 @@
               <div class="cell">
                 <div class="cell-label">1세라당 테라</div>
                 <div class="metric-value eff ${metrics.complete ? '' : 'empty'}">${effText}</div>
-                <div class="metric-sub">보상 제외 기본 효율</div>
+                <div class="metric-sub">${effModeSub}</div>
+                ${effToggleHTML}
+                ${efficiencyChangeHTML}
+                ${maxPurchaseHTML}
+                <div class="calc-exclusion-reason" data-result-reason="${escapeHTML(product.productName)}"></div>
               </div>
             </article>
             ${rewardRows}
@@ -2177,6 +2509,9 @@
 
         bindPriceInputs();
         bindExcludeInputs();
+        bindManualResetButtons();
+        bindEfficiencyModeToggles();
+        updateOptionSummary();
       }
 
       function bindPriceInputs(){
@@ -2187,7 +2522,12 @@
             input.select();
           });
 
+          input.addEventListener('input',() => {
+            enforceIntegerInput(input);
+          });
+
           input.addEventListener('blur',() => {
+            enforceIntegerInput(input);
             const key = input.dataset.key;
             const n = Math.max(0,Math.floor(toNumber(input.value)));
 
@@ -2204,6 +2544,50 @@
           input.addEventListener('keydown',e => {
             if(e.key === 'Enter') input.blur();
           });
+        });
+      }
+
+      function bindManualResetButtons(){
+        document.querySelectorAll('.js-manual-reset').forEach(button=>{
+          button.addEventListener('click',()=>{
+            const key=String(button.dataset.key||'').trim();
+            if(!key) return;
+            delete savedPrices[key]; saveJSON(STORAGE_PRICE_KEY,savedPrices);
+            renderProducts({preserveOrder:true}); renderEmptyResult();
+          });
+        });
+      }
+
+      function bindEfficiencyModeToggles(){
+        document.querySelectorAll('.js-eff-mode-toggle').forEach(button=>{
+          button.addEventListener('click',()=>{
+            const name=String(button.dataset.productName||'').trim();
+            const key=normalizeProductLinkName(name);
+            if(!key) return;
+            if(rewardEfficiencyView.has(key)) rewardEfficiencyView.delete(key);
+            else rewardEfficiencyView.add(key);
+            renderProducts({preserveOrder:true});
+          });
+        });
+      }
+
+      function updateProductExclusionReasons(result,budget){
+        const selected=new Map((result?.combo||[]).map(item=>[normalizeProductLinkName(item.productName),item.qty]));
+        document.querySelectorAll('[data-result-reason]').forEach(el=>{
+          const name=String(el.dataset.resultReason||'');
+          const product=products.find(p=>normalizeProductLinkName(p.productName)===normalizeProductLinkName(name));
+          if(!product){ el.textContent=''; return; }
+          let reason='';
+          if(isProductExcluded(product)) reason='계산 제외: 사용자 제외';
+          else {
+            const metrics=getProductMetrics(product);
+            const maxQty=normalizeLimit(product.limitQty,product.limitType,product.seraPrice,budget,product.limitUnlock);
+            if(!metrics.complete) reason='계산 제외: 시세 입력 필요';
+            else if(product.seraPrice>budget) reason='계산 제외: 보유 세라 부족';
+            else if(maxQty<=0) reason='계산 제외: 구매제한으로 구매 불가';
+            else if(!selected.has(normalizeProductLinkName(product.productName))) reason='미선택: 더 높은 수익의 조합이 우선';
+          }
+          el.textContent=reason;
         });
       }
 
@@ -2234,133 +2618,195 @@
       }
 
       function optimizeCombination(budget, availableProducts){
-        if(budget <= 0 || !availableProducts.length) return null;
+        if(budget<=0 || !availableProducts.length) return null;
 
-        const gcd = (a,b) => {
-          a = Math.abs(a);
-          b = Math.abs(b);
-          while(b) [a,b] = [b,a % b];
-          return a || 1;
+        const gcd=(a,b)=>{
+          a=Math.abs(Math.round(a));
+          b=Math.abs(Math.round(b));
+          while(b) [a,b]=[b,a%b];
+          return a||1;
         };
 
-        let unit = 0;
+        // 세라는 최소 100단위가 기본이다. 예외 가격이 있다면 정확한 계산을 위해
+        // 실제 가격들과 100의 최대공약수를 자동 사용한다.
+        let unit=100;
         for(const p of availableProducts){
-          unit = gcd(unit,Math.round(p.seraPrice));
+          unit=gcd(unit,p.seraPrice);
+          if(unit===1) break;
         }
-        unit = Math.max(1,unit);
+        unit=Math.max(1,unit);
 
-        const cap = Math.floor(budget / unit);
+        const cap=Math.floor(budget/unit);
+        if(cap<=0) return null;
 
-        let dp = new Float64Array(cap + 1);
-        dp.fill(-1);
-        dp[0] = 0;
+        /*
+         * 핵심 최적화
+         * -----------
+         * 예전 방식은 각 상품에서 qty=1..maxQty를 옵션으로 전부 만든 뒤
+         * DP 상태마다 그 옵션들을 다시 훑었다. 1억 세라에서는 한 상품만으로도
+         * 수십만~백만 개 옵션이 생길 수 있었다.
+         *
+         * 상품의 가치식은
+         *   구매수량 × 기본 실수령 테라 + 조건 달성 보상
+         * 이므로 보상 조건 사이에서는 완전한 직선이다.
+         * 각 직선 구간 [L,R]은 슬라이딩 최대값(deque)으로 한 번에 전이하여
+         * 구매 가능 수량과 무관하게 O(예산DP칸 × 보상구간수)로 계산한다.
+         */
+        let dp=new Float64Array(cap+1);
+        dp.fill(Number.NEGATIVE_INFINITY);
+        dp[0]=0;
 
-        // 상품별로 "0~최대수량 중 하나"를 고르는 다중선택 DP.
-        // 특정 수량에서만 발생하는 1회 보상을 정확하게 반영하기 위해
-        // 기존의 선형 bounded-knapsack 대신 이 방식을 사용한다.
-        const historyPrevBudget = [];
-        const historyQty = [];
+        // 결과 역추적용. 수량 전체 후보를 저장하는 대신 각 예산 상태에서
+        // 해당 상품을 몇 개 골랐는지만 1개의 Uint32Array로 보관한다.
+        const choiceHistory=[];
 
-        for(let productIndex = 0; productIndex < availableProducts.length; productIndex++){
-          const p = availableProducts[productIndex];
-
-          const options = [];
-          options.push({
-            qty:0,
-            costUnit:0,
-            value:0,
-            metrics:getPurchaseOptionMetrics(p,0)
-          });
-
-          for(let qty = 1; qty <= p.maxQty; qty++){
-            const metrics = getPurchaseOptionMetrics(p,qty);
-            if(!metrics.complete) continue;
-
-            const costUnit = Math.round((p.seraPrice * qty) / unit);
-            if(costUnit <= 0 || costUnit > cap) continue;
-
-            options.push({
-              qty,
-              costUnit,
-              value:metrics.tera,
-              metrics
-            });
+        for(const p of availableProducts){
+          const priceUnit=Math.round(p.seraPrice/unit);
+          if(priceUnit<=0){
+            choiceHistory.push(new Uint32Array(cap+1));
+            continue;
           }
 
-          const next = new Float64Array(cap + 1);
-          next.fill(-1);
+          const maxQty=Math.min(
+            Math.max(0,Math.floor(Number(p.maxQty||0))),
+            Math.floor(budget/p.seraPrice)
+          );
 
-          const prevBudgetForThisProduct = new Int32Array(cap + 1);
-          const qtyForThisProduct = new Int32Array(cap + 1);
-          prevBudgetForThisProduct.fill(-1);
-          qtyForThisProduct.fill(-1);
+          const choice=new Uint32Array(cap+1);
+          const next=new Float64Array(cap+1);
+          next.set(dp); // q=0 선택
 
-          for(let b = 0; b <= cap; b++){
-            if(dp[b] < 0) continue;
+          if(maxQty<=0){
+            choiceHistory.push(choice);
+            dp=next;
+            continue;
+          }
 
-            for(const option of options){
-              const nb = b + option.costUnit;
-              if(nb > cap) continue;
+          const baseMetrics=getProductMetrics(p);
+          if(!baseMetrics.complete || baseMetrics.net<=0){
+            choiceHistory.push(choice);
+            dp=next;
+            continue;
+          }
 
-              const cand = dp[b] + option.value;
+          // 같은 필요수량의 보상은 하나로 합친다. 가격을 알 수 없는 보상이
+          // 해금되는 순간부터는 기존 로직과 동일하게 해당 수량 이상을 계산에서 제외한다.
+          const rewardByNeed=new Map();
+          let firstIncompleteNeed=Infinity;
+          for(const reward of (p.rewards||[])){
+            if(isRewardExcluded(p,reward)) continue;
+            const need=Math.max(1,Math.floor(Number(reward.requiredQty||0)));
+            if(need>maxQty) continue;
+            const rm=getProductMetrics(reward);
+            if(!rm.complete){
+              firstIncompleteNeed=Math.min(firstIncompleteNeed,need);
+              continue;
+            }
+            rewardByNeed.set(need,(rewardByNeed.get(need)||0)+rm.net);
+          }
 
-              if(cand > next[nb] + 0.000001){
-                next[nb] = cand;
-                prevBudgetForThisProduct[nb] = b;
-                qtyForThisProduct[nb] = option.qty;
+          const validMax=Math.min(maxQty, Number.isFinite(firstIncompleteNeed)?firstIncompleteNeed-1:maxQty);
+          if(validMax<=0){
+            choiceHistory.push(choice);
+            dp=next;
+            continue;
+          }
+
+          const thresholds=[...rewardByNeed.keys()].filter(n=>n<=validMax).sort((a,b)=>a-b);
+          const segments=[];
+          let start=1;
+          let bonus=0;
+          for(const need of thresholds){
+            if(start<=need-1) segments.push({L:start,R:need-1,bonus});
+            bonus+=rewardByNeed.get(need)||0;
+            start=need;
+          }
+          if(start<=validMax) segments.push({L:start,R:validMax,bonus});
+
+          const A=baseMetrics.net;
+          const w=priceUnit;
+
+          // 각 보상 구간별로 bounded linear knapsack 전이를 O(cap)에 수행한다.
+          for(const seg of segments){
+            const L=seg.L;
+            const R=seg.R;
+            if(L>R) continue;
+
+            const maxResidue=Math.min(w-1,cap);
+            for(let r=0;r<=maxResidue;r++){
+              const K=Math.floor((cap-r)/w);
+              if(K<L) continue;
+
+              const dqIndex=new Int32Array(K+1);
+              const dqValue=new Float64Array(K+1);
+              let head=0,tail=0;
+
+              for(let k=0;k<=K;k++){
+                const addJ=k-L;
+                if(addJ>=0){
+                  const prevIndex=r+addJ*w;
+                  const prevValue=dp[prevIndex];
+                  if(Number.isFinite(prevValue)){
+                    const transformed=prevValue-addJ*A;
+                    while(tail>head && dqValue[tail-1]<=transformed) tail--;
+                    dqIndex[tail]=addJ;
+                    dqValue[tail]=transformed;
+                    tail++;
+                  }
+                }
+
+                const minJ=k-R;
+                while(tail>head && dqIndex[head]<minJ) head++;
+                if(tail<=head) continue;
+
+                const j=dqIndex[head];
+                const qty=k-j;
+                const b=r+k*w;
+                const candidate=dqValue[head]+k*A+seg.bonus;
+                if(candidate>next[b]+0.000001){
+                  next[b]=candidate;
+                  choice[b]=qty;
+                }
               }
             }
           }
 
-          historyPrevBudget.push(prevBudgetForThisProduct);
-          historyQty.push(qtyForThisProduct);
-          dp = next;
+          choiceHistory.push(choice);
+          dp=next;
         }
 
-        let bestB = 0;
-
-        for(let b = 1; b <= cap; b++){
-          if(dp[b] > dp[bestB] + 0.000001){
-            bestB = b;
-          }else if(
-            Math.abs(dp[b] - dp[bestB]) < 0.000001 &&
-            dp[b] >= 0 &&
-            b < bestB
-          ){
-            bestB = b;
+        let bestB=-1;
+        for(let b=0;b<=cap;b++){
+          if(!Number.isFinite(dp[b]) || dp[b]<=0) continue;
+          if(bestB<0 || dp[b]>dp[bestB]+0.000001 || (Math.abs(dp[b]-dp[bestB])<0.000001 && b<bestB)){
+            bestB=b;
           }
         }
+        if(bestB<0) return null;
 
-        if(dp[bestB] <= 0) return null;
-
-        const counts = new Array(availableProducts.length).fill(0);
-        let cursor = bestB;
-
-        for(let i = availableProducts.length - 1; i >= 0; i--){
-          const qty = historyQty[i][cursor];
-          const prev = historyPrevBudget[i][cursor];
-
-          if(qty < 0 || prev < 0) return null;
-
-          counts[i] = qty;
-          cursor = prev;
+        const counts=new Array(availableProducts.length).fill(0);
+        let cursor=bestB;
+        for(let i=availableProducts.length-1;i>=0;i--){
+          const qty=choiceHistory[i]?.[cursor]||0;
+          counts[i]=qty;
+          cursor-=Math.round((availableProducts[i].seraPrice/unit)*qty);
+          if(cursor<0) return null;
         }
 
-        let usedSera = 0;
-        let totalTera = 0;
-        const combo = [];
+        let usedSera=0;
+        let totalTera=0;
+        let rewardCount=0;
+        const combo=[];
 
-        counts.forEach((qty,i) => {
-          if(qty <= 0) return;
-
-          const p = availableProducts[i];
-          const option = getPurchaseOptionMetrics(p,qty);
-
+        counts.forEach((qty,i)=>{
+          if(qty<=0) return;
+          const p=availableProducts[i];
+          const option=getPurchaseOptionMetrics(p,qty);
           if(!option.complete) return;
 
-          usedSera += option.sera;
-          totalTera += option.tera;
-
+          usedSera+=option.sera;
+          totalTera+=option.tera;
+          rewardCount+=(option.unlockedRewards||[]).length;
           combo.push({
             productName:p.productName,
             image:p.image,
@@ -2370,140 +2816,98 @@
             tera:option.tera,
             baseTera:option.baseTera,
             efficiency:option.efficiency,
-            rewards:option.unlockedRewards || []
+            maxQty:p.maxQty,
+            rewards:option.unlockedRewards||[]
           });
         });
 
-        combo.sort((a,b)=>b.efficiency - a.efficiency);
-
+        combo.sort((a,b)=>b.efficiency-a.efficiency);
         return {
           usedSera,
-          remainingSera:Math.max(0,budget - usedSera),
+          remainingSera:Math.max(0,budget-usedSera),
           totalTera,
-          avgEfficiency:usedSera > 0 ? totalTera / usedSera : 0,
-          combo
+          rewardCount,
+          avgEfficiency:usedSera>0?totalTera/usedSera:0,
+          utilization:budget>0?(usedSera/budget)*100:0,
+          combo,
+          unit
         };
       }
 
       function calculate(){
-        const budget = getBudget();
+        formatBudgetInput();
+        const budget=getBudget();
+        if(budget<=0){ alert('보유 세라를 입력해주세요.'); budgetEl.focus(); return; }
 
-        if(budget <= 0){
-          alert('보유 세라를 입력해주세요.');
-          budgetEl.focus();
-          return;
-        }
-
-        const available = products
-        .filter(product => !isProductExcluded(product))
-        .map(product => {
-          const metrics = getProductMetrics(product);
-
-          return {
-            ...product,
-            ...metrics,
-            maxQty:normalizeLimit(
-              product.limitQty,
-              product.limitType,
-              product.seraPrice,
-              budget,
-              product.limitUnlock
-            )
-          };
-        }).filter(p =>
-          p.complete &&
-          p.seraPrice > 0 &&
-          p.seraPrice <= budget &&
-          p.maxQty > 0
-        );
+        const available=products
+          .filter(product=>!isProductExcluded(product))
+          .map(product=>{
+            const metrics=getProductMetrics(product);
+            return {...product,...metrics,maxQty:normalizeLimit(product.limitQty,product.limitType,product.seraPrice,budget,product.limitUnlock)};
+          })
+          .filter(p=>p.complete && p.seraPrice>0 && p.seraPrice<=budget && p.maxQty>0);
 
         if(!available.length){
-          resultArea.innerHTML = `
-            <div class="result-empty" style="color:#ff9f93">
-              계산 가능한 상품이 없습니다.<br>
-              경매장 시세와 보유 세라를 확인해주세요.
-            </div>
-          `;
+          resultArea.innerHTML=`<div class="result-empty" style="color:#ff9f93">계산 가능한 상품이 없습니다.<br>경매장 시세와 보유 세라를 확인해주세요.</div>`;
+          updateProductExclusionReasons(null,budget);
           return;
         }
 
-        const result = optimizeCombination(budget,available);
+        // 추천안은 최대 테라 기준 하나만 계산한다.
+        const primary=optimizeCombination(budget,available);
 
-        if(!result || !result.combo.length){
-          resultArea.innerHTML = `
-            <div class="result-empty" style="color:#ff9f93">
-              최적 구매 조합을 찾지 못했습니다.
-            </div>
-          `;
+        if(!primary?.combo?.length){
+          resultArea.innerHTML=`<div class="result-empty" style="color:#ff9f93">최적 구매 조합을 찾지 못했습니다.</div>`;
+          updateProductExclusionReasons(null,budget);
           return;
         }
 
-        const comboHTML = result.combo.map(item => {
-          const gradeClass = getMarketGradeClass(item.grade);
-          const image = item.image
-            ? `<img class="combo-img ${gradeClass}" src="${escapeHTML(item.image)}" alt="">`
-            : `<div class="combo-img ${gradeClass}"></div>`;
+        updateProductExclusionReasons(primary,budget);
 
-          const rewardText = (item.rewards || []).length
-            ? `<div class="combo-rewards">🎁 ${
-                item.rewards.map(r =>
-                  `${escapeHTML(r.productName)} ×1 (+${formatNumber(Math.round(r.tera))} 테라)`
-                ).join('<br>')
-              }</div>`
-            : '';
+        function renderComboRows(result){
+          return result.combo.map(item=>{
+            const gradeClass=getMarketGradeClass(item.grade);
+            const image=item.image?`<img class="combo-img ${gradeClass}" src="${escapeHTML(item.image)}" alt="">`:`<div class="combo-img ${gradeClass}"></div>`;
+            const rewardText=(item.rewards||[]).length?`<div class="combo-rewards">보상 · ${item.rewards.map(r=>`${escapeHTML(r.productName)} ×1 (+${formatNumber(Math.round(r.tera))} 테라)`).join('<br>')}</div>`:'';
+            let reason='효율 우선 조합';
+            if((item.rewards||[]).length) reason='누적보상 포함';
+            else if(item.maxQty>0 && item.qty>=item.maxQty) reason='구매 가능 수량 최대';
+            return `<div class="combo-row">${image}<div class="combo-info"><div class="combo-name ${gradeClass}">${escapeHTML(item.productName)} × ${formatNumber(item.qty)}</div><div class="combo-values"><span>${formatNumber(item.sera)} 세라</span><b>${formatNumber(Math.round(item.tera))} 테라</b></div>${rewardText}<div class="combo-reason">${reason}</div></div></div>`;
+          }).join('');
+        }
 
-          return `
-            <div class="combo-row">
-              ${image}
-              <div class="combo-info">
-                <div class="combo-name ${gradeClass}">
-                  ${escapeHTML(item.productName)} × ${formatNumber(item.qty)}
-                </div>
-                <div class="combo-values">
-                  <span>${formatNumber(item.sera)} 세라</span>
-                  <b>${formatNumber(Math.round(item.tera))} 테라</b>
-                </div>
-                ${rewardText}
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        resultArea.innerHTML = `
+        resultArea.innerHTML=`
+          ${getMarketTrustHTML()}
           <div class="result-crown">
-            <div class="result-kicker">예상 획득 테라</div>
-
-            <div class="result-main-value">
-              <img class="result-tera-img" src="img/market/테라배지.png" alt="테라">
-              ${formatNumber(Math.round(result.totalTera))}
-            </div>
-
+            <div class="result-kicker">최대 테라 기준 예상 획득</div>
+            <div class="result-main-value"><img class="result-tera-img" src="img/market/테라배지.png" alt="테라">${formatNumber(Math.round(primary.totalTera))}</div>
             <div class="result-grid">
-              <div class="result-mini">
-                <div class="result-mini-label">총 사용 세라</div>
-                <div class="result-mini-value">${formatNumber(result.usedSera)}</div>
-              </div>
-
-              <div class="result-mini">
-                <div class="result-mini-label">남는 세라</div>
-                <div class="result-mini-value">${formatNumber(result.remainingSera)}</div>
-              </div>
-
-              <div class="result-mini">
-                <div class="result-mini-label">평균 효율</div>
-                <div class="result-mini-value">${formatNumber(result.avgEfficiency,1)}</div>
-              </div>
-
-              <div class="result-mini">
-                <div class="result-mini-label">구매 상품 종류</div>
-                <div class="result-mini-value">${formatNumber(result.combo.length)}종</div>
-              </div>
+              <div class="result-mini"><div class="result-mini-label">총 사용 세라</div><div class="result-mini-value">${formatNumber(primary.usedSera)}</div></div>
+              <div class="result-mini"><div class="result-mini-label">남는 세라</div><div class="result-mini-value">${formatNumber(primary.remainingSera)}</div></div>
+              <div class="result-mini"><div class="result-mini-label">평균 효율</div><div class="result-mini-value">${formatNumber(primary.avgEfficiency,1)}</div></div>
+              <div class="result-mini"><div class="result-mini-label">누적보상</div><div class="result-mini-value">${formatNumber(primary.rewardCount)}개</div></div>
+              <div class="result-mini"><div class="result-mini-label">예산 소진율</div><div class="result-mini-value">${formatNumber(primary.utilization,1)}%</div></div>
             </div>
           </div>
-
-          <div class="combo-title">최적 조합 내역</div>
-          <div class="combo-list">${comboHTML}</div>
-        `;
+          <div class="combo-title">최적 구매 조합</div>
+          <div class="recommendation-wrap">
+            <section class="recommendation-card primary">
+              <div class="recommendation-head">
+                <div>
+                  <div class="recommendation-title">최대 테라</div>
+                  <div class="recommendation-desc">현재 조건에서 최종 획득 테라가 가장 많은 조합</div>
+                </div>
+                <div class="recommendation-total">${formatNumber(Math.round(primary.totalTera))} 테라</div>
+              </div>
+              <div class="recommendation-stats">
+                <span class="recommendation-stat">사용 ${formatNumber(primary.usedSera)} 세라</span>
+                <span class="recommendation-stat">잔여 ${formatNumber(primary.remainingSera)} 세라</span>
+                <span class="recommendation-stat">평균 ${formatNumber(primary.avgEfficiency,1)} 테라/세라</span>
+                <span class="recommendation-stat">보상 ${formatNumber(primary.rewardCount)}개</span>
+              </div>
+              <div class="recommendation-combo">${renderComboRows(primary)}</div>
+            </section>
+          </div>`;
       }
 
       async function loadMarketItems(){
@@ -2555,28 +2959,49 @@
       }
 
       // 보유 세라
-      const savedBudget = toNumber(localStorage.getItem(STORAGE_BUDGET_KEY));
+      function updateBudgetEntryState(){
+        if(!budgetEntryBoxEl) return;
+        const hasValue = getBudget() > 0;
+        budgetEntryBoxEl.classList.toggle('is-empty',!hasValue);
+        budgetEntryBoxEl.classList.toggle('has-value',hasValue);
+      }
+
+      const savedBudget = Math.min(MAX_SERA_BUDGET, Math.max(0, Math.floor(toNumber(localStorage.getItem(STORAGE_BUDGET_KEY)))));
       if(savedBudget > 0) budgetEl.value = formatNumber(savedBudget);
+      else budgetEl.value = '';
+      updateBudgetEntryState();
 
       budgetEl.addEventListener('focus',() => {
-        const n = getBudget();
-        budgetEl.value = n ? String(n) : '';
-        budgetEl.select();
+        // 다시 입력할 때도 천 단위 콤마를 유지하고 전체 선택하지 않는다.
+        formatBudgetInput();
+        updateBudgetEntryState();
+      });
+
+      budgetEl.addEventListener('input',() => {
+        // 보유 세라는 숫자(0~9)만 허용하고 최대 999,999,999 세라까지만 입력할 수 있으며, 입력 즉시 천 단위 콤마를 표시한다.
+        enforceBudgetInput();
+        // 입력 중에도 첫 이용자 안내 강조가 즉시 해제되도록 한다.
+        updateBudgetEntryState();
       });
 
       budgetEl.addEventListener('blur',() => {
-        const n = getBudget();
-        budgetEl.value = n ? formatNumber(n) : '';
+        const n = formatBudgetInput();
 
         try{
           localStorage.setItem(STORAGE_BUDGET_KEY,String(n || ''));
         }catch(_){}
 
+        updateBudgetEntryState();
+        renderProducts({preserveOrder:true});
         renderEmptyResult();
       });
 
       budgetEl.addEventListener('keydown',e => {
-        if(e.key === 'Enter') budgetEl.blur();
+        if(e.key === 'Enter'){
+          e.preventDefault();
+          formatBudgetInput();
+          budgetEl.blur();
+        }
       });
 
       purchaseLimitEnabledEl?.addEventListener('change',() => {
@@ -2587,6 +3012,13 @@
       efficiencySortBtn?.addEventListener('click',() => {
         // 현재 자동/수동 시세를 모두 반영한 값으로 사용자가 원할 때만 재정렬
         renderProducts();
+      });
+
+      clearExcludedBtn?.addEventListener('click',() => {
+        if(!excludedProducts.size) return;
+        if(!confirm('상품과 구매 보상의 제외 체크를 모두 해제할까요?')) return;
+        excludedProducts.clear(); saveExcludedProducts();
+        renderProducts({preserveOrder:true}); renderEmptyResult();
       });
 
       clearPricesBtn.addEventListener('click',() => {
