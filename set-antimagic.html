@@ -885,6 +885,66 @@
       text-shadow: 0 1px 0 rgba(0,0,0,.55);
     }
 
+
+    /* ===== 세트 일괄 활성화 ALL 순환 버튼 ===== */
+    .set-title-row {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+
+    .set-title-row .set-name {
+      flex: 0 1 auto;
+    }
+
+    .set-all-cycle-btn {
+      flex: 0 0 auto;
+      height: 22px;
+      min-width: 48px;
+      padding: 0 7px;
+      border: 2px solid rgba(255,255,255,.22);
+      border-radius: 5px;
+      background: rgba(15, 13, 12, .72);
+      color: rgba(230,233,239,.72);
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 1000;
+      line-height: 1;
+      cursor: pointer;
+      letter-spacing: -.02em;
+      transition:
+        filter .12s ease,
+        transform .12s ease,
+        background .12s ease,
+        border-color .12s ease,
+        color .12s ease,
+        box-shadow .12s ease;
+    }
+
+    .set-all-cycle-btn:hover {
+      filter: brightness(1.18);
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.07);
+    }
+
+    .set-all-cycle-btn.is-unique {
+      border-color: #ef53ce;
+      color: #ff9aea;
+      box-shadow:
+        0 0 0 .5px rgba(221,72,181,.35),
+        0 0 4px rgba(198,51,159,.10);
+    }
+
+    .set-all-cycle-btn.is-epic {
+      border-color: #ffd133;
+      color: #ffe46c;
+      box-shadow:
+        0 0 0 .5px rgba(244,183,31,.35),
+        0 0 4px rgba(235,140,16,.10);
+    }
+
     .set-power {
       margin-left: 5px;
       font-weight: 1000;
@@ -1175,6 +1235,13 @@
       .favorite-btn { font-size: 26px; }
       .search-btn svg { width: 23px; height: 23px; }
       .set-name { font-size: 17px; }
+      .set-title-row { gap: 5px; }
+      .set-all-cycle-btn {
+        height: 20px;
+        min-width: 44px;
+        padding: 0 5px;
+        font-size: 9px;
+      }
       .equipment-row {
         justify-content: flex-start;
         overflow-x: auto;
@@ -3150,13 +3217,22 @@
       const linkedTypes = getFamilyLinkedTypesForType(setRows, info.type);
       const season = norm(info.season);
 
-      let candidates = rows.filter((item) =>
+      // ✅ 항마력 계산기에서는 루크레이드 접두사 파생 장비를 일반 세트 장비로 취급하지 않는다.
+      //    이름이 [칼리고] / [루멘]으로 시작하는 행은 유니크/에픽/익시드 후보에서 전부 제외한다.
+      const isLukePrefixItem = (item) => {
+        const name = norm(item?.name);
+        return name.startsWith('[칼리고]') || name.startsWith('[루멘]');
+      };
+
+      const cleanRows = rows.filter((item) => !isLukePrefixItem(item));
+
+      let candidates = cleanRows.filter((item) =>
         linkedTypes.has(norm(item.type)) && (!season || norm(item.season) === season)
       );
 
       // 시트의 시즌 표기가 서로 다르거나 비어 있는 경우에도 family 연결을 우선 유지한다.
       if (!candidates.length) {
-        candidates = rows.filter((item) => linkedTypes.has(norm(item.type)));
+        candidates = cleanRows.filter((item) => linkedTypes.has(norm(item.type)));
       }
 
       return candidates;
@@ -3469,6 +3545,13 @@
       }
       applyState(savedState);
 
+      // ✅ 세트 헤더 ALL 버튼용 상태 적용 훅
+      slot.__applyAntimagicState = (stateKey) => {
+        pageState.itemSelections[selectionKey] = stateKey;
+        applyState(stateKey);
+      };
+      slot.__antimagicSelectionKey = selectionKey;
+
       if (isOptimizerPickedItem(pageState.currentCategory, setName, item)) {
         slot.classList.add('optimizer-picked');
         slot.dataset.optimizerPicked = '1';
@@ -3478,6 +3561,11 @@
         const nextState = getNextState(slot.dataset.state || 'inactive');
         pageState.itemSelections[selectionKey] = nextState;
         applyState(nextState);
+
+        // ✅ 사용자가 한 부위라도 직접 바꾸면 해당 세트의 ALL 일괄 상태는 해제
+        slot.dispatchEvent(new CustomEvent('antimagic-individual-state-change', {
+          bubbles: true
+        }));
       });
 
       image.addEventListener('error', () => {
@@ -3507,6 +3595,76 @@
       title.className = 'set-name';
       title.textContent = set.name;
 
+      const titleRow = document.createElement('div');
+      titleRow.className = 'set-title-row';
+      titleRow.appendChild(title);
+
+      // ✅ 레거시장비는 익시드 전용이므로 유니크/에픽 ALL 버튼 미표시
+      if (pageState.currentCategory !== 'legacy') {
+        const allBtn = document.createElement('button');
+        allBtn.type = 'button';
+        allBtn.className = 'set-all-cycle-btn';
+        allBtn.dataset.allState = 'off';
+
+        const syncAllButtonUI = () => {
+          const mode = allBtn.dataset.allState || 'off';
+          allBtn.classList.toggle('is-unique', mode === 'unique');
+          allBtn.classList.toggle('is-epic', mode === 'epic');
+
+          allBtn.textContent = 'ALL';
+
+          if (mode === 'unique') {
+            allBtn.title = `${set.name} 전체 유니크 활성화 상태`;
+            allBtn.setAttribute('aria-label', `${set.name} 전체 유니크 활성화 상태`);
+          } else if (mode === 'epic') {
+            allBtn.title = `${set.name} 전체 에픽 활성화 상태`;
+            allBtn.setAttribute('aria-label', `${set.name} 전체 에픽 활성화 상태`);
+          } else {
+            allBtn.title = `${set.name} 전체 활성화`;
+            allBtn.setAttribute('aria-label', `${set.name} 전체 활성화`);
+          }
+        };
+
+        const applyAllState = (stateKey) => {
+          card.querySelectorAll('.equipment-slot').forEach((slot) => {
+            if (typeof slot.__applyAntimagicState === 'function') {
+              slot.__applyAntimagicState(stateKey);
+            }
+          });
+        };
+
+        allBtn.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          const current = allBtn.dataset.allState || 'off';
+
+          if (current === 'off') {
+            allBtn.dataset.allState = 'unique';
+            applyAllState('unique');
+          } else if (current === 'unique') {
+            allBtn.dataset.allState = 'epic';
+            applyAllState('epic');
+          } else {
+            allBtn.dataset.allState = 'off';
+            applyAllState('inactive');
+          }
+
+          syncAllButtonUI();
+        });
+
+        // ✅ ALL 활성 중 사용자가 한 부위를 개별 조작하면 버튼만 즉시 OFF.
+        //    이미 사용자가 바꾼 각 장비 상태는 그대로 유지한다.
+        card.addEventListener('antimagic-individual-state-change', () => {
+          if ((allBtn.dataset.allState || 'off') === 'off') return;
+          allBtn.dataset.allState = 'off';
+          syncAllButtonUI();
+        });
+
+        syncAllButtonUI();
+        titleRow.appendChild(allBtn);
+      }
+
       const search = document.createElement('button');
       search.type = 'button';
       search.className = 'icon-btn search-btn';
@@ -3517,7 +3675,7 @@
           <path d="M19.5 19.5L27 27"></path>
         </svg>`;
 
-      header.append(favorite, title, search);
+      header.append(favorite, titleRow, search);
 
       if (set.grouped) {
         const groupsWrap = document.createElement('div');
