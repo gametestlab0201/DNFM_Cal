@@ -17102,8 +17102,9 @@
       ) || 0;
       const name = String(item?.name || '').normalize('NFC').trim();
       const isErosionWeapon = name.startsWith('[침식]');
+      const isMonarchWeapon = name.startsWith('[군주]');
 
-      return (isEpic && level >= 70) || isErosionWeapon;
+      return (isEpic && level >= 70) || isErosionWeapon || isMonarchWeapon;
     }
 
     function _clearMobileWeaponUnique() {

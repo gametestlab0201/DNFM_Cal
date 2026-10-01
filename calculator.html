@@ -14879,8 +14879,13 @@ const uniqueApplyMessages = [];
   const lowR = weaponRarity.toLowerCase();
   const isEpic = (weaponRarity === '에픽' || lowR === 'epic');
   const isErosionWeapon = weaponName.startsWith('[침식]');
+  const isMonarchWeapon = weaponName.startsWith('[군주]');
 
-  canApplyWeaponUnique = !!selWeapon && ((isEpic && weaponLevel >= 70) || isErosionWeapon);
+  canApplyWeaponUnique = !!selWeapon && (
+    (isEpic && weaponLevel >= 70) ||
+    isErosionWeapon ||
+    isMonarchWeapon
+  );
 
   if (picked === '없음') {
     // 없음은 무기 조건과 관계없이 초기화 허용
@@ -21026,15 +21031,20 @@ const row =
   const isUnique = (wRarity === '유니크' || low === 'unique');
   const isRare = (wRarity === '레어' || low === 'rare');
 
-  // ✅ 침식 무기 허용
+  // ✅ 침식 / 군주 무기 허용
   const isErosionWeapon = wName.startsWith('[침식]');
+  const isMonarchWeapon = wName.startsWith('[군주]');
 
-  // 레어/유니크는 이름·레벨과 관계없이 고유효과 불가
+  // 레어/유니크 일반 무기는 불가.
+  // 단, [침식] / [군주] 접두 무기는 예외적으로 고유효과 허용.
   const forbiddenByRarity = isUnique || isRare;
   const ok =
     !!selWeapon &&
-    !forbiddenByRarity &&
-    ((isEpic && wLevel >= 70) || isErosionWeapon);
+    (
+      (!forbiddenByRarity && isEpic && wLevel >= 70) ||
+      isErosionWeapon ||
+      isMonarchWeapon
+    );
 
   if (!ok) {
     if (cs.type || cs.customType || cs.weaponType || cs.weaponName || state.customOptLabel) {
@@ -21587,11 +21597,16 @@ if (selWeapon) {
 const lowR = weaponRarity.toLowerCase();
 const isEpic = (weaponRarity === '에픽' || lowR === 'epic');
 
-// ✅ 침식 무기 허용
+// ✅ 침식 / 군주 무기 허용
 const isErosionWeapon = weaponName.startsWith('[침식]');
+const isMonarchWeapon = weaponName.startsWith('[군주]');
 
-if (!((isEpic && weaponLevel >= 70) || isErosionWeapon)) {
-  toast('유니크, 레어 등급은 고유효과를 사용할 수 없습니다.');
+if (!(
+  (isEpic && weaponLevel >= 70) ||
+  isErosionWeapon ||
+  isMonarchWeapon
+)) {
+  toast('고유효과 적용 조건을 충족하지 않는 무기입니다.');
   return;
 }
         // 이제는 단순히 모달만 열고,
