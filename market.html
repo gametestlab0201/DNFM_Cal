@@ -1499,6 +1499,186 @@
       }
       .right-box{margin-bottom:8px}
     }
+
+    /* ===== 모바일: 종속(구매 보상) 상품의 획득 조건 / 지급 횟수 한 행 배치 ===== */
+    @media (max-width:760px) {
+      /* 보상 카드만 오른쪽 실수령 칸에 충분한 폭을 준다. 글꼴은 일반 상품과 동일하게 상속. */
+      .product-row.reward-row {
+        grid-template-columns:minmax(0,1fr) minmax(154px,49%);
+      }
+      .product-row.reward-row > .product-main { grid-column:1 / -1; }
+      .product-row.reward-row > .cell:nth-child(2) { grid-column:1; grid-row:2; }
+      .product-row.reward-row > .cell:nth-child(3) { grid-column:2; grid-row:2; }
+      /* 세 번째 행: 경매장 시세·그래프 왼쪽 / 실수령·계산 방식 오른쪽 */
+      .product-row.reward-row > .cell:nth-child(4) {
+        grid-column:1;
+        grid-row:3 / span 2;
+        justify-content:flex-start;
+        min-width:0;
+        border-left:0;
+      }
+      .product-row.reward-row > .cell:nth-child(5) {
+        grid-column:2;
+        grid-row:3;
+        min-width:0;
+        border-left:1px solid rgba(90,64,31,.32);
+      }
+      .product-row.reward-row > .cell:nth-child(6) {
+        grid-column:2;
+        grid-row:4;
+        min-width:0;
+        min-height:0;
+        border-left:1px solid rgba(90,64,31,.32);
+      }
+      .product-row.reward-row > .cell:nth-child(4) .price-input { min-width:0; }
+      .product-row.reward-row > .cell:nth-child(4) .market-history-btn {
+        max-width:100%;
+        white-space:normal;
+        overflow-wrap:anywhere;
+      }
+      .product-row.reward-row > .cell:nth-child(5) .metric-value { font-size:12px; }
+      .product-row.reward-row > .cell:nth-child(5) .metric-sub,
+      .product-row.reward-row > .cell:nth-child(6) .metric-sub { line-height:1.4; }
+      .product-row.reward-row > .cell:nth-child(4) .cell-label,
+      .product-row.reward-row > .cell:nth-child(5) .cell-label,
+      .product-row.reward-row > .cell:nth-child(6) .cell-label { white-space:normal; line-height:1.35; }
+      /* 예외: 실수령 제목만 원래 크기(8px)로 한 줄 표시 */
+      .product-row.reward-row > .cell:nth-child(5) .cell-label { white-space:nowrap; }
+      .product-row.reward-row > .cell:nth-child(3) {
+        border-left:1px solid rgba(90,64,31,.32);
+      }
+    }
+
+    /* ===== 품목별 일별 시세 그래프 ===== */
+    .market-history-btn{margin-top:5px;padding:4px 7px;border:1px solid rgba(213,164,71,.5);border-radius:3px;background:#21190f;color:#f1ce7a;font-size:10px;font-weight:850;text-align:left}
+    .market-history-btn:hover{background:#39270f;color:#fff4d5}
+    .history-overlay{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.96);display:flex;align-items:center;justify-content:center;padding:14px}
+    .history-overlay[hidden]{display:none!important}
+    .history-panel{width:min(880px,100%);max-height:92vh;overflow:auto;border:1px solid #a47a37;background:#17120d;box-shadow:0 24px 65px rgba(0,0,0,.75);padding:18px;color:#f4ead4}
+    .history-head{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+    .history-head h2{margin:0;color:#f1ce7a;font-size:19px;word-break:keep-all}
+    .history-sub{color:#9b8e7a;font-size:11px;margin:5px 0 13px}
+    .history-close{color:#e7d3ac;background:transparent;border:1px solid #69502d;padding:5px 10px}
+    .history-controls{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+    .history-control{background:#241b10;border:1px solid #594321;color:#d4c1a1;padding:7px 11px;border-radius:3px;font-size:11px}
+    .history-control.active{background:#c99c48;color:#140f09;border-color:#edd07f;font-weight:900}
+    .history-chart-wrap{position:relative;isolation:isolate;border:1px solid #4c3920;background:#100d09;padding:12px 10px;min-height:280px;overflow:hidden}
+    .history-chart-wrap svg{display:block;width:100%;height:auto;overflow:hidden;max-width:100%;contain:paint}
+    .history-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:12px 0}
+    .history-stat{padding:10px 7px;border:1px solid #4c3920;background:#21190f;min-width:0}
+    .history-stat label{display:block;color:#9b8e7a;font-size:10px}
+    .history-stat b{display:block;color:#f1ce7a;font-size:13px;margin-top:5px;overflow-wrap:anywhere}
+    .history-mode{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 12px}
+    .history-group-list{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0 12px;max-height:115px;overflow:auto}
+    .history-group-check{display:inline-flex;align-items:center;gap:5px;border:1px solid #594321;padding:6px 9px;background:#21190f;color:#dfd0b0;font-size:11px;cursor:pointer;max-width:100%}
+    .history-group-check input{accent-color:#e7c36d}
+    .history-legend-dot{height:9px;width:9px;display:inline-block;border-radius:50%;flex-shrink:0}
+    .history-msg{padding:32px 10px;color:#c5b398;text-align:center;font-size:12px}
+    .history-note{color:#998b74;font-size:10px;line-height:1.6;margin-top:8px}
+    @media(max-width:600px){.history-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.history-panel{padding:12px}.history-head h2{font-size:16px}}
+
+    /* PC는 기존 1세라당 효율 칸을 사용하므로 중복 표시하지 않음 */
+    .mobile-sera-efficiency { display:none; }
+    /* ===== 모바일 전용: 구매 제한만 한 줄로 표시 (상품 칸 배치 유지) ===== */
+    @media (max-width:760px) {
+      /* 일반 상품: 구매 제한은 다섯 번째 자식 (리본 2개 포함) */
+      .product-row:not(.reward-row) > .cell:nth-child(5) {
+        display:flex;
+        flex-direction:row;
+        align-items:center;
+        justify-content:flex-start;
+        gap:10px;
+        min-height:36px;
+        padding:5px 8px;
+      }
+      .product-row:not(.reward-row) > .cell:nth-child(5) .cell-label {
+        flex:0 0 auto;
+        margin-bottom:0;
+        white-space:nowrap;
+      }
+      .product-row:not(.reward-row) > .cell:nth-child(5) .limit-value {
+        min-width:0;
+        white-space:nowrap;
+        overflow-x:auto;
+        overflow-wrap:normal;
+        word-break:normal;
+      }
+      /* 보상 행에는 리본이 없으므로 지급 횟수 칸만 같은 방식으로 처리 */
+      .product-row.reward-row > .cell:nth-child(3) .limit-value {
+        white-space:nowrap;
+      }
+      /* 모바일: 별도의 기본/보상 효율 칸 전체를 숨긴다. */
+      .product-row:not(.reward-row) > .cell:last-child {
+        display:none !important;
+      }
+      /* 기존 수령 테라 아래에 1세라당 테라만 간결히 배치 */
+      .mobile-sera-efficiency {
+        display:flex;
+        align-items:baseline;
+        justify-content:space-between;
+        gap:10px;
+        margin-top:9px;
+        padding-top:8px;
+        border-top:1px solid rgba(112,82,40,.35);
+      }
+      .mobile-sera-efficiency .cell-label {
+        margin-bottom:0;
+        white-space:nowrap;
+      }
+      .mobile-sera-efficiency .metric-value {
+        font-size:12px;
+        text-align:right;
+      }
+    }
+
+    /* 모바일: 경매장 가격 아래 중복 판매품목명 숨김 (PC는 유지) */
+    @media (max-width:760px) {
+      .product-row .sell-stack > .sell-item-name {
+        display:none !important;
+      }
+    }
+
+    /* ===== 모바일 전용: 모든 상품의 테라 금액 숫자 가독성 개선 ===== */
+    @media (max-width:760px) {
+      /* 경매장 테라 가격 입력값: 기존 10px → 13px */
+      .product-row .price-input { font-size:13px; }
+      /* 실수령 테라: 일반 상품과 종속 보상 상품에 같은 크기 적용 */
+      .product-row .metric-value:not(.eff):not(.empty) { font-size:16px; }
+      /* 1세라당 테라 수치만 확대, 계산 방식의 '보너스'는 유지 */
+      .product-row:not(.reward-row) .mobile-sera-efficiency .metric-value.eff:not(.empty) {
+        font-size:14px;
+      }
+    }
+
+    /* ===== 모바일 전용: 세라 계산 우선 배치 / 좌측 메뉴 숨김 ===== */
+    @media (max-width:760px) {
+      /* 데스크톱 3단 레이아웃은 그대로 두고 모바일에서만 순서를 변경 */
+      .market-body {
+        display:flex;
+        flex-direction:column;
+      }
+      .market-side {
+        display:none !important;
+      }
+      .market-right {
+        order:0;
+        display:block;
+        width:100%;
+        min-width:0;
+        border-left:0;
+        border-top:0;
+        border-bottom:1px solid rgba(116,83,38,.45);
+        padding:10px 8px 12px;
+      }
+      .market-center {
+        order:1;
+        width:100%;
+        min-width:0;
+      }
+      .market-right .right-box {
+        margin-bottom:8px;
+      }
+    }
   </style>
 </head>
 
@@ -1635,6 +1815,23 @@
     </div>
   </div>
 
+
+  <div class="history-overlay" id="marketHistoryOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="marketHistoryTitle">
+    <section class="history-panel">
+      <div class="history-head"><div><h2 id="marketHistoryTitle">품목별 시세</h2><div class="history-sub">한국시간 기준 · 하루 동안 수집한 가격의 산술평균</div></div><button type="button" class="history-close" id="marketHistoryClose" aria-label="닫기">✕ 닫기</button></div>
+      <div class="history-mode" id="historyModes"><button class="history-control active" data-mode="single" type="button">개별 시세</button><button class="history-control" data-mode="group" type="button" hidden>그룹 통합 비교</button></div>
+      <div id="historyGroupList" class="history-group-list" hidden></div>
+      <div class="history-controls" id="historyPeriods" aria-label="조회 기간">
+        <button type="button" class="history-control" data-days="7">7일</button><button type="button" class="history-control active" data-days="30">30일</button><button type="button" class="history-control" data-days="90">90일</button><button type="button" class="history-control" data-days="365">1년</button>
+      </div>
+      <div class="history-controls" id="historyMetrics" aria-label="가격 종류">
+        <button type="button" class="history-control active" data-metric="selectedPrice">계산기 적용가</button><button type="button" class="history-control" data-metric="lowestPrice">등록 최저가</button><button type="button" class="history-control" data-metric="averagePrice">게임 평균가</button>
+      </div>
+      <div id="historyChart" class="history-chart-wrap"><div class="history-msg">품목을 선택해 주세요.</div></div>
+      <div id="historyStats" class="history-stats"></div>
+      <div class="history-note">수집하지 않은 날짜는 가격을 추정하지 않습니다. 점은 실제 기록이 있는 날짜만 나타냅니다. 일별 값은 해당 날짜에 수집한 기록의 단순 평균이며, 인게임 전체 거래의 평균이 아닙니다.</div>
+    </section>
+  </div>
   <script>
     (() => {
       'use strict';
@@ -2314,6 +2511,7 @@
                     aria-label="${escapeHTML(item.name)} 경매장 가격">
                 </div>
                 ${manualPrice > 0 ? `<div class="manual-price-label">수동 입력</div><button class="manual-reset-btn js-manual-reset" type="button" data-key="${escapeHTML(key)}">자동값으로 복원</button>` : ''}
+                <button type="button" class="market-history-btn js-market-history" data-item-name="${escapeHTML(item.name)}" title="${escapeHTML(item.name)}의 일별 시세 그래프 열기">▥ 일별 시세 그래프</button>
               </div>
             `;
           }).join('');
@@ -2424,7 +2622,7 @@
                 </div>
 
                 <div class="cell">
-                  <div class="cell-label">예상 실수령 테라</div>
+                  <div class="cell-label">수수료 제외 실수령 테라</div>
                   <div class="metric-value ${rewardMetrics.complete ? '' : 'empty'}">${rewardNetText}</div>
                   <div class="metric-sub">조건 달성 시 1회 추가</div>
                 </div>
@@ -2487,15 +2685,19 @@
               </div>
 
               <div class="cell">
-                <div class="cell-label">예상 실수령 테라</div>
+                <div class="cell-label">수수료 제외 실수령 테라</div>
                 <div class="metric-value ${metrics.complete ? '' : 'empty'}">${netText}</div>
                 <div class="metric-sub">상품 1개 판매 기준</div>
+                <div class="mobile-sera-efficiency">
+                  <div class="cell-label">1세라당 테라</div>
+                  <div class="metric-value eff ${metrics.complete ? '' : 'empty'}">${formatNumber(metrics.efficiency,1)}</div>
+                </div>
               </div>
 
               <div class="cell">
                 <div class="cell-label">1세라당 테라</div>
                 <div class="metric-value eff ${metrics.complete ? '' : 'empty'}">${effText}</div>
-                <div class="metric-sub">${effModeSub}</div>
+                <div class="metric-sub efficiency-mode-description">${effModeSub}</div>
                 ${effToggleHTML}
                 ${efficiencyChangeHTML}
                 ${maxPurchaseHTML}
@@ -2920,6 +3122,156 @@
           </div>`;
       }
 
+      // 품목의 정확한 판매아이템명으로 D1 일별 평균 시세를 조회한다.
+      const historyOverlay = document.getElementById('marketHistoryOverlay');
+      const historyTitle = document.getElementById('marketHistoryTitle');
+      const historyChart = document.getElementById('historyChart');
+      const historyStats = document.getElementById('historyStats');
+      let historyName = '', historyDays = 30, historyMetric = 'selectedPrice', historyMode='single';
+      let historyGroup='', historyGroupSeries=[], historyGroupNames=[], historySelected=new Set(), historyGroupRequestId=0;
+      let historyPoints = [], historyRequestId = 0;
+      const metricLabels = {selectedPrice:'계산기 적용가',lowestPrice:'등록 최저가',averagePrice:'게임 평균가'};
+      function historyEscape(s){ return escapeHTML(String(s ?? '')); }
+      function historyNumber(n){ return formatNumber(Number(n),2); }
+      function historyButtons(){
+        document.querySelectorAll('#historyPeriods [data-days]').forEach(b=>b.classList.toggle('active',Number(b.dataset.days)===historyDays));
+        document.querySelectorAll('#historyMetrics [data-metric]').forEach(b=>b.classList.toggle('active',b.dataset.metric===historyMetric));
+      }
+      const groupColors=['#f1ce7a','#7be6c7','#cba5ff','#ff938c','#83baff','#e4a95a','#b3d56f','#e68cca','#b1b6ff','#ffa661'];
+      function historyGroupControls(){
+        document.querySelectorAll('#historyModes [data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===historyMode));
+        document.getElementById('historyGroupList').hidden=historyMode!=='group';
+      }
+      async function loadHistoryGroup(){
+        const seq=++historyGroupRequestId;
+        const q=new URLSearchParams({type:'market_price_group',itemName:historyName,days:String(historyDays)});
+        const btn=document.querySelector('#historyModes [data-mode="group"]');
+        try{
+          const r=await fetch(`${API_BASE}?${q}`,{cache:'no-store'});
+          const data=await r.json();
+          if(!r.ok||!data.ok||!Array.isArray(data.series))throw new Error(data.error||'그룹 데이터 요청 실패');
+          if(seq!==historyGroupRequestId)return;
+          historyGroup=data.group||'';
+          historyGroupSeries=data.series;
+          historyGroupNames=(data.items||[]).filter(n=>typeof n==='string');
+          if(!historySelected.size)historySelected=new Set(historyGroupNames);
+          btn.hidden=!historyGroup||historyGroupNames.length<2;
+          if(btn.hidden){historyMode='single';historyGroupControls();drawHistory();return;}
+          if(historyMode==='group')drawHistoryGroup();
+        }catch(err){
+          if(seq!==historyGroupRequestId)return;
+          btn.hidden=true;
+          if(historyMode==='group') {historyChart.innerHTML=`<div class="history-msg">${historyEscape(err.message)}</div>`;}
+        }
+      }
+      function drawHistoryGroup(){
+        historyButtons();historyGroupControls();
+        const list=document.getElementById('historyGroupList');
+        list.innerHTML=historyGroupNames.map((n,i)=>`<label class="history-group-check"><input type="checkbox" data-group-name="${historyEscape(n)}" ${historySelected.has(n)?'checked':''}><i class="history-legend-dot" style="background:${groupColors[i%groupColors.length]}"></i>${historyEscape(n)}</label>`).join('');
+        const selected=historyGroupNames.filter(n=>historySelected.has(n));
+        const rows=historyGroupSeries.filter(p=>selected.includes(p.itemName)&&Number(p[historyMetric])>0);
+        if(!rows.length){historyChart.innerHTML='<div class="history-msg">선택한 상품의 수집 기록이 없습니다.</div>';historyStats.innerHTML='';return;}
+        const vals=rows.map(p=>Number(p[historyMetric]));
+        const lo=Math.min(...vals),hi=Math.max(...vals),rng=hi-lo||Math.max(1,hi*.08);
+        const bottom=Math.max(0,lo-rng*.14),top=hi+rng*.17;
+        const W=780,H=310,L=104,R=26,T=26,B=50,plotW=W-L-R,plotH=H-T-B;
+        const days=rows.map(p=>p.day).sort();const minDate=Date.parse(days[0]+'T00:00:00Z'),maxDate=Date.parse(days.at(-1)+'T00:00:00Z');
+        const x=d=>L+(minDate===maxDate?plotW/2:(Date.parse(d+'T00:00:00Z')-minDate)/(maxDate-minDate)*plotW);
+        const y=v=>T+(top-v)/(top-bottom)*plotH;
+        let shapes='';
+        for(let i=0;i<=4;i++){const v=bottom+(top-bottom)*i,yy=y(v);shapes+=`<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" stroke="#473824" stroke-dasharray="3 4"/><text x="${L-7}" y="${yy+4}" fill="#a89b85" font-size="11" text-anchor="end">${historyEscape(formatNumber(v,0))}</text>`;}
+        const tickDays=[...new Set(days)];const nt=Math.min(5,tickDays.length);
+        for(let i=0;i<nt;i++){let d=tickDays[nt===1?0:Math.round(i*(tickDays.length-1)/(nt-1))];shapes+=`<text x="${x(d)}" y="${H-15}" text-anchor="middle" fill="#a89b85" font-size="11">${historyEscape(d.slice(5))}</text>`;}
+        selected.forEach(name=>{
+          const i=historyGroupNames.indexOf(name),color=groupColors[i%groupColors.length];
+          const points=rows.filter(p=>p.itemName===name).sort((a,b)=>a.day.localeCompare(b.day));
+          for(let j=1;j<points.length;j++){
+            const p=points[j-1],q=points[j];
+            if(Date.parse(q.day+'T00:00:00Z')-Date.parse(p.day+'T00:00:00Z')===86400000)
+              shapes+=`<line x1="${x(p.day)}" y1="${y(Number(p[historyMetric]))}" x2="${x(q.day)}" y2="${y(Number(q[historyMetric]))}" stroke="${color}" stroke-width="2.4"/>`;
+          }
+          points.forEach(p=>{shapes+=`<circle cx="${x(p.day)}" cy="${y(Number(p[historyMetric]))}" r="3.8" fill="${color}" stroke="#201710"><title>${historyEscape(name)} · ${historyEscape(p.day)} · ${historyEscape(historyNumber(p[historyMetric]))} 테라 (${Number(p.samples||0)}회)</title></circle>`;});
+        });
+        historyChart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${historyEscape(historyGroup)} 그룹 상품별 일평균 가격 비교">${shapes}</svg>`;
+        historyStats.innerHTML=`<div class="history-note" style="grid-column:1/-1">${historyEscape(historyGroup)} 그룹 · ${selected.length}개 선택 / ${historyGroupNames.length}개 전체 · ${historyEscape(metricLabels[historyMetric])} · 상품별 일평균 (상품 간 평균이나 합산 아님)</div>`;
+      }
+      async function loadHistory(){
+        const seq=++historyRequestId;
+        historyButtons(); historyStats.innerHTML='';
+        historyGroupSeries=[]; loadHistoryGroup();
+        historyChart.innerHTML='<div class="history-msg">시세 기록을 불러오는 중입니다...</div>';
+        try{
+          const q=new URLSearchParams({type:'market_price_history',itemName:historyName,days:String(historyDays)});
+          const r=await fetch(`${API_BASE}?${q.toString()}`,{cache:'no-store'});
+          const data=await r.json();
+          if(!r.ok||!data.ok||!Array.isArray(data.points))throw new Error(data.error||`HTTP ${r.status}`);
+          if(seq!==historyRequestId)return;
+          historyPoints=data.points;
+          if(historyMode==='group')drawHistoryGroup();else drawHistory();
+        }catch(e){
+          if(seq!==historyRequestId)return;
+          historyChart.innerHTML=`<div class="history-msg">시세 기록을 불러오지 못했습니다.<br>${historyEscape(e.message||e)}</div>`;
+        }
+      }
+      function drawHistory(){
+        if(historyMode==='group'){drawHistoryGroup();return;}
+        historyGroupControls();historyButtons();
+        const data=historyPoints.filter(p=>Number.isFinite(Number(p[historyMetric])) && Number(p[historyMetric])>0);
+        if(!data.length){historyChart.innerHTML='<div class="history-msg">선택한 기간에 수집된 시세 기록이 없습니다.</div>';historyStats.innerHTML='';return;}
+        const values=data.map(p=>Number(p[historyMetric]));
+        const lo=Math.min(...values),hi=Math.max(...values),range=hi-lo||Math.max(1,hi*.08);
+        const bottom=Math.max(0,lo-range*.14),top=hi+range*.17;
+        const W=780,H=285,L=104,R=26,T=26,B=48,plotW=W-L-R,plotH=H-T-B;
+        // 날짜 사이의 실제 간격을 보존하며, 데이터가 없는 날짜로 선을 이어 그리지 않는다.
+        const startDate=new Date(data[0].day+'T00:00:00Z').getTime();
+        const endDate=new Date(data[data.length-1].day+'T00:00:00Z').getTime();
+        const x=day=>L+(endDate===startDate?plotW/2:(new Date(day+'T00:00:00Z').getTime()-startDate)/(endDate-startDate)*plotW);
+        const y=v=>T+(top-v)/(top-bottom)*plotH;
+        let grid='';
+        for(let i=0;i<=4;i++){const v=bottom+(top-bottom)*i, yy=y(v);grid+=`<line x1="${L}" y1="${yy}" x2="${W-R}" y2="${yy}" stroke="#473824" stroke-dasharray="3 4"/><text x="${L-7}" y="${yy+4}" fill="#a89b85" font-size="11" text-anchor="end">${historyEscape(formatNumber(v,0))}</text>`;}
+        const maxLabel=Math.min(5,data.length),ticks=[];
+        for(let i=0;i<maxLabel;i++){const index=maxLabel===1?0:Math.round(i*(data.length-1)/(maxLabel-1));const p=data[index];if(!ticks.some(t=>t.day===p.day))ticks.push(p);}
+        const tickSvg=ticks.map(p=>`<text x="${x(p.day)}" y="${H-15}" text-anchor="middle" fill="#a89b85" font-size="11">${historyEscape(p.day.slice(5))}</text>`).join('');
+        const dots=data.map(p=>`<circle cx="${x(p.day)}" cy="${y(Number(p[historyMetric]))}" r="4" fill="#f1ce7a" stroke="#352313" stroke-width="1.5"><title>${historyEscape(p.day)} · ${historyEscape(metricLabels[historyMetric])} ${historyEscape(historyNumber(p[historyMetric]))} 테라 (${Number(p.samples||0)}회 수집)</title></circle>`).join('');
+        // 인접한 날짜끼리만 선을 이으며 빈 날짜 사이에는 공백 표시.
+        let segments='';for(let i=1;i<data.length;i++){
+          const prev=data[i-1],cur=data[i];
+          if((new Date(cur.day+'T00:00:00Z')-new Date(prev.day+'T00:00:00Z'))===86400000){
+            segments+=`<line x1="${x(prev.day)}" y1="${y(Number(prev[historyMetric]))}" x2="${x(cur.day)}" y2="${y(Number(cur[historyMetric]))}" stroke="#f1ce7a" stroke-width="2.5"/>`;
+          }
+        }
+        historyChart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${historyEscape(historyName)} 날짜별 평균 시세 그래프">${grid}${segments}${dots}${tickSvg}</svg>`;
+        const mean=values.reduce((s,v)=>s+v,0)/values.length;
+        const change=values.length>=2 && values[0]!==0?((values.at(-1)/values[0]-1)*100):null;
+        const cells=[['기록된 날짜',`${data.length}일`],['일별 평균가의 평균',`${historyNumber(mean)} 테라`],['기간 내 최저 일평균',`${historyNumber(lo)} 테라`],['기간 내 최고 일평균',`${historyNumber(hi)} 테라`]];
+        historyStats.innerHTML=cells.map(([k,v])=>`<div class="history-stat"><label>${historyEscape(k)}</label><b>${historyEscape(v)}</b></div>`).join('') + `<div class="history-note" style="grid-column:1/-1">첫 기록일 ${historyEscape(data[0].day)} → 마지막 기록일 ${historyEscape(data.at(-1).day)}${change===null?'':` · 변동률 ${change>=0?'+':''}${historyNumber(change)}%`} · 날짜별 표본 수는 그래프 점에 마우스를 올리면 표시됩니다.</div>`;
+      }
+      function closeHistory(){historyOverlay.hidden=true;historyRequestId++;historyGroupRequestId++;document.body.style.overflow='';}
+      productListEl.addEventListener('click',e=>{
+        const btn=e.target.closest('.js-market-history');if(!btn)return;
+        historyName=btn.dataset.itemName||'';if(!historyName)return;
+        historyTitle.textContent=historyName+' · 일별 시세';historyDays=30;historyMetric='selectedPrice';historyMode='single';historySelected=new Set();document.querySelector('#historyModes [data-mode="group"]').hidden=true;
+        historyOverlay.hidden=false;document.body.style.overflow='hidden';loadHistory();
+      });
+      document.getElementById('historyModes').addEventListener('click',e=>{
+        const b=e.target.closest('[data-mode]');if(!b||b.hidden)return;
+        historyMode=b.dataset.mode;historyGroupControls();drawHistory();
+      });
+      document.getElementById('historyGroupList').addEventListener('change',e=>{
+        const input=e.target.closest('[data-group-name]');if(!input)return;
+        if(input.checked)historySelected.add(input.dataset.groupName);else historySelected.delete(input.dataset.groupName);
+        drawHistoryGroup();
+      });
+      document.getElementById('marketHistoryClose').addEventListener('click',closeHistory);
+      historyOverlay.addEventListener('click',e=>{if(e.target===historyOverlay)closeHistory();});
+      document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!historyOverlay.hidden)closeHistory();});
+      document.getElementById('historyPeriods').addEventListener('click',e=>{
+        const b=e.target.closest('[data-days]');if(!b)return;historyDays=Number(b.dataset.days);loadHistory();
+      });
+      document.getElementById('historyMetrics').addEventListener('click',e=>{
+        const b=e.target.closest('[data-metric]');if(!b)return;historyMetric=b.dataset.metric;drawHistory();
+      });
+
       async function loadMarketItems(){
         productListEl.innerHTML = `<div class="state-box">상품 정보를 불러오고 있습니다.</div>`;
 
@@ -2936,7 +3288,9 @@
             throw new Error(data?.message || data?.error || `HTTP ${response.status}`);
           }
 
-          rawRows = data.items;
+          // 비공개 시세수집 품목은 화면/최적화 계산에서 완전히 제외한다.
+          // 서버에서 필터링하더라도 이전 캐시가 남아 있을 가능성에 대비한다.
+          rawRows = data.items.filter(row => String(row?.priceGroup ?? '').normalize('NFC').trim() !== '비공개');
           marketUpdatedAtValueEl.textContent = formatMarketUpdatedAt(data.updatedAt);
           updateMarketFreshness(data.updatedAt);
 
