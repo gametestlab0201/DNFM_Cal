@@ -1570,6 +1570,7 @@
     .history-stat b{display:block;color:#f1ce7a;font-size:13px;margin-top:5px;overflow-wrap:anywhere}
     .history-mode{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 12px}
     .history-group-list{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0 12px;max-height:115px;overflow:auto}
+    .history-group-list[hidden]{display:none!important} /* 개별 시세에서는 이전 그룹 선택상자를 확실하게 숨김 */
     .history-group-check{display:inline-flex;align-items:center;gap:5px;border:1px solid #594321;padding:6px 9px;background:#21190f;color:#dfd0b0;font-size:11px;cursor:pointer;max-width:100%}
     .history-group-check input{accent-color:#e7c36d}
     .history-legend-dot{height:9px;width:9px;display:inline-block;border-radius:50%;flex-shrink:0}
@@ -3250,7 +3251,7 @@
       productListEl.addEventListener('click',e=>{
         const btn=e.target.closest('.js-market-history');if(!btn)return;
         historyName=btn.dataset.itemName||'';if(!historyName)return;
-        historyTitle.textContent=historyName+' · 일별 시세';historyDays=30;historyMetric='selectedPrice';historyMode='single';historySelected=new Set();document.querySelector('#historyModes [data-mode="group"]').hidden=true;
+        historyTitle.textContent=historyName+' · 일별 시세';historyDays=30;historyMetric='selectedPrice';historyMode='single';historySelected=new Set();historyGroup='';historyGroupSeries=[];historyGroupNames=[];document.getElementById('historyGroupList').innerHTML='';historyGroupControls();document.querySelector('#historyModes [data-mode="group"]').hidden=true;
         historyOverlay.hidden=false;document.body.style.overflow='hidden';loadHistory();
       });
       document.getElementById('historyModes').addEventListener('click',e=>{
