@@ -1680,6 +1680,25 @@
         margin-bottom:8px;
       }
     }
+
+    /* 관리자 수동 시세 보충 (기존 가격 갱신과 별개) */
+    .market-admin-entry{margin:12px 0;padding:12px;border:1px solid rgba(165,125,60,.45);background:#16110c}
+    .market-admin-entry[hidden],.market-admin-fields[hidden]{display:none!important}
+    .market-admin-entry summary{cursor:pointer;color:#d9bc78;font-weight:850;font-size:11px}
+    .market-admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px}
+    .market-admin-grid label{display:block;color:#ad9b80;font-size:10px;margin-bottom:4px}
+    .market-admin-grid input,.market-admin-grid select{width:100%;min-width:0;border:1px solid #69502d;background:#0c0d0c;color:#f4ead4;border-radius:3px;padding:9px;font-size:12px}
+    .market-admin-actions{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}
+    .market-admin-actions button{border:1px solid #a47a37;background:#31230f;color:#f5dfa9;border-radius:3px;padding:8px 11px;font-weight:850;font-size:11px}
+    .market-admin-status{font-size:11px;color:#d7c29b;line-height:1.6;min-height:18px;white-space:pre-wrap}
+    .market-admin-records{display:grid;gap:8px;max-height:35vh;overflow-y:auto}
+    .market-admin-record{border:1px solid #5e482a;background:#15110c;padding:9px;font-size:11px;color:#d9cba9}
+    .market-admin-record .record-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:6px}
+    .market-admin-record input{width:140px;max-width:100%;padding:7px;background:#0c0d0c;color:#fff;border:1px solid #74572e;font-size:13px}
+    .market-admin-record button{padding:7px 10px;border:1px solid #a47a37;background:#35270f;color:#f4dfa8;border-radius:3px;cursor:pointer}
+    .market-admin-record button.delete-record{border-color:#a64b4b;color:#ffb8b4;background:#361716}
+    @media(max-width:600px){.market-admin-grid{grid-template-columns:1fr}}
+    #marketAdminOpen[hidden], #marketAdminOverlay[hidden] { display:none !important; }
   </style>
 </head>
 
@@ -1817,6 +1836,11 @@
   </div>
 
 
+  <div id="marketAdminEntry" style="text-align:center;padding:8px 0 18px" hidden>
+    <button type="button" id="marketAdminOpen" class="history-control" style="font-size:10px;opacity:.8" hidden>관리자 · 시세 기록 관리</button>
+    <button type="button" id="marketAdminDiagnose" class="history-control" style="font-size:10px;opacity:.75" hidden>관리자 시세 입력 권한 확인</button>
+    <div id="marketAdminAuthStatus" role="status" style="font-size:10px;color:#b9a78b;margin-top:5px" hidden></div>
+  </div>
   <div class="history-overlay" id="marketHistoryOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="marketHistoryTitle">
     <section class="history-panel">
       <div class="history-head"><div><h2 id="marketHistoryTitle">품목별 시세</h2><div class="history-sub">한국시간 기준 · 하루 동안 수집한 가격의 산술평균</div></div><button type="button" class="history-close" id="marketHistoryClose" aria-label="닫기">✕ 닫기</button></div>
@@ -1831,6 +1855,23 @@
       <div id="historyChart" class="history-chart-wrap"><div class="history-msg">품목을 선택해 주세요.</div></div>
       <div id="historyStats" class="history-stats"></div>
       <div class="history-note">수집하지 않은 날짜는 가격을 추정하지 않습니다. 점은 실제 기록이 있는 날짜만 나타냅니다. 일별 값은 해당 날짜에 수집한 기록의 단순 평균이며, 인게임 전체 거래의 평균이 아닙니다.</div>
+    </section>
+  </div>
+
+  <div class="history-overlay" id="marketAdminOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="marketAdminTitle">
+    <section class="history-panel">
+      <div class="history-head"><h2 id="marketAdminTitle">관리자 · 시세 기록 관리</h2><button type="button" class="history-close" id="marketAdminClose">✕ 닫기</button></div>
+      <div class="history-note">D1 그래프 이력에만 추가합니다. 구글 시트의 현재 경매장가격은 변경되지 않습니다. 이미 기록된 날짜는 개별 기록을 조회한 뒤 수정하거나 삭제할 수 있습니다. 새 기록은 빈 날짜에만 추가합니다.</div>
+      <div class="market-admin-grid">
+        <div><label for="marketAdminItem">품목 선택 (미사용/비공개 포함)</label><select id="marketAdminItem"><option value="">먼저 품목 불러오기를 누르세요</option></select></div>
+        <div><label for="marketAdminManualId">판매아이템 ID (D1 이력이 없는 신규 품목만)</label><input type="text" id="marketAdminManualId" inputmode="numeric" placeholder="기존 D1 기록이 있으면 자동 입력"></div>
+        <div><label for="marketAdminDate">기록 날짜 (한국시간)</label><input type="date" id="marketAdminDate"></div>
+        <div><label for="marketAdminPrice">적용 가격 (테라)</label><input type="number" min="1" step="1" id="marketAdminPrice" placeholder="예: 800000"></div>
+      </div>
+      <div class="market-admin-actions"><button type="button" id="marketAdminList">품목 불러오기</button><button type="button" id="marketAdminCheck">날짜 기록 확인</button><button type="button" id="marketAdminSave">빈 날짜에 저장</button></div>
+      <div class="market-admin-actions"><button type="button" id="marketAdminRecords">선택 날짜 기록 불러오기</button></div>
+      <div class="market-admin-records" id="marketAdminRecordsView" aria-live="polite"></div>
+      <div id="marketAdminStatus" class="market-admin-status" role="status" aria-live="polite"></div>
     </section>
   </div>
   <script>
@@ -3272,6 +3313,153 @@
       document.getElementById('historyMetrics').addEventListener('click',e=>{
         const b=e.target.closest('[data-metric]');if(!b)return;historyMetric=b.dataset.metric;drawHistory();
       });
+
+
+      // ===== 관리자 수동 시세: 서버가 기존 special_user 권한 검증 =====
+      (()=>{
+        const overlay=document.getElementById('marketAdminOverlay');
+        const item=document.getElementById('marketAdminItem');
+        const day=document.getElementById('marketAdminDate');
+        const manualId=document.getElementById('marketAdminManualId');
+        const adminKnownItems=new Map();
+        const price=document.getElementById('marketAdminPrice');
+        const recordsView=document.getElementById('marketAdminRecordsView');
+        let currentRecords=[];
+        const status=document.getElementById('marketAdminStatus');
+        day.value=new Date(Date.now()+9*3600000).toISOString().slice(0,10);
+        day.max=day.value;
+        const report=(s,err=false)=>{status.textContent=s;status.style.color=err?'#ff9f93':'#d7c29b';};
+        const close=()=>{overlay.hidden=true;document.body.style.overflow='';};
+        const adminOpen=document.getElementById('marketAdminOpen');
+        adminOpen.addEventListener('click',()=>{overlay.hidden=false;document.body.style.overflow='hidden';run('list');});
+        document.getElementById('marketAdminClose').addEventListener('click',close);
+        overlay.addEventListener('click',e=>{if(e.target===overlay)close();});
+        async function requestAdmin(action, record=null, newPrice=null){
+          const adminKey=String(sessionStorage.getItem('id_token') || localStorage.getItem('id_token') || window.idToken || '').trim();
+          if(!adminKey || adminKey.startsWith('GUEST.')){throw new Error('공통 헤더에서 로그인해 주세요.');}
+          const chosen=adminKnownItems.get(item.value);
+          const body={id_token:adminKey,action,itemName:item.value,itemId:(chosen?.itemId||manualId.value.trim()),day:day.value};
+          if(record){body.recordId=record.id;body.expectedPrice=Number(record.selectedPrice);}
+          if(action==='update')body.selectedPrice=newPrice;
+          if(action==='save') {
+            const n=Number(price.value);
+            if(!Number.isSafeInteger(n)||n<=0){report('가격을 양의 정수로 입력하세요.',true);return null;}
+            body.selectedPrice=n;
+          }
+          const r=await fetch(`${API_BASE}?type=market_history_admin`,{
+            method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),cache:'no-store'
+          });
+          const result=await r.json().catch(()=>({ok:false,message:'응답을 해석할 수 없습니다.'}));
+          if(!r.ok||!result.ok)throw new Error(result.message||result.error||`HTTP ${r.status}`);
+          return result;
+        }
+        async function run(action){
+          if(action!=='list'&&(!item.value||!day.value)){report('품목과 날짜를 선택해 주세요.',true);return;}
+          if(action==='save'&&!window.confirm(`정말 ${item.options[item.selectedIndex].text}의 ${day.value} 시세를 D1에 등록하시겠습니까?`))return;
+          report('처리 중...');
+          try{
+            const result=await requestAdmin(action);
+            if(!result)return;
+            if(action==='list'){
+              item.innerHTML='<option value="">품목 선택</option>';
+              adminKnownItems.clear();
+              (result.items||[]).sort((a,b)=>a.itemName.localeCompare(b.itemName,'ko')).forEach(p=>{
+                adminKnownItems.set(p.itemName,p);
+                const op=document.createElement('option');op.value=p.itemName;op.textContent=p.itemId?`${p.itemName} (${p.itemId})`:`${p.itemName} (ID 확인 필요)`;item.appendChild(op);
+              });
+              report(`${(result.items||[]).length}개 품목을 불러왔습니다. 미사용 상품도 포함됩니다.`);
+              manualId.value='';resetRecords();
+            }else if(action==='check'){
+              report(result.available?`${day.value}에는 기록이 없습니다. ${result.needsItemId?'저장 전 실제 판매아이템 ID를 입력하세요.':'저장 가능합니다.'}`:`${day.value}에 이미 ${result.count}개 기록이 있습니다. 평균 ${Number(result.average||0).toLocaleString('ko-KR')} 테라. 저장 불가.`,!result.available);
+            }else{
+              report(`${day.value} ${result.item.itemName} ${Number(result.selectedPrice).toLocaleString('ko-KR')} 테라 저장 완료. 그래프를 다시 열면 확인할 수 있습니다.`);resetRecords();
+            }
+          }catch(e){report(e.message||String(e),true);}
+        }
+        function resetRecords(){currentRecords=[];recordsView.replaceChildren();}
+        async function loadRecords(){
+          if(!item.value||!day.value){report('품목과 날짜를 선택해 주세요.',true);return;}
+          report('해당 날짜의 개별 시세 기록을 조회 중...');
+          try{
+            const result=await requestAdmin('records');
+            currentRecords=result.records||[];
+            recordsView.replaceChildren();
+            if(!currentRecords.length){report('이 날짜에는 기록이 없습니다. 빈 날짜에 저장할 수 있습니다.');return;}
+            for(const record of currentRecords){
+              const box=document.createElement('div');box.className='market-admin-record';
+              const label=document.createElement('div');
+              const time=String(record.recordedAt||'');
+              label.textContent=`기록 #${record.id} · ${time} (UTC) · 현재 ${Number(record.selectedPrice).toLocaleString('ko-KR')} 테라`;
+              const controls=document.createElement('div');controls.className='record-row';
+              const input=document.createElement('input');input.type='number';input.min='1';input.step='1';input.value=record.selectedPrice;input.setAttribute('aria-label','변경할 테라 가격');
+              const edit=document.createElement('button');edit.type='button';edit.textContent='금액 변경';
+              const del=document.createElement('button');del.type='button';del.className='delete-record';del.textContent='기록 삭제';
+              edit.addEventListener('click',async()=>{
+                const n=Number(input.value);
+                if(!Number.isSafeInteger(n)||n<=0){report('변경 가격은 양의 정수여야 합니다.',true);return;}
+                if(!confirm(`기록 #${record.id}의 가격을 ${Number(record.selectedPrice).toLocaleString('ko-KR')} → ${n.toLocaleString('ko-KR')} 테라로 변경하시겠습니까?`))return;
+                try{await requestAdmin('update',record,n);report('가격을 변경했습니다. 그래프를 다시 열면 반영됩니다.');await loadRecords();}catch(e){report(e.message||String(e),true);}
+              });
+              del.addEventListener('click',async()=>{
+                if(!confirm(`기록 #${record.id} (${Number(record.selectedPrice).toLocaleString('ko-KR')} 테라)를 영구 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`))return;
+                try{await requestAdmin('delete',record);report('기록을 삭제했습니다.');await loadRecords();}catch(e){report(e.message||String(e),true);}
+              });
+              controls.append(input,edit,del);box.append(label,controls);recordsView.appendChild(box);
+            }
+            report(`${currentRecords.length}개 개별 기록입니다. 여러 건이 있으면 수정·삭제할 건만 선택하세요.`);
+          }catch(e){report(e.message||String(e),true);}
+        }
+        document.getElementById('marketAdminRecords').addEventListener('click',loadRecords);
+        day.addEventListener('change',resetRecords);
+        item.addEventListener('change',()=>{resetRecords();manualId.value='';manualId.placeholder=adminKnownItems.get(item.value)?.itemId?'D1에서 ID 확인됨 · 입력 불필요':'실제 판매아이템 ID를 입력하세요';});
+        document.getElementById('marketAdminList').addEventListener('click',()=>run('list'));
+        document.getElementById('marketAdminCheck').addEventListener('click',()=>run('check'));
+        document.getElementById('marketAdminSave').addEventListener('click',()=>run('save'));
+        // 헤더 로그인 연동 / 서버 권한 확인. 실패 시 확인 버튼에서 사유를 표시한다.
+        const adminEntry=document.getElementById('marketAdminEntry');
+        const adminDiagnose=document.getElementById('marketAdminDiagnose');
+        const authStatus=document.getElementById('marketAdminAuthStatus');
+        let adminCheckSerial=0;
+        const storedLoginToken=()=>String(sessionStorage.getItem('id_token')||localStorage.getItem('id_token')||window.idToken||'').trim();
+        const showAuthMessage=(msg)=>{authStatus.textContent=msg;authStatus.hidden=false;};
+        async function refreshAdminVisibility(showFailure=false){
+          const serial=++adminCheckSerial;
+          const token=storedLoginToken();
+          adminOpen.hidden=true;
+          authStatus.hidden=true;
+          if(!token || token.startsWith('GUEST.')){
+            adminEntry.hidden=true;
+            close();
+            return;
+          }
+          adminEntry.hidden=false;
+          adminDiagnose.hidden=false;
+          adminDiagnose.textContent='관리자 권한 확인 중…';
+          adminDiagnose.disabled=true;
+          try{
+            const response=await requestAdmin('list');
+            if(serial!==adminCheckSerial)return;
+            if(response?.ok){
+              adminOpen.hidden=false;
+              adminDiagnose.hidden=true;
+              authStatus.hidden=true;
+            }
+          }catch(error){
+            if(serial!==adminCheckSerial)return;
+            close();
+            adminDiagnose.hidden=false;
+            adminDiagnose.textContent='관리자 시세 입력 권한 다시 확인';
+            if(showFailure) showAuthMessage('관리자 기능을 사용할 수 없습니다: '+(error?.message||String(error)));
+          }finally{
+            if(serial===adminCheckSerial)adminDiagnose.disabled=false;
+          }
+        }
+        adminDiagnose.addEventListener('click',()=>refreshAdminVisibility(true));
+        window.addEventListener('common-header-auth-changed',()=>refreshAdminVisibility());
+        document.addEventListener('gsi:issued',()=>refreshAdminVisibility());
+        window.addEventListener('storage',e=>{if(e.key==='id_token')refreshAdminVisibility();});
+        refreshAdminVisibility();
+      })();
 
       async function loadMarketItems(){
         productListEl.innerHTML = `<div class="state-box">상품 정보를 불러오고 있습니다.</div>`;
