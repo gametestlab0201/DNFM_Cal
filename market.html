@@ -2175,6 +2175,7 @@
               limitQty:Number(row.limitQty || 0),
               limitType:row.limitType || '',
               limitUnlock:String(row.limitUnlock ?? row['제한해제'] ?? '').trim(),
+              exclusiveGroup:String(row.exclusiveGroup ?? row['구매독점그룹'] ?? '').normalize('NFC').trim(),
               image:row.image || '',
               grade:row.grade || row.rarity || row['등급'] || '',
               mainProduct:String(row.mainProduct || row['메인상품'] || '').trim(),
@@ -2203,6 +2204,7 @@
           if(!p.description && (row.description || row['설명'])){
             p.description = row.description || row['설명'];
           }
+          if(!p.exclusiveGroup && (row.exclusiveGroup || row['구매독점그룹'])) p.exclusiveGroup = String(row.exclusiveGroup || row['구매독점그룹']).normalize('NFC').trim();
           if(!p.limitType && row.limitType) p.limitType = row.limitType;
           if(!p.limitQty && Number(row.limitQty || 0)) p.limitQty = Number(row.limitQty || 0);
           if(isLimitUnlockBlocked(row.limitUnlock ?? row['제한해제'])) p.limitUnlock = '불가능';
@@ -2379,6 +2381,7 @@
       }
 
       function buildLimitText(product){
+        if(String(product.exclusiveGroup || '').trim()) return `${product.exclusiveGroup} 그룹 중 1종만 구매 가능`;
         const t = String(product.limitType || '').trim();
         const q = Number(product.limitQty || 0);
 
@@ -2913,8 +2916,47 @@
         // 결과 역추적용. 수량 전체 후보를 저장하는 대신 각 예산 상태에서
         // 해당 상품을 몇 개 골랐는지만 1개의 Uint32Array로 보관한다.
         const choiceHistory=[];
-
+        const stageProducts=[];
+        const groupedStages=new Map();
+        // 동일 구매독점그룹 상품은 하나의 DP 단계로 계산한다.
+        // 어느 상품을 하나 선택하거나 아예 선택하지 않는 옵션만 허용한다.
         for(const p of availableProducts){
+          const group=String(p.exclusiveGroup || '').normalize('NFC').trim();
+          if(!group){ stageProducts.push({kind:'single',items:[p]}); continue; }
+          if(!groupedStages.has(group)){
+            const stage={kind:'exclusive',items:[]};
+            groupedStages.set(group,stage);
+            stageProducts.push(stage);
+          }
+          groupedStages.get(group).items.push(p);
+        }
+
+        for(const stage of stageProducts){
+          if(stage.kind==='exclusive'){
+            const next=new Float64Array(cap+1);
+            next.set(dp);
+            const picked=new Uint32Array(cap+1); // 0=없음, 1..N=선택한 상품
+            for(let i=0;i<stage.items.length;i++){
+              const candidateProduct=stage.items[i];
+              const priceUnit=Math.round(candidateProduct.seraPrice/unit);
+              if(priceUnit<=0 || Math.floor(candidateProduct.maxQty||0)<1 || priceUnit>cap) continue;
+              const option=getPurchaseOptionMetrics(candidateProduct,1);
+              if(!option.complete || option.tera<=0) continue;
+              for(let budgetUnit=priceUnit;budgetUnit<=cap;budgetUnit++){
+                const prev=dp[budgetUnit-priceUnit];
+                if(!Number.isFinite(prev)) continue;
+                const value=prev+option.tera;
+                if(value>next[budgetUnit]+0.000001){
+                  next[budgetUnit]=value;
+                  picked[budgetUnit]=i+1;
+                }
+              }
+            }
+            choiceHistory.push(picked);
+            dp=next;
+            continue;
+          }
+          const p=stage.items[0];
           const priceUnit=Math.round(p.seraPrice/unit);
           if(priceUnit<=0){
             choiceHistory.push(new Uint32Array(cap+1));
@@ -3038,12 +3080,23 @@
         }
         if(bestB<0) return null;
 
-        const counts=new Array(availableProducts.length).fill(0);
+        const selectedQuantities=new Map();
         let cursor=bestB;
-        for(let i=availableProducts.length-1;i>=0;i--){
-          const qty=choiceHistory[i]?.[cursor]||0;
-          counts[i]=qty;
-          cursor-=Math.round((availableProducts[i].seraPrice/unit)*qty);
+        for(let i=stageProducts.length-1;i>=0;i--){
+          const stage=stageProducts[i];
+          const selection=choiceHistory[i]?.[cursor]||0;
+          if(stage.kind==='exclusive'){
+            if(selection>0){
+              const product=stage.items[selection-1];
+              if(!product) return null;
+              selectedQuantities.set(product,1);
+              cursor-=Math.round(product.seraPrice/unit);
+            }
+          }else if(selection>0){
+            const product=stage.items[0];
+            selectedQuantities.set(product,selection);
+            cursor-=Math.round((product.seraPrice/unit)*selection);
+          }
           if(cursor<0) return null;
         }
 
@@ -3052,9 +3105,8 @@
         let rewardCount=0;
         const combo=[];
 
-        counts.forEach((qty,i)=>{
+        selectedQuantities.forEach((qty,p)=>{
           if(qty<=0) return;
-          const p=availableProducts[i];
           const option=getPurchaseOptionMetrics(p,qty);
           if(!option.complete) return;
 
@@ -3097,7 +3149,7 @@
           .filter(product=>!isProductExcluded(product))
           .map(product=>{
             const metrics=getProductMetrics(product);
-            return {...product,...metrics,maxQty:normalizeLimit(product.limitQty,product.limitType,product.seraPrice,budget,product.limitUnlock)};
+            return {...product,...metrics,maxQty:product.exclusiveGroup ? Math.min(1,normalizeLimit(product.limitQty,product.limitType,product.seraPrice,budget,product.limitUnlock)) : normalizeLimit(product.limitQty,product.limitType,product.seraPrice,budget,product.limitUnlock)};
           })
           .filter(p=>p.complete && p.seraPrice>0 && p.seraPrice<=budget && p.maxQty>0);
 
