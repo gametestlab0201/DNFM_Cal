@@ -1562,7 +1562,13 @@
     .history-controls{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
     .history-control{background:#241b10;border:1px solid #594321;color:#d4c1a1;padding:7px 11px;border-radius:3px;font-size:11px}
     .history-control.active{background:#c99c48;color:#140f09;border-color:#edd07f;font-weight:900}
-    .history-chart-wrap{position:relative;isolation:isolate;border:1px solid #4c3920;background:#100d09;padding:12px 10px;min-height:280px;overflow:hidden}
+    .history-ma-controls{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:-2px 0 10px}
+    .history-ma-controls[hidden]{display:none!important}
+    .history-ma-toggle{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border:1px solid #594321;border-radius:3px;background:#241b10;color:#d4c1a1;font-size:11px;font-weight:850;cursor:pointer;user-select:none}
+    .history-ma-toggle input{width:13px;height:13px;margin:0;accent-color:var(--ma-color)}
+    .history-ma-line{width:15px;height:3px;border-radius:2px;background:var(--ma-color)}
+    .history-ma-toggle:has(input:not(:checked)){opacity:.5}
+    .history-chart-wrap{position:relative;isolation:isolate;border:1px solid #4c3920;background:#100d09;padding:4px 3px;min-height:280px;overflow:hidden}
     .history-chart-wrap svg{display:block;width:100%;height:auto;overflow:hidden;max-width:100%;contain:paint}
     .history-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:12px 0}
     .history-stat{padding:10px 7px;border:1px solid #4c3920;background:#21190f;min-width:0}
@@ -1577,6 +1583,17 @@
     .history-msg{padding:32px 10px;color:#c5b398;text-align:center;font-size:12px}
     .history-note{color:#998b74;font-size:10px;line-height:1.6;margin-top:8px}
     @media(max-width:600px){.history-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.history-panel{padding:12px}.history-head h2{font-size:16px}}
+    /* 모바일은 차트 자체를 화면 너비에 맞춰 다시 그려 글씨/가격선이 축소되지 않도록 한다. */
+    @media(max-width:600px){
+      .history-overlay{padding:5px;align-items:center}
+      .history-panel{width:100%;max-height:calc(100dvh - 10px);padding:10px 8px}
+      .history-chart-wrap{width:100%;padding:4px 2px;min-height:370px}
+      .history-chart-wrap svg{width:100%;height:auto;max-width:none}
+      .history-controls{gap:5px}
+      .history-control{padding:7px 8px}
+      .history-ma-controls{gap:5px}
+      .history-ma-toggle{padding:5px 6px;font-size:10px}
+    }
 
     /* PC는 기존 1세라당 효율 칸을 사용하므로 중복 표시하지 않음 */
     .mobile-sera-efficiency { display:none; }
@@ -1851,6 +1868,12 @@
       </div>
       <div class="history-controls" id="historyMetrics" aria-label="가격 종류">
         <button type="button" class="history-control active" data-metric="selectedPrice">계산기 적용가</button><button type="button" class="history-control" data-metric="lowestPrice">등록 최저가</button><button type="button" class="history-control" data-metric="averagePrice">게임 평균가</button>
+      </div>
+      <div class="history-ma-controls" id="historyMaControls" aria-label="이동평균선 표시">
+        <label class="history-ma-toggle" style="--ma-color:#b4e35c"><input type="checkbox" data-ma-days="5" checked><i class="history-ma-line"></i>5일선</label>
+        <label class="history-ma-toggle" style="--ma-color:#bd8ee8"><input type="checkbox" data-ma-days="20" checked><i class="history-ma-line"></i>20일선</label>
+        <label class="history-ma-toggle" style="--ma-color:#83baff"><input type="checkbox" data-ma-days="60" checked><i class="history-ma-line"></i>60일선</label>
+        <label class="history-ma-toggle" style="--ma-color:#54bfb2"><input type="checkbox" data-ma-days="120" checked><i class="history-ma-line"></i>120일선</label>
       </div>
       <div id="historyChart" class="history-chart-wrap"><div class="history-msg">품목을 선택해 주세요.</div></div>
       <div id="historyStats" class="history-stats"></div>
@@ -3223,7 +3246,45 @@
       const historyStats = document.getElementById('historyStats');
       let historyName = '', historyDays = 30, historyMetric = 'selectedPrice', historyMode='single';
       let historyGroup='', historyGroupSeries=[], historyGroupNames=[], historySelected=new Set(), historyGroupRequestId=0;
-      let historyPoints = [], historyRequestId = 0;
+      let historyPoints = [], historyAllPoints = [], historyRequestId = 0;
+      const historyMaColors={5:'#b4e35c',20:'#bd8ee8',60:'#83baff',120:'#54bfb2'};
+      const historyMaEnabled=new Set([5,20,60,120]);
+      // 수집된 날짜만 순서대로 계산한다. 날짜 누락을 보정하지 않으며 N회 미만은 선을 그리지 않는다.
+      function historyMovingAverages(metric){
+        const series=historyAllPoints.filter(p=>Number.isFinite(Number(p[metric]))&&Number(p[metric])>0)
+          .sort((a,b)=>a.day.localeCompare(b.day));
+        const result=new Map();
+        for(const period of [5,20,60,120]){
+          let sum=0;const list=[];
+          series.forEach((p,i)=>{
+            sum+=Number(p[metric]);
+            if(i>=period)sum-=Number(series[i-period][metric]);
+            if(i>=period-1)list.push({day:p.day,value:sum/period});
+          });
+          result.set(period,list);
+        }
+        return result;
+      }
+      function historyPeriodStart(days){
+        const kst=new Date(Date.now()+9*3600000);
+        return new Date(Date.UTC(kst.getUTCFullYear(),kst.getUTCMonth(),kst.getUTCDate()-days+1)).toISOString().slice(0,10);
+      }
+      function historyMALines(seriesMap,visibleDays,x,y){
+        const output=[];
+        const days=new Set(visibleDays);
+        for(const period of [120,60,20,5]){
+          if(!historyMaEnabled.has(period))continue;
+          const points=(seriesMap.get(period)||[]).filter(p=>days.has(p.day));
+          const color=historyMaColors[period];
+          for(let i=1;i<points.length;i++){
+            const a=points[i-1],b=points[i];
+            if(Date.parse(b.day+'T00:00:00Z')-Date.parse(a.day+'T00:00:00Z')!==86400000)continue;
+            output.push(`<line x1="${x(a.day)}" y1="${y(a.value)}" x2="${x(b.day)}" y2="${y(b.value)}" stroke="${color}" stroke-width="1.1" stroke-opacity=".85" pointer-events="none"/>`);
+          }
+        }
+        return output.join('');
+      }
+
       const metricLabels = {selectedPrice:'계산기 적용가',lowestPrice:'등록 최저가',averagePrice:'게임 평균가'};
       function historyEscape(s){ return escapeHTML(String(s ?? '')); }
       function historyNumber(n){ return formatNumber(Number(n),2); }
@@ -3235,6 +3296,7 @@
       function historyGroupControls(){
         document.querySelectorAll('#historyModes [data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===historyMode));
         document.getElementById('historyGroupList').hidden=historyMode!=='group';
+        document.getElementById('historyMaControls').hidden=historyMode==='group';
       }
       async function loadHistoryGroup(){
         const seq=++historyGroupRequestId;
@@ -3258,6 +3320,136 @@
           if(historyMode==='group') {historyChart.innerHTML=`<div class="history-msg">${historyEscape(err.message)}</div>`;}
         }
       }
+      // 시세축 눈금: 데이터 최고가가 1,000 이상이면 100 단위 / 10~999는 10 단위 / 10 미만은 1 단위.
+      // 실제 데이터 바깥에 확보한 여백을 유지한 상태에서 바깥 방향으로 정리한다.
+      function historyPriceAxis(minValue,maxValue){
+        const span=maxValue-minValue||Math.max(1,maxValue*.08);
+        const rawBottom=Math.max(0,minValue-span*.14);
+        const rawTop=maxValue+span*.17;
+        const step=maxValue>=1000?100:maxValue>=10?10:1;
+        const bottom=Math.max(0,Math.floor(rawBottom/step)*step);
+        let top=Math.ceil(rawTop/step)*step;
+        if(top<=bottom)top=bottom+step;
+        return {bottom,top};
+      }
+      // 극값 주석을 더 편하게 읽을 수 있도록 상단 42px, 하단 46px의 여유를 눈금 범위에 확보한다.
+      // 기존 100/10/1 단위 올림·내림 규칙을 유지하면서 필요한 만큼만 경계를 바깥으로 넓힌다.
+      function historyLabelSafePriceAxis(lo,hi,plotH){
+        let {bottom,top}=historyPriceAxis(lo,hi);
+        const step=hi>=1000?100:hi>=10?10:1;
+        const highClearance=42,lowClearance=46;
+        // plotH는 실제 그래프 영역 높이. 최악의 극값에서도 주석이 SVG 안에 들어와야 한다.
+        for(let i=0;i<100;i++){
+          const span=top-bottom;
+          const topGap=span>0?(top-hi)/span*plotH:0;
+          const bottomGap=span>0?(lo-bottom)/span*plotH:0;
+          if(topGap>=highClearance && bottomGap>=lowClearance)break;
+          if(topGap<highClearance)top+=step;
+          if(bottomGap<lowClearance){
+            if(bottom>0)bottom=Math.max(0,bottom-step);
+            // 0 미만의 가격축은 허용하지 않는다. 이때 최저점 주석은 위쪽으로 배치한다.
+          }
+        }
+        return {bottom,top};
+      }
+      // SVG에서 MM / DD를 두 줄로 출력하고 해당 날짜에 세로 점선을 표시한다.
+      function historyDateTicks(days,maxCount,xCoord,chartHeight,plotTop,plotBottom){
+        const unique=[...new Set(days)];
+        const count=Math.min(maxCount,unique.length);
+        let out='';
+        for(let i=0;i<count;i++){
+          const day=unique[count===1?0:Math.round(i*(unique.length-1)/(count-1))];
+          const xx=xCoord(day),mm=day.slice(5,7),dd=day.slice(8,10);
+          out+=`<line x1="${xx}" y1="${plotTop}" x2="${xx}" y2="${plotBottom}" stroke="#473824" stroke-dasharray="3 4"/>`;
+          out+=`<text x="${xx}" y="${chartHeight-27}" text-anchor="middle" fill="#a89b85" font-size="11"><tspan x="${xx}" dy="0">${historyEscape(mm)}</tspan><tspan x="${xx}" dy="13">/${historyEscape(dd)}</tspan></text>`;
+        }
+        return out;
+      }
+      // 극값 주석을 데이터 점 바로 위/아래에 배치한다.
+      // 세로축은 각 주석 한 줄만큼 더 확장하여, 그래프 영역 내에서 곡선을 가리지 않는다.
+      function historyExtremaLabels(points,x,y,chartW,plotTop,plotBottom,chartH){
+        if(!points.length)return '';
+        const sorted=[...points].sort((a,b)=>a.day.localeCompare(b.day));
+        const min=Math.min(...points.map(p=>Number(p.value)));
+        const max=Math.max(...points.map(p=>Number(p.value)));
+        const latestMatch=value=>[...sorted].reverse().find(p=>Number(p.value)===value);
+        const picks=max===min?[{p:latestMatch(max),kind:'최고·최저'}]:[
+          {p:latestMatch(max),kind:'최고'}, {p:latestMatch(min),kind:'최저'}
+        ];
+        let svg='';
+        for(const {p,kind} of picks){
+          const px=x(p.day),py=y(Number(p.value));
+          const matching=p.itemName?sorted.filter(q=>q.itemName===p.itemName):sorted;
+          const now=Number(matching.at(-1).value);
+          const percent=now>0?(Number(p.value)/now-1)*100:0;
+          const pct=(percent>0?'+':'')+percent.toFixed(2)+'%';
+          const date=String(p.day).replace(/^(\d{4})-(\d{2})-(\d{2})$/,'$1/$2/$3').slice(2);
+          const label=`${historyNumber(p.value)}(${date}), ${pct}`;
+          const isHigh=kind!=='최저';
+          // 양 끝의 최고·최저점도 텍스트가 잘리지 않도록 위치/정렬을 조절한다.
+          const approxWidth=Math.min(290,Math.max(155,label.length*7.5));
+          const margin=8;
+          const txtX=Math.max(margin+approxWidth/2,Math.min(chartW-margin-approxWidth/2,px));
+          const placeAbove=isHigh || (py+25>plotBottom-4);
+          const txtY=placeAbove?py-16:py+25;
+          const color=kind==='최고'?'#f04a55':(kind==='최저'?'#399cff':'#ffe4a0');
+          // 극값 점과 글자를 짧은 눈금으로 연결한다. 라벨은 해당 점에서 16~25px만 떨어진다.
+          const direction=placeAbove?-1:1;
+          const y2=py+direction*11;
+          svg+=`<g class="history-extrema-label"><circle cx="${px}" cy="${py}" r="5.5" fill="none" stroke="${color}" stroke-width="1.8"/><line x1="${px}" y1="${py+direction*5}" x2="${px}" y2="${y2}" stroke="${color}" stroke-width="1.5"/><text x="${txtX}" y="${txtY}" text-anchor="middle" font-size="13" font-weight="800" fill="${color}">${historyEscape(label)}</text><title>${historyEscape(kind)} · ${historyEscape(label)} · 최신 기록 ${historyNumber(now)} 테라 기준</title></g>`;
+        }
+        return svg;
+      }
+      // 전일 대비 상승=빨간색, 하락=파란색, 동일=기존 선 색상.
+      function historySlopeColor(previousPrice,currentPrice,unchangedColor){
+        const before=Number(previousPrice),after=Number(currentPrice);
+        if(after>before)return '#f04a55';
+        if(after<before)return '#399cff';
+        return unchangedColor;
+      }
+      // 개별 상품의 가장 최근 일평균 시세를 Y축 오른쪽에 붙인 가격표로 표시한다.
+      // 변화율은 직전 *기록일* 대비. 그룹 비교는 상품별 구분이 중요하여 표시하지 않는다.
+      function historyLatestPriceTag(data,metric,x,y,plotRight,chartW){
+        if(!data.length)return '';
+        const latest=data[data.length-1],price=Number(latest[metric]);
+        const previous=data.length>1?Number(data[data.length-2][metric]):NaN;
+        const change=Number.isFinite(previous)&&previous>0?(price/previous-1)*100:null;
+        const changeText=change===null?'첫 기록':`${change>0?'+':''}${change.toFixed(2)}%`;
+        const color=change===null||change===0?'#d8a94d':change>0?'#f04a55':'#399cff';
+        const mobile=window.matchMedia('(max-width:600px)').matches;
+        const py=y(price),labelX=plotRight+(mobile?7:10);
+        const tagW=mobile?Math.max(48,chartW-labelX-3):Math.max(70,chartW-labelX-4);
+        const tagH=mobile?29:35;
+        const priceFont=mobile?10.2:12.5,changeFont=mobile?9:11;
+        const priceTextY=mobile?12:15,changeTextY=mobile?24:29;
+        const topY=Math.max(3,py-tagH/2);
+        const leftTip=plotRight+2;
+        // 가격 수준을 기준으로 오른쪽 가격축과 이어지는 점선, 이어서 말풍선 가격표.
+        return `<g class="history-current-price"><line x1="${x(latest.day)}" y1="${py}" x2="${plotRight}" y2="${py}" stroke="${color}" stroke-width="1" stroke-dasharray="3 3" opacity=".65"/><path d="M${leftTip},${py} L${labelX},${topY+4} L${labelX},${topY+tagH-4} Z" fill="${color}"/><rect x="${labelX}" y="${topY}" width="${tagW}" height="${tagH}" rx="2" fill="${color}"/><text x="${labelX+tagW/2}" y="${topY+priceTextY}" text-anchor="middle" font-size="${priceFont}" font-weight="900" fill="#ffffff">${historyEscape(historyNumber(price))}</text><text x="${labelX+tagW/2}" y="${topY+changeTextY}" text-anchor="middle" font-size="${changeFont}" font-weight="800" fill="#ffffff">${historyEscape(changeText)}</text><title>최근 기록 ${historyEscape(latest.day)} · ${historyEscape(historyNumber(price))} 테라 · 직전 기록 대비 ${historyEscape(changeText)}</title></g>`;
+      }
+      // Y축 눈금을 그래프 높이에 맞게 균등 배치한다. 현재가 말풍선과 겹치는 글자는 생략한다.
+      function historyYAxisTicks(bottom,top,y,left,right,plotHeight,currentPrice=null){
+        const intervals=Math.max(4,Math.min(10,Math.round(plotHeight/38)));
+        const currentY=Number.isFinite(currentPrice)?y(currentPrice):NaN;
+        let out='';
+        for(let i=0;i<=intervals;i++){
+          const v=bottom+(top-bottom)*i/intervals;
+          const yy=y(v);
+          out+=`<line x1="${left}" y1="${yy}" x2="${right}" y2="${yy}" stroke="#473824" stroke-dasharray="3 4"/>`;
+          if(!Number.isFinite(currentY)||Math.abs(yy-currentY)>=23){
+            out+=`<text x="${right+10}" y="${yy+4}" fill="#a89b85" font-size="11" text-anchor="start">${historyEscape(formatNumber(v,0))}</text>`;
+          }
+        }
+        return out;
+      }
+      // 화면 너비에 맞춘 SVG 실제 좌표 크기: 데스크톱은 기존 780px 유지.
+      // 모바일은 SVG를 780px에서 줄이지 않고 현재 칸 너비로 직접 렌더링한다.
+      function historyChartDimensions(group=false){
+        const available=historyChart.clientWidth-8;
+        const mobile=window.matchMedia('(max-width:600px)').matches;
+        if(!mobile)return {W:780,H:group?375:350,L:22,R:101,T:24,B:43,ticks:10};
+        return {W:Math.max(290,Math.floor(available||320)),H:group?405:385,L:10,R:70,T:40,B:48,ticks:4};
+      }
       function drawHistoryGroup(){
         historyButtons();historyGroupControls();
         const list=document.getElementById('historyGroupList');
@@ -3267,18 +3459,19 @@
         if(!rows.length){historyChart.innerHTML='<div class="history-msg">선택한 상품의 수집 기록이 없습니다.</div>';historyStats.innerHTML='';return;}
         const vals=rows.map(p=>Number(p[historyMetric]));
         const lo=Math.min(...vals),hi=Math.max(...vals),rng=hi-lo||Math.max(1,hi*.08);
-        const bottom=Math.max(0,lo-rng*.14),top=hi+rng*.17;
-        const W=780,H=310,L=104,R=26,T=26,B=50,plotW=W-L-R,plotH=H-T-B;
+        const {W,H,L,R,T,B,ticks}=historyChartDimensions(true),plotW=W-L-R,plotH=H-T-B;
+        const {bottom,top}=historyLabelSafePriceAxis(lo,hi,plotH);
         const days=rows.map(p=>p.day).sort();const minDate=Date.parse(days[0]+'T00:00:00Z'),maxDate=Date.parse(days.at(-1)+'T00:00:00Z');
         const x=d=>L+(minDate===maxDate?plotW/2:(Date.parse(d+'T00:00:00Z')-minDate)/(maxDate-minDate)*plotW);
         const y=v=>T+(top-v)/(top-bottom)*plotH;
         let shapes='';
-        for(let i=0;i<=4;i++){const v=bottom+(top-bottom)*i,yy=y(v);shapes+=`<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" stroke="#473824" stroke-dasharray="3 4"/><text x="${L-7}" y="${yy+4}" fill="#a89b85" font-size="11" text-anchor="end">${historyEscape(formatNumber(v,0))}</text>`;}
-        const tickDays=[...new Set(days)];const nt=Math.min(5,tickDays.length);
-        for(let i=0;i<nt;i++){let d=tickDays[nt===1?0:Math.round(i*(tickDays.length-1)/(nt-1))];shapes+=`<text x="${x(d)}" y="${H-15}" text-anchor="middle" fill="#a89b85" font-size="11">${historyEscape(d.slice(5))}</text>`;}
+        shapes+=historyYAxisTicks(bottom,top,y,L,W-R,plotH);
+        shapes+=historyDateTicks(days,ticks,x,H,T,H-B);
+        const labelPoints=[];
         selected.forEach(name=>{
           const i=historyGroupNames.indexOf(name),color=groupColors[i%groupColors.length];
           const points=rows.filter(p=>p.itemName===name).sort((a,b)=>a.day.localeCompare(b.day));
+          points.forEach(p=>labelPoints.push({day:p.day,value:Number(p[historyMetric]),itemName:name}));
           for(let j=1;j<points.length;j++){
             const p=points[j-1],q=points[j];
             if(Date.parse(q.day+'T00:00:00Z')-Date.parse(p.day+'T00:00:00Z')===86400000)
@@ -3286,6 +3479,7 @@
           }
           points.forEach(p=>{shapes+=`<circle cx="${x(p.day)}" cy="${y(Number(p[historyMetric]))}" r="3.8" fill="${color}" stroke="#201710"><title>${historyEscape(name)} · ${historyEscape(p.day)} · ${historyEscape(historyNumber(p[historyMetric]))} 테라 (${Number(p.samples||0)}회)</title></circle>`;});
         });
+        shapes+=historyExtremaLabels(labelPoints,x,y,W-R,T,H-B,H);
         historyChart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${historyEscape(historyGroup)} 그룹 상품별 일평균 가격 비교">${shapes}</svg>`;
         historyStats.innerHTML=`<div class="history-note" style="grid-column:1/-1">${historyEscape(historyGroup)} 그룹 · ${selected.length}개 선택 / ${historyGroupNames.length}개 전체 · ${historyEscape(metricLabels[historyMetric])} · 상품별 일평균 (상품 간 평균이나 합산 아님)</div>`;
       }
@@ -3295,12 +3489,15 @@
         historyGroupSeries=[]; loadHistoryGroup();
         historyChart.innerHTML='<div class="history-msg">시세 기록을 불러오는 중입니다...</div>';
         try{
-          const q=new URLSearchParams({type:'market_price_history',itemName:historyName,days:String(historyDays)});
+          // 기존 API 최대 1년 데이터를 받아서 조회 기간 앞의 N개 수집일도 이동평균 계산에 포함.
+          const q=new URLSearchParams({type:'market_price_history',itemName:historyName,days:'365'});
           const r=await fetch(`${API_BASE}?${q.toString()}`,{cache:'no-store'});
           const data=await r.json();
           if(!r.ok||!data.ok||!Array.isArray(data.points))throw new Error(data.error||`HTTP ${r.status}`);
           if(seq!==historyRequestId)return;
-          historyPoints=data.points;
+          historyAllPoints=data.points.slice().sort((a,b)=>a.day.localeCompare(b.day));
+          const periodStart=historyPeriodStart(historyDays);
+          historyPoints=historyAllPoints.filter(p=>p.day>=periodStart);
           if(historyMode==='group')drawHistoryGroup();else drawHistory();
         }catch(e){
           if(seq!==historyRequestId)return;
@@ -3313,28 +3510,42 @@
         const data=historyPoints.filter(p=>Number.isFinite(Number(p[historyMetric])) && Number(p[historyMetric])>0);
         if(!data.length){historyChart.innerHTML='<div class="history-msg">선택한 기간에 수집된 시세 기록이 없습니다.</div>';historyStats.innerHTML='';return;}
         const values=data.map(p=>Number(p[historyMetric]));
+        const maSeries=historyMovingAverages(historyMetric);
+        const visibleDays=data.map(p=>p.day);
+        const maValues=[];
+        for(const period of historyMaEnabled){
+          for(const p of maSeries.get(period)||[])if(visibleDays.includes(p.day))maValues.push(p.value);
+        }
+        const allAxisValues=values.concat(maValues);
         const lo=Math.min(...values),hi=Math.max(...values),range=hi-lo||Math.max(1,hi*.08);
-        const bottom=Math.max(0,lo-range*.14),top=hi+range*.17;
-        const W=780,H=285,L=104,R=26,T=26,B=48,plotW=W-L-R,plotH=H-T-B;
+        const axisLo=Math.min(...allAxisValues),axisHi=Math.max(...allAxisValues);
+        const {W,H,L,R,T,B,ticks}=historyChartDimensions(),plotW=W-L-R,plotH=H-T-B;
+        const {bottom,top}=historyLabelSafePriceAxis(axisLo,axisHi,plotH);
         // 날짜 사이의 실제 간격을 보존하며, 데이터가 없는 날짜로 선을 이어 그리지 않는다.
         const startDate=new Date(data[0].day+'T00:00:00Z').getTime();
         const endDate=new Date(data[data.length-1].day+'T00:00:00Z').getTime();
         const x=day=>L+(endDate===startDate?plotW/2:(new Date(day+'T00:00:00Z').getTime()-startDate)/(endDate-startDate)*plotW);
         const y=v=>T+(top-v)/(top-bottom)*plotH;
         let grid='';
-        for(let i=0;i<=4;i++){const v=bottom+(top-bottom)*i, yy=y(v);grid+=`<line x1="${L}" y1="${yy}" x2="${W-R}" y2="${yy}" stroke="#473824" stroke-dasharray="3 4"/><text x="${L-7}" y="${yy+4}" fill="#a89b85" font-size="11" text-anchor="end">${historyEscape(formatNumber(v,0))}</text>`;}
-        const maxLabel=Math.min(5,data.length),ticks=[];
-        for(let i=0;i<maxLabel;i++){const index=maxLabel===1?0:Math.round(i*(data.length-1)/(maxLabel-1));const p=data[index];if(!ticks.some(t=>t.day===p.day))ticks.push(p);}
-        const tickSvg=ticks.map(p=>`<text x="${x(p.day)}" y="${H-15}" text-anchor="middle" fill="#a89b85" font-size="11">${historyEscape(p.day.slice(5))}</text>`).join('');
-        const dots=data.map(p=>`<circle cx="${x(p.day)}" cy="${y(Number(p[historyMetric]))}" r="4" fill="#f1ce7a" stroke="#352313" stroke-width="1.5"><title>${historyEscape(p.day)} · ${historyEscape(metricLabels[historyMetric])} ${historyEscape(historyNumber(p[historyMetric]))} 테라 (${Number(p.samples||0)}회 수집)</title></circle>`).join('');
+        grid+=historyYAxisTicks(bottom,top,y,L,W-R,plotH,values.at(-1));
+        const tickSvg=historyDateTicks(data.map(p=>p.day),ticks,x,H,T,H-B);
+        // 개별 시세: 각 날짜의 원은 직전 기록일 대비 상승/하락에 맞춰 선과 같은 색상으로 표시한다.
+        // 첫 기록일 및 가격 동일 시 기존 금색을 유지한다.
+        const dots=data.map((p,i)=>{
+          const dotColor=i===0?'#f1ce7a':historySlopeColor(data[i-1][historyMetric],p[historyMetric],'#f1ce7a');
+          return `<circle cx="${x(p.day)}" cy="${y(Number(p[historyMetric]))}" r="4" fill="${dotColor}" stroke="#352313" stroke-width="1.5"><title>${historyEscape(p.day)} · ${historyEscape(metricLabels[historyMetric])} ${historyEscape(historyNumber(p[historyMetric]))} 테라 (${Number(p.samples||0)}회 수집)</title></circle>`;
+        }).join('');
         // 인접한 날짜끼리만 선을 이으며 빈 날짜 사이에는 공백 표시.
         let segments='';for(let i=1;i<data.length;i++){
           const prev=data[i-1],cur=data[i];
           if((new Date(cur.day+'T00:00:00Z')-new Date(prev.day+'T00:00:00Z'))===86400000){
-            segments+=`<line x1="${x(prev.day)}" y1="${y(Number(prev[historyMetric]))}" x2="${x(cur.day)}" y2="${y(Number(cur[historyMetric]))}" stroke="#f1ce7a" stroke-width="2.5"/>`;
+            segments+=`<line x1="${x(prev.day)}" y1="${y(Number(prev[historyMetric]))}" x2="${x(cur.day)}" y2="${y(Number(cur[historyMetric]))}" stroke="${historySlopeColor(prev[historyMetric],cur[historyMetric],'#f1ce7a')}" stroke-width="2.5"/>`;
           }
         }
-        historyChart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${historyEscape(historyName)} 날짜별 평균 시세 그래프">${grid}${segments}${dots}${tickSvg}</svg>`;
+        const movingLines=historyMALines(maSeries,visibleDays,x,y);
+        const extrema=historyExtremaLabels(data.map(p=>({day:p.day,value:Number(p[historyMetric])})),x,y,W-R,T,H-B,H);
+        const currentTag=historyLatestPriceTag(data,historyMetric,x,y,W-R,W);
+        historyChart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${historyEscape(historyName)} 날짜별 평균 시세 그래프">${grid}${movingLines}${segments}${dots}${tickSvg}${extrema}${currentTag}</svg>`;
         const mean=values.reduce((s,v)=>s+v,0)/values.length;
         const change=values.length>=2 && values[0]!==0?((values.at(-1)/values[0]-1)*100):null;
         const cells=[['기록된 날짜',`${data.length}일`],['일별 평균가의 평균',`${historyNumber(mean)} 테라`],['기간 내 최저 일평균',`${historyNumber(lo)} 테라`],['기간 내 최고 일평균',`${historyNumber(hi)} 테라`]];
@@ -3343,7 +3554,7 @@
       function closeHistory(){historyOverlay.hidden=true;historyRequestId++;historyGroupRequestId++;document.body.style.overflow='';}
       productListEl.addEventListener('click',e=>{
         const btn=e.target.closest('.js-market-history');if(!btn)return;
-        historyName=btn.dataset.itemName||'';if(!historyName)return;
+        historyName=btn.dataset.itemName||'';if(!historyName)return;historyAllPoints=[];
         historyTitle.textContent=historyName+' · 일별 시세';historyDays=30;historyMetric='selectedPrice';historyMode='single';historySelected=new Set();historyGroup='';historyGroupSeries=[];historyGroupNames=[];document.getElementById('historyGroupList').innerHTML='';historyGroupControls();document.querySelector('#historyModes [data-mode="group"]').hidden=true;
         historyOverlay.hidden=false;document.body.style.overflow='hidden';loadHistory();
       });
@@ -3361,6 +3572,22 @@
       document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!historyOverlay.hidden)closeHistory();});
       document.getElementById('historyPeriods').addEventListener('click',e=>{
         const b=e.target.closest('[data-days]');if(!b)return;historyDays=Number(b.dataset.days);loadHistory();
+      });
+      document.getElementById('historyMaControls').addEventListener('change',e=>{
+        const el=e.target.closest('[data-ma-days]');if(!el)return;
+        const n=Number(el.dataset.maDays);
+        if(el.checked)historyMaEnabled.add(n);else historyMaEnabled.delete(n);
+        if(historyMode==='single')drawHistory();
+      });
+      // 기기를 회전하거나 브라우저 너비가 바뀌면 새로운 크기로 다시 렌더링.
+      let historyResizeFrame=0;
+      window.addEventListener('resize',()=>{
+        if(historyOverlay.hidden)return;
+        cancelAnimationFrame(historyResizeFrame);
+        historyResizeFrame=requestAnimationFrame(()=>{
+          if(historyOverlay.hidden)return;
+          if(historyMode==='group')drawHistoryGroup();else drawHistory();
+        });
       });
       document.getElementById('historyMetrics').addEventListener('click',e=>{
         const b=e.target.closest('[data-metric]');if(!b)return;historyMetric=b.dataset.metric;drawHistory();
