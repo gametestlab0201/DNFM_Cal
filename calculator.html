@@ -2563,6 +2563,14 @@
       text-overflow: ellipsis;
     }
 
+    /* 2734: 신규 시즌 접두사 텍스트 색상 (첨부 이미지의 연한 황록색) */
+    #itemModal .season-prefix-highlight,
+    .item-list .season-prefix-highlight,
+    .season-prefix-highlight {
+      color: #e4e77b;
+      font-weight: 600;
+    }
+
     /* 장비 접두사 라벨 (슬롯 좌측 상단) */
     .slot .equip-prefix {
       position: absolute;
@@ -6271,6 +6279,36 @@
 
     #accSetModal .armor-set-dialog {
       overflow: visible;
+    }
+
+    /* 2735: 특수장비 세트 상단 삭룡 갈리아르 선택 영역 — 루크레이드 UI와 공통 스타일 */
+    #specSetModal .armor-set-titlebar {
+      display:grid; grid-template-columns:auto auto minmax(0,1fr) auto;
+      align-items:center; justify-content:initial; column-gap:8px; row-gap:0;
+      position:relative; z-index:120; overflow:visible;
+    }
+    #specSetModal .armor-set-titlebar h2 {grid-column:1;white-space:nowrap;}
+    #specSetModal #specSetToggle {grid-column:2;}
+    #specSetModal .spec-galiar-control-wrap {
+      grid-column:3;justify-self:start;margin-left:10px;
+      display:inline-flex;align-items:center;gap:6px;min-width:0;
+    }
+    #specSetModal .spec-galiar-label {font-size:10px;font-weight:800;color:#d8c79a;white-space:nowrap;opacity:.95;}
+    #specSetModal .spec-galiar-part {display:inline-flex;align-items:center;gap:5px;min-width:0;}
+    #specSetModal .spec-galiar-part-label {font-size:10px;font-weight:700;color:#b8c5d7;white-space:nowrap;}
+    #specSetModal .spec-galiar-dropdown {width:138px;flex:0 0 138px;}
+    #specSetModal .armor-set-titlebar > [data-close] {grid-column:4;justify-self:end;width:auto;white-space:nowrap;}
+    #specSetModal .armor-set-dialog {overflow:visible;}
+    #specSetModal .armor-set-body {position:relative;z-index:1;}
+    @media(max-width:850px) {
+      #specSetModal .armor-set-titlebar {grid-template-columns:auto auto 1fr auto;row-gap:8px;}
+      #specSetModal .spec-galiar-control-wrap {grid-column:1 / 5;grid-row:2;margin-left:0;flex-wrap:wrap;}
+      #specSetModal .armor-set-titlebar > [data-close] {grid-column:4;grid-row:1;}
+    }
+    @media(max-width:520px) {
+      #specSetModal .spec-galiar-dropdown {width:108px;flex-basis:108px;}
+      #specSetModal .spec-galiar-part-label {font-size:9px;}
+      #specSetModal .spec-galiar-label {font-size:10px;}
     }
 
     /* ✅ 고유효과 ON/OFF 토글 줄 */
@@ -11543,6 +11581,45 @@
           <div class="armor-toggle-thumb"></div>
         </div>
 
+        <!-- 2735: 삭룡 갈리아르 / 보조장비·마법석 (루크레이드와 동일한 헤더 배치) -->
+        <div class="spec-galiar-control-wrap" aria-label="삭룡 갈리아르 장비 선택">
+          <span class="spec-galiar-label">삭룡 갈리아르</span>
+          <div class="spec-galiar-part">
+            <span class="spec-galiar-part-label">보조장비</span>
+            <div id="specGaliarSubDropdown" class="acc-prefix-dropdown spec-galiar-dropdown">
+              <button type="button" class="acc-prefix-dropdown-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="삭룡 갈리아르 보조장비 선택">
+                <span class="spec-galiar-selected-label">없음</span><span class="acc-prefix-dropdown-arrow">▾</span>
+              </button>
+              <div class="acc-prefix-dropdown-menu" role="listbox" aria-hidden="true">
+                <button type="button" class="acc-prefix-dropdown-option is-selected" data-value="none" role="option" aria-selected="true">없음</button>
+                <button type="button" class="acc-prefix-dropdown-option" data-value="돌풍" role="option" aria-selected="false">돌풍</button>
+                <button type="button" class="acc-prefix-dropdown-option" data-value="여우" role="option" aria-selected="false">여우</button>
+                <button type="button" class="acc-prefix-dropdown-option" data-value="폭풍" role="option" aria-selected="false">폭풍</button>
+                <button type="button" class="acc-prefix-dropdown-option" data-value="허기" role="option" aria-selected="false">허기</button>
+                <button type="button" class="acc-prefix-dropdown-option" data-value="밀짚" role="option" aria-selected="false">밀짚</button>
+              
+              </div>
+            </div>
+          </div>
+          <div class="spec-galiar-part">
+            <span class="spec-galiar-part-label">마법석</span>
+            <div id="specGaliarStoneDropdown" class="acc-prefix-dropdown spec-galiar-dropdown">
+              <button type="button" class="acc-prefix-dropdown-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="삭룡 갈리아르 마법석 선택">
+                <span class="spec-galiar-selected-label">없음</span><span class="acc-prefix-dropdown-arrow">▾</span>
+              </button>
+              <div class="acc-prefix-dropdown-menu" role="listbox" aria-hidden="true">
+                <button type="button" class="acc-prefix-dropdown-option is-selected" data-value="none" role="option" aria-selected="true">없음</button>
+                <button type="button" class="acc-prefix-dropdown-option" data-value="영원" role="option" aria-selected="false">영원</button>
+                <button type="button" class="acc-prefix-dropdown-option" data-value="수인" role="option" aria-selected="false">수인</button>
+                <button type="button" class="acc-prefix-dropdown-option" data-value="흡혈" role="option" aria-selected="false">흡혈</button>
+                <button type="button" class="acc-prefix-dropdown-option" data-value="자매" role="option" aria-selected="false">자매</button>
+                <button type="button" class="acc-prefix-dropdown-option" data-value="마녀" role="option" aria-selected="false">마녀</button>
+              
+              </div>
+            </div>
+          </div>
+        </div>
+
         <button type="button" class="btn" data-close style="font-size:12px;padding:4px 8px;">
           닫기
         </button>
@@ -13803,11 +13880,14 @@ if (/[\r\n]/.test(nickname)) {
       const raw = String(name ?? '');
       const safe = escapeHtmlText(raw);
 
-      // 기존 [침식] 표기는 유지하고, 신규 [칼리고]/[루멘] 접두사만 별도 색상 적용
+      // 기존 [침식], [칼리고], [루멘] 색상과 충돌하지 않도록 유지한다.
+      // 2734: 신규 시즌 접두사 10종만 연한 황록색 표시.
       return safe
         .replace(/^\[침식\]/, '<span class="erosion-prefix">[침식]</span>')
         .replace(/^\[칼리고\]/, '<span class="caligo-prefix">[칼리고]</span>')
-        .replace(/^\[루멘\]/, '<span class="lumen-prefix">[루멘]</span>');
+        .replace(/^\[루멘\]/, '<span class="lumen-prefix">[루멘]</span>')
+        .replace(/^\[(돌풍|여우|폭풍|허기|밀짚|영원|수인|흡혈|자매|마녀)\](?=\s|$)/,
+          '<span class="season-prefix-highlight">[$1]</span>');
     }
 
     /* ===== 상태/상수 ===== */
@@ -15760,6 +15840,9 @@ showModal($uniqueEffectModal, false);
         seasonCardsEl.appendChild(card);
       });
     }
+
+    // 드롭다운은 별도 스크립트에 있지만 목록 렌더러는 이 클로저 내부에 있다.
+    document.getElementById('specSetModal')?.addEventListener('spec-galiar-change', () => renderSpecSetModal());
 
     function renderSpecSetModal() {
       if (!$specSetList) return;
@@ -20153,20 +20236,50 @@ const row =
           const rows = equipBySlot[slotKey] || [];
           let row;
 
+          // 2736: 삭룡 갈리아르 드롭다운의 접두사에 따라 부위별 아이템 교체.
+          // '없음'은 신규 접두사 없는 일반 아이템, 귀걸이는 기존 검색 방식 유지.
+          const partDropdownId = slotKey === 'sub' ? 'specGaliarSubDropdown'
+            : slotKey === 'magestone' ? 'specGaliarStoneDropdown' : '';
+          const selectedPrefix = partDropdownId
+            ? (document.getElementById(partDropdownId)?.dataset.value || 'none') : null;
+          const allowedPrefixes = slotKey === 'sub'
+            ? ['돌풍','여우','폭풍','허기','밀짚']
+            : slotKey === 'magestone' ? ['영원','수인','흡혈','자매','마녀'] : [];
+          const getItemPrefix = r => {
+            const fromCol=norm(r?._raw?.['접두사'] ?? r?._raw?.prefix ?? '');
+            if(fromCol)return fromCol;
+            const found=norm(r?.name).match(/^\[([^\]]+)\]/);
+            return found ? found[1] : '';
+          };
+          const baseMatches=rows.filter(r => norm(r.type)===norm(typeKey) && norm(r.season)===seasonKey);
+          // 2737: 유니크 등급은 삭룡 갈리아르 접두사 드롭다운의 적용 대상이 아니다.
+          // 유니크 세트/부위는 기존 원본 후보를 사용해 선택 변경 시에도 그대로 유지한다.
+          const isUniqueSet = norm(info.rarity).toLowerCase() === '유니크'
+            || norm(info.rarity).toLowerCase() === 'unique';
+          const isUniqueOnlyPart = baseMatches.length > 0 && baseMatches.every(r => {
+            const rarity = norm(r.rarity).toLowerCase();
+            return rarity === '유니크' || rarity === 'unique';
+          });
+          const candidateRows = (selectedPrefix === null || isUniqueSet || isUniqueOnlyPart)
+            ? baseMatches
+            : baseMatches.filter(r => selectedPrefix === 'none'
+              ? !allowedPrefixes.includes(getItemPrefix(r))
+              : getItemPrefix(r) === selectedPrefix);
+
           if (mode === 'epic') {
             // 에픽 모드: 종류 + 레어리티 '에픽' 우선
-            row = rows.find(
+            row = candidateRows.find(
               (r) =>
                 norm(r.type) === norm(typeKey) &&
                 norm(r.season) === seasonKey &&
                 norm(r.rarity || r['레어리티']) === '에픽'
             );
             if (!row) {
-              row = rows.find((r) => norm(r.type) === norm(typeKey) && norm(r.season) === seasonKey);
+              row = candidateRows[0];
             }
           } else {
             // 익시드 모드: 종류만 맞으면 OK
-            row = rows.find((r) => norm(r.type) === norm(typeKey) && norm(r.season) === seasonKey);
+            row = candidateRows[0];
           }
 
           if (row) {
@@ -20363,9 +20476,33 @@ const row =
       'sub', 'magestone', 'earring',
     ]);
 
+    // 2733: 시즌 장비 접두사 아이콘을 기존 시즌5 세트 배지 경로로 표시한다.
+    const EQUIP_PREFIX_BADGES = new Set([
+      '돌풍', '여우', '폭풍', '허기', '밀짚',
+      '영원', '수인', '흡혈', '자매', '마녀'
+    ]);
+    const EQUIP_PREFIX_TARGET_SLOTS = new Set([
+      'weapon', 'headshoulder', 'top', 'bottom', 'belt', 'shoes',
+      'bracelet', 'necklace', 'ring', 'sub', 'magestone', 'earring'
+    ]);
+    function getEquipPrefixBadgeSrc(item) {
+      const prefix = String(
+        item?.prefix ?? item?.prefixLabel ?? item?.['접두사'] ??
+        item?._raw?.['접두사'] ?? item?._raw?.prefix ?? ''
+      ).normalize('NFC').trim().replace(/^\[|\]$/g, '');
+      const matched = [...EQUIP_PREFIX_BADGES].find(word =>
+        prefix === word || prefix.startsWith(word + ' ') || prefix.startsWith(word + ':')
+      );
+      return matched ? `img/etc/icon/${matched}.png` : '';
+    }
     function getSetBadgeSrc(item, slotKey = '') {
       if (!item) return '';
-      if (!BADGE_TARGET_SLOTS.has(String(slotKey || '').trim())) return '';
+      const key = String(slotKey || '').trim();
+      if (EQUIP_PREFIX_TARGET_SLOTS.has(key)) {
+        const prefixSrc = getEquipPrefixBadgeSrc(item);
+        if (prefixSrc) return prefixSrc;
+      }
+      if (!BADGE_TARGET_SLOTS.has(key)) return '';
       const setName = String(item.type || item['종류'] || '').trim();
       return SET_BADGE_ICON_MAP[setName] || '';
     }
@@ -30575,6 +30712,7 @@ try {
           const restoredItem = {
             name: String(info?.name || eq?.name || eq?.['이름'] || '').trim(),
             img: srcImg || null,
+            prefix: String(info?.prefixLabel || info?.prefix || eq?.prefix || eq?.['접두사'] || '').trim(),
             type: String(
               info?.type ||
               eq?.type ||
@@ -35156,7 +35294,7 @@ try {
         </div>
         <div class="meta">
           <div class="meta-top">
-            <span class="lvl">${lvlLabel}</span><span class="name">${name}</span>
+            <span class="lvl">${lvlLabel}</span><span class="name">${renderErosionWeaponName(name)}</span>
           </div>
           <div class="meta-sub">${rowType}</div>
         </div>
@@ -39865,9 +40003,34 @@ return `
     #guildDinnerModal .guild-favorite-symbol {font-size:14px; color:#c5b08b;}
     #guildDinnerModal .guild-dinner-close {justify-self:end; width:30px; height:30px; border-radius:50%; color:#f9e7bd; background:#292219; border:1px solid #80623b; font-size:20px; cursor:pointer;}
     #guildDinnerModal .guild-menu-slots {display:flex; justify-content:center; gap:clamp(10px,4vw,44px); padding:33px 12px 32px;}
-    #guildDinnerModal .guild-menu-slot {position:relative; width:clamp(78px,16vw,136px); aspect-ratio:1; border:2px solid #90764e; background:#1d1914; box-shadow:0 0 0 7px #86765025,0 0 0 9px #9e815444,inset 0 0 0 7px #211a15; color:#b9a273; font-size:50px; font-weight:700; cursor:pointer;}
-    #guildDinnerModal .guild-menu-slot:before {content:''; position:absolute; inset:-13px; border:2px solid #87765280; transform:rotate(45deg) scale(.78); pointer-events:none;}
+    #guildDinnerModal .guild-menu-slot {
+      --guild-slot-ornament-offset: clamp(38px, 7.4vw, 56px);
+      position:relative; z-index:0; width:clamp(78px,16vw,136px); aspect-ratio:1;
+      overflow:visible; border:2px solid #90764e; border-radius:2px;
+      background:linear-gradient(180deg,#241b14 0%,#1a1410 100%);
+      box-shadow:inset 0 0 0 1px rgba(255,226,169,.18), inset 0 0 0 6px #1e1712, 0 0 0 2px rgba(73,57,35,.35);
+      color:#b9a273; font-size:50px; font-weight:700; cursor:pointer;
+    }
+    #guildDinnerModal .guild-menu-slot::before {
+      content:''; position:absolute; left:50%; top:50%; width:132%; height:132%;
+      border:2px solid rgba(181,162,109,.55); border-radius:2px;
+      transform:translate(-50%,-50%) rotate(45deg); pointer-events:none; z-index:-2;
+      box-shadow:0 0 10px rgba(255,228,155,.10);
+    }
+    #guildDinnerModal .guild-menu-slot::after {
+      content:''; position:absolute; left:50%; top:50%; width:11px; height:11px;
+      border:2px solid rgba(181,162,109,.58); border-radius:1px;
+      background:rgba(36,28,19,.9); transform:translate(-50%,-50%) rotate(45deg);
+      box-shadow:
+        0 calc(-1 * var(--guild-slot-ornament-offset)) 0 0 rgba(181,162,109,.58),
+        var(--guild-slot-ornament-offset) 0 0 0 rgba(181,162,109,.58),
+        0 var(--guild-slot-ornament-offset) 0 0 rgba(181,162,109,.58),
+        calc(-1 * var(--guild-slot-ornament-offset)) 0 0 0 rgba(181,162,109,.58);
+      pointer-events:none; z-index:-1;
+    }
     #guildDinnerModal .guild-menu-slot:hover,#guildDinnerModal .guild-menu-slot:focus-visible {border-color:#e8c98d; color:#f5d28b; outline:none;}
+    #guildDinnerModal .guild-menu-slot:hover::before,#guildDinnerModal .guild-menu-slot:focus-visible::before {border-color:rgba(243,211,129,.72);}
+    #guildDinnerModal .guild-menu-slot:hover::after,#guildDinnerModal .guild-menu-slot:focus-visible::after {border-color:rgba(243,211,129,.74);}
     #guildDinnerModal .guild-dinner-effects {display:grid;grid-template-columns:1fr 1fr; min-height:235px; border:1px solid #715331; border-radius:8px; background:#100e0bde; margin:0 14px 18px; overflow:hidden;}
     #guildDinnerModal .guild-dinner-effect {padding:12px 20px; min-width:0;}
     #guildDinnerModal .guild-dinner-effect + .guild-dinner-effect {border-left:1px solid #61482c;}
@@ -39911,7 +40074,12 @@ return `
     #guildDinnerModal .guild-menu-name {font-size:17px;font-weight:850;color:#f3dfb1;word-break:keep-all;}
     #guildDinnerModal .guild-menu-subtitle {font-size:12px;color:#b7a58a;line-height:1.45;word-break:keep-all;}
     #guildDinnerModal .guild-dinner-main {min-width:0;min-height:0;overflow-y:auto;padding:0 14px 16px;}
-    #guildDinnerModal .guild-menu-slot.is-active {border-color:#ffd16a;box-shadow:0 0 0 6px #e0a84627,0 0 17px #ffbb4c88;}
+    #guildDinnerModal .guild-menu-slot.is-active {
+      border-color:#ffd16a;
+      box-shadow:inset 0 0 0 1px rgba(255,240,188,.28), inset 0 0 0 6px #1e1712, 0 0 0 3px rgba(224,168,70,.22), 0 0 18px rgba(255,187,76,.38);
+    }
+    #guildDinnerModal .guild-menu-slot.is-active::before {border-color:rgba(255,217,117,.88); box-shadow:0 0 14px rgba(255,215,108,.24);}
+    #guildDinnerModal .guild-menu-slot.is-active::after {border-color:rgba(255,217,117,.92);}
     #guildDinnerModal .guild-menu-slot .guild-slot-img {display:block;width:65%;height:65%;object-fit:contain;margin:auto;}
     #guildDinnerModal .guild-menu-slot.has-menu {font-size:12px;}
     #guildDinnerModal .guild-menu-slot.has-menu .guild-slot-name {display:block;margin-top:4px;color:#fce7a9;font-size:11px;line-height:1.2;}
@@ -39933,7 +40101,7 @@ return `
       #guildDinnerModal .guild-dinner-dialog {padding:13px 8px;}
       #guildDinnerModal .guild-dinner-header h3 {font-size:19px;}
       #guildDinnerModal .guild-menu-slots {gap:17px; padding:28px 7px;}
-      #guildDinnerModal .guild-menu-slot {width:min(24vw,106px); font-size:38px;}
+      #guildDinnerModal .guild-menu-slot {width:min(24vw,106px); font-size:38px; --guild-slot-ornament-offset:min(9vw,38px);}
       #guildDinnerModal .guild-dinner-effects {min-height:190px; margin:0 7px 14px;}
       #guildDinnerModal .guild-dinner-effect {padding:9px 8px;}
       #guildDinnerModal .guild-dinner-effect h4 {font-size:14px;}
@@ -40404,6 +40572,28 @@ return `
     button.addEventListener('click',()=>{showPicker(activeSlot||'1');openOriginal();});
     document.addEventListener('keydown', event => { if(event.key === 'Escape' && modal.classList.contains('show')) applyGuildDinnerMeal(); });
   })();
+</script>
+<script>
+/* 2735: 삭룡 갈리아르 드롭다운의 UI 상태만 처리 (장비 장착/스탯 계산과 미연결) */
+(() => {
+  const ids=['specGaliarSubDropdown','specGaliarStoneDropdown'];
+  const dropdowns=ids.map(id=>document.getElementById(id)).filter(Boolean);
+  if(dropdowns.length!==2)return;
+  function closeAll(){for(const d of dropdowns){d.classList.remove('open');d.querySelector('.acc-prefix-dropdown-btn')?.setAttribute('aria-expanded','false');d.querySelector('.acc-prefix-dropdown-menu')?.setAttribute('aria-hidden','true');}}
+  for(const drop of dropdowns){
+    const trigger=drop.querySelector('.acc-prefix-dropdown-btn');
+    const menu=drop.querySelector('.acc-prefix-dropdown-menu');
+    const label=drop.querySelector('.spec-galiar-selected-label');
+    trigger.addEventListener('click', e=>{e.stopPropagation();const wasOpen=drop.classList.contains('open');closeAll();drop.classList.toggle('open',!wasOpen);trigger.setAttribute('aria-expanded',String(!wasOpen));menu.setAttribute('aria-hidden',String(wasOpen));});
+    for(const option of menu.querySelectorAll('.acc-prefix-dropdown-option')){
+      option.addEventListener('click',e=>{e.stopPropagation();label.textContent=option.textContent.trim();drop.dataset.value=option.dataset.value;
+      document.getElementById('specSetModal')?.dispatchEvent(new CustomEvent('spec-galiar-change'));
+      for(const o of menu.querySelectorAll('.acc-prefix-dropdown-option')){const selected=o===option;o.classList.toggle('is-selected',selected);o.setAttribute('aria-selected',String(selected));}closeAll();});
+    }
+  }
+  document.addEventListener('click',e=>{if(!dropdowns.some(d=>d.contains(e.target)))closeAll();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
+})();
 </script>
 </body>
 
