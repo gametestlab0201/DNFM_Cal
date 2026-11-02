@@ -14053,7 +14053,8 @@ if (/[\r\n]/.test(nickname)) {
       const hasSpecialLike = !!window.__IS_SPECIAL_USER__;
       const prePatchRow = document.getElementById('skillSheetToggleRow');
       const prePatchInput = document.getElementById('chkUsePrePatchSkills');
-      const canUsePrePatch = window.__loginPingResult?.prePatchAllowed === true;
+      // special_user 또는 research_user: 서버에서 허용한 패치전 기능을 표시한다.
+      const canUsePrePatch = window.__loginPingResult?.prePatchAllowed === true && (isSpecialUser || isResearchUser);
       if (prePatchRow) prePatchRow.style.display = canUsePrePatch ? 'inline-flex' : 'none';
       if (!canUsePrePatch && prePatchInput) prePatchInput.checked = false;
 
@@ -16101,6 +16102,11 @@ showModal($uniqueEffectModal, false);
       noticePrevBtn?.addEventListener('click', () => window.setNoticeModalPage(noticePageNow - 1));
       noticeNextBtn?.addEventListener('click', () => window.setNoticeModalPage(noticePageNow + 1));
       window.setNoticeModalPage(1);
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && $noticeModal.classList.contains('show')) {
+          showModal($noticeModal, false);
+        }
+      });
     }
 
     // ✅ 탈퇴 안내 모달 닫기
@@ -16125,12 +16131,13 @@ showModal($uniqueEffectModal, false);
     };
 
 
-    // PC 계산기 로딩 후 공지 모달을 띄우는 전역 함수
+    // 2740: 이전 공지사항 모달과 직인 복원, 기존 진입 호출 재활용
     window.showQuatroNoticeOnce = function () {
       const modal = document.getElementById('noticeModal');
       if (!modal) return;
       if (typeof window.setNoticeModalPage === 'function') window.setNoticeModalPage(1);
       showModal(modal, true);
+      modal.querySelector('.notice-restored-close')?.focus({ preventScroll: true });
     };
 
 
@@ -40359,6 +40366,132 @@ return `
 </script>
 
 
+
+<!-- ====================== 2740: 예전 공지사항 모달 구조 복원 ======================
+     기존 코드에 남아 있던 noticeModal, patch-log-body,
+     sign-row / seal-stamp / sign-text 스타일을 활용합니다.
+     안내 문구는 아래 notice-announcement 영역만 수정하세요.
+============================================================================= -->
+<style>
+  #noticeModal {z-index:20000; padding:16px; box-sizing:border-box;}
+  #noticeModal .notice-dialog-restored {
+    position:relative; display:flex; flex-direction:column;
+    width:min(860px,96vw); max-height:min(90dvh,820px); overflow:hidden;
+    background:linear-gradient(180deg,#23272f,#15191f);
+    color:#f0e6d2; border:1px solid rgba(250,204,107,.44);
+    border-radius:14px; box-shadow:0 24px 70px rgba(0,0,0,.76);
+  }
+  #noticeModal .notice-restored-header {
+    flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+    padding:17px 27px;border-bottom:1px solid rgba(250,204,107,.22);
+  }
+  #noticeModal .notice-restored-header h3 {
+    margin:0;font-size:24px;font-weight:900;color:#ffe8a3;
+  }
+  #noticeModal .notice-restored-close {
+    border:0;background:transparent;color:#eadbb7;cursor:pointer;
+    font-size:28px;line-height:1;padding:0 4px;
+  }
+  #noticeModal .patch-log-body {flex:1;min-height:0;padding:24px 32px 16px;overflow-y:auto;}
+  #noticeModal .notice-announcement {
+    overflow-wrap:anywhere;word-break:keep-all;
+    font-size:16px;line-height:1.65;color:#f2eee5;
+  }
+  #noticeModal .notice-signature {
+    margin-top:16px;padding-top:12px;
+    border-top:1px solid rgba(250,204,107,.18);
+  }
+  #noticeModal .notice-signature .seal-stamp {
+    width:90px;max-height:95px;object-fit:contain;
+  }
+  #noticeModal .notice-signature .sign-text {
+    color:#f6e1ae;font-weight:800;font-size:15px;
+  }
+  #noticeModal .notice-announcement p {margin:0 0 15px;}
+  #noticeModal .notice-announcement .notice-greeting {margin-bottom:12px;}
+  #noticeModal .notice-announcement .notice-intro {margin-bottom:15px;}
+  #noticeModal .notice-rule-label {font-size:13px;font-weight:900;letter-spacing:.03em;color:#dbc697;margin-bottom:5px;}
+  #noticeModal .notice-rule {padding:10px 14px;border-left:3px solid #d9aa54;background:rgba(255,255,255,.035);margin:0 0 8px;}
+  #noticeModal .notice-rule strong {font-size:17px;font-weight:850;color:#ffe6a4;}
+  #noticeModal .notice-rule-wrong {border-left-color:#ce7c6a;}
+  #noticeModal .notice-rule-wrong strong {color:#f2b2a5;}
+  #noticeModal .notice-rule-correct {border-left-color:#8fc18d;}
+  #noticeModal .notice-rule-correct strong {color:#c9eabb;}
+  #noticeModal .notice-urgent {margin:16px 0 12px;padding:12px 15px;border:1px solid rgba(239,198,111,.42);border-radius:7px;color:#ffe8b1;font-weight:750;line-height:1.6;}
+  #noticeModal .notice-urgent strong {color:#ffde7b;}
+  /* 2743: 인사말과 마무리 문구에 같은 글꼴 크기·색상·굵기 적용 */
+  #noticeModal .notice-announcement .notice-greeting,
+  #noticeModal .notice-announcement .notice-outro {
+    font-size:14px;
+    font-weight:400;
+    color:#cbd0da;
+    line-height:1.65;
+  }
+  #noticeModal .notice-announcement .notice-outro {margin:0;}
+  @media(max-width:600px){
+    #noticeModal {padding:9px;}
+    #noticeModal .notice-dialog-restored{width:100%;max-height:94dvh;}
+    #noticeModal .notice-restored-header {padding:12px 16px;}
+    #noticeModal .notice-restored-header h3{font-size:20px;}
+    #noticeModal .patch-log-body{padding:16px 16px 10px;}
+    #noticeModal .notice-announcement{font-size:14px;line-height:1.6;}
+    #noticeModal .notice-rule strong{font-size:14px;}
+    #noticeModal .notice-rule {padding:9px 10px;}
+    #noticeModal .notice-urgent{padding:10px 11px;}
+    #noticeModal .notice-signature .seal-stamp {width:72px;}
+  }
+</style>
+<div id="noticeModal" class="modal" aria-hidden="true">
+  <div class="backdrop" data-close></div>
+  <section class="notice-dialog-restored" role="dialog" aria-modal="true" aria-labelledby="noticeRestoredTitle">
+    <div class="notice-restored-header">
+      <h3 id="noticeRestoredTitle">공지사항</h3>
+      <button class="notice-restored-close" type="button" data-close aria-label="공지사항 닫기">×</button>
+    </div>
+    <div class="patch-log-body">
+      <!-- 공지사항 문구 수정 영역: 아래 notice-announcement 안의 텍스트를 편집하세요. -->
+      <div class="notice-announcement">
+        <p class="notice-greeting">안녕하세요. 게임실험연구소입니다.</p>
+        <p class="notice-intro">삭룡 갈리아르 보조장비 <strong>‘여우’ 접두사 아이템</strong>의 <strong>트루 크리티컬 옵션 계산 오류</strong>를 수정했습니다.</p>
+        <div class="notice-rule-label">기존 잘못된 적용</div>
+        <div class="notice-rule notice-rule-wrong">크리티컬 공격 시 <strong>75% 확률</strong>로 크리티컬 데미지 <strong>5%p 증가</strong></div>
+        <div class="notice-rule-label">수정된 정상 적용</div>
+        <div class="notice-rule notice-rule-correct">크리티컬 공격 시 <strong>5% 확률</strong>로 크리티컬 데미지 <strong>75%p 증가</strong></div>
+        <div class="notice-urgent">기존에 ‘여우’ 접두사 아이템으로 계산하셨다면, <strong>삭룡 갈리아르 장비 제작 전 반드시 다시 계산</strong>해 주세요.</div>
+        <p class="notice-outro">이용에 혼선을 드려 죄송합니다. 더욱 정확한 계산기를 제공하도록 노력하겠습니다. 감사합니다.</p>
+      </div>
+      <div class="sign-row notice-signature">
+        <span class="sign-text">게임실험연구소</span>
+        <img class="seal-stamp" src="img/sign.png" alt="게임실험연구소 직인" loading="eager">
+      </div>
+    </div>
+  </section>
+</div>
+<!-- 2745: 공지 모달 DOM 생성 이후 닫기 동작 연결 -->
+<script>
+(() => {
+  const modal = document.getElementById('noticeModal');
+  if (!modal) return;
+  const closeNotice = () => {
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+  };
+  modal.querySelectorAll('.notice-restored-close, .backdrop[data-close]').forEach(el => {
+    el.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      closeNotice();
+    });
+  });
+  // 배경 영역 자체를 클릭한 경우에도 닫되, 공지 본문 클릭은 유지한다.
+  modal.addEventListener('click', event => {
+    if (event.target === modal) closeNotice();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && modal.classList.contains('show')) closeNotice();
+  });
+})();
+</script>
   <!-- 길드회식 주문 UI: 실제 메뉴·버프 데이터는 추후 연동 -->
   <div id="guildDinnerModal" class="modal" aria-hidden="true">
     <div class="backdrop" data-close></div>
