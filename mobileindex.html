@@ -2185,6 +2185,31 @@
     }
 
 
+    /* 713: PC 공지사항(2745)과 동일한 구성, 모바일 화면 최적화 */
+    #noticeModal .mobile-notice-dialog { width:min(600px,94vw); max-height:min(88dvh,780px); border:1px solid rgba(210,170,81,.6); }
+    #noticeModal .mobile-notice-dialog > header h2 {color:#ffe8a3;font-size:19px;font-weight:900;}
+    #noticeModal .mobile-notice-dialog > header .close {font-size:25px;line-height:1;padding:0 5px;background:transparent;border:0;color:#eadbb7;}
+    #noticeModal .mobile-notice-dialog .notice-body {padding:19px 18px 14px;overscroll-behavior:contain;}
+    #noticeModal .notice-announcement {font-size:14px;line-height:1.65;color:#f2eee5;word-break:keep-all;overflow-wrap:anywhere;}
+    #noticeModal .notice-announcement p {margin:0 0 13px;}
+    #noticeModal .notice-announcement .notice-greeting,
+    #noticeModal .notice-announcement .notice-outro {font-size:13px;font-weight:400;color:#cbd0da;line-height:1.65;}
+    #noticeModal .notice-announcement .notice-greeting {margin-bottom:12px;}
+    #noticeModal .notice-announcement .notice-outro {margin-bottom:0;}
+    #noticeModal .notice-announcement .notice-rule-label {font-size:12px;font-weight:900;color:#dbc697;margin:10px 0 5px;}
+    #noticeModal .notice-announcement .notice-rule {padding:10px 11px;border-left:3px solid #d9aa54;background:rgba(255,255,255,.035);margin:0 0 7px;}
+    #noticeModal .notice-announcement .notice-rule strong {font-weight:900;}
+    #noticeModal .notice-announcement .notice-rule-wrong {border-left-color:#ce7c6a;}
+    #noticeModal .notice-announcement .notice-rule-wrong strong {color:#f2b2a5;}
+    #noticeModal .notice-announcement .notice-rule-correct {border-left-color:#8fc18d;}
+    #noticeModal .notice-announcement .notice-rule-correct strong {color:#c9eabb;}
+    #noticeModal .notice-announcement .notice-urgent {margin:13px 0 12px;padding:11px 12px;border:1px solid rgba(239,198,111,.42);border-radius:7px;color:#ffe8b1;font-weight:750;line-height:1.6;}
+    #noticeModal .notice-announcement .notice-urgent strong {color:#ffde7b;}
+    #noticeModal .notice-signature {margin-top:14px;padding-top:12px;border-top:1px solid rgba(250,204,107,.18);}
+    #noticeModal .notice-signature .sign-text {color:#f6e1ae;font-size:13px;font-weight:800;}
+    #noticeModal .notice-signature .seal-stamp {width:62px;height:68px;object-fit:contain;}
+    @media(min-width:560px){#noticeModal .mobile-notice-dialog .notice-body{padding:22px 26px 16px;}#noticeModal .notice-announcement{font-size:15px;}}
+
     /* ✅ 모바일 계산기 로딩 공지 모달: PC와 동일한 1페이지/2페이지 전환 */
     #noticeModal .dialog {
       width: min(740px, 94vw);
@@ -7937,79 +7962,35 @@
     </div>
   </div>
 
-  <!-- ✅ 공지/안내사항 모달 -->
+  <!-- ✅ 713: 기존 모바일 안내사항 모달과 직인(img/sign.png) 복원 -->
   <div id="noticeModal" class="modal" aria-hidden="true">
     <div class="backdrop" data-notice-close></div>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="noticeTitle">
+    <div class="dialog mobile-notice-dialog" role="dialog" aria-modal="true" aria-labelledby="noticeTitle">
       <header>
-        <h2 id="noticeTitle">안내사항</h2>
-        <button type="button" class="close" data-notice-close>닫기</button>
+        <h2 id="noticeTitle">공지사항</h2>
+        <button type="button" class="close" data-notice-close aria-label="공지사항 닫기">×</button>
       </header>
-
       <div class="notice-body" id="noticeBody" data-static="1">
         <div class="notice-page active" data-notice-page="1">
-          <div class="notice-new-page">
-            <strong class="notice-new-title">📢 캐릭터 세팅 현황 관리가 추가되었습니다!</strong>
-
-            안녕하세요 게임실험연구소 입니다.<br><br>
-
-            이제 계산기에서 저장한 캐릭터 세팅을 한눈에 확인하고 관리할 수 있는<br>
-            <strong style="color: #ff4444;">캐릭터 전체 세팅 현황</strong> 기능이 추가되었습니다.<br><br>
-
-            장비, 마법부여, 엠블렘, 강화, 마법봉인 등 주요 세팅 상태를<br>
-            <strong style="color:#ffe8a3;">캐릭터별로</strong> 정리해서 확인할 수 있으며, 여러 캐릭터의 세팅 현황을 비교하거나<br>
-            부족한 부분을 점검할 때 더욱 편리하게 사용할 수 있습니다.<br><br>
-
-            PC 계산기에서는 상단의 캐릭터 전체 세팅 현황 버튼을 통해 이동할 수 있으며,<br>
-            모바일 계산기에서도 캐릭터 선택 화면 아래에 추가된 버튼을 통해 이용할 수 있습니다.<br><br>
-
-            앞으로도 더 편리하게 세팅을 관리할 수 있도록 계속 개선해 나가겠습니다.<br><br>
-
-            <li class="sign-row">
-              <span class="sign-text">- 게임실험연구소장 드림 -</span>
-              <img src="/img/sign.png" alt="게임실험연구소장 직인" class="seal-stamp">
-            </li>
+          <!-- 공지 문구 수정은 이 notice-announcement 내부에서 가능합니다. -->
+          <div class="notice-announcement">
+            <p class="notice-greeting">안녕하세요. 게임실험연구소입니다.</p>
+            <p class="notice-intro">삭룡 갈리아르 보조장비 <strong>‘여우’ 접두사 아이템</strong>의 <strong>트루 크리티컬 옵션 계산 오류</strong>를 수정했습니다.</p>
+            <div class="notice-rule-label">기존 잘못된 적용</div>
+            <div class="notice-rule notice-rule-wrong">크리티컬 공격 시 <strong>75% 확률</strong>로 크리티컬 데미지 <strong>5%p 증가</strong></div>
+            <div class="notice-rule-label">수정된 정상 적용</div>
+            <div class="notice-rule notice-rule-correct">크리티컬 공격 시 <strong>5% 확률</strong>로 크리티컬 데미지 <strong>75%p 증가</strong></div>
+            <div class="notice-urgent">기존에 ‘여우’ 접두사 아이템으로 계산하셨다면, <strong>삭룡 갈리아르 장비 제작 전 반드시 다시 계산</strong>해 주세요.</div>
+            <p class="notice-outro">이용에 혼선을 드려 죄송합니다. 더욱 정확한 계산기를 제공하도록 노력하겠습니다. 감사합니다.</p>
+          </div>
+          <div class="sign-row notice-signature">
+            <span class="sign-text">게임실험연구소</span>
+            <img src="img/sign.png" alt="게임실험연구소 직인" class="seal-stamp" loading="eager">
           </div>
         </div>
-
-        <div class="notice-page" data-notice-page="2">
-          <ul class="notice-list">
-            <li></li>
-
-            <strong style="font-size:16px;">🎉 누적 로그인 20,000회 돌파! 감사 기념 <strong style="color: #ff4444;">저장슬롯 3배</strong>
-              이벤트 🎉</strong><br><br>
-
-            <br>안녕하세요 게임실험연구소 입니다.<br><br>
-
-            계산기 오픈 이후 연구원분들의 많은 관심과 이용 덕분에 누적 로그인 <strong style="font-size:1.15em;">20,000회</strong>를 넘겼습니다! <br><br>
-
-            보내주신 성원에 감사드리며, 감사 기념으로 1개월 이상 장기 이용자분들께 <strong style="font-size:1.15em; color:#ff4444;">저장슬롯 3배
-              이벤트</strong>를 진행합니다.<br><br>
-
-            더 많은 세팅을 저장하고, 더 편하게 비교해보시길 바랍니다.<br>
-            앞으로도 더욱 좋은 계산기로 보답하겠습니다.<br><br>
-
-            감사합니다.<br><br><br>
-
-            ※ 본 이벤트는 '선임 연구원' 이상 등급에서 연속 2회 이상 이용하고 계신 연구원분들께 자동 적용됩니다.<br>
-            (정확한 이벤트 적용 시점은 2회차 이용이 시작된 뒤 약 2주 후, 총 이용기간 45일 전후로 자동 반영됩니다.)<br><br>
-
-            <li class="sign-row">
-              <span class="sign-text">- 게임실험연구소장 드림 -</span>
-              <img src="/img/sign.png" alt="게임실험연구소장 직인" class="seal-stamp">
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="notice-page-controls">
-        <button type="button" id="noticePrevBtn" class="notice-page-btn">이전</button>
-        <span id="noticePageIndicator" class="notice-page-indicator">1 / 2</span>
-        <button type="button" id="noticeNextBtn" class="notice-page-btn">다음</button>
       </div>
     </div>
   </div>
-
 
   <!-- ✅ 수련일지 1차 선택 모달 (모바일) -->
 
@@ -9802,9 +9783,8 @@
         ensurePage3Init();
         ensurePage4Init();
 
-        // ✅ 구버전 안내사항 자동 표시 중단
-        // 필요 시 추후 새 공지로 교체한 뒤 showNoticeOnce_mobile() 호출을 복원한다.
-        // showNoticeOnce_mobile();
+        // ✅ 713: 초기 데이터 로딩 완료 후 공지사항 자동 표시 (페이지 진입 시 1회)
+        showNoticeOnce_mobile();
 
       } catch (e) {
         console.error(e);
