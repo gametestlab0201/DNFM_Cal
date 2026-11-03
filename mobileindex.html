@@ -23110,8 +23110,71 @@ function buildSynergyPayloadMobile() {
         ).trim().toLowerCase();
       }
 
+
+      // 게스트 자동 저장은 세션 토큰과 무관하게 이 브라우저에서 한 건만 유지한다.
+      const GUEST_LAST_STATE_KEY = `${LAST_STATE_PREFIX}guest`;
+      const GUEST_LAST_STATE_MAX_CHARS = 750000; // 대략 1.5MB(UTF-16 기준) 이상 비정상 저장 방지
+
+      function isGuestLastStateSession() {
+        const token = String(window.idToken || sessionStorage.getItem('id_token') || '').trim();
+        if (token.startsWith('GUEST.')) return true;
+        if (token && !token.startsWith('GUEST.')) return false;
+        return window.__GUEST_MODE__ === true;
+      }
+
+      // 기존 guest-UUID@guest.invalid 자동저장 기록은 최신 정상 상태 하나만 이전 후 정리한다.
+      // 실제 로그인 계정 기록, 다른 캐시, 프리셋/슬롯 키는 삭제하지 않는다.
+      function migrateAndCleanupGuestLastStates() {
+        try {
+          const legacyKeys = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith(LAST_STATE_PREFIX)) {
+              const account = key.slice(LAST_STATE_PREFIX.length);
+              if (/^guest-[^:]+@guest\.invalid$/i.test(account)) legacyKeys.push(key);
+            }
+          }
+          if (!legacyKeys.length) return;
+
+          const existing = localStorage.getItem(GUEST_LAST_STATE_KEY);
+          let newest = null;
+          if (!existing) {
+            for (const key of legacyKeys) {
+              const raw = localStorage.getItem(key);
+              if (!raw || raw.length > GUEST_LAST_STATE_MAX_CHARS) continue;
+              try {
+                const parsed = JSON.parse(raw);
+                if (!parsed?.state || typeof parsed.state !== 'object' || Array.isArray(parsed.state)) continue;
+                const stamp = Number(parsed.savedAt) || 0;
+                if (!newest || stamp > newest.stamp) newest = { key, raw, stamp };
+              } catch (_) {}
+            }
+          }
+
+          // 이전 대상 데이터는 마지막까지 남겨두어 저장 실패 시 데이터 소실을 피한다.
+          for (const key of legacyKeys) {
+            if (key !== newest?.key) localStorage.removeItem(key);
+          }
+          if (newest) {
+            try {
+              localStorage.setItem(GUEST_LAST_STATE_KEY, newest.raw);
+              localStorage.removeItem(newest.key);
+            } catch (error) {
+              console.warn('[게스트 마지막 상태] 최신 기록 이전 실패, 원본 유지:', error);
+            }
+          }
+          console.info('[게스트 마지막 상태] 기존 게스트 기록 정리:', legacyKeys.length, '건');
+        } catch (error) {
+          console.warn('[게스트 마지막 상태] 기존 기록 정리 실패:', error);
+        }
+      }
+
+      migrateAndCleanupGuestLastStates();
+
       function getSharedLastStateStorageKey_mobile() {
+        if (isGuestLastStateSession()) return GUEST_LAST_STATE_KEY;
         const email = getLoginEmailForSharedLastState_mobile();
+        if (email.endsWith('@guest.invalid')) return GUEST_LAST_STATE_KEY;
         return email ? `${LAST_STATE_PREFIX}${email}` : '';
       }
 
@@ -23142,6 +23205,11 @@ function buildSynergyPayloadMobile() {
         try {
           const snapshot = buildSharedLastStateSnapshot_mobile();
           const stateJson = JSON.stringify(snapshot);
+          if (key === GUEST_LAST_STATE_KEY && stateJson.length > GUEST_LAST_STATE_MAX_CHARS) {
+            console.warn('[게스트 마지막 상태] 비정상적으로 큰 상태는 저장하지 않음:', stateJson.length);
+            dirty = false;
+            return;
+          }
 
           if (!force && stateJson === lastSavedStateJson) {
             dirty = false;

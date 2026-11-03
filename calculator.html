@@ -32454,6 +32454,61 @@ try {
           console.warn('[computeViaBackend] final_compute uses 반영 실패:', e);
         }
 
+        // [2792] Worker 2573 트루 크리티컬 진단을 F12 콘솔에서 바로 확인.
+        // 데미지 계산에는 관여하지 않으며, 서버의 공유/독립 비교 수치를 그대로 표시한다.
+        if (resCompute.trueCritDiag) {
+          const diag = resCompute.trueCritDiag;
+          window.__lastTrueCritDiag = diag; // Console에서 __lastTrueCritDiag 입력으로 재확인
+          console.groupCollapsed('[TRUE_CRIT_DIAG] 트루 크리티컬 공유 쿨타임 진단');
+          console.log('전체 진단 데이터:', diag);
+          console.table([{
+            캐릭터: diag.character,
+            크리티컬확률: diag.critRate,
+            공유적용스킬: diag.sharedSkillCount,
+            독립대체스킬: diag.fallbackSkillCount,
+            공유타격이벤트: diag.sharedHitEvents,
+            독립기대발동: diag.independentExpectedProcs,
+            실제기대발동: diag.actualExpectedProcs,
+            독립추가데미지: diag.independentBonus,
+            실제추가데미지: diag.actualBonus,
+            추가데미지감소: diag.bonusReduction
+          }]);
+          if (diag.fallbackSkills?.length) {
+            console.log('공유 계산 제외 사유:', diag.fallbackReasons);
+            console.table(diag.fallbackSkills);
+          }
+          if (diag.topReductionSkills?.length) {
+            console.log('공유 적용으로 감소량이 큰 스킬:');
+            console.table(diag.topReductionSkills);
+          }
+          if (diag.timelineDetail) {
+            const td = diag.timelineDetail;
+            console.groupCollapsed('[TRUE_CRIT_TIMELINE] 공유 타격 시간표 상세 진단');
+            console.log('타격 시간표 원본:', td);
+            console.table([{
+              전체타격:td.hitEvents, 첫타격프레임:td.firstHit, 마지막타격프레임:td.lastHit,
+              준비상태발동확률:td.chancePerReadyHit, 공유기대발동:td.expectedProcs,
+              평균쿨타임점유확률:td.averageLockedBefore, 최대쿨타임점유확률:td.peakLockedBefore,
+              평균최근30F타수:td.avgRolling30Hits, 최대최근30F타수:td.maxRolling30Hits,
+              앞선30F공격과경쟁한타격:td.hitsWithEarlier30FCompetition,
+              동시타격프레임수:td.simultaneousFrames, 최대동시타격수:td.maxSimultaneousHits
+            }]);
+            if(td.busiest30FrameBuckets?.length) {console.log('타격 밀도가 높은 30F 구간 (고정 구간):');console.table(td.busiest30FrameBuckets);}
+            if(td.sameFrameTop?.length) {console.log('동일 시점 동시 타격 상위 구간:');console.table(td.sameFrameTop);}
+            if(td.perSkill?.length) {console.log('스킬별 타격 시간 및 쿨타임 점유:');console.table(td.perSkill);}
+            if(td.first60Hits?.length) {console.log('첫 60개 타격 상세 시간표:');console.table(td.first60Hits);}
+            console.log('해석 주의:',td.note);
+            console.groupEnd();
+            window.__lastTrueCritTimeline = td;
+          } else {
+            window.__lastTrueCritTimeline = null;
+          }
+          console.groupEnd();
+        } else {
+          window.__lastTrueCritDiag = null;
+          console.info('[TRUE_CRIT_DIAG] 결과 없음 (트루 크리티컬 미적용 또는 백코드 2573 미배포)');
+        }
+
         if (resCompute.elapsed) {
           console.log('[final_compute elapsed]', resCompute.elapsed);
         }
@@ -38386,8 +38441,71 @@ return `
         ).trim().toLowerCase();
       }
 
+
+      // 게스트 자동 저장은 세션 토큰과 무관하게 이 브라우저에서 한 건만 유지한다.
+      const GUEST_LAST_STATE_KEY = `${LAST_STATE_PREFIX}guest`;
+      const GUEST_LAST_STATE_MAX_CHARS = 750000; // 대략 1.5MB(UTF-16 기준) 이상 비정상 저장 방지
+
+      function isGuestLastStateSession() {
+        const token = String(window.idToken || sessionStorage.getItem('id_token') || '').trim();
+        if (token.startsWith('GUEST.')) return true;
+        if (token && !token.startsWith('GUEST.')) return false;
+        return window.__GUEST_MODE__ === true;
+      }
+
+      // 기존 guest-UUID@guest.invalid 자동저장 기록은 최신 정상 상태 하나만 이전 후 정리한다.
+      // 실제 로그인 계정 기록, 다른 캐시, 프리셋/슬롯 키는 삭제하지 않는다.
+      function migrateAndCleanupGuestLastStates() {
+        try {
+          const legacyKeys = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith(LAST_STATE_PREFIX)) {
+              const account = key.slice(LAST_STATE_PREFIX.length);
+              if (/^guest-[^:]+@guest\.invalid$/i.test(account)) legacyKeys.push(key);
+            }
+          }
+          if (!legacyKeys.length) return;
+
+          const existing = localStorage.getItem(GUEST_LAST_STATE_KEY);
+          let newest = null;
+          if (!existing) {
+            for (const key of legacyKeys) {
+              const raw = localStorage.getItem(key);
+              if (!raw || raw.length > GUEST_LAST_STATE_MAX_CHARS) continue;
+              try {
+                const parsed = JSON.parse(raw);
+                if (!parsed?.state || typeof parsed.state !== 'object' || Array.isArray(parsed.state)) continue;
+                const stamp = Number(parsed.savedAt) || 0;
+                if (!newest || stamp > newest.stamp) newest = { key, raw, stamp };
+              } catch (_) {}
+            }
+          }
+
+          // 이전 대상 데이터는 마지막까지 남겨두어 저장 실패 시 데이터 소실을 피한다.
+          for (const key of legacyKeys) {
+            if (key !== newest?.key) localStorage.removeItem(key);
+          }
+          if (newest) {
+            try {
+              localStorage.setItem(GUEST_LAST_STATE_KEY, newest.raw);
+              localStorage.removeItem(newest.key);
+            } catch (error) {
+              console.warn('[게스트 마지막 상태] 최신 기록 이전 실패, 원본 유지:', error);
+            }
+          }
+          console.info('[게스트 마지막 상태] 기존 게스트 기록 정리:', legacyKeys.length, '건');
+        } catch (error) {
+          console.warn('[게스트 마지막 상태] 기존 기록 정리 실패:', error);
+        }
+      }
+
+      migrateAndCleanupGuestLastStates();
+
       function getLastStateStorageKey() {
+        if (isGuestLastStateSession()) return GUEST_LAST_STATE_KEY;
         const email = getLoginEmailForLastState();
+        if (email.endsWith('@guest.invalid')) return GUEST_LAST_STATE_KEY;
         return email ? `${LAST_STATE_PREFIX}${email}` : '';
       }
 
@@ -38416,6 +38534,11 @@ return `
         try {
           const snapshot = buildFrontPresetState();
           const stateJson = JSON.stringify(snapshot);
+          if (key === GUEST_LAST_STATE_KEY && stateJson.length > GUEST_LAST_STATE_MAX_CHARS) {
+            console.warn('[게스트 마지막 상태] 비정상적으로 큰 상태는 저장하지 않음:', stateJson.length);
+            dirty = false;
+            return;
+          }
 
           if (!force && stateJson === lastSavedStateJson) {
             dirty = false;
