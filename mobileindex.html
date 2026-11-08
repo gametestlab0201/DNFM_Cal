@@ -6584,6 +6584,100 @@
       border-radius: 0 !important;
     }
 
+  
+    /* 913: 이누야샤 콜라보 모바일 간결형 공지 */
+    #noticeModal .mobile-notice-dialog { width:min(440px,94vw); max-height:min(88dvh,760px); }
+    #noticeModal .mobile-notice-dialog > header {flex:0 0 auto;}
+    #noticeModal .mobile-notice-dialog > header h2 {font-size:16px;}
+    #noticeModal .mobile-notice-dialog .notice-body {padding:13px 14px 18px;scrollbar-width:thin;}
+    #noticeModal .inuyasha-mobile {font-size:12px;line-height:1.55;color:#e9e9ee;word-break:keep-all;}
+    #noticeModal .inuyasha-mobile .iy-intro {margin:0 0 10px;color:#d9dce6;}
+    #noticeModal .iy-hero {padding:12px;border:1px solid rgba(255,184,76,.46);border-radius:12px;background:linear-gradient(135deg,rgba(102,44,19,.42),rgba(30,30,39,.96));}
+    #noticeModal .iy-eyebrow {font-size:10px;font-weight:900;color:#ffbd71;letter-spacing:.025em;}
+    #noticeModal .iy-title {margin:5px 0 7px;font-size:17px;line-height:1.35;font-weight:950;color:#fff0d0;}
+    #noticeModal .iy-hero-desc {margin:0;color:#f1e6d7;font-size:11px;}
+    #noticeModal .iy-art-grid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:11px 0;}
+    #noticeModal .iy-art-item {min-width:0;overflow:hidden;border:1px solid rgba(255,255,255,.15);border-radius:9px;background:rgba(255,255,255,.045);text-align:center;}
+    #noticeModal .iy-art-item img {display:block;width:100%;height:87px;object-fit:contain;object-position:center bottom;background:radial-gradient(ellipse at bottom,rgba(233,164,77,.12),transparent 76%);}
+    #noticeModal .iy-art-name {display:block;padding:3px 1px 0;font-size:10px;font-weight:900;color:#ffe2a4;white-space:nowrap;}
+    #noticeModal .iy-art-type {display:block;padding-bottom:5px;font-size:9px;color:#b7bfcb;}
+    #noticeModal .iy-section-title {margin:13px 0 7px;font-size:13px;font-weight:900;color:#ffd38d;}
+    #noticeModal .iy-conditions {display:grid;gap:4px;margin:0;padding:0;list-style:none;}
+    #noticeModal .iy-conditions li {position:relative;padding-left:15px;}
+    #noticeModal .iy-conditions li::before {content:'✓';position:absolute;left:1px;color:#ffbb69;font-weight:900;}
+    #noticeModal .iy-roster {display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+    #noticeModal .iy-group {min-width:0;border:1px solid rgba(255,255,255,.12);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.045);}
+    #noticeModal .iy-group h4 {margin:0;padding:7px 8px;font-size:11px;font-weight:900;color:#ffe0ad;background:rgba(255,177,75,.08);border-bottom:1px solid rgba(255,255,255,.09);}
+    #noticeModal .iy-job {display:flex;align-items:center;justify-content:space-between;gap:2px;padding:5px 7px;font-size:10px;border-bottom:1px solid rgba(255,255,255,.05);}
+    #noticeModal .iy-job:last-child {border-bottom:0;}
+    #noticeModal .iy-job span:first-child {min-width:0;}
+    #noticeModal .iy-status {flex:0 0 auto;font-size:9px;font-weight:950;padding:2px 5px;border-radius:999px;white-space:nowrap;}
+    #noticeModal .iy-status.open {color:#fff4da;background:linear-gradient(125deg,#a7190c,#ed4210 55%,#fc9026);border:1px solid #ffaf5b;box-shadow:0 0 7px rgba(255,79,22,.35);}
+    #noticeModal .iy-status.closed {color:#b3b7c0;border:1px solid rgba(179,183,192,.3);background:rgba(130,134,145,.12);}
+    #noticeModal .iy-email-box {margin-top:7px;padding:10px;border-radius:10px;border:1px solid rgba(255,190,98,.45);background:rgba(255,179,65,.065);}
+    #noticeModal .iy-email-row {display:flex;align-items:center;gap:6px;justify-content:space-between;}
+    #noticeModal .iy-email {font-size:12px;color:#ffe3a8;font-weight:850;overflow-wrap:anywhere;}
+    #noticeModal .iy-copy {flex:0 0 auto;min-height:30px;border:1px solid rgba(255,190,98,.6);background:rgba(255,190,98,.15);border-radius:8px;color:#ffe1a7;padding:0 9px;font-size:11px;font-weight:850;cursor:pointer;}
+    #noticeModal .iy-footnote {font-size:10px;color:#aeb6c4;margin:8px 0 0;line-height:1.5;}
+    @media(max-width:350px) {#noticeModal .iy-art-item img{height:67px;}#noticeModal .iy-job{font-size:9px;padding:5px 4px;}#noticeModal .iy-status{font-size:8px;padding:2px 4px;}#noticeModal .iy-email{font-size:11px;}}
+    @media(prefers-reduced-motion:reduce) {#noticeModal .iy-status.open{animation:none;}}
+
+
+    /* 914: 공지 레이어를 사이트 헤더/푸터보다 위로 올리고 뷰포트 중앙 고정 */
+    #noticeModal {
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      z-index: 2147483000 !important;
+      align-items: center;
+      justify-content: center;
+      padding: max(12px, env(safe-area-inset-top, 0px)) 10px max(12px, env(safe-area-inset-bottom, 0px));
+      overflow: hidden;
+      isolation: isolate;
+    }
+    #noticeModal.show { display: flex !important; }
+    #noticeModal > .backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, .78);
+      z-index: 0;
+    }
+    #noticeModal > .mobile-notice-dialog {
+      position: relative !important;
+      inset: auto !important;
+      top: auto !important;
+      left: auto !important;
+      transform: none !important;
+      margin: 0 auto !important;
+      z-index: 1;
+      width: min(440px, 100%) !important;
+      height: auto !important;
+      max-height: 100% !important;
+      min-height: 0;
+      display: flex !important;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #noticeModal > .mobile-notice-dialog > header {
+      flex: 0 0 auto;
+      min-height: 48px;
+      position: relative;
+      z-index: 2;
+      background: #161b26;
+    }
+    #noticeModal > .mobile-notice-dialog > .notice-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+    @media (max-height: 560px) {
+      #noticeModal { padding-top: 7px; padding-bottom: 7px; }
+      #noticeModal > .mobile-notice-dialog > header { min-height: 42px; }
+    }
   </style>
 </head>
 
@@ -7962,30 +8056,66 @@
     </div>
   </div>
 
-  <!-- ✅ 713: 기존 모바일 안내사항 모달과 직인(img/sign.png) 복원 -->
+  <!-- 914: 이누야샤 콜라보 영상 제보 공지 / 화면 중앙 고정 -->
   <div id="noticeModal" class="modal" aria-hidden="true">
     <div class="backdrop" data-notice-close></div>
     <div class="dialog mobile-notice-dialog" role="dialog" aria-modal="true" aria-labelledby="noticeTitle">
       <header>
-        <h2 id="noticeTitle">공지사항</h2>
+        <h2 id="noticeTitle">이누야샤 콜라보 영상 제보</h2>
         <button type="button" class="close" data-notice-close aria-label="공지사항 닫기">×</button>
       </header>
       <div class="notice-body" id="noticeBody" data-static="1">
         <div class="notice-page active" data-notice-page="1">
-          <!-- 공지 문구 수정은 이 notice-announcement 내부에서 가능합니다. -->
-          <div class="notice-announcement">
-            <p class="notice-greeting">안녕하세요. 게임실험연구소입니다.</p>
-            <p class="notice-intro">삭룡 갈리아르 보조장비 <strong>‘여우’ 접두사 아이템</strong>의 <strong>트루 크리티컬 옵션 계산 오류</strong>를 수정했습니다.</p>
-            <div class="notice-rule-label">기존 잘못된 적용</div>
-            <div class="notice-rule notice-rule-wrong">크리티컬 공격 시 <strong>75% 확률</strong>로 크리티컬 데미지 <strong>5%p 증가</strong></div>
-            <div class="notice-rule-label">수정된 정상 적용</div>
-            <div class="notice-rule notice-rule-correct">크리티컬 공격 시 <strong>5% 확률</strong>로 크리티컬 데미지 <strong>75%p 증가</strong></div>
-            <div class="notice-urgent">기존에 ‘여우’ 접두사 아이템으로 계산하셨다면, <strong>삭룡 갈리아르 장비 제작 전 반드시 다시 계산</strong>해 주세요.</div>
-            <p class="notice-outro">이용에 혼선을 드려 죄송합니다. 더욱 정확한 계산기를 제공하도록 노력하겠습니다. 감사합니다.</p>
-          </div>
-          <div class="sign-row notice-signature">
-            <span class="sign-text">게임실험연구소</span>
-            <img src="img/sign.png" alt="게임실험연구소 직인" class="seal-stamp" loading="eager">
+          <div class="inuyasha-mobile">
+            <p class="iy-intro">안녕하세요, 게임실험연구소입니다! 이누야샤 콜라보를 맞아 <strong>직업별 아바타 던전 플레이 영상</strong>을 모집합니다.</p>
+            <div class="iy-hero">
+              <div class="iy-eyebrow">영상 제보 이벤트 · 직업별 선착순 1명</div>
+              <div class="iy-title">아바타 착용 모습과<br>스킬 연출을 보여주세요!</div>
+              <p class="iy-hero-desc">여러분의 영상을 모아 직업별 아바타 비교 영상을 제작하려고 합니다.</p>
+            </div>
+            <div class="iy-art-grid" aria-label="제보 대상 아바타 4종">
+              <div class="iy-art-item"><img src="img/notice/셋쇼마루.png" alt="셋쇼마루 아바타" loading="eager"><span class="iy-art-name">셋쇼마루</span><span class="iy-art-type">히든</span></div>
+              <div class="iy-art-item"><img src="img/notice/금강.png" alt="금강 아바타" loading="eager"><span class="iy-art-name">금강</span><span class="iy-art-type">히든</span></div>
+              <div class="iy-art-item"><img src="img/notice/이누야샤.png" alt="이누야샤 아바타" loading="eager"><span class="iy-art-name">이누야샤</span><span class="iy-art-type">일반</span></div>
+              <div class="iy-art-item"><img src="img/notice/유가영.png" alt="유가영 아바타" loading="eager"><span class="iy-art-name">유가영</span><span class="iy-art-type">일반</span></div>
+            </div>
+            <div class="iy-section-title">촬영 조건</div>
+            <ul class="iy-conditions">
+              <li>해당 아바타 착용 후 <strong>솔로 던전 플레이 약 1분</strong></li>
+              <li>스킬 투명도 <strong>60% 이상</strong> · 가능하면 <strong>60fps 이상</strong></li>
+              <li><strong>BGM만 OFF</strong> · 스킬 효과음 ON</li>
+              <li>다양한 스킬 사용 · <strong>편집·자막 없는 원본</strong></li>
+            </ul>
+            <div class="iy-section-title">모집 현황 <span style="font-size:10px;color:#b8c0cc;font-weight:600;">(선착순 1명씩)</span></div>
+            <div class="iy-roster">
+              <div class="iy-group"><h4>셋쇼마루 · 히든</h4>
+                <div class="iy-job"><span>소울브링어</span><span class="iy-status open">🔥 모집 중</span></div>
+                <div class="iy-job"><span>웨펀마스터</span><span class="iy-status closed">마감</span></div>
+                <div class="iy-job"><span>버서커</span><span class="iy-status open">🔥 모집 중</span></div>
+                <div class="iy-job"><span>아수라</span><span class="iy-status closed">마감</span></div>
+              </div>
+              <div class="iy-group"><h4>금강 · 히든</h4>
+                <div class="iy-job"><span>트래블러</span><span class="iy-status closed">마감</span></div>
+                <div class="iy-job"><span>뮤즈</span><span class="iy-status open">🔥 모집 중</span></div>
+              </div>
+              <div class="iy-group"><h4>이누야샤 · 일반</h4>
+                <div class="iy-job"><span>소울브링어</span><span class="iy-status closed">마감</span></div>
+                <div class="iy-job"><span>웨펀마스터</span><span class="iy-status open">🔥 모집 중</span></div>
+                <div class="iy-job"><span>버서커</span><span class="iy-status open">🔥 모집 중</span></div>
+                <div class="iy-job"><span>아수라</span><span class="iy-status closed">마감</span></div>
+              </div>
+              <div class="iy-group"><h4>유가영 · 일반</h4>
+                <div class="iy-job"><span>트래블러</span><span class="iy-status open">🔥 모집 중</span></div>
+                <div class="iy-job"><span>뮤즈</span><span class="iy-status open">🔥 모집 중</span></div>
+              </div>
+            </div>
+            <div class="iy-section-title">제보 방법</div>
+            <div class="iy-email-box">
+              <div class="iy-email-row"><span class="iy-email">gametestlab0201@gmail.com</span><button type="button" class="iy-copy" id="iyEmailCopyMobile">주소 복사</button></div>
+              <div class="iy-footnote">영상 원본을 이메일에 첨부해 보내주세요.</div>
+            </div>
+            <p class="iy-footnote">※ 제보 영상은 게임실험연구소 유튜브 콘텐츠에 활용됩니다. 다른 본캐릭터 닉네임으로 출처 표기를 원하시면 메일에 함께 적어주세요. 모집 현황은 공지 업데이트 시 반영됩니다.</p>
+            <div class="sign-row notice-signature"><span class="sign-text">게임실험연구소</span><img src="img/sign.png" alt="게임실험연구소 직인" class="seal-stamp" loading="eager"></div>
           </div>
         </div>
       </div>
@@ -13065,6 +13195,31 @@
 
     document.querySelectorAll('[data-notice-close]').forEach(el => {
       el.addEventListener('click', () => closeModal('noticeModal'));
+    });
+    // 913: 모바일 공지 제보 이메일 복사
+    document.getElementById('iyEmailCopyMobile')?.addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      const email = 'gametestlab0201@gmail.com';
+      try {
+        if (navigator.clipboard?.writeText && window.isSecureContext) {
+          await navigator.clipboard.writeText(email);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = email;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          const ok = document.execCommand('copy');
+          ta.remove();
+          if (!ok) throw new Error('copy failed');
+        }
+        btn.textContent = '복사 완료';
+      } catch (err) {
+        btn.textContent = '길게 눌러 복사';
+        const target = document.querySelector('#noticeModal .iy-email');
+        if (target) { target.style.userSelect = 'text'; target.style.webkitUserSelect = 'text'; }
+      }
     });
     document.getElementById('noticeModal')?.addEventListener('click', (e) => {
       if (e.target?.classList?.contains('backdrop')) closeModal('noticeModal');

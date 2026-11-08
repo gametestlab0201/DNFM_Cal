@@ -40490,98 +40490,195 @@ return `
 
 
 
-<!-- ====================== 2740: 예전 공지사항 모달 구조 복원 ======================
-     기존 코드에 남아 있던 noticeModal, patch-log-body,
-     sign-row / seal-stamp / sign-text 스타일을 활용합니다.
-     안내 문구는 아래 notice-announcement 영역만 수정하세요.
+<!-- ====================== 2991: 이누야샤 콜라보 플레이 영상 제보 공지 ======================
+     모집 상태 변경: 아래 notice-job-item의 data-status를 open/closed로 변경하고
+     상태 텍스트도 '모집 중'/'마감'으로 변경하세요. 상단 모집 수는 자동 계산됩니다.
+     기존 noticeModal ID와 공지 열기/닫기 스크립트는 유지합니다.
 ============================================================================= -->
 <style>
-  #noticeModal {z-index:20000; padding:16px; box-sizing:border-box;}
-  #noticeModal .notice-dialog-restored {
-    position:relative; display:flex; flex-direction:column;
-    width:min(860px,96vw); max-height:min(90dvh,820px); overflow:hidden;
-    background:linear-gradient(180deg,#23272f,#15191f);
-    color:#f0e6d2; border:1px solid rgba(250,204,107,.44);
-    border-radius:14px; box-shadow:0 24px 70px rgba(0,0,0,.76);
+  /* 2993: 화면 전체를 덮는 오버레이 + 화면 중앙 모달. 헤더 높이에 따른 강제 오프셋 금지 */
+  #noticeModal {position:fixed;inset:0;z-index:20000;padding:16px;box-sizing:border-box;min-height:0;place-items:center;}
+  #noticeModal > .backdrop {position:absolute;inset:0;background:rgba(0,0,0,.68);backdrop-filter:blur(2px);}
+  #noticeModal.show {display:grid;}
+  #noticeModal .notice-dialog-restored {position:relative;display:flex;flex-direction:column;width:min(850px,calc(100vw - 32px));height:min(760px,calc(100dvh - 32px));max-height:calc(100dvh - 32px);min-height:0;overflow:hidden;background:linear-gradient(160deg,#222630,#111820 78%);color:#edf0f4;border:1px solid rgba(250,204,107,.45);border-radius:17px;box-shadow:0 26px 75px rgba(0,0,0,.8);}
+  #noticeModal .notice-restored-header {flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 25px;border-bottom:1px solid rgba(250,204,107,.19);}
+  #noticeModal .notice-restored-header h3 {margin:0;font-size:21px;font-weight:900;color:#ffdda0;letter-spacing:-.03em;}
+  #noticeModal .notice-restored-close {border:0;background:rgba(255,255,255,.06);border-radius:9px;width:34px;height:34px;color:#f3e2bd;cursor:pointer;font-size:26px;line-height:1;flex:0 0 auto;}
+  #noticeModal .notice-restored-close:hover {background:rgba(255,255,255,.13);}
+  #noticeModal .patch-log-body {flex:1;min-height:0;padding:22px 28px 22px;overflow-y:auto;overscroll-behavior:contain;}
+  #noticeModal .notice-announcement {overflow-wrap:anywhere;word-break:keep-all;font-size:14px;line-height:1.7;color:#e0e5ee;}
+  #noticeModal .notice-greeting {margin:0 0 10px;color:#bfc7d5;}
+  #noticeModal .notice-hero {padding:18px 20px;margin:0 0 18px;border-radius:14px;border:1px solid rgba(250,204,107,.3);background:radial-gradient(circle at 90% 8%,rgba(250,204,107,.14),transparent 40%),linear-gradient(135deg,#30271f,#1d232f);}
+  #noticeModal .notice-hero-kicker {display:inline-block;margin-bottom:5px;font-size:11px;letter-spacing:.09em;font-weight:900;color:#f9ca79;}
+  #noticeModal .notice-hero-title {margin:0 0 8px;font-size:23px;line-height:1.35;letter-spacing:-.04em;font-weight:900;color:#fff1ca;}
+  /* 3154: 콜라보 아바타 4종 이미지 — 공지 상단 카드형 갤러리 */
+  #noticeModal .notice-avatar-gallery {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0 17px;}
+  #noticeModal .notice-avatar-card {margin:0;min-width:0;overflow:hidden;text-align:center;border:1px solid rgba(250,204,107,.25);border-radius:11px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(0,0,0,.24));}
+  #noticeModal .notice-avatar-art {height:160px;display:flex;align-items:center;justify-content:center;padding:8px 5px 0;background:radial-gradient(ellipse at 50% 85%,rgba(233,172,71,.16),transparent 67%);}
+  #noticeModal .notice-avatar-art img {display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 5px 9px rgba(0,0,0,.55));}
+  #noticeModal .notice-avatar-card figcaption {display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;padding:7px 3px 9px;font-weight:900;color:#fff0ce;font-size:12px;border-top:1px solid rgba(250,204,107,.12);}
+  #noticeModal .notice-avatar-type {font-size:10px;border-radius:5px;padding:1px 5px;font-weight:900;white-space:nowrap;}
+  #noticeModal .notice-avatar-type.is-hidden {background:rgba(248,196,75,.18);color:#ffdb83;border:1px solid rgba(248,196,75,.42);}
+  #noticeModal .notice-avatar-type.is-normal {background:rgba(135,175,225,.14);color:#c5dcff;border:1px solid rgba(135,175,225,.33);}
+  @media(max-width:600px) {
+    #noticeModal .notice-avatar-gallery {grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:13px 0 15px;}
+    #noticeModal .notice-avatar-art {height:145px;}
   }
-  #noticeModal .notice-restored-header {
-    flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
-    padding:17px 27px;border-bottom:1px solid rgba(250,204,107,.22);
+  #noticeModal .notice-hero p {margin:0;color:#e0e4ec;line-height:1.7;}
+  #noticeModal .notice-hero strong {color:#ffe0a0;}
+  #noticeModal .notice-status-summary {display:flex;flex-wrap:wrap;gap:8px;margin:13px 0 0;align-items:center;}
+  #noticeModal .notice-summary-pill {font-size:12px;font-weight:850;border-radius:99px;padding:4px 11px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#e5eaf1;}
+  /* 3153: 모집 중 강조 — 붉은 불꽃 그라데이션 + 은은한 발광 */
+  #noticeModal .notice-summary-pill.is-open {
+    position:relative; isolation:isolate; overflow:hidden;
+    color:#fff8e9; border:1px solid #ffba62;
+    background:linear-gradient(110deg,#80100b 0%,#d52c12 37%,#ff7723 72%,#bc1d0d 100%);
+    box-shadow:0 0 0 1px rgba(255,104,27,.2),0 0 12px rgba(255,80,22,.48),inset 0 1px 0 rgba(255,235,177,.36);
+    text-shadow:0 1px 2px rgba(67,9,0,.85);
+    animation:notice-fire-pulse 2.4s ease-in-out infinite;
   }
-  #noticeModal .notice-restored-header h3 {
-    margin:0;font-size:24px;font-weight:900;color:#ffe8a3;
+  #noticeModal .notice-summary-pill.is-open::before {content:'🔥';margin-right:5px;}
+  #noticeModal .notice-summary-pill.is-closed {color:#bac1cc;}
+  #noticeModal .notice-section {margin:22px 0 0;}
+  #noticeModal .notice-section-title {display:flex;gap:8px;align-items:center;margin:0 0 11px;font-weight:900;font-size:16px;color:#ffe0a2;}
+  #noticeModal .notice-section-title::before {content:'';width:4px;height:16px;border-radius:5px;background:#e4ac5e;flex:none;}
+  #noticeModal .notice-intro {margin:0 0 10px;}
+  #noticeModal .notice-small-note {color:#aeb9c8;font-size:12px;line-height:1.6;margin:9px 0 0;}
+  #noticeModal .notice-checklist {margin:0;padding:0;list-style:none;display:grid;gap:7px;}
+  #noticeModal .notice-checklist li {display:flex;align-items:flex-start;gap:9px;padding:0;}
+  #noticeModal .notice-checklist li::before {content:'✓';font-weight:900;color:#8fe1ad;flex:none;}
+  #noticeModal .notice-checklist strong {color:#fff0ce;}
+  #noticeModal .notice-jobs {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+  #noticeModal .notice-job-card {border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.035);border-radius:12px;overflow:hidden;min-width:0;}
+  #noticeModal .notice-job-card h5 {margin:0;padding:10px 13px;font-size:14px;color:#ffe1a5;background:rgba(250,204,107,.075);border-bottom:1px solid rgba(255,255,255,.09);}
+  #noticeModal .notice-job-list {list-style:none;margin:0;padding:4px 12px 7px;}
+  #noticeModal .notice-job-item {display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;padding:7px 0;font-size:13px;}
+  #noticeModal .notice-job-item + .notice-job-item {border-top:1px solid rgba(255,255,255,.06);}
+  #noticeModal .notice-job-name {min-width:0;}
+  #noticeModal .notice-job-item[data-status='closed'] .notice-job-name {color:#8995a5;}
+  #noticeModal .notice-job-badge {white-space:nowrap;flex:none;font-size:11px;font-weight:850;padding:2px 9px;border-radius:99px;background:rgba(70,192,119,.13);color:#a6ecc3;border:1px solid rgba(70,192,119,.33);}
+  #noticeModal .notice-job-item[data-status='open'] .notice-job-badge {
+    position:relative; isolation:isolate; overflow:hidden;
+    display:inline-flex; align-items:center; justify-content:center;
+    min-height:23px; padding:3px 11px; font-weight:950; letter-spacing:.015em;
+    color:#fff9e8; border:1px solid #ffb65b;
+    background:linear-gradient(115deg,#8f100b 0%,#e13413 39%,#ff8a24 72%,#b31b0d 100%);
+    text-shadow:0 1px 2px rgba(77,6,0,.9);
+    box-shadow:0 0 0 1px rgba(255,106,28,.22),0 0 9px rgba(255,68,15,.55),inset 0 1px 0 rgba(255,238,183,.46);
+    animation:notice-fire-pulse 2.4s ease-in-out infinite;
   }
-  #noticeModal .notice-restored-close {
-    border:0;background:transparent;color:#eadbb7;cursor:pointer;
-    font-size:28px;line-height:1;padding:0 4px;
+  #noticeModal .notice-job-item[data-status='open'] .notice-job-badge::before {
+    content:'🔥';font-size:11px;margin-right:5px;filter:drop-shadow(0 0 3px rgba(255,198,78,.8));
   }
-  #noticeModal .patch-log-body {flex:1;min-height:0;padding:24px 32px 16px;overflow-y:auto;}
-  #noticeModal .notice-announcement {
-    overflow-wrap:anywhere;word-break:keep-all;
-    font-size:16px;line-height:1.65;color:#f2eee5;
+  @keyframes notice-fire-pulse {
+    0%,100% {filter:brightness(1);box-shadow:0 0 0 1px rgba(255,106,28,.2),0 0 7px rgba(255,68,15,.4),inset 0 1px 0 rgba(255,238,183,.4);}
+    50% {filter:brightness(1.13);box-shadow:0 0 0 1px rgba(255,143,41,.37),0 0 15px rgba(255,73,14,.72),inset 0 1px 0 rgba(255,238,183,.56);}
   }
-  #noticeModal .notice-signature {
-    margin-top:16px;padding-top:12px;
-    border-top:1px solid rgba(250,204,107,.18);
+  @media (prefers-reduced-motion:reduce) {
+    #noticeModal .notice-summary-pill.is-open,
+    #noticeModal .notice-job-item[data-status='open'] .notice-job-badge {animation:none;}
   }
-  #noticeModal .notice-signature .seal-stamp {
-    width:90px;max-height:95px;object-fit:contain;
-  }
-  #noticeModal .notice-signature .sign-text {
-    color:#f6e1ae;font-weight:800;font-size:15px;
-  }
-  #noticeModal .notice-announcement p {margin:0 0 15px;}
-  #noticeModal .notice-announcement .notice-greeting {margin-bottom:12px;}
-  #noticeModal .notice-announcement .notice-intro {margin-bottom:15px;}
-  #noticeModal .notice-rule-label {font-size:13px;font-weight:900;letter-spacing:.03em;color:#dbc697;margin-bottom:5px;}
-  #noticeModal .notice-rule {padding:10px 14px;border-left:3px solid #d9aa54;background:rgba(255,255,255,.035);margin:0 0 8px;}
-  #noticeModal .notice-rule strong {font-size:17px;font-weight:850;color:#ffe6a4;}
-  #noticeModal .notice-rule-wrong {border-left-color:#ce7c6a;}
-  #noticeModal .notice-rule-wrong strong {color:#f2b2a5;}
-  #noticeModal .notice-rule-correct {border-left-color:#8fc18d;}
-  #noticeModal .notice-rule-correct strong {color:#c9eabb;}
-  #noticeModal .notice-urgent {margin:16px 0 12px;padding:12px 15px;border:1px solid rgba(239,198,111,.42);border-radius:7px;color:#ffe8b1;font-weight:750;line-height:1.6;}
-  #noticeModal .notice-urgent strong {color:#ffde7b;}
-  /* 2743: 인사말과 마무리 문구에 같은 글꼴 크기·색상·굵기 적용 */
-  #noticeModal .notice-announcement .notice-greeting,
-  #noticeModal .notice-announcement .notice-outro {
-    font-size:14px;
-    font-weight:400;
-    color:#cbd0da;
-    line-height:1.65;
-  }
-  #noticeModal .notice-announcement .notice-outro {margin:0;}
-  @media(max-width:600px){
-    #noticeModal {padding:9px;}
-    #noticeModal .notice-dialog-restored{width:100%;max-height:94dvh;}
-    #noticeModal .notice-restored-header {padding:12px 16px;}
-    #noticeModal .notice-restored-header h3{font-size:20px;}
-    #noticeModal .patch-log-body{padding:16px 16px 10px;}
-    #noticeModal .notice-announcement{font-size:14px;line-height:1.6;}
-    #noticeModal .notice-rule strong{font-size:14px;}
-    #noticeModal .notice-rule {padding:9px 10px;}
-    #noticeModal .notice-urgent{padding:10px 11px;}
-    #noticeModal .notice-signature .seal-stamp {width:72px;}
+  #noticeModal .notice-job-item[data-status='closed'] .notice-job-badge {color:#aeb7c5;background:rgba(148,163,184,.1);border-color:rgba(148,163,184,.24);}
+  #noticeModal .notice-first-note {margin:12px 0 0;padding:9px 12px;border-radius:8px;background:rgba(250,204,107,.07);border:1px solid rgba(250,204,107,.19);font-size:12px;color:#e9d4a8;}
+  #noticeModal .notice-email-box {margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border:1px solid rgba(250,204,107,.3);border-radius:12px;padding:13px 15px;background:rgba(250,204,107,.06);}
+  #noticeModal .notice-email-label {display:block;color:#bcc6d2;font-size:11px;font-weight:700;}
+  #noticeModal .notice-email-address {display:block;color:#ffe3ae;font-size:17px;font-weight:900;text-decoration:none;overflow-wrap:anywhere;}
+  #noticeModal .notice-email-address:hover {text-decoration:underline;}
+  #noticeModal .notice-copy-email {border:1px solid rgba(250,204,107,.45);background:rgba(250,204,107,.13);color:#ffe6b5;padding:7px 11px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;}
+  #noticeModal .notice-copy-email:hover {background:rgba(250,204,107,.22);}
+  #noticeModal .notice-usage {margin-top:12px;padding:11px 13px;background:rgba(255,255,255,.035);border-left:3px solid #cfa24f;border-radius:5px;font-size:12px;color:#cdd4de;}
+  #noticeModal .notice-outro {margin:19px 0 0;line-height:1.75;color:#dce3eb;}
+  #noticeModal .notice-signature {display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:15px;padding-top:12px;border-top:1px solid rgba(250,204,107,.16);}
+  #noticeModal .notice-signature .seal-stamp {width:68px;max-height:76px;object-fit:contain;}
+  #noticeModal .notice-signature .sign-text {color:#f6e1ae;font-size:14px;font-weight:850;}
+  @media(max-width:600px) {
+    #noticeModal {inset:0;padding:10px;}
+    #noticeModal .notice-dialog-restored {width:100%;height:calc(100dvh - 20px);max-height:calc(100dvh - 20px);}
+    #noticeModal .notice-restored-header {padding:12px 15px;}
+    #noticeModal .notice-restored-header h3 {font-size:18px;}
+    #noticeModal .patch-log-body {padding:15px;}
+    #noticeModal .notice-announcement {font-size:13px;}
+    #noticeModal .notice-hero {padding:15px;}
+    #noticeModal .notice-hero-title {font-size:19px;}
+    #noticeModal .notice-jobs {grid-template-columns:1fr;gap:9px;}
+    #noticeModal .notice-section {margin-top:19px;}
+    #noticeModal .notice-email-address {font-size:15px;}
   }
 </style>
 <div id="noticeModal" class="modal" aria-hidden="true">
   <div class="backdrop" data-close></div>
   <section class="notice-dialog-restored" role="dialog" aria-modal="true" aria-labelledby="noticeRestoredTitle">
     <div class="notice-restored-header">
-      <h3 id="noticeRestoredTitle">공지사항</h3>
+      <h3 id="noticeRestoredTitle">이누야샤 콜라보 영상 제보 안내</h3>
       <button class="notice-restored-close" type="button" data-close aria-label="공지사항 닫기">×</button>
     </div>
     <div class="patch-log-body">
-      <!-- 공지사항 문구 수정 영역: 아래 notice-announcement 안의 텍스트를 편집하세요. -->
       <div class="notice-announcement">
-        <p class="notice-greeting">안녕하세요. 게임실험연구소입니다.</p>
-        <p class="notice-intro">삭룡 갈리아르 보조장비 <strong>‘여우’ 접두사 아이템</strong>의 <strong>트루 크리티컬 옵션 계산 오류</strong>를 수정했습니다.</p>
-        <div class="notice-rule-label">기존 잘못된 적용</div>
-        <div class="notice-rule notice-rule-wrong">크리티컬 공격 시 <strong>75% 확률</strong>로 크리티컬 데미지 <strong>5%p 증가</strong></div>
-        <div class="notice-rule-label">수정된 정상 적용</div>
-        <div class="notice-rule notice-rule-correct">크리티컬 공격 시 <strong>5% 확률</strong>로 크리티컬 데미지 <strong>75%p 증가</strong></div>
-        <div class="notice-urgent">기존에 ‘여우’ 접두사 아이템으로 계산하셨다면, <strong>삭룡 갈리아르 장비 제작 전 반드시 다시 계산</strong>해 주세요.</div>
-        <p class="notice-outro">이용에 혼선을 드려 죄송합니다. 더욱 정확한 계산기를 제공하도록 노력하겠습니다. 감사합니다.</p>
+        <div class="notice-hero">
+          <span class="notice-hero-kicker">이누야샤 콜라보 · 영상 제보 모집</span>
+          <h4 class="notice-hero-title">셋쇼마루/금강 히든 아바타, 이누야샤/유가영 일반 아바타<br>                  실제 플레이 모습을 보여주세요!</h4>
+          <div class="notice-avatar-gallery" aria-label="제보 대상 콜라보 아바타 이미지">
+            <figure class="notice-avatar-card"><div class="notice-avatar-art"><img src="img/notice/셋쇼마루.png" alt="셋쇼마루 아바타" loading="eager"></div><figcaption>셋쇼마루 <span class="notice-avatar-type is-hidden">히든</span></figcaption></figure>
+            <figure class="notice-avatar-card"><div class="notice-avatar-art"><img src="img/notice/금강.png" alt="금강 아바타" loading="eager"></div><figcaption>금강 <span class="notice-avatar-type is-hidden">히든</span></figcaption></figure>
+            <figure class="notice-avatar-card"><div class="notice-avatar-art"><img src="img/notice/이누야샤.png" alt="이누야샤 아바타" loading="eager"></div><figcaption>이누야샤 <span class="notice-avatar-type is-normal">일반</span></figcaption></figure>
+            <figure class="notice-avatar-card"><div class="notice-avatar-art"><img src="img/notice/유가영.png" alt="유가영 아바타" loading="eager"></div><figcaption>유가영 <span class="notice-avatar-type is-normal">일반</span></figcaption></figure>
+          </div>
+          <p>어떤 직업에 아바타가 가장 잘 어울릴지 고민 중이신가요? 뽑기 영상은 많지만 <strong>실제 착용 모습과 스킬 연출</strong>을 확인하기는 쉽지 않습니다. 여러분이 제보해 주신 던전 영상을 모아 <strong>직업별 아바타 비교 영상</strong>을 제작하려고 합니다.</p>
+          <div class="notice-status-summary" aria-label="모집 현황">
+            <span class="notice-summary-pill is-open" id="noticeOpenCount">모집 중 7개</span>
+            <span class="notice-summary-pill is-closed" id="noticeClosedCount">마감 5개</span>
+            <span class="notice-summary-pill">직업별 선착순 1명</span>
+          </div>
+        </div>
+        <section class="notice-section" aria-labelledby="noticeVideoTitle">
+          <h4 class="notice-section-title" id="noticeVideoTitle">보내주실 영상 · 촬영 조건</h4>
+          <ul class="notice-checklist">
+            <li><span><strong>셋쇼마루·금강 히든 아바타</strong> 또는 <strong>이누야샤·유가영 일반 아바타</strong> 착용 던전 플레이 (약 1분 내외)</span></li>
+            <li><span>스킬 이펙트 투명도 <strong>60% 이상</strong></span></li>
+            <li><span>가능하면 <strong>60fps 이상</strong>으로 녹화</span></li>
+            <li><span>게임 설정에서 <strong>배경음악(BGM)만 OFF</strong> · 스킬 효과음은 ON</span></li>
+            <li><span>아바타 외형과 스킬 연출이 잘 보이도록 <strong>다양한 스킬 사용</strong></span></li>
+            <li><span>파티가 아닌 <strong>솔로 플레이</strong>로 녹화</span></li>
+          </ul>
+          <p class="notice-small-note">※ 편집이나 자막 없이 녹화 원본 그대로 보내주세요.</p>
+        </section>
+        <section class="notice-section" aria-labelledby="noticeJobsTitle">
+          <h4 class="notice-section-title" id="noticeJobsTitle">제보 대상 · 모집 현황</h4>
+          <!-- 모집 상태 변경 시 각 항목의 data-status와 배지 문구를 함께 수정하세요. -->
+          <div class="notice-jobs">
+            <div class="notice-job-card"><h5>셋쇼마루 · 히든</h5><ul class="notice-job-list">
+              <li class="notice-job-item" data-status="open"><span class="notice-job-name">소울브링어</span><span class="notice-job-badge">모집 중</span></li>
+              <li class="notice-job-item" data-status="closed"><span class="notice-job-name">웨펀마스터</span><span class="notice-job-badge">마감</span></li>
+              <li class="notice-job-item" data-status="open"><span class="notice-job-name">버서커</span><span class="notice-job-badge">모집 중</span></li>
+              <li class="notice-job-item" data-status="closed"><span class="notice-job-name">아수라</span><span class="notice-job-badge">마감</span></li>
+            </ul></div>
+            <div class="notice-job-card"><h5>금강 · 히든</h5><ul class="notice-job-list">
+              <li class="notice-job-item" data-status="closed"><span class="notice-job-name">트래블러</span><span class="notice-job-badge">마감</span></li>
+              <li class="notice-job-item" data-status="open"><span class="notice-job-name">뮤즈</span><span class="notice-job-badge">모집 중</span></li>
+            </ul></div>
+            <div class="notice-job-card"><h5>이누야샤 · 일반</h5><ul class="notice-job-list">
+              <li class="notice-job-item" data-status="closed"><span class="notice-job-name">소울브링어</span><span class="notice-job-badge">마감</span></li>
+              <li class="notice-job-item" data-status="open"><span class="notice-job-name">웨펀마스터</span><span class="notice-job-badge">모집 중</span></li>
+              <li class="notice-job-item" data-status="open"><span class="notice-job-name">버서커</span><span class="notice-job-badge">모집 중</span></li>
+              <li class="notice-job-item" data-status="closed"><span class="notice-job-name">아수라</span><span class="notice-job-badge">마감</span></li>
+            </ul></div>
+            <div class="notice-job-card"><h5>유가영 · 일반</h5><ul class="notice-job-list">
+              <li class="notice-job-item" data-status="open"><span class="notice-job-name">트래블러</span><span class="notice-job-badge">모집 중</span></li>
+              <li class="notice-job-item" data-status="open"><span class="notice-job-name">뮤즈</span><span class="notice-job-badge">모집 중</span></li>
+            </ul></div>
+          </div>
+          <p class="notice-first-note">※ 각 직업·아바타 조합별 <strong>선착순 1명</strong>을 모집합니다. 마감 상태는 운영자가 제보 접수 상황에 따라 갱신합니다.</p>
+        </section>
+        <section class="notice-section" aria-labelledby="noticeSubmitTitle">
+          <h4 class="notice-section-title" id="noticeSubmitTitle">영상 제보 방법</h4>
+          <p class="notice-intro">아래 이메일로 <strong>영상 원본 파일을 첨부</strong>해 보내주세요.</p>
+          <div class="notice-email-box">
+            <div><span class="notice-email-label">제보 이메일</span><a class="notice-email-address" href="mailto:gametestlab0201@gmail.com">gametestlab0201@gmail.com</a></div>
+            <button class="notice-copy-email" type="button" id="noticeCopyEmail">주소 복사</button>
+          </div>
+          <div class="notice-usage">제보 영상은 <strong>게임실험연구소 유튜브 콘텐츠 제작</strong>에 사용됩니다. 영상 속 캐릭터 닉네임 대신 <strong>다른 본캐릭터 닉네임으로 출처 표기</strong>를 원하시면 메일에 해당 닉네임을 함께 남겨주세요.</div>
+        </section>
+        <p class="notice-outro">보내주신 영상은 최대한 빠르게 정리해 업로드하겠습니다. 이번 콘텐츠가 아바타 선택을 고민하시는 분들께 도움이 되기를 바랍니다.<br>여러분의 관심과 참여 부탁드립니다. 감사합니다!</p>
       </div>
       <div class="sign-row notice-signature">
         <span class="sign-text">게임실험연구소</span>
@@ -40590,6 +40687,41 @@ return `
     </div>
   </section>
 </div>
+<script>
+(() => {
+  const modal = document.getElementById('noticeModal');
+  if (!modal) return;
+  const items = Array.from(modal.querySelectorAll('.notice-job-item'));
+  const open = items.filter(el => el.dataset.status === 'open').length;
+  const closed = items.filter(el => el.dataset.status === 'closed').length;
+  const openCount = modal.querySelector('#noticeOpenCount');
+  const closedCount = modal.querySelector('#noticeClosedCount');
+  if (openCount) openCount.textContent = `모집 중 ${open}개`;
+  if (closedCount) closedCount.textContent = `마감 ${closed}개`;
+  modal.querySelector('#noticeCopyEmail')?.addEventListener('click', async event => {
+    const button = event.currentTarget;
+    const email = 'gametestlab0201@gmail.com';
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(email);
+      } else {
+        const helper = document.createElement('textarea');
+        helper.value = email;
+        helper.setAttribute('readonly', '');
+        helper.style.cssText = 'position:fixed;left:-9999px;top:0;';
+        document.body.appendChild(helper);
+        helper.select();
+        const success = document.execCommand('copy');
+        helper.remove();
+        if (!success) throw new Error('copy failed');
+      }
+      button.textContent = '복사 완료';
+    } catch (_error) {
+      button.textContent = '주소를 길게 눌러 복사';
+    }
+  });
+})();
+</script>
 <!-- 2745: 공지 모달 DOM 생성 이후 닫기 동작 연결 -->
 <script>
 (() => {
